@@ -1,0 +1,23 @@
+## SECTION=devicetree
+
+menuconfig HOST_DTC
+	tristate "dtc (standalone)              "
+	depends on !KERNEL_DTC
+	help
+	  Select this if the HOST_DTC tool is required without
+	  building a device tree. (It is also used for building
+	  U-boot FIT images)
+
+if HOST_DTC
+
+config HOST_DTC_VERSION
+	string "Device tree compiler version"
+	default "1.4.1"
+	help
+	  Specify the DTC version number to be used
+
+config HOST_DTC_MD5
+	string "dtc source md5sum"
+	default "e3543e76153c553cfce531ce147b9bfd"
+
+endif

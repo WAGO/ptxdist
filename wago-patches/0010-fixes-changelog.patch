@@ -1,0 +1,24 @@
+From 7d88acebc750f9a3f4def918b41cea24d64a43cf Mon Sep 17 00:00:00 2001
+From: Andrej Gantvorg <andrej.gantvorg@wago.com>
+Date: Fri, 23 Nov 2018 10:16:13 +0100
+Subject: [PATCH 10/10] fixes changelog.
+
+---
+ CHANGELOG.WAGO | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CHANGELOG.WAGO b/CHANGELOG.WAGO
+index 9fe84ae..aebc07c 100644
+--- a/CHANGELOG.WAGO
++++ b/CHANGELOG.WAGO
+@@ -1,6 +1,6 @@
+ 2017.11.1: 
+     - bugfix release
+-    - 8 upstream patches fixing 3 issues backported to 2017.11.0 by WAGO
++    - 7 upstream patches fixing 3 issues backported to 2017.11.0 by WAGO
+         - makes install_archive preserve owner/group info
+         - fixes ptxdist print behaviour when printing multiple variables at once
+         - adds installed size to opkg meta information
+-- 
+2.7.4
+

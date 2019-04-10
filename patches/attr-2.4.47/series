@@ -1,0 +1,2 @@
+0001-fix-install-with-domain-user.patch
+0002-build-translations-only-if-gettext-is-enabled.patch

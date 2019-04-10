@@ -1,0 +1,59 @@
+## SECTION=security
+
+menuconfig ECRYPTFS_UTILS
+	tristate
+	prompt "ecryptfs-utils                "
+	select KEYUTILS
+	select LIBGCRYPT
+	select HOST_INTLTOOL
+	select HOST_GETTEXT	# needed for autogen.sh
+	select HOST_GLIB	# needed for autogen.sh
+	select HOST_LIBGCRYPT	# needed for autogen.sh
+	select ATTR			if ECRYPTFS_UTILS_TESTS
+	select BASH			if ECRYPTFS_UTILS_TESTS
+	select COREUTILS		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_DF		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_MKDIR		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_SLEEP		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_STAT		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_TR		if ECRYPTFS_UTILS_TESTS
+	select COREUTILS_TRUNCATE	if ECRYPTFS_UTILS_TESTS
+	select UTIL_LINUX_NG_MKFS	if ECRYPTFS_UTILS_TESTS
+	help
+	  eCryptfs is a POSIX-compliant enterprise-class stacked
+	  cryptographic filesystem for Linux.
+
+if ECRYPTFS_UTILS
+
+# /sbin
+config ECRYPTFS_UTILS_MOUNT_ECRYPTFS
+	bool "mount.ecryptfs, umount.ecryptfs"
+
+# /usr/bin
+config ECRYPTFS_UTILS_ECRYPTFS_ADD_PASSPHRASE
+	bool "ecryptfs-add-passphrase"
+
+config ECRYPTFS_UTILS_ECRYPTFSD
+	bool "ecryptfsd"
+
+config ECRYPTFS_UTILS_ECRYPTFS_INSERT_WRAPPED_PASSPHRASE_INTO_KEYRING
+	bool "ecryptfs-insert-wrapped-passphrase-into-keyring"
+
+config ECRYPTFS_UTILS_ECRYPTFS_MANAGER
+	bool "ecryptfs-manager"
+
+config ECRYPTFS_UTILS_ECRYPTFS_REWRAP_PASSPHRASE
+	bool "ecryptfs-rewrap-passphrase"
+
+config ECRYPTFS_UTILS_ECRYPTFS_STAT
+	bool "ecryptfs-stat"
+
+config ECRYPTFS_UTILS_ECRYPTFS_UNWRAP_PASSPHRASE
+	bool "ecryptfs-unwrap-passphrase"
+
+config ECRYPTFS_UTILS_ECRYPTFS_WRAP_PASSPHRASE
+	bool "ecryptfs-wrap-passphrase"
+
+config ECRYPTFS_UTILS_TESTS
+	bool "ecryptfs-tests"
+endif

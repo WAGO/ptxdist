@@ -1,0 +1,20 @@
+## SECTION=system_libraries
+
+config LIBGUDEV
+	tristate
+	select HOST_GLIB
+	select GLIB
+	select GOBJECT_INTROSPECTION	if LIBGUDEV_INTROSPECTION
+	select UDEV
+	select UDEV_LIBUDEV
+	prompt "libgudev"
+	help
+	  GObject-based wrapper library for libudev
+
+if LIBGUDEV
+
+config LIBGUDEV_INTROSPECTION
+	bool
+	default GOBJECT_INTROSPECTION_HELPER
+
+endif

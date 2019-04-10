@@ -1,0 +1,8 @@
+## SECTION=staging
+## old section:
+### SECTION=hosttools_noprompt
+
+config HOST_USPLASH
+	tristate
+	select HOST_LIBGD
+	default ALLYES

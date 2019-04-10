@@ -1,0 +1,8 @@
+## SECTION=hosttools_noprompt
+
+config HOST_APIEXTRACTOR
+	tristate
+	default ALLYES
+	select HOST_QT4
+	select HOST_QT4_XMLPATTERNS
+	select HOST_CMAKE

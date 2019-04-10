@@ -1,0 +1,135 @@
+## SECTION=networking
+
+menuconfig IPUTILS
+	tristate
+	prompt "iputils                       "
+	select LIBC_RESOLV	if IPUTILS_PING
+	select LIBCAP		if IPUTILS_ARPING || IPUTILS_PING || IPUTILS_TRACEROUTE6 || IPUTILS_CLOCKDIFF
+	select LIBGCRYPT	if IPUTILS_GCRYPT
+	select NETTLE		if IPUTILS_NETTLE
+	select OPENSSL		if IPUTILS_OPENSSL
+	help
+	  The iputils package is set of small useful utilities for Linux
+	  networking.
+
+if IPUTILS
+
+config IPUTILS_ARPING
+	bool
+	depends on !BUSYBOX_ARPING || ALLYES
+	prompt "arping"
+	help
+	  Ping destination on device interface by ARP packets, using source
+	  address source.
+
+comment "BusyBox' arping is selected!"
+        depends on BUSYBOX_ARPING
+
+config IPUTILS_CLOCKDIFF
+	bool
+	prompt "clockdiff"
+	help
+	  Measures clock difference between us and destination with 1 msec
+	  resolution.
+
+config IPUTILS_PING
+	bool
+	depends on (!BUSYBOX_PING && !INETUTILS_PING) || ALLYES
+	prompt "ping"
+	help
+	  ping uses the ICMP protocols mandatory ECHO_REQUEST datagram to elicit
+	  an ICMP ECHO_RESPONSE from a host or gateway.
+	  It works with both IPv4 and IPv6. Using only one of them explicitly can
+	  be enforced by specifying -4 or -6.
+
+comment "inetutils' ping is selected!"
+        depends on INETUTILS_PING
+
+comment "BusyBox' ping is selected!"
+        depends on BUSYBOX_PING
+
+if GLOBAL_IPV6
+
+choice
+	prompt "crypto library to be used for ping -N"
+	default IPUTILS_NOCRYPTO
+	depends on IPUTILS_PING
+	help
+	  Selecting a crypto library is necessary for ping to support
+	  sending IPv6 Node Information Queries (RFC 4620).
+
+	config IPUTILS_NOCRYPTO
+		bool
+		prompt "none"
+		help
+		  No crypto library is used. This means that ping -N
+		  won't work.
+
+	config IPUTILS_GCRYPT
+		bool
+		prompt "libgcrypt"
+
+	config IPUTILS_NETTLE
+		bool
+		prompt "nettle"
+
+	config IPUTILS_OPENSSL
+		bool
+		prompt "openssl"
+
+endchoice
+
+endif
+
+config IPUTILS_RARPD
+	bool
+	prompt "rarpd"
+	help
+	  Listens RARP (http://tools.ietf.org/rfc/rfc903.txt) requests from
+	  clients. Provided MAC address of client is found in /etc/ethers
+	  database and obtained host name is resolvable to an IP address
+	  appropriate for attached network, rarpd answers to client with
+	  RARPD reply carrying an IP address.
+
+config IPUTILS_RDISC
+	bool
+	prompt "rdisc"
+	help
+	  The rdisc command implements client side of the ICMP router discover
+	  protocol. rdisc is invoked at boot time to populate the network
+	  routing tables with default routes.
+
+config IPUTILS_TFTPD
+	bool
+	depends on (!BUSYBOX_TFTPD && !INETUTILS_TFTPD) || ALLYES
+	prompt "tftpd"
+	help
+
+comment "inetutils' tftpd is selected!"
+        depends on INETUTILS_PING
+
+comment "BusyBox' tftpd is selected!"
+        depends on BUSYBOX_TFTPD
+
+config IPUTILS_TRACEPATH
+	bool
+	prompt "tracepath"
+	help
+	  tracepath traces the path to a network host discovering the MTU along
+	  this path. Because it uses UDP for tracing, it does not need superuser
+	  privileges like traceroute6. tracepath works for both IPv4 and IPv6.
+
+config IPUTILS_TRACEROUTE6
+	bool
+	depends on !BUSYBOX_TRACEROUTE6 || ALLYES
+	prompt "traceroute6"
+	depends on GLOBAL_IPV6
+	help
+	  traceroute6 tracks the route packets take from an IP network on their
+	  way to a given host. Supports UDP, ICMP and TCP for tracing and works
+	  for IPv6 only.
+
+comment "BusyBox' traceroute6 is selected!"
+        depends on BUSYBOX_TRACEROUTE6
+
+endif

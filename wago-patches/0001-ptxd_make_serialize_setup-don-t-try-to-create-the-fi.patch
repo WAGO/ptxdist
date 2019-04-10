@@ -1,0 +1,33 @@
+From 21b7eb35a9f7602f13b10921521cf5cad2bdec17 Mon Sep 17 00:00:00 2001
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Thu, 11 Oct 2018 08:38:27 +0200
+Subject: [PATCH 01/10] ptxd_make_serialize_setup: don't try to create the fifo
+ if it exists
+
+This is needed because for collections ptxd_make_log() may be called once
+for each layer. It's in a new shell, so the variables must be set, but the
+fifo file will already exist.
+
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+---
+ scripts/lib/ptxd_make_serialize.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/lib/ptxd_make_serialize.sh b/scripts/lib/ptxd_make_serialize.sh
+index 8d560e5..6b6bffe 100644
+--- a/scripts/lib/ptxd_make_serialize.sh
++++ b/scripts/lib/ptxd_make_serialize.sh
+@@ -35,7 +35,9 @@ ptxd_make_serialize_setup() {
+     local readptr="ptxd_make_serialize_${name}_readfd"
+     local writefd readfd
+ 
+-    mkfifo "${fifo}" || return
++    if [ ! -e "${fifo}" ]; then
++	mkfifo "${fifo}" || return
++    fi
+     echo -n "$(seq -s "+" 0 ${count} | sed 's/[^+]//g')" > "${fifo}" &
+     exec {readfd}< "${fifo}" &&
+     exec {writefd}> "${fifo}" &&
+-- 
+2.7.4
+

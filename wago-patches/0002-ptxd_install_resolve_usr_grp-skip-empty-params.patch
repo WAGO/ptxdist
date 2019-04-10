@@ -1,0 +1,40 @@
+From c6263314f29a1f288408a9f5898ffb8f4c9a68e7 Mon Sep 17 00:00:00 2001
+From: "Andrej.Gantvorg@wago.com" <Andrej.Gantvorg@wago.com>
+Date: Fri, 26 Oct 2018 14:05:01 +0000
+Subject: [PATCH 02/10] ptxd_install_resolve_usr_grp: skip empty params
+
+Empty parameters may be passed to ptxd_install_resolve_usr_grp i.e. when
+calling install_archive with UID/GID set to '-'. According to
+documentation this should preserve the owner/group stored in the
+archive. Without this patch, empty strings are mapped to the first entry
+in /etc/{passwd,group} (usually 0) instead, thus breaking the documented
+behaviour.
+
+Signed-off-by: Andrej Gantvorg <andrej.gantvorg@wago.com>
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+---
+ scripts/lib/ptxd_make_xpkg_pkg.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/lib/ptxd_make_xpkg_pkg.sh b/scripts/lib/ptxd_make_xpkg_pkg.sh
+index 4efc316..6116a98 100644
+--- a/scripts/lib/ptxd_make_xpkg_pkg.sh
++++ b/scripts/lib/ptxd_make_xpkg_pkg.sh
+@@ -79,12 +79,12 @@ export -f ptxd_install_getent_id
+ # convert usr/grp that contain names into numeric values
+ #
+ ptxd_install_resolve_usr_grp() {
+-    if ! [ 0 -le $usr ] 2>/dev/null; then
++    if [ -n "$usr" ] && ! [ 0 -le "$usr" ] 2>/dev/null; then
+ 	ptxd_install_getent_id usr || return
+     else
+ 	unset usr_name
+     fi
+-    if ! [ 0 -le $grp ] 2>/dev/null; then
++    if [ -n "$grp" ] && ! [ 0 -le "$grp" ] 2>/dev/null; then
+ 	ptxd_install_getent_id grp || return
+     else
+ 	unset grp_name
+-- 
+2.7.4
+

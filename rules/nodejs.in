@@ -1,0 +1,43 @@
+## SECTION=bytecode_engines
+
+menuconfig NODEJS
+	tristate
+	prompt "nodejs                        "
+	select HOST_NODEJS
+	select OPENSSL
+	select ZLIB
+	help
+	  evented I/O for V8 javascript
+
+	  Node.js is a platform built on Chrome's JavaScript runtime
+	  for easily building fast, scalable network
+	  applications. Node.js uses an event-driven, non-blocking I/O
+	  model that makes it lightweight and efficient, perfect for
+	  data-intensive real-time applications that run across
+	  distributed devices.
+
+
+if NODEJS
+
+config NODEJS_NPM
+	tristate
+	prompt "install npm on target"
+
+config NODEJS_MODULE_LIST
+	string
+	prompt "install nodejs packages"
+	help
+	  A list of Node.js packages including version (e.g. express@4.13.0).
+	  'ptxdist make nodejs-get' will download the packages and create a
+	  npmbox file for each package. Note: The packages are stored in
+	  local_src/ and should be part of the BSP. Downloading a package
+	  again may result in different content.
+
+config NODEJS_MODULE_MD5
+	string
+	prompt "nodejs packages md5 sums"
+	help
+	  A md5 sum for each npmbox file of the packages listed in
+	  NODEJS_MODULE_LIST.
+
+endif

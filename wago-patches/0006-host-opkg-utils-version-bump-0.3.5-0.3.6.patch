@@ -1,0 +1,506 @@
+From 74213e94259ff8737dba8d1aa58d23a80c32470d Mon Sep 17 00:00:00 2001
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Thu, 27 Sep 2018 18:48:35 +0200
+Subject: [PATCH 06/10] host-opkg-utils: version bump 0.3.5 -> 0.3.6
+
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+---
+ .../0001-opkg-make-ar-deterministic.patch          | 50 ----------------------
+ .../0002-opkg-build-use-CROSS_COMPILE-ar.patch     | 28 ------------
+ .../0003-Fill-out-Installed-Size.patch             | 37 ----------------
+ ...in-ptxdist-the-maxium-UID-for-system-user.patch | 31 --------------
+ patches/opkg-utils-0.3.5/series                    |  7 ---
+ ...build-improve-ipk-package-reproducibility.patch | 30 +++++++++++++
+ .../0001-opkg-build-use-CROSS_COMPILE-ar.patch     | 28 ++++++++++++
+ .../0002-Fill-out-Installed-Size.patch             | 39 +++++++++++++++++
+ ...rt-name-on-versions-of-tar-which-support-.patch | 48 +++++++++++++++++++++
+ ...Use-local-time-for-build_date-since-opkg-.patch | 42 ++++++++++++++++++
+ ...in-ptxdist-the-maxium-UID-for-system-user.patch | 31 ++++++++++++++
+ patches/opkg-utils-0.3.6/series                    | 11 +++++
+ rules/host-opkg-utils.make                         |  4 +-
+ 13 files changed, 231 insertions(+), 155 deletions(-)
+ delete mode 100644 patches/opkg-utils-0.3.5/0001-opkg-make-ar-deterministic.patch
+ delete mode 100644 patches/opkg-utils-0.3.5/0002-opkg-build-use-CROSS_COMPILE-ar.patch
+ delete mode 100644 patches/opkg-utils-0.3.5/0003-Fill-out-Installed-Size.patch
+ delete mode 100644 patches/opkg-utils-0.3.5/0004-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+ delete mode 100644 patches/opkg-utils-0.3.5/series
+ create mode 100644 patches/opkg-utils-0.3.6/0001-opkg-build-improve-ipk-package-reproducibility.patch
+ create mode 100644 patches/opkg-utils-0.3.6/0001-opkg-build-use-CROSS_COMPILE-ar.patch
+ create mode 100644 patches/opkg-utils-0.3.6/0002-Fill-out-Installed-Size.patch
+ create mode 100644 patches/opkg-utils-0.3.6/0002-Only-use-sort-name-on-versions-of-tar-which-support-.patch
+ create mode 100644 patches/opkg-utils-0.3.6/0003-opkg-build-Use-local-time-for-build_date-since-opkg-.patch
+ create mode 100644 patches/opkg-utils-0.3.6/0003-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+ create mode 100644 patches/opkg-utils-0.3.6/series
+
+diff --git a/patches/opkg-utils-0.3.5/0001-opkg-make-ar-deterministic.patch b/patches/opkg-utils-0.3.5/0001-opkg-make-ar-deterministic.patch
+deleted file mode 100644
+index c2e3b32..0000000
+--- a/patches/opkg-utils-0.3.5/0001-opkg-make-ar-deterministic.patch
++++ /dev/null
+@@ -1,50 +0,0 @@
+-From: Michael Olbrich <m.olbrich@pengutronix.de>
+-Date: Tue, 24 May 2011 07:56:53 +0200
+-Subject: [PATCH] opkg: make ar deterministic
+-
+-Based on a patch from Darren Hutchinson <dhutchinson@google.com>
+-
+-From the original description:
+-
+-I had a strange problem when I tried to create an image.
+-The last part of the error message was:
+-
+-File
+-"<path to ptxdist>/projects/<project name>/ \
+-platform-<project name>/sysroot-host/lib/python2.6/site-packages/arfile.py",
+-line 79, in _scan
+-    size = int(descriptor[5])
+-ValueError: invalid literal for int() with base 10: '`'
+-
+-The problem eventually turned out to be that arfile.py has trouble parsing AR
+-files created with a UID >99999 - it relies on the (ascii) AR header fields
+-using one digit less than their allocated sizes so it can the padding
+-space to split() them.
+-
+-The original patch added the option 'D' to ar to set the UID and GID to
+-zero. This option is not available in older versions of ar. chown to 0:0
+-instead. This is possible because the everything is run in fakeroot.
+-
+-Not for upstream!
+-
+-Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+----
+- opkg-build | 5 ++++-
+- 1 file changed, 4 insertions(+), 1 deletion(-)
+-
+-diff --git a/opkg-build b/opkg-build
+-index 5dbf903710e3..f05eaecc6836 100755
+---- a/opkg-build
+-+++ b/opkg-build
+-@@ -306,7 +306,10 @@ fi
+- 
+- rm -f $pkg_file
+- if [ "$outer" = "ar" ] ; then
+--  ( cd $tmp_dir && ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+-+  # chown the content to "0:0".  files. This is needed as high UID values (>
+-+  # 99999) cause problems when parsing ar file headers
+-+  ( cd $tmp_dir && chown 0:0 ./debian-binary ./data.tar.gz ./control.tar.gz &&
+-+	ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+- else
+-   ( cd $tmp_dir && tar -cz $tarformat -f $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+- fi
+diff --git a/patches/opkg-utils-0.3.5/0002-opkg-build-use-CROSS_COMPILE-ar.patch b/patches/opkg-utils-0.3.5/0002-opkg-build-use-CROSS_COMPILE-ar.patch
+deleted file mode 100644
+index eaaebff..0000000
+--- a/patches/opkg-utils-0.3.5/0002-opkg-build-use-CROSS_COMPILE-ar.patch
++++ /dev/null
+@@ -1,28 +0,0 @@
+-From: =?UTF-8?q?Andreas=20Bie=C3=9Fmann?= <andreas@biessmann.de>
+-Date: Fri, 20 Jan 2012 09:03:55 +0100
+-Subject: [PATCH] opkg-build: use ${CROSS_COMPILE}ar
+-MIME-Version: 1.0
+-Content-Type: text/plain; charset=UTF-8
+-Content-Transfer-Encoding: 8bit
+-
+-Some host systems do not provide proper ar, make it possible to switch
+-to cross-ar here.
+-
+-Signed-off-by: Andreas Bießmann <andreas@biessmann.de>
+----
+- opkg-build | 2 +-
+- 1 file changed, 1 insertion(+), 1 deletion(-)
+-
+-diff --git a/opkg-build b/opkg-build
+-index f05eaecc6836..e24216946346 100755
+---- a/opkg-build
+-+++ b/opkg-build
+-@@ -309,7 +309,7 @@ if [ "$outer" = "ar" ] ; then
+-   # chown the content to "0:0".  files. This is needed as high UID values (>
+-   # 99999) cause problems when parsing ar file headers
+-   ( cd $tmp_dir && chown 0:0 ./debian-binary ./data.tar.gz ./control.tar.gz &&
+--	ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+-+	${CROSS_COMPILE}ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+- else
+-   ( cd $tmp_dir && tar -cz $tarformat -f $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+- fi
+diff --git a/patches/opkg-utils-0.3.5/0003-Fill-out-Installed-Size.patch b/patches/opkg-utils-0.3.5/0003-Fill-out-Installed-Size.patch
+deleted file mode 100644
+index cbf63f3..0000000
+--- a/patches/opkg-utils-0.3.5/0003-Fill-out-Installed-Size.patch
++++ /dev/null
+@@ -1,37 +0,0 @@
+-From: George McCollister <george.mccollister@gmail.com>
+-Date: Fri, 23 Mar 2012 13:13:41 -0500
+-Subject: [PATCH] Fill out Installed-Size
+-
+-Fill out Installed-Size so opkg can check to make sure there is enough
+-space to install the package before attempting to do so.
+-
+-Signed-off-by: George McCollister <george.mccollister@gmail.com>
+----
+- opkg.py | 7 ++++++-
+- 1 file changed, 6 insertions(+), 1 deletion(-)
+-
+-diff --git a/opkg.py b/opkg.py
+-index 2ecac8ae60b0..bf31eeb003a6 100644
+---- a/opkg.py
+-+++ b/opkg.py
+-@@ -165,6 +165,11 @@ class Package(object):
+-             ## sys.stderr.write("  extracting control.tar.gz from %s\n"% (fn,)) 
+- 
+-             ar = arfile.ArFile(f, fn)
+-+
+-+            tarStream = ar.open("data.tar.gz")
+-+            tarf = tarfile.open("data.tar.gz", "r", tarStream)
+-+            self.installed_size = sum([f.size for f in tarf.getmembers()])
+-+
+-             tarStream = ar.open("control.tar.gz")
+-             tarf = tarfile.open("control.tar.gz", "r", tarStream)
+-             try:
+-@@ -473,7 +478,7 @@ class Package(object):
+-         if self.maintainer: out = out + "Maintainer: %s\n" % (self.maintainer)
+-         if self.md5: out = out + "MD5Sum: %s\n" % (self.md5)
+-         if self.size: out = out + "Size: %d\n" % int(self.size)
+--        if self.installed_size: out = out + "InstalledSize: %d\n" % int(self.installed_size)
+-+        if self.installed_size: out = out + "Installed-Size: %d\n" % int(self.installed_size)
+-         if self.filename: out = out + "Filename: %s\n" % (self.filename)
+-         if self.source: out = out + "Source: %s\n" % (self.source)
+-         if self.description:
+diff --git a/patches/opkg-utils-0.3.5/0004-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch b/patches/opkg-utils-0.3.5/0004-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+deleted file mode 100644
+index 7348b41..0000000
+--- a/patches/opkg-utils-0.3.5/0004-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
++++ /dev/null
+@@ -1,31 +0,0 @@
+-From: Michael Olbrich <m.olbrich@pengutronix.de>
+-Date: Fri, 10 Nov 2017 19:52:05 +0100
+-Subject: [PATCH] opkg-build: in ptxdist the maxium UID for system users is 999
+-
+-Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+----
+- opkg-build | 6 +++---
+- 1 file changed, 3 insertions(+), 3 deletions(-)
+-
+-diff --git a/opkg-build b/opkg-build
+-index e24216946346..cfeeb994e195 100755
+---- a/opkg-build
+-+++ b/opkg-build
+-@@ -68,14 +68,14 @@ You probably want to remove them: " >&2
+- 	    fi
+- 	fi
+- 
+--	large_uid_files=`find . -uid +99 -ls -printf '\\\n' || true`
+-+	large_uid_files=`find . -uid +999 -ls -printf '\\\n' || true`
+- 
+- 	if [ "$ogargs" = "" ]  && [ -n "$large_uid_files" ]; then
+--		echo "*** Warning: The following files have a UID greater than 99.
+-+		echo "*** Warning: The following files have a UID greater than 999.
+- You probably want to chown these to a system user: " >&2
+- 		echo -e $large_uid_files
+- 		if [ $? -ne 0 ]; then
+--			echo "*** Error: Fail to list files have a UID greater than 99."
+-+			echo "*** Error: Fail to list files have a UID greater than 999."
+- 			exit 1
+- 		fi
+- 		echo >&2
+diff --git a/patches/opkg-utils-0.3.5/series b/patches/opkg-utils-0.3.5/series
+deleted file mode 100644
+index 182540f..0000000
+--- a/patches/opkg-utils-0.3.5/series
++++ /dev/null
+@@ -1,7 +0,0 @@
+-# generated by git-ptx-patches
+-#tag:base --start-number 1
+-0001-opkg-make-ar-deterministic.patch
+-0002-opkg-build-use-CROSS_COMPILE-ar.patch
+-0003-Fill-out-Installed-Size.patch
+-0004-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+-# adca77b30a59248aea5724b3e8202f6c  - git-ptx-patches magic
+diff --git a/patches/opkg-utils-0.3.6/0001-opkg-build-improve-ipk-package-reproducibility.patch b/patches/opkg-utils-0.3.6/0001-opkg-build-improve-ipk-package-reproducibility.patch
+new file mode 100644
+index 0000000..f06a7d4
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0001-opkg-build-improve-ipk-package-reproducibility.patch
+@@ -0,0 +1,30 @@
++From: Gardon Lukasz <garjack555@gmail.com>
++Date: Wed, 21 Feb 2018 13:09:39 +0100
++Subject: [PATCH] opkg-build: improve ipk package reproducibility
++
++Implement timestamp recommendation from reproducible-build.org [1]
++
++- Enable deterministic archieve by setting zero timestamp and
++  uids/guds with using 'D' in GNU ar tool
++
++[1] https://reproducible-builds.org/docs/archives/
++
++Signed-off-by: Gardon Lukasz <garjack555@gmail.com>
++Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
++---
++ opkg-build | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/opkg-build b/opkg-build
++index 318f308069a7..265906f66a8a 100755
++--- a/opkg-build
+++++ b/opkg-build
++@@ -294,7 +294,7 @@ fi
++ 
++ rm -f $pkg_file
++ if [ "$outer" = "ar" ] ; then
++-  ( cd $tmp_dir && ar -crf $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+++  ( cd $tmp_dir && ar -crfD $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
++ else
++   ( cd $tmp_dir && tar -c --sort=name --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++ fi
+diff --git a/patches/opkg-utils-0.3.6/0001-opkg-build-use-CROSS_COMPILE-ar.patch b/patches/opkg-utils-0.3.6/0001-opkg-build-use-CROSS_COMPILE-ar.patch
+new file mode 100644
+index 0000000..9efe075
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0001-opkg-build-use-CROSS_COMPILE-ar.patch
+@@ -0,0 +1,28 @@
++From: =?UTF-8?q?Andreas=20Bie=C3=9Fmann?= <andreas@biessmann.de>
++Date: Fri, 20 Jan 2012 09:03:55 +0100
++Subject: [PATCH] opkg-build: use ${CROSS_COMPILE}ar
++MIME-Version: 1.0
++Content-Type: text/plain; charset=UTF-8
++Content-Transfer-Encoding: 8bit
++
++Some host systems do not provide proper ar, make it possible to switch
++to cross-ar here.
++
++Signed-off-by: Andreas Bießmann <andreas@biessmann.de>
++---
++ opkg-build | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/opkg-build b/opkg-build
++index 0050c2bb11ed..4fddf4c9afda 100755
++--- a/opkg-build
+++++ b/opkg-build
++@@ -299,7 +299,7 @@ fi
++ 
++ rm -f $pkg_file
++ if [ "$outer" = "ar" ] ; then
++-  ( cd $tmp_dir && ar -crfD $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
+++  ( cd $tmp_dir && ${CROSS_COMPILE}ar -crfD $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
++ else
++   ( cd $tmp_dir && tar -c $tsortargs --mtime="$build_date" $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++ fi
+diff --git a/patches/opkg-utils-0.3.6/0002-Fill-out-Installed-Size.patch b/patches/opkg-utils-0.3.6/0002-Fill-out-Installed-Size.patch
+new file mode 100644
+index 0000000..34fa96b
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0002-Fill-out-Installed-Size.patch
+@@ -0,0 +1,39 @@
++From: George McCollister <george.mccollister@gmail.com>
++Date: Fri, 23 Mar 2012 13:13:41 -0500
++Subject: [PATCH] Fill out Installed-Size
++
++Fill out Installed-Size so opkg can check to make sure there is enough
++space to install the package before attempting to do so.
++
++Signed-off-by: George McCollister <george.mccollister@gmail.com>
++---
++ opkg.py | 6 +++++-
++ 1 file changed, 5 insertions(+), 1 deletion(-)
++
++diff --git a/opkg.py b/opkg.py
++index 153b62c7e7fa..0ee9853b2ba6 100644
++--- a/opkg.py
+++++ b/opkg.py
++@@ -169,9 +169,13 @@ class Package(object):
++             if tarfile.is_tarfile(fn):
++                 tar = tarfile.open(fn, "r", f)
++                 tarStream = tar.extractfile("./control.tar.gz")
+++                dataTarStream = tar.extractfile("./data.tar.gz")
++             else:
++                 ar = arfile.ArFile(f, fn)
++                 tarStream = ar.open("control.tar.gz")
+++                dataTarStream = ar.open("data.tar.gz")
+++            tarf = tarfile.open("data.tar.gz", "r", dataTarStream)
+++            self.installed_size = sum([f.size for f in tarf.getmembers()])
++             tarf = tarfile.open("control.tar.gz", "r", tarStream)
++             try:
++                 control = tarf.extractfile("control")
++@@ -482,7 +486,7 @@ class Package(object):
++         if self.maintainer: out = out + "Maintainer: %s\n" % (self.maintainer)
++         if self.md5: out = out + "MD5Sum: %s\n" % (self.md5)
++         if self.size: out = out + "Size: %d\n" % int(self.size)
++-        if self.installed_size: out = out + "InstalledSize: %d\n" % int(self.installed_size)
+++        if self.installed_size: out = out + "Installed-Size: %d\n" % int(self.installed_size)
++         if self.filename: out = out + "Filename: %s\n" % (self.filename)
++         if self.source: out = out + "Source: %s\n" % (self.source)
++         if self.description: out = out + "Description: %s\n" % (self.description)
+diff --git a/patches/opkg-utils-0.3.6/0002-Only-use-sort-name-on-versions-of-tar-which-support-.patch b/patches/opkg-utils-0.3.6/0002-Only-use-sort-name-on-versions-of-tar-which-support-.patch
+new file mode 100644
+index 0000000..84a2c81
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0002-Only-use-sort-name-on-versions-of-tar-which-support-.patch
+@@ -0,0 +1,48 @@
++From: Michael Hansen <michael.j.hansen@hp.com>
++Date: Mon, 26 Feb 2018 09:42:56 -0800
++Subject: [PATCH] Only use --sort=name on versions of tar which support it.
++ This fixes compatibility with bsdtar and old versions of GNU tar (e.g.
++ RHEL6).
++
++Signed-off-by: Michael Hansen <michael.j.hansen@hp.com>
++Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
++---
++ opkg-build | 11 ++++++++---
++ 1 file changed, 8 insertions(+), 3 deletions(-)
++
++diff --git a/opkg-build b/opkg-build
++index 265906f66a8a..094d69f8fad3 100755
++--- a/opkg-build
+++++ b/opkg-build
++@@ -232,6 +232,11 @@ if [ $compressor = "gzip" ] ; then
++ 	compressorargs=$zipargs
++ fi
++ 
+++tsortargs=
+++if tar --help 2>&1 | grep -- "--sort=" > /dev/null; then
+++	tsortargs="--sort=name"
+++fi
+++
++ shift $(($OPTIND - 1))
++ 
++ # continue on to process additional arguments
++@@ -280,8 +285,8 @@ mkdir $tmp_dir
++ build_date="$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y-%m-%d)"
++ 
++ echo $CONTROL > $tmp_dir/tarX
++-( cd $pkg_dir && tar $ogargs --sort=name --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
++-( cd $pkg_dir/$CONTROL && tar $ogargs --sort=name --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
+++( cd $pkg_dir && tar $ogargs $tsortargs --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
+++( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
++ rm $tmp_dir/tarX
++ 
++ echo "2.0" > $tmp_dir/debian-binary
++@@ -296,7 +301,7 @@ rm -f $pkg_file
++ if [ "$outer" = "ar" ] ; then
++   ( cd $tmp_dir && ar -crfD $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
++ else
++-  ( cd $tmp_dir && tar -c --sort=name --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
+++  ( cd $tmp_dir && tar -c $tsortargs --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++ fi
++ 
++ rm $tmp_dir/debian-binary $tmp_dir/data.tar.$cext $tmp_dir/control.tar.gz
+diff --git a/patches/opkg-utils-0.3.6/0003-opkg-build-Use-local-time-for-build_date-since-opkg-.patch b/patches/opkg-utils-0.3.6/0003-opkg-build-Use-local-time-for-build_date-since-opkg-.patch
+new file mode 100644
+index 0000000..000371c
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0003-opkg-build-Use-local-time-for-build_date-since-opkg-.patch
+@@ -0,0 +1,42 @@
++From: Michael Hansen <michael.j.hansen@hp.com>
++Date: Mon, 26 Feb 2018 10:17:01 -0800
++Subject: [PATCH] opkg-build: Use local time for build_date, since opkg
++ extracts files assuming local time rather than UTC.
++
++Also increase resolution of build date down to the second, rather than
++clamping to midnight of the current date.
++
++Signed-off-by: Michael Hansen <michael.j.hansen@hp.com>
++Signed-off-by: Alejandro del Castillo <alejandro.delcastillo@ni.com>
++---
++ opkg-build | 8 ++++----
++ 1 file changed, 4 insertions(+), 4 deletions(-)
++
++diff --git a/opkg-build b/opkg-build
++index 094d69f8fad3..0050c2bb11ed 100755
++--- a/opkg-build
+++++ b/opkg-build
++@@ -282,11 +282,11 @@ fi
++ tmp_dir=$dest_dir/IPKG_BUILD.$$
++ mkdir $tmp_dir
++ 
++-build_date="$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y-%m-%d)"
+++build_date="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" "+%Y-%m-%d %H:%M:%S")"
++ 
++ echo $CONTROL > $tmp_dir/tarX
++-( cd $pkg_dir && tar $ogargs $tsortargs --mtime=$build_date -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
++-( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime=$build_date -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
+++( cd $pkg_dir && tar $ogargs $tsortargs --mtime="$build_date" -X $tmp_dir/tarX -c $tarformat . | $compressor $compressorargs > $tmp_dir/data.tar.$cext )
+++( cd $pkg_dir/$CONTROL && tar $ogargs $tsortargs --mtime="$build_date" -c $tarformat . | gzip $zipargs > $tmp_dir/control.tar.gz )
++ rm $tmp_dir/tarX
++ 
++ echo "2.0" > $tmp_dir/debian-binary
++@@ -301,7 +301,7 @@ rm -f $pkg_file
++ if [ "$outer" = "ar" ] ; then
++   ( cd $tmp_dir && ar -crfD $pkg_file ./debian-binary ./control.tar.gz ./data.tar.$cext )
++ else
++-  ( cd $tmp_dir && tar -c $tsortargs --mtime=$build_date $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
+++  ( cd $tmp_dir && tar -c $tsortargs --mtime="$build_date" $tarformat ./debian-binary ./control.tar.gz ./data.tar.$cext | gzip $zipargs > $pkg_file )
++ fi
++ 
++ rm $tmp_dir/debian-binary $tmp_dir/data.tar.$cext $tmp_dir/control.tar.gz
+diff --git a/patches/opkg-utils-0.3.6/0003-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch b/patches/opkg-utils-0.3.6/0003-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+new file mode 100644
+index 0000000..09f9a48
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/0003-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
+@@ -0,0 +1,31 @@
++From: Michael Olbrich <m.olbrich@pengutronix.de>
++Date: Fri, 10 Nov 2017 19:52:05 +0100
++Subject: [PATCH] opkg-build: in ptxdist the maxium UID for system users is 999
++
++Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
++---
++ opkg-build | 6 +++---
++ 1 file changed, 3 insertions(+), 3 deletions(-)
++
++diff --git a/opkg-build b/opkg-build
++index 4fddf4c9afda..9401f34924ee 100755
++--- a/opkg-build
+++++ b/opkg-build
++@@ -68,14 +68,14 @@ You probably want to remove them: " >&2
++ 	    fi
++ 	fi
++ 
++-	large_uid_files=`find . -uid +99 -ls -printf '\\\n' || true`
+++	large_uid_files=`find . -uid +999 -ls -printf '\\\n' || true`
++ 
++ 	if [ "$ogargs" = "" ]  && [ -n "$large_uid_files" ]; then
++-		echo "*** Warning: The following files have a UID greater than 99.
+++		echo "*** Warning: The following files have a UID greater than 999.
++ You probably want to chown these to a system user: " >&2
++ 		echo -e $large_uid_files
++ 		if [ $? -ne 0 ]; then
++-			echo "*** Error: Fail to list files have a UID greater than 99."
+++			echo "*** Error: Fail to list files have a UID greater than 999."
++ 			exit 1
++ 		fi
++ 		echo >&2
+diff --git a/patches/opkg-utils-0.3.6/series b/patches/opkg-utils-0.3.6/series
+new file mode 100644
+index 0000000..4e7d32f
+--- /dev/null
++++ b/patches/opkg-utils-0.3.6/series
+@@ -0,0 +1,11 @@
++# generated by git-ptx-patches
++#tag:base --start-number 1
++#tag:upstream --start-number 1
++0001-opkg-build-improve-ipk-package-reproducibility.patch
++0002-Only-use-sort-name-on-versions-of-tar-which-support-.patch
++0003-opkg-build-Use-local-time-for-build_date-since-opkg-.patch
++#tag:ptx --start-number 1
++0001-opkg-build-use-CROSS_COMPILE-ar.patch
++0002-Fill-out-Installed-Size.patch
++0003-opkg-build-in-ptxdist-the-maxium-UID-for-system-user.patch
++# b7f8b3116c68b3731292e7065c4ce1f6  - git-ptx-patches magic
+diff --git a/rules/host-opkg-utils.make b/rules/host-opkg-utils.make
+index 19fa982..d3dedda 100644
+--- a/rules/host-opkg-utils.make
++++ b/rules/host-opkg-utils.make
+@@ -16,8 +16,8 @@ HOST_PACKAGES-$(PTXCONF_HOST_OPKG_UTILS) += host-opkg-utils
+ #
+ # Paths and names
+ #
+-HOST_OPKG_UTILS_VERSION	:= 0.3.5
+-HOST_OPKG_UTILS_MD5	:= 4696b1381d9fd2a5df9ca7f5c079588a
++HOST_OPKG_UTILS_VERSION	:= 0.3.6
++HOST_OPKG_UTILS_MD5	:= 8acd4392f0f998b7d85ac3717749eee6
+ HOST_OPKG_UTILS		:= opkg-utils-$(HOST_OPKG_UTILS_VERSION)
+ HOST_OPKG_UTILS_SUFFIX	:= tar.bz2
+ HOST_OPKG_UTILS_URL	:= https://git.yoctoproject.org/cgit/cgit.cgi/opkg-utils/snapshot/$(HOST_OPKG_UTILS).$(HOST_OPKG_UTILS_SUFFIX)
+-- 
+2.7.4
+

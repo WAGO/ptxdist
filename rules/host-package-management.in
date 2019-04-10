@@ -1,0 +1,6 @@
+## SECTION=hosttools
+
+config HOST_PACKAGE_MANAGEMENT_OPKG
+	bool
+	default y
+	select HOST_OPKG

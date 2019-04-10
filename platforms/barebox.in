@@ -1,0 +1,113 @@
+## SECTION=bootloader
+
+config BAREBOX_ARCH_STRING
+	string
+	default "arm"			if ARCH_ARM || ARCH_ARM64
+	default "blackfin"		if ARCH_BLACKFIN
+	default "ppc"			if ARCH_PPC
+	default "x86"			if ARCH_X86
+
+menuconfig BAREBOX
+	select BOOTLOADER
+	select HOST_LIBUSB if BAREBOX_NEEDS_HOST_LIBUSB
+	select HOST_OPENSSL if BAREBOX_NEEDS_HOST_OPENSSL
+	select HOST_IMX_CST if BAREBOX_NEEDS_HOST_IMX_CST
+	select HOST_LZOP if BAREBOX_NEEDS_HOST_LZOP
+	prompt "barebox                       "
+	bool
+	help
+	  The famous bootloader formerly known as U-Boot V2.
+
+if BAREBOX
+
+config BAREBOX_VERSION
+	prompt "barebox version"
+	string
+	default "2016.08.0"
+
+config BAREBOX_MD5
+	prompt "barebox source md5sum"
+	string
+
+config BAREBOX_CONFIG
+	prompt "config file"
+	string
+	default "barebox.config"
+	help
+	  This entry specifies the .config file used to compile
+	  barebox.
+
+config BAREBOX_EXTRA_ENV
+	prompt "extend the builtin barebox environment"
+	bool
+
+config BAREBOX_EXTRA_ENV_PATH
+	prompt "env dir"
+	string
+	default "${PTXDIST_PLATFORMCONFIGDIR}/barebox-defaultenv"
+	depends on BAREBOX_EXTRA_ENV
+
+config BAREBOX_BAREBOXENV
+	prompt "install 'bareboxenv'"
+	bool
+	help
+	  The tool 'bareboxenv' can be used to manipulate the barebox
+	  environment. Enable this option access the barebox environment
+	  from the target Linux system.
+
+config BAREBOX_BAREBOXCRC32
+	prompt "install 'bareboxcrc32'"
+	bool
+	help
+	  The tool 'bareboxcrc32' can be used to calculate the crc32 of
+	  files, with the same crc32 flavour that the barebox crc32
+	  command uses.
+
+config BAREBOX_KERNEL_INSTALL
+	prompt "install 'kernel-install'"
+	bool
+	help
+	  The tool 'kernel-install' can be used to install a kernel
+	  according to the bootloader spec:
+	  http://www.freedesktop.org/wiki/Specifications/BootLoaderSpec/
+
+config BAREBOX_BAREBOXIMD
+	prompt "install 'bareboximd'"
+	bool
+	help
+	  The tool 'bareboximd' can be used to extract metadata from
+	  the (flashed) barebox image.
+
+config BAREBOX_NEEDS_HOST_LIBUSB
+	prompt "barebox needs libusb"
+	bool
+
+config BAREBOX_NEEDS_HOST_OPENSSL
+	prompt "barebox needs openssl"
+	bool
+
+config BAREBOX_NEEDS_HOST_IMX_CST
+	prompt "barebox needs imx-cst"
+	bool
+	help
+	  The imx "CST" is the propretary "Code Signing Tool" by
+	  freescale, that is needed to sign the bootloader with a
+	  cryptographic signature. This part of freescale's high
+	  assurance boot (HAB) scenario where only correctly signed
+	  images can be started.
+	  Barebox currently supports HABv4 for i.MX6 only.
+
+	  This options does not do the signing, it just creates the
+	  correct dependencies so that the proprieraty "cst" program
+	  is installed before barebox is compiled. THe signing is done
+	  in barebox and needs special configuration for your board.
+
+config BAREBOX_NEEDS_HOST_LZOP
+	prompt "barebox needs lzop"
+	bool
+	help
+	  The barebox executable can be compressed. Select this if
+	  lzop is used in order to compile lzop for your development
+	  host.
+
+endif

@@ -1,0 +1,9 @@
+## SECTION=test_suites
+
+config HOST_PELTS
+	tristate
+	default ALLYES
+	prompt "pelts"
+	help
+	  Pengutronix Embedded Linux Test Suite
+

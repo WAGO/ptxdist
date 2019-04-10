@@ -1,0 +1,12 @@
+## SECTION=hosttools_noprompt
+## SECTION=hosttools_platform
+
+config HOST_ACL
+	tristate
+	default ALLYES
+	select HOST_ATTR
+	help
+	  Access control list utilities
+
+	  This package contains the getfacl and setfacl utilities
+	  needed for manipulating access control lists.
