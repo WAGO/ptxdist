@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Sascha Hauer
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_APP_XSETROOT) += xorg-app-xsetroot
 #
 # Paths and names
 #
-XORG_APP_XSETROOT_VERSION	:= 1.1.0
-XORG_APP_XSETROOT_MD5		:= b78a2da4cf128775031a5a3422fc0b78
+XORG_APP_XSETROOT_VERSION	:= 1.1.2
+XORG_APP_XSETROOT_MD5		:= 5fe769c8777a6e873ed1305e4ce2c353
 XORG_APP_XSETROOT		:= xsetroot-$(XORG_APP_XSETROOT_VERSION)
 XORG_APP_XSETROOT_SUFFIX	:= tar.bz2
 XORG_APP_XSETROOT_URL		:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_XSETROOT).$(XORG_APP_XSETROOT_SUFFIX))

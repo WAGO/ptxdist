@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBUSB_COMPAT_SUFFIX	:= tar.bz2
 LIBUSB_COMPAT_URL	:= $(call ptx/mirror, SF, libusb/$(LIBUSB_COMPAT).$(LIBUSB_COMPAT_SUFFIX))
 LIBUSB_COMPAT_SOURCE	:= $(SRCDIR)/$(LIBUSB_COMPAT).$(LIBUSB_COMPAT_SUFFIX)
 LIBUSB_COMPAT_DIR	:= $(BUILDDIR)/$(LIBUSB_COMPAT)
-LIBUSB_COMPAT_LICENSE	:= LGPL-2.1
+LIBUSB_COMPAT_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -4,8 +4,6 @@
 #               2009, 2012 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2015 by Bruno Thomsen <bth@kamstrup.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,8 +16,8 @@ PACKAGES-$(PTXCONF_PHP5) += php5
 #
 # Paths and names
 #
-PHP5_VERSION	:= 5.5.30
-PHP5_MD5	:= ef6d848756ea9d19b7a7e1a9d824d7c1
+PHP5_VERSION	:= 5.6.40
+PHP5_MD5	:= c7dde3afb16ce7b761abf2805125d372
 PHP5		:= php-$(PHP5_VERSION)
 PHP5_SUFFIX	:= tar.xz
 PHP5_SOURCE	:= $(SRCDIR)/$(PHP5).$(PHP5_SUFFIX)
@@ -41,7 +39,7 @@ PHP5_URL := \
 PHP5_CONF_ENV := \
 	$(CROSS_ENV) \
 	ac_cv_prog_cc_cross=yes \
-	ac_cv_c_bigendian_php=$(call ptx/ifdef, PTXCONF_ENDIAN_BIG, yes, no)
+	ac_cv_c_bigendian_php=$(call ptx/yesno, PTXCONF_ENDIAN_BIG)
 
 #
 # autoconf
@@ -51,6 +49,8 @@ PHP5_AUTOCONF := \
 	--disable-phar \
 	--with-config-file-path=/etc/php5 \
 	--enable-opcache=no \
+	--disable-fileinfo \
+	--without-xmlrpc \
 	--without-iconv
 
 # FIXME: php5 doesn't interprete "with_foo=no" correctly, so we cannot
@@ -210,12 +210,6 @@ else
 PHP5_AUTOCONF += --disable-simplexml
 endif
 
-ifdef PTXCONF_PHP5_XML_LIBXML2_XMLRPC
-PHP5_AUTOCONF += --with-xmlrpc
-else
-PHP5_AUTOCONF += --without-xmlrpc
-endif
-
 ifdef PTXCONF_PHP5_EXT_ZLIB
 PHP5_AUTOCONF += --with-zlib=$(SYSROOT)/usr
 else
@@ -259,7 +253,7 @@ ifdef PTXCONF_PHP5_EXT_SQLITE3
 PHP5_AUTOCONF += --with-sqlite3=$(PTXDIST_SYSROOT_TARGET)/usr --with-pdo-sqlite
 # broken config system: sqlite3 (local copy) uses it
 # but it is only linked to if used by external dependencies
-PHP5_CONF_ENV += PHP_LDFLAGS=-ldl
+PHP5_CONF_ENV += PHP_LDFLAGS="-ldl -lpthread"
 else
 PHP5_AUTOCONF += --without-sqlite3 --without-pdo-sqlite
 endif

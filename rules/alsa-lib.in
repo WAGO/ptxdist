@@ -1,42 +1,18 @@
-## SECTION=system_libraries
+## SECTION=multimedia_sound
+
 menuconfig ALSA_LIB
 	tristate
-	prompt "alsa libaries                 "
+	prompt "alsa libraries                "
 	select LIBC_DL
 	select LIBC_M
 	select LIBC_PTHREAD
 	select LIBC_RT
 	select GCCLIBS_GCC_S
+	select ALSA_LIB_MIXER		if ALSA_LIB_UCM
 	help
 	  This is the userspace library to the kernel's "Advanced Linux Sound Architecture" feature
 
 if ALSA_LIB
-
-choice
-	prompt "Base library"
-	default ALSA_LIB_FULL
-
-	config ALSA_LIB_FULL
-		bool
-		prompt "full featured ALSA libs"
-		help
-		  Full featured ALSA library. No limits.
-
-	config ALSA_LIB_LIGHT
-		bool
-		prompt "embedded ALSA libs"
-		help
-		  SALSA-Lib is a small, light-weight, hot and spicy version of
-		  the ALSA library, mainly for embedded systems with limited
-		  resources. The library is designed to be source-level
-		  compatible with ALSA library API for limited contents.  Most
-		  of function calls are inlined, and accesses directly to the
-		  hardware via system calls.
-		  Some components like ALSA sequencer aren't supported, and
-		  most of all, the alsa-lib plugins and configurations are
-		  completely dropped.  Thus, neither dmix nor format
-		  conversion is available with SALSA-lib.
-endchoice
 
 config ALSA_LIB_ASOUND_CONF
 	bool
@@ -60,6 +36,7 @@ config ALSA_LIB_READ
 
 config ALSA_LIB_MIXER
 	bool
+	select ALSA_LIB_PCM
 	default y
 	prompt "mixer"
 	help
@@ -71,6 +48,19 @@ config ALSA_LIB_PCM
 	prompt "pcm"
 	help
 	  Disable the PCM component if you do not need it
+
+config ALSA_LIB_PCM_MODULES
+	depends on ALSA_LIB_PCM
+	string
+	prompt "pcm modules"
+	default "all"
+	help
+	  You can use the keyword 'all' here for all supported PCM modules or a
+	  comma separated list of required module keywords. The list of module
+	  keywords is:
+	    copy linear route mulaw alaw adpcm rate plug multi shm file null
+	    empty share meter hooks lfloat ladspa dmix dshare dsnoop asym
+	    iec958 softvol extplug ioplug mmap_emul
 
 config ALSA_LIB_RAWMIDI
 	bool
@@ -88,6 +78,7 @@ config ALSA_LIB_HWDEP
 
 config ALSA_LIB_SEQ
 	bool
+	select ALSA_LIB_PCM
 	default y
 	prompt "sequencer"
 	help
@@ -103,6 +94,10 @@ config ALSA_LIB_UCM
 config ALSA_LIB_ALISP
 	bool
 	default y
+	# alisp itself broken in 1.1.7 builds now (alsa-lib commit 639d404),
+	# but then targets SI7018/sndo[cp]-mixer.alisp in src/conf/cards/
+	# fail (missing in tarball, present in git tree).
+	depends on BROKEN
 	prompt "alisp"
 	help
 	  Disable the alisp component if you do not need it

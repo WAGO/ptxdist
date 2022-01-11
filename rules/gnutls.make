@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Jan Luebbe <jlu@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_GNUTLS) += gnutls
 #
 # Paths and names
 #
-GNUTLS_VERSION	:= 3.6.0
-GNUTLS_MD5	:= 296f8d61333851b9326bd18484e6135e
+GNUTLS_VERSION	:= 3.6.14
+GNUTLS_MD5	:= bf70632d420e421baff482247f01dbfe
 GNUTLS		:= gnutls-$(GNUTLS_VERSION)
 GNUTLS_SUFFIX	:= tar.xz
-GNUTLS_URL	:= ftp://ftp.gnutls.org/gcrypt/gnutls/v$(basename $(GNUTLS_VERSION))/$(GNUTLS).$(GNUTLS_SUFFIX)
+GNUTLS_URL	:= https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/$(GNUTLS).$(GNUTLS_SUFFIX)
 GNUTLS_SOURCE	:= $(SRCDIR)/$(GNUTLS).$(GNUTLS_SUFFIX)
 GNUTLS_DIR	:= $(BUILDDIR)/$(GNUTLS)
-GNUTLS_LICENSE	:= LGPL-3.0+
+GNUTLS_LICENSE	:= LGPL-3.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,13 +34,17 @@ GNUTLS_CONF_TOOL	:= autoconf
 GNUTLS_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--enable-threads=posix \
 	--disable-code-coverage \
+	--disable-bash-tests \
 	--disable-doc \
 	--disable-manpages \
 	--disable-tools \
 	--enable-cxx \
 	--enable-hardware-acceleration \
+	--enable-tls13-interop \
 	--enable-padlock \
+	--enable-strict-der-time \
 	--enable-sha1-support \
 	--disable-ssl3-support \
 	--enable-ssl2-support \
@@ -54,9 +56,9 @@ GNUTLS_CONF_OPT		:= \
 	--enable-anon-authentication \
 	--enable-dhe \
 	--enable-ecdhe \
-	--disable-cryptodev \
+	--enable-gost \
+	--$(call ptx/endis, PTXCONF_GNUTLS_CRYPTODEV)-cryptodev \
 	--enable-ocsp \
-	--enable-session-tickets \
 	--$(call ptx/endis, PTXCONF_GNUTLS_OPENSSL)-openssl-compatibility \
 	--disable-tests \
 	--disable-fuzzer-target \
@@ -66,8 +68,10 @@ GNUTLS_CONF_OPT		:= \
 	--disable-nls \
 	--disable-rpath \
 	--disable-seccomp-tests \
+	--enable-cross-guesses=conservative \
 	--disable-valgrind-tests \
 	--disable-full-test-suite \
+	--disable-oldgnutls-interop \
 	--disable-gcc-warnings \
 	--disable-static \
 	--enable-shared \
@@ -103,7 +107,9 @@ $(STATEDIR)/gnutls.targetinstall:
 	@$(call install_fixup, gnutls,DESCRIPTION,missing)
 
 	@$(call install_lib, gnutls, 0, 0, 0644, libgnutls)
+ifdef PTXCONF_GNUTLS_CXX
 	@$(call install_lib, gnutls, 0, 0, 0644, libgnutlsxx)
+endif
 
 ifdef PTXCONF_GNUTLS_OPENSSL
 	@$(call install_lib, gnutls, 0, 0, 0644, libgnutls-openssl)

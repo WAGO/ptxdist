@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -39,17 +37,17 @@ HOST_SHIBOKEN_CONF_OPT	= \
 $(STATEDIR)/host-shiboken.install:
 	@$(call targetinfo)
 	@$(call world/install, HOST_SHIBOKEN)
-	@sed -i -e 's,"$(PTXCONF_SYSROOT_HOST),",g' \
+	@sed -i -e 's,"$(PTXDIST_SYSROOT_HOST),",g' \
 		$(HOST_SHIBOKEN_PKGDIR)/lib/cmake/Shiboken-$(SHIBOKEN_VERSION)/ShibokenConfig-python$(PYTHON_MAJORMINOR).cmake
 	@$(call touch)
 
 $(STATEDIR)/host-shiboken.install.post:
 	@$(call targetinfo)
 	@$(call world/install.post, HOST_SHIBOKEN)
-	@sed -i -e 's,(/,($(PTXCONF_SYSROOT_HOST)/,g' \
-		'$(PTXCONF_SYSROOT_HOST)/lib/cmake/Shiboken-$(SHIBOKEN_VERSION)/ShibokenConfig.cmake'
-	@sed -i -e 's,"/,"$(PTXCONF_SYSROOT_HOST)/,g' \
-		'$(PTXCONF_SYSROOT_HOST)/lib/cmake/Shiboken-$(SHIBOKEN_VERSION)/ShibokenConfig-python$(PYTHON_MAJORMINOR).cmake'
+	@sed -i -e 's,(/,($(PTXDIST_SYSROOT_HOST)/,g' \
+		'$(PTXDIST_SYSROOT_HOST)/lib/cmake/Shiboken-$(SHIBOKEN_VERSION)/ShibokenConfig.cmake'
+	@sed -i -e 's,"/,"$(PTXDIST_SYSROOT_HOST)/,g' \
+		'$(PTXDIST_SYSROOT_HOST)/lib/cmake/Shiboken-$(SHIBOKEN_VERSION)/ShibokenConfig-python$(PYTHON_MAJORMINOR).cmake'
 	@$(call touch)
 
 # vim: syntax=make

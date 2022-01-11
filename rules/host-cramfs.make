@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Robert Schwebel
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -37,8 +35,8 @@ HOST_CRAMFS_CONF_TOOL := NO
 
 $(STATEDIR)/host-cramfs.install:
 	@$(call targetinfo)
-	cp $(HOST_CRAMFS_DIR)/mkcramfs $(PTXCONF_SYSROOT_HOST)/bin
-	cp $(HOST_CRAMFS_DIR)/cramfsck $(PTXCONF_SYSROOT_HOST)/bin
+	cp $(HOST_CRAMFS_DIR)/mkcramfs $(PTXDIST_SYSROOT_HOST)/bin
+	cp $(HOST_CRAMFS_DIR)/cramfsck $(PTXDIST_SYSROOT_HOST)/bin
 	@$(call touch)
 
 # vim: syntax=make

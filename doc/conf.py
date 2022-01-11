@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PTXdist'
-copyright = u'2015, The Pengutronix Development Team'
+copyright = u'2015-2017, The Pengutronix Development Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -104,9 +104,10 @@ gnu_target = os.getenv("PTXCONF_GNU_TARGET") or "arm-v5te-linux-gnueabi"
 try:
 	toolchain = os.readlink(os.path.join(os.getenv("PTXDIST_PLATFORMDIR",""), "selected_toolchain")).split("/")
 except:
-	toolchain = "/opt/OSELAS.Toolchain-2014.12.2/arm-v5te-linux-gnueabi/gcc-4.9.2-glibc-2.20-binutils-2.24-kernel-3.16-sanitized/bin".split("/")
+	toolchain = "/opt/OSELAS.Toolchain-2019.09.1/arm-v5te-linux-gnueabi/gcc-9.2.1-glibc-2.30-binutils-2.32-kernel-5.0-sanitized/bin".split("/")
 
-ptxdistPlatformDir = "platform-" + os.getenv("PTXCONF_PLATFORM", "versatilepb")
+ptxdistPlatformName = os.getenv("PTXCONF_PLATFORM", "versatilepb")
+ptxdistPlatformDir = "platform-" + ptxdistPlatformName
 oselasTCNarch = gnu_target.split("-")[0]
 oselasTCNvariant = gnu_target.split("-")[1]
 oselasTCNVendorVersion = toolchain[-4].split("-")[1]
@@ -130,6 +131,7 @@ except:
 	pass
 
 replace_dict = {
+	b"|ptxdistPlatformName|": ptxdistPlatformName,
 	b"|ptxdistPlatformDir|": ptxdistPlatformDir,
 	b"|oselasTCNarch|": oselasTCNarch,
 	b"|oselasTCNvariant|": oselasTCNvariant,
@@ -155,6 +157,8 @@ for line in fileinput.FileInput(files=filter(os.path.isfile, os.listdir(".")), i
 		sys.stdout.buffer.write(line)
 	except:
 		sys.stdout.write(line)
+
+line = None
 
 if os.getenv("PTXDIST_VERBOSE","0") == "1":
 	for key, value in sorted(replace_dict.items()):
@@ -282,11 +286,14 @@ latex_additional_files = [
 
 latex_engine='xelatex'
 
+def sanitize(s):
+  return re.sub('[^\w@_+=\.-]+', '-', s)
+
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', "OSELAS.BSP-" + ptxdistHwVendor + "-" + ptxdistHwProduct + '-Quickstart.tex', u'PTXdist Quickstart Manual',
+  ('index', "OSELAS.BSP-" + sanitize(ptxdistHwVendor) + "-" + sanitize(ptxdistHwProduct) + '-Quickstart.tex', u'PTXdist Quickstart Manual',
    u'The PTXdist project', 'manual'),
 ]
 

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,7 +14,7 @@ CROSS_DUMMY_STRIP_LICENSE := ignore
 
 $(STATEDIR)/cross-dummy-strip.install:
 	@$(call targetinfo)
-	install -D -m 755 $(PTXDIST_TOPDIR)/scripts/dummy-strip.sh $(PTXCONF_SYSROOT_CROSS)/bin/strip
+	install -D -m 755 $(PTXDIST_TOPDIR)/scripts/dummy-strip.sh $(PTXDIST_SYSROOT_CROSS)/bin/strip
 	@$(call touch)
 
 # vim: syntax=make

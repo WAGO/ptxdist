@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_APP_XEV) += xorg-app-xev
 #
 # Paths and names
 #
-XORG_APP_XEV_VERSION	:= 1.2.0
-XORG_APP_XEV_MD5	:= 2727c72f3eba0c23f8f6b2e618d195a2
+XORG_APP_XEV_VERSION	:= 1.2.3
+XORG_APP_XEV_MD5	:= eec82a5d4b599736f0fa637e96136746
 XORG_APP_XEV		:= xev-$(XORG_APP_XEV_VERSION)
 XORG_APP_XEV_SUFFIX	:= tar.bz2
 XORG_APP_XEV_URL	:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_XEV).$(XORG_APP_XEV_SUFFIX))

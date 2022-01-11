@@ -6,8 +6,6 @@
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #           (C) 2016 by Clemens Gruber <clemens.gruber@pqgruber.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -85,6 +83,10 @@ ifdef PTXCONF_GLIBC_NSS_HESIOD
 	@$(call install_copy_toolchain_lib, glibc, libnss_hesiod.so)
 endif
 
+ifdef PTXCONF_GLIBC_ANL
+	@$(call install_copy_toolchain_lib, glibc, libanl.so)
+endif
+
 ifdef PTXCONF_GLIBC_NSS_NIS
 	@$(call install_copy_toolchain_lib, glibc, libnss_nis.so)
 endif
@@ -124,6 +126,10 @@ endif
 ifdef PTXCONF_GLIBC_GCONV_ZH
 	@$(call install_copy_toolchain_lib, glibc, gconv/GBBIG5.so)
 	@$(call install_copy_toolchain_lib, glibc, gconv/GB18030.so)
+endif
+
+ifdef PTXCONF_GLIBC_GETENT
+	@$(call install_copy_toolchain_usr, glibc, bin/getent)
 endif
 
 ifdef PTXCONF_GLIBC_LDCONFIG

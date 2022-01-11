@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Robert Schwebel
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -29,8 +27,10 @@ HOST_DBUS_CONF_TOOL	:= autoconf
 HOST_DBUS_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--enable-silent-rules \
+	--disable-developer \
+	--disable-debug \
+	--enable-largefile \
 	--disable-static \
-	--disable-compiler-coverage \
 	--disable-ansi \
 	--disable-verbose-mode \
 	--disable-asserts \
@@ -38,22 +38,27 @@ HOST_DBUS_CONF_OPT	:= \
 	--disable-xml-docs \
 	--disable-doxygen-docs \
 	--disable-ducktype-docs \
-	--enable-abstract-sockets=yes \
 	--disable-selinux \
 	--disable-apparmor \
 	--disable-libaudit \
 	--disable-inotify \
 	--disable-kqueue \
 	--disable-console-owner-file \
+	--disable-launchd \
 	--disable-systemd \
 	--disable-embedded-tests \
 	--disable-modular-tests \
 	--disable-tests \
+	--disable-installed-tests \
+	--disable-code-coverage \
 	--disable-epoll \
 	--disable-x11-autolaunch \
+	--disable-compile-warnings \
+	--disable-Werror \
+	--disable-relocation \
 	--disable-stats \
 	--disable-user-session \
-	--without-x \
-	--without-valgrind
+	--without-valgrind \
+	--without-x
 
 # vim: syntax=make

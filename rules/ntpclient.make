@@ -3,8 +3,6 @@
 # Copyright (C) 2003-2009 by Pengutronix e.K., Hildesheim, Germany
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,7 +23,7 @@ NTPCLIENT_TARBALL	:= ntpclient_2007_$(NTPCLIENT_VERSION).$(NTPCLIENT_SUFFIX)
 NTPCLIENT_URL		:= http://doolittle.icarus.com/ntpclient/$(NTPCLIENT_TARBALL)
 NTPCLIENT_SOURCE	:= $(SRCDIR)/$(NTPCLIENT_TARBALL)
 NTPCLIENT_DIR		:= $(BUILDDIR)/$(NTPCLIENT)
-NTPCLIENT_LICENSE	:= GPL-2.0
+NTPCLIENT_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

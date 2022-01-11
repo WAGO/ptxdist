@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBSNDFILE_SUFFIX	:= tar.gz
 LIBSNDFILE_URL		:= http://www.mega-nerd.com/libsndfile/files/$(LIBSNDFILE).$(LIBSNDFILE_SUFFIX)
 LIBSNDFILE_SOURCE	:= $(SRCDIR)/$(LIBSNDFILE).$(LIBSNDFILE_SUFFIX)
 LIBSNDFILE_DIR		:= $(BUILDDIR)/$(LIBSNDFILE)
-LIBSNDFILE_LICENSE	:= LGPL-2.1
+LIBSNDFILE_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

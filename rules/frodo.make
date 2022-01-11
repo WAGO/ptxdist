@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2007-2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -44,6 +42,9 @@ FRODO_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
 	--without-x
 
+# cpp files are built with gcc
+FRODO_CFLAGS := -std=gnu++98
+
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
@@ -73,6 +74,7 @@ $(STATEDIR)/frodo.targetinstall:
 
 	@$(call install_copy, frodo, 0, 0, 0755, -, /usr/bin/Frodo)
 
+	@$(call install_copy, frodo, 0, 0, 2775, /home)
 	@$(call install_copy, frodo, 0, 0, 0644, -, /home/1541 ROM)
 	@$(call install_copy, frodo, 0, 0, 0644, -, /home/Basic ROM)
 	@$(call install_copy, frodo, 0, 0, 0644, -, /home/Char ROM)

@@ -5,7 +5,7 @@ menuconfig MOSQUITTO
 	prompt "mosquitto                     "
 	select OPENSSL	if MOSQUITTO_TLS
 	select C_ARES	if MOSQUITTO_SRV
-	select LIBUUID	if MOSQUITTO_UUID
+	select SYSTEMD	if MOSQUITTO_SYSTEMD_UNIT
 	help
 	  Open source MQTT message broker, library, and client.
 
@@ -14,6 +14,13 @@ if MOSQUITTO
 config MOSQUITTO_BROKER
 	bool
 	prompt "Broker"
+
+config MOSQUITTO_SYSTEMD_UNIT
+	bool
+	default y
+	select MOSQUITTO_BROKER
+	depends on INITMETHOD_SYSTEMD
+	prompt "install systemd unit file"
 
 config MOSQUITTO_CLIENTS
 	bool
@@ -26,10 +33,6 @@ config MOSQUITTO_TLS
 config MOSQUITTO_SRV
 	bool
 	prompt "SRV lookup support"
-
-config MOSQUITTO_UUID
-	bool
-	prompt "UUID as client id"
 
 endif
 

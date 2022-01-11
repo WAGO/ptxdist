@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Shahar Livne <shahar@livnex.com>
 #               2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,14 +17,14 @@ PACKAGES-$(PTXCONF_ARCH_ARM)-$(PTXCONF_VALGRIND) += valgrind
 #
 # Paths and names
 #
-VALGRIND_VERSION	:= 3.12.0
-VALGRIND_MD5		:= 6eb03c0c10ea917013a7622e483d61bb
+VALGRIND_VERSION	:= 3.14.0
+VALGRIND_MD5		:= 74175426afa280184b62591b58c671b3
 VALGRIND		:= valgrind-$(VALGRIND_VERSION)
 VALGRIND_SUFFIX		:= tar.bz2
 VALGRIND_URL		:= http://valgrind.org/downloads/$(VALGRIND).$(VALGRIND_SUFFIX)
 VALGRIND_SOURCE		:= $(SRCDIR)/$(VALGRIND).$(VALGRIND_SUFFIX)
 VALGRIND_DIR		:= $(BUILDDIR)/$(VALGRIND)
-VALGRIND_LICENSE	:= GPL-2.0
+VALGRIND_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -60,6 +58,7 @@ endif
 VALGRIND_CONF_TOOL	:= autoconf
 VALGRIND_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--without-mpicc \
 	--enable-tls
 
 # ----------------------------------------------------------------------------

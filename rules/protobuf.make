@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Adrian Baumgarth <adrian.baumgarth@l-3com.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,11 +14,11 @@ PACKAGES-$(PTXCONF_PROTOBUF) += protobuf
 #
 # Paths and names
 #
-PROTOBUF_VERSION	:= 3.3.2
-PROTOBUF_MD5		:= 19ed45d0cbbb88de2c4922978235d314 ef2a6a6bb3b92d8fa8d71e3cef741f2f
-PROTOBUF		:= protobuf-$(PROTOBUF_VERSION)
+PROTOBUF_VERSION	:= 3.7.1
+PROTOBUF_MD5		:= cda6ae370a5df941f8aa837c8a0292ba
+PROTOBUF		:= protobuf-all-$(PROTOBUF_VERSION)
 PROTOBUF_SUFFIX		:= tar.gz
-PROTOBUF_URL		:= https://github.com/google/protobuf/archive/v$(PROTOBUF_VERSION).$(PROTOBUF_SUFFIX)
+PROTOBUF_URL		:= https://github.com/google/protobuf/releases/download/v$(PROTOBUF_VERSION)/$(PROTOBUF).$(PROTOBUF_SUFFIX)
 PROTOBUF_SOURCE		:= $(SRCDIR)/$(PROTOBUF).$(PROTOBUF_SUFFIX)
 PROTOBUF_DIR		:= $(BUILDDIR)/$(PROTOBUF)
 PROTOBUF_LICENSE	:= BSD-3-Clause
@@ -35,6 +33,7 @@ PROTOBUF_LICENSE	:= BSD-3-Clause
 PROTOBUF_CONF_TOOL	:= autoconf
 PROTOBUF_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-64bit-solaris \
 	--disable-static \
 	--$(call ptx/wwo, PTXCONF_PROTOBUF_ZLIB)-zlib \
 	--with-protoc=$(PTXDIST_SYSROOT_HOST)/bin/protoc

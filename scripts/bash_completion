@@ -5,7 +5,7 @@
 # part of PTXdist, so same licence.
 #
 
-if have ptxdist; then
+if _have ptxdist; then
 
 declare -a _ptxdist_completion_opts
 declare -a _ptxdist_completion_cmds
@@ -15,6 +15,9 @@ __ptxdist_completion_packages() {
 	local cache="${1}/.bash_completion_packages"
 	if [ -z "${2}" -o "${2}" -nt "${cache}" -o "${3}" -nt "${cache}" -o "${4}" -nt "${cache}" ]; then
 		${_ptxdist_cmd} print PTX_PACKAGES_SELECTED 2>/dev/null | tee "${cache}" 2>/dev/null
+		if [ ${PIPESTATUS[0]} -ne 0 -o ${PIPESTATUS[1]} -ne 0 ]; then
+			rm "${cache}"
+		fi
 	else
 		cat "${cache}"
 	fi
@@ -103,20 +106,16 @@ _ptxdist_completion()
 		# if no commands were given, complete on commands themselves
 		COMPREPLY=( $( compgen -W "${_ptxdist_completion_cmds[*]} help" -- $cur ) )
 		;;
-	menuconfig)
+	*config)
 		COMPREPLY=( $( compgen -W "kernel platform barebox board collection user" -- $cur) )
 		;;
 	clone)
-		#HACK! Enable filename completion without specifying '-o filenames' during complete (that will add slashes to commands if there is a dir of the same name :( )
-		compgen -f /dummy >/dev/null
 		[ ${#args[@]} -lt 2 ] && _filedir -d
 		;;
 	toolchain|export_src)
-		compgen -f /dummy >/dev/null
 		[ ${#args[@]} -lt 1 ] && _filedir -d
 		;;
-	select|platform|collection)
-		compgen -f /dummy >/dev/null
+	select|platform|collection|gdb)
 		[ ${#args[@]} -lt 1 ] && _filedir
 		;;
 	clean)
@@ -136,6 +135,12 @@ _ptxdist_completion()
 			COMPREPLY=( $( compgen -W "${_ptxdist_completion_newpkg[*]}" -- $cur) )
 		fi
 		;;
+	local-src)
+		if [ ${#args[@]} -lt 1 ]; then
+			COMPREPLY+=( $( compgen -W "$(__ptxdist_completion_packages)" -- $cur ) )
+		else
+			_filedir -d
+		fi
 	esac
 	COMPREPLY+=( $( compgen -W "${_ptxdist_completion_opts[*]}" -- $cur ) )
 	[[ $COMPREPLY == *= ]] && compopt -o nospace

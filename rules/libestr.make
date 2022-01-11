@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBESTR_SUFFIX	:= tar.gz
 LIBESTR_URL	:= http://libestr.adiscon.com/files/download/$(LIBESTR).$(LIBESTR_SUFFIX)
 LIBESTR_SOURCE	:= $(SRCDIR)/$(LIBESTR).$(LIBESTR_SUFFIX)
 LIBESTR_DIR	:= $(BUILDDIR)/$(LIBESTR)
-LIBESTR_LICENSE	:= LGPL-2.1+
+LIBESTR_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

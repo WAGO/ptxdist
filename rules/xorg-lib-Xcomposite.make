@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XCOMPOSITE) += xorg-lib-xcomposite
 #
 # Paths and names
 #
-XORG_LIB_XCOMPOSITE_VERSION	:= 0.4.4
-XORG_LIB_XCOMPOSITE_MD5		:= f7a218dcbf6f0848599c6c36fc65c51a
+XORG_LIB_XCOMPOSITE_VERSION	:= 0.4.5
+XORG_LIB_XCOMPOSITE_MD5		:= 3fa0841ea89024719b20cd702a9b54e0
 XORG_LIB_XCOMPOSITE		:= libXcomposite-$(XORG_LIB_XCOMPOSITE_VERSION)
 XORG_LIB_XCOMPOSITE_SUFFIX	:= tar.bz2
 XORG_LIB_XCOMPOSITE_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XCOMPOSITE).$(XORG_LIB_XCOMPOSITE_SUFFIX))

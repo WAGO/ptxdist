@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XMU) += xorg-lib-xmu
 #
 # Paths and names
 #
-XORG_LIB_XMU_VERSION	:= 1.1.2
-XORG_LIB_XMU_MD5	:= 41d92ab627dfa06568076043f3e089e4
+XORG_LIB_XMU_VERSION	:= 1.1.3
+XORG_LIB_XMU_MD5	:= ac774cff8b493f566088a255dbf91201
 XORG_LIB_XMU		:= libXmu-$(XORG_LIB_XMU_VERSION)
 XORG_LIB_XMU_SUFFIX	:= tar.bz2
 XORG_LIB_XMU_URL	:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XMU).$(XORG_LIB_XMU_SUFFIX))

@@ -1,8 +1,6 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2002, 2003, 2008 by Pengutronix e.K., Hildesheim, Germany
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -26,7 +24,7 @@ UTELNETD_DIR		:= $(BUILDDIR)/$(UTELNETD)
 # Compile
 # ----------------------------------------------------------------------------
 
-UTELNETD_COMPILE_ENV := \
+UTELNETD_MAKE_ENV := \
 	CROSS_COMPILE=$(COMPILER_PREFIX) \
 	$(CROSS_ENV_FLAGS)
 

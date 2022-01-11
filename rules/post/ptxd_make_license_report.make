@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011-2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -13,18 +11,26 @@ PTX_PACKAGES_TOOLS := \
 	$(HOST_PACKAGES) \
 	$(LAZY_PACKAGES)
 
+PTX_PACKAGES_TARGET := \
+	$(PTX_PACKAGES_INSTALL) \
+	$(EXTRA_PACKAGES)
+
+PHONY += license-check
+
+license-check: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_SELECTED)))
+
 PHONY += license-report
 
 license-report: \
 	$(REPORTDIR)/license-report.pdf \
 	$(REPORTDIR)/license-report-tools.pdf
 
-$(REPORTDIR)/license-report.pdf: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_INSTALL)))
+$(REPORTDIR)/license-report.pdf: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_TARGET)))
 	@$(call targetinfo)
 	@mkdir -p $(REPORTDIR)
 	@$(image/env) \
 	ptx_license_target="$@" \
-	ptxd_make_license_report $(sort $(PTX_PACKAGES_INSTALL))
+	ptxd_make_license_report $(sort $(PTX_PACKAGES_TARGET))
 	@$(call finish)
 
 $(REPORTDIR)/license-report-tools.pdf: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_TOOLS)))
@@ -43,7 +49,7 @@ license-compliance-distribution: \
 		$(RELEASEDIR)/license-compliance.pdf \
 		$(PTXDIST_LICENSE_COMPLIANCE_OSS_ARCHIVE)
 
-$(PTXDIST_LICENSE_COMPLIANCE_OSS_ARCHIVE): $(addprefix $(STATEDIR)/,$(addsuffix .release,$(PTX_PACKAGES_INSTALL) $(PTX_PACKAGES_TOOLS)))
+$(PTXDIST_LICENSE_COMPLIANCE_OSS_ARCHIVE): $(addprefix $(STATEDIR)/,$(addsuffix .release,$(PTX_PACKAGES_SELECTED)))
 	@$(call targetinfo)
 	@tar -C "$(RELEASEDIR)" \
 		--exclude=license-compliance.pdf --exclude $(notdir $@) \
@@ -51,12 +57,25 @@ $(PTXDIST_LICENSE_COMPLIANCE_OSS_ARCHIVE): $(addprefix $(STATEDIR)/,$(addsuffix 
 	@$(call finish)
 
 
-$(RELEASEDIR)/license-compliance.pdf: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_INSTALL)))
+$(RELEASEDIR)/license-compliance.pdf: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_TARGET)))
 	@$(call targetinfo)
 	@mkdir -p $(RELEASEDIR)
 	@$(image/env) \
 	ptx_license_target="$@" \
-	ptxd_make_license_compliance $(sort $(PTX_PACKAGES_INSTALL))
+	ptxd_make_license_compliance_pdf $(sort $(PTX_PACKAGES_TARGET))
+	@$(call finish)
+
+PHONY += license-compliance-data
+
+license-compliance-data: \
+	$(RELEASEDIR)/license-compliance.yaml
+
+$(RELEASEDIR)/license-compliance.yaml: $(addprefix $(STATEDIR)/,$(addsuffix .report,$(PTX_PACKAGES_SELECTED) $(IMAGE_PACKAGES)))
+	@$(call targetinfo)
+	@mkdir -p $(RELEASEDIR)
+	@$(image/env) \
+	ptx_license_target="$@" \
+	ptxd_make_license_compliance_yaml $(sort $(PTX_PACKAGES_SELECTED) $(IMAGE_PACKAGES))
 	@$(call finish)
 
 # vim: syntax=make

@@ -3,8 +3,6 @@
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #               2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -21,10 +19,10 @@ LIBNL_VERSION	:= 1.1
 LIBNL_MD5	:= ae970ccd9144e132b68664f98e7ceeb1
 LIBNL		:= libnl-$(LIBNL_VERSION)
 LIBNL_SUFFIX	:= tar.gz
-LIBNL_URL	:= http://people.suug.ch/~tgr/libnl/files/$(LIBNL).$(LIBNL_SUFFIX)
+LIBNL_URL	:= https://www.infradead.org/~tgr/libnl/files/$(LIBNL).$(LIBNL_SUFFIX)
 LIBNL_SOURCE	:= $(SRCDIR)/$(LIBNL).$(LIBNL_SUFFIX)
 LIBNL_DIR	:= $(BUILDDIR)/$(LIBNL)
-LIBNL_LICENSE	:= LGPL-2.1
+LIBNL_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

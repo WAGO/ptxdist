@@ -3,8 +3,6 @@
 # Copyright (C) 2002, 2003 by Pengutronix e.K., Hildesheim, Germany
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_OPENSSH) += openssh
 #
 # Paths and names
 #
-OPENSSH_VERSION	:= 7.5p1
-OPENSSH_MD5	:= 652fdc7d8392f112bef11cacf7e69e23
+OPENSSH_VERSION	:= 8.3p1
+OPENSSH_MD5	:= 68d7527bf2672153ca47402f6489a1af
 OPENSSH		:= openssh-$(OPENSSH_VERSION)
 OPENSSH_SUFFIX	:= tar.gz
 OPENSSH_URL	:= \
@@ -27,8 +25,8 @@ OPENSSH_URL	:= \
 
 OPENSSH_SOURCE	:= $(SRCDIR)/$(OPENSSH).$(OPENSSH_SUFFIX)
 OPENSSH_DIR	:= $(BUILDDIR)/$(OPENSSH)
-OPENSSH_LICENSE	:= BSD, 2-term BSD, 3-term BSD, MIT, THE BEER-WARE LICENSE
-OPENSSH_LICENSE_FILES := file://LICENCE;md5=e326045657e842541d3f35aada442507
+OPENSSH_LICENSE	:= BSD AND BSD-2-Clause AND BSD-3-Clause AND MIT AND Beerware AND ISC
+OPENSSH_LICENSE_FILES := file://LICENCE;encoding=ISO-8859-1;md5=18d9e5a8b3dd1790d73502f50426d4d3
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -53,6 +51,7 @@ OPENSSH_CONF_OPT	:= \
 	--sysconfdir=/etc/ssh \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-pkcs11 \
+	--disable-security-key \
 	--disable-strip \
 	--disable-etc-default-login \
 	--disable-lastlog \
@@ -64,13 +63,11 @@ OPENSSH_CONF_OPT	:= \
 	--disable-pututline \
 	--disable-pututxline \
 	--with-openssl \
-	--without-ssh1 \
 	--with-stackprotect \
 	--with-hardening \
 	--without-rpath \
 	--without-Werror \
 	--with-zlib=$(SYSROOT) \
-	--without-skey \
 	--without-ldns \
 	--without-libedit \
 	--without-audit \

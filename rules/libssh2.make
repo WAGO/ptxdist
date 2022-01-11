@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBSSH2) += libssh2
 #
 # Paths and names
 #
-LIBSSH2_VERSION	:= 1.8.0
-LIBSSH2_MD5	:= 3d1147cae66e2959ea5441b183de1b1c
+LIBSSH2_VERSION	:= 1.9.0
+LIBSSH2_MD5	:= 1beefafe8963982adc84b408b2959927
 LIBSSH2		:= libssh2-$(LIBSSH2_VERSION)
 LIBSSH2_SUFFIX	:= tar.gz
 LIBSSH2_URL	:= http://www.libssh2.org/download/$(LIBSSH2).$(LIBSSH2_SUFFIX)
@@ -45,9 +43,8 @@ LIBSSH2_AUTOCONF := \
 	--enable-debug \
 	--enable-hidden-symbols \
 	--enable-examples-build \
-	--with-openssl \
-	--without-wincng \
-	--without-mbedtls \
+	--disable-werror \
+	--with-crypto=openssl \
 	--with-libz \
 	--with-libssl-prefix=$(SYSROOT)/usr \
 	--with-libz-prefix=$(SYSROOT)/usr

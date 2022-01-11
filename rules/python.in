@@ -50,17 +50,6 @@ config PYTHON_SYMLINK
 	prompt "install symbolic link /usr/bin/python"
 	default y
 
-config PYTHON_LIBTK
-	bool
-	prompt "Include lib-tk packages"
-
-config PYTHON_IDLELIB
-	bool
-	prompt "Include idlelib packages"
-	help
-	  IDLE, an Integrated Development Environment for Python written in
-	  100% Python
-
 config PYTHON_DISTUTILS
 	bool
 	prompt "Include distutils packages"

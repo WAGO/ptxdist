@@ -3,15 +3,16 @@
 menuconfig SYSTEMD
 	tristate
 	depends on INITMETHOD_SYSTEMD
+	select HOST_SYSTEM_PYTHON3
+	select HOST_MESON
+	select HOST_GETTEXT
 	select HOST_GPERF
-	select HOST_CHRPATH
-	# for 'ln --relative'
-	select HOST_COREUTILS
 	select ROOTFS_RUN
 	select LIBC_PTHREAD
 	select LIBC_RT
 	select LIBC_DL		if SYSTEMD_NETWORK
 	select LIBC_M		if SYSTEMD_NETWORK || SYSTEMD_TIMEDATE
+	select ACL		if SYSTEMD_UNITS_USER
 	select LIBCAP
 	select LIBKMOD
 	select LIBKMOD_TOOLS
@@ -20,6 +21,7 @@ menuconfig SYSTEMD
 	select MACHINE_ID	if RUNTIME
 	select XZ		if SYSTEMD_XZ
 	select LZ4		if SYSTEMD_LZ4
+	select ZSTD		if SYSTEMD_ZSTD
 	select LIBMICROHTTPD	if SYSTEMD_MICROHTTPD
 	select LIBSECCOMP	if SYSTEMD_SECCOMP
 	select LIBSELINUX	if GLOBAL_SELINUX
@@ -30,6 +32,8 @@ menuconfig SYSTEMD
 	select ROOTFS_DEV
 	select LIBBLKID
 	select HOST_SYSTEMD	if SYSTEMD_UDEV_HWDB
+	select ROOTFS_VAR_LIB	if RUNTIME
+	select ROOTFS_VAR_CACHE	if RUNTIME
 	prompt "systemd                       "
 	help
 	  systemd is a system and session manager for Linux, compatible with SysV
@@ -42,6 +46,9 @@ menuconfig SYSTEMD
 	  drop-in replacement for sysvinit.
 
 	  http://www.freedesktop.org/wiki/Software/systemd
+
+	  Note: on a read-only root filesystem this package still requires a
+	  writable '/var/lib' and '/var/cache' for its run-time information.
 
 if SYSTEMD
 
@@ -77,6 +84,11 @@ config SYSTEMD_LOGIND
 	select SYSTEMD_DBUS
 	prompt "login daemon"
 
+config SYSTEMD_UNITS_USER
+	bool
+	select SYSTEMD_LOGIND
+	prompt "install default user target units"
+
 config SYSTEMD_NETWORK
 	bool
 	prompt "network configuration with systemd"
@@ -108,6 +120,9 @@ config SYSTEMD_SECCOMP
 	help
 	  Enable this if you want to use SystemCallFilter in service files
 
+config SYSTEMD_POLKIT
+	bool
+	default POLKIT
 
 menu "journald                    "
 
@@ -118,6 +133,10 @@ config SYSTEMD_XZ
 config SYSTEMD_LZ4
 	bool
 	prompt "LZ4 compressed journal support"
+
+config SYSTEMD_ZSTD
+	bool
+	prompt "ZSTD compressed journal support"
 
 config SYSTEMD_JOURNAL_REMOTE
 	bool
@@ -136,6 +155,7 @@ menu "install options               "
 
 config SYSTEMD_UDEV_DRIVERS_RULES
 	bool
+	default y
 	prompt "install udev driver rules"
 	help
 	  This will install the generic udev drivers rules files from the udev package
@@ -178,12 +198,6 @@ config SYSTEMD_UDEV_PERSISTENT_V4L
 endmenu
 
 menu "misc helper                   "
-
-config SYSTEMD_UDEV_COLLECT
-	bool
-	prompt "collect"
-	help
-	  Collect variables across events
 
 config SYSTEMD_UDEV_MTD_PROBE
 	bool

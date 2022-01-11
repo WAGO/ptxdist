@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Juergen Beisert
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,24 +14,30 @@ PACKAGES-$(PTXCONF_CPUFREQUTILS) += cpufrequtils
 #
 # Paths and names
 #
-CPUFREQUTILS_VERSION	:= 007
-CPUFREQUTILS_MD5	:= fdd833ce70a9ae40ae8bce5b18f2becf
+CPUFREQUTILS_VERSION	:= 008
+CPUFREQUTILS_MD5	:= e0c9f333a9546f71d17fd5a0546db79e
 CPUFREQUTILS		:= cpufrequtils-$(CPUFREQUTILS_VERSION)
-CPUFREQUTILS_SUFFIX	:= tar.bz2
+CPUFREQUTILS_SUFFIX	:= tar.xz
 CPUFREQUTILS_URL	:= $(call ptx/mirror, KERNEL, utils/kernel/cpufreq/$(CPUFREQUTILS).$(CPUFREQUTILS_SUFFIX))
 CPUFREQUTILS_SOURCE	:= $(SRCDIR)/$(CPUFREQUTILS).$(CPUFREQUTILS_SUFFIX)
 CPUFREQUTILS_DIR	:= $(BUILDDIR)/$(CPUFREQUTILS)
+CPUFREQUTILS_LICENSE	:= GPL-2.0-only
+CPUFREQUTILS_LICENSE_FILES := \
+	file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
+	file://utils/info.c;startline=1;endline=5;md5=a3504f2818a74b2fffdc8e61bf3ef0f8
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-CPUFREQUTILS_PATH := PATH=$(CROSS_PATH)
-CPUFREQUTILS_COMPILE_ENV := $(CROSS_ENV)
-CPUFREQUTILS_MAKEVARS := \
+CPUFREQUTILS_MAKE_ENV	:= \
+	$(CROSS_ENV) \
 	NLS=false \
-	V=true \
-	STRIPCMD=/bin/true
+	V=$(if $(filter 1,$(PTXDIST_VERBOSE)),true,false) \
+	STRIP=strip
+
+CPUFREQUTILS_MAKE_OPT	:= \
+	CROSS=$(COMPILER_PREFIX)
 
 $(STATEDIR)/cpufrequtils.prepare:
 	@$(call targetinfo)

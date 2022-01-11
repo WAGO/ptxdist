@@ -1,0 +1,77 @@
+# -*-makefile-*-
+#
+# Copyright (C) @YEAR@ by @AUTHOR@
+#
+# For further information about the PTXdist project and license conditions
+# see the README file.
+#
+
+#
+# We provide this package
+#
+PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
+
+#
+# Paths and names
+#
+@PACKAGE@_VERSION	:= @VERSION@
+@PACKAGE@		:= @package@-$(@PACKAGE@_VERSION)
+@PACKAGE@_URL		:= file://local_src/@package@
+@PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
+@PACKAGE@_LICENSE	:= 0BSD
+@PACKAGE@_LICENSE_FILES	:= file://COPYING;md5=240269ccb62c2c66a81d8fdd094dd69f
+
+# ----------------------------------------------------------------------------
+# Get
+# ----------------------------------------------------------------------------
+
+#$(@PACKAGE@_SOURCE):
+#	@$(call targetinfo)
+#	@$(call get, @PACKAGE@)
+
+# ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
+
+#@PACKAGE@_CONF_ENV	:= $(CROSS_ENV)
+
+#
+# meson
+#
+@PACKAGE@_CONF_TOOL	:= meson
+#@PACKAGE@_CONF_OPT	:= $(CROSS_MESON_USR)
+
+# ----------------------------------------------------------------------------
+# Target-Install
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/@package@.targetinstall:
+	@$(call targetinfo)
+
+	@$(call install_init, @package@)
+	@$(call install_fixup, @package@, PRIORITY, optional)
+	@$(call install_fixup, @package@, SECTION, base)
+	@$(call install_fixup, @package@, AUTHOR, "@AUTHOR@")
+	@$(call install_fixup, @package@, DESCRIPTION, missing)
+
+#	# This is an example only. Adapt it to your requirements. Read the
+#	# documentation's section "Make it Work" in chapter "Adding new Packages"
+#	# how to prepare this content or/and read chapter
+#	# "Rule File Macro Reference" to get an idea of the available macros
+#	# you can use here and how to use them.
+
+	@$(call install_copy, @package@, 0, 0, 0755, -, /usr/bin/@package@)
+
+	@$(call install_finish, @package@)
+
+	@$(call touch)
+
+# ----------------------------------------------------------------------------
+# Clean
+# ----------------------------------------------------------------------------
+
+#$(STATEDIR)/@package@.clean:
+#	@$(call targetinfo)
+#	@$(call clean_pkg, @PACKAGE@)
+
+# vim: syntax=make

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 Dr. Neuhaus Telekommunikation GmbH, Hamburg Germany,  Oliver Graute <oliver.graute@neuhaus.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ MOSH_SUFFIX	:= tar.gz
 MOSH_URL	:= https://mosh.mit.edu/$(MOSH).$(MOSH_SUFFIX)
 MOSH_SOURCE	:= $(SRCDIR)/$(MOSH).$(MOSH_SUFFIX)
 MOSH_DIR	:= $(BUILDDIR)/$(MOSH)
-MOSH_LICENSE	:= GPL-3.0
+MOSH_LICENSE	:= GPL-3.0-only
 
 #
 # autoconf
@@ -43,6 +41,7 @@ MOSH_CONF_OPT	:= \
 	--without-ncursesw \
 	--with-crypto-library=$(call ptx/ifdef, PTXCONF_MOSH_NETTLE, nettle, openssl)
 
+MOSH_CXXFLAGS := -std=c++11
 
 # ----------------------------------------------------------------------------
 # Target-Install

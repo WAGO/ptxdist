@@ -5,9 +5,10 @@
 menuconfig DNSMASQ
 	tristate
 	prompt "dnsmasq                       "
-	select DBUS	if DNSMASQ_DBUS
-	select LUA	if DNSMASQ_SCRIPT_LUA
-	select ROOTFS_VAR_LIB
+	select DBUS		if DNSMASQ_DBUS
+	select LUA		if DNSMASQ_SCRIPT_LUA
+	select NETTLE		if DNSMASQ_DNSSEC
+	select ROOTFS_VAR_LIB	if DNSMASQ_DHCP && RUNTIME
 	help
 	  A small caching DNS proxy and DHCP server.
 
@@ -23,18 +24,21 @@ menuconfig DNSMASQ
 	  Note: In order to make dnsmasq work as DHCP, you have to enable
 	  the following kernel features: FIXME
 
+	  Note: on a read-only root filesystem this package still requires a
+	  writable '/var/lib' for its leases database (DHCP feature enabled).
+
 if DNSMASQ
 
 comment "build options   ---"
 
 config DNSMASQ_DBUS
 	bool
-	prompt "include DBUS support [BROKEN]"
-	depends on BROKEN
+	prompt "include DBUS support"
 	help
-	  This enables DBUS support in dnsmasq. This is not only a build
-	  option. You also have to enable it at runtime. FIXME: Show how,
-	  see DBUS document in dnsmasq packet
+	  This enables DBUS support in dnsmasq. To enable it at runtime
+	  /etc/dnsmasq.conf needs to contain the line
+
+	  enable-dbus
 
 config DNSMASQ_TFTP
 	bool
@@ -69,7 +73,6 @@ config DNSMASQ_DNSSEC
 	bool
 	default n
 	prompt "include DNSSEC support"
-	select NETTLE
 	help
 	  Without this option it is not possible to call scripts when a lease changes
 
@@ -77,6 +80,7 @@ comment "runtime options   ---"
 
 choice
 	prompt "Kind of startup"
+	depends on !INITMETHOD_SYSTEMD
 
 	config DNSMASQ_INETD
 		bool
@@ -106,7 +110,7 @@ endchoice
 config DNSMASQ_SYSTEMD_UNIT
 	bool
 	default y
-	depends on SYSTEMD
+	depends on INITMETHOD_SYSTEMD
 	prompt "install systemd unit files for dnsmasq"
 
 endif

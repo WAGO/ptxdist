@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ DHEX_SUFFIX	:= tar.gz
 DHEX_URL	:= http://www.dettus.net/dhex/$(DHEX).$(DHEX_SUFFIX)
 DHEX_SOURCE	:= $(SRCDIR)/$(DHEX).$(DHEX_SUFFIX)
 DHEX_DIR	:= $(BUILDDIR)/$(DHEX)
-DHEX_LICENSE	:= GPL-2.0
+DHEX_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

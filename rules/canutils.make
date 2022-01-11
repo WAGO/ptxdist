@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Robert Schwebel
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutroinx.de>
 #          
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ CANUTILS_SUFFIX		:= tar.bz2
 CANUTILS_URL		:= http://www.pengutronix.de/software/socket-can/download/canutils/v4.0/$(CANUTILS).$(CANUTILS_SUFFIX)
 CANUTILS_SOURCE		:= $(SRCDIR)/$(CANUTILS).$(CANUTILS_SUFFIX)
 CANUTILS_DIR		:= $(BUILDDIR)/$(CANUTILS)
-CANUTILS_LICENSE	:= GPL-2.0
+CANUTILS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,7 +30,7 @@ CANUTILS_LICENSE	:= GPL-2.0
 
 CANUTILS_CONF_ENV := \
 	$(CROSS_ENV) \
-	CPPFLAGS="-I$(KERNEL_HEADERS_INCLUDE_DIR) $(CROSS_CPPFLAGS)"
+	CPPFLAGS="-isystem $(KERNEL_HEADERS_INCLUDE_DIR) $(CROSS_CPPFLAGS)"
 
 #
 # autoconf

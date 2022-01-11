@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #          
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -32,6 +30,7 @@ HOST_EXPAT_DIR	= $(HOST_BUILDDIR)/$(HOST_EXPAT)
 HOST_EXPAT_CONF_TOOL	:= autoconf
 HOST_EXPAT_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
-	--disable-static
+	--disable-static \
+	--without-docbook
 
 # vim: syntax=make

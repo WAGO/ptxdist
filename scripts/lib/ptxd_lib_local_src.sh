@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 Sascha Hauer <s.hauer@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -26,7 +24,7 @@ ptxd_lib_local_src() {
 	mkdir -p "${PTXDIST_WORKSPACE}/local_src"
 
 	if [ -e "${link}" -o -L "${link}" ]; then
-		if [ -n "${PTX_FORCE}" ]; then
+		if [ -n "${PTXDIST_FORCE}" ]; then
 			rm "${link}" || exit 1
 		else
 			ptxd_bailout "'${link}' already exists. Use -f to overwrite"
@@ -37,6 +35,11 @@ ptxd_lib_local_src() {
 		ptxd_bailout "'${target}' does not exist or is not a directory"
 		exit 1
 	fi
+
+	case "${target}" in
+	/*) ;;
+	*)  target="$(ptxd_abspath "${target}")" ;;
+	esac
 
 	echo "Creating local_src link for '${pkgname}'. Package '${pkgname}' will be built from '${target}'"
 

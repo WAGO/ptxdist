@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_CAIRO) += cairo
 #
 # Paths and names
 #
-CAIRO_VERSION	:= 1.14.8
-CAIRO_MD5	:= 4ef0db2eacb271c74f8a3fd87822aa98
+CAIRO_VERSION	:= 1.16.0
+CAIRO_MD5	:= f19e0353828269c22bd72e271243a552
 CAIRO		:= cairo-$(CAIRO_VERSION)
 CAIRO_SUFFIX	:= tar.xz
 CAIRO_URL	:= http://cairographics.org/releases/cairo-$(CAIRO_VERSION).$(CAIRO_SUFFIX)
 CAIRO_SOURCE	:= $(SRCDIR)/$(CAIRO).$(CAIRO_SUFFIX)
 CAIRO_DIR	:= $(BUILDDIR)/$(CAIRO)
-CAIRO_LICENSE	:= LGPL-2.1, MPL-1.1
+CAIRO_LICENSE	:= LGPL-2.1-only AND MPL-1.1
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -55,7 +53,6 @@ CAIRO_CONF_OPT	:= \
 	--disable-quartz-image \
 	--disable-win32 \
 	--disable-win32-font \
-	--disable-skia \
 	--disable-os2 \
 	--disable-beos \
 	--disable-drm \
@@ -63,8 +60,9 @@ CAIRO_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_CAIRO_PNG)-png \
 	--$(call ptx/endis, PTXCONF_CAIRO_GL)-gl \
 	--$(call ptx/endis, PTXCONF_CAIRO_GLES2)-glesv2 \
+	--disable-glesv3 \
 	--disable-cogl \
-	--$(call ptx/endis, PTXCONF_CAIRO_DIRECTFB)-directfb \
+	--disable-directfb \
 	--disable-vg \
 	--$(call ptx/endis, PTXCONF_CAIRO_EGL)-egl \
 	--$(call ptx/endis, PTXCONF_CAIRO_GLX)-glx \

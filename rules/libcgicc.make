@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Alessio Igor Bogani
 #               2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,13 +15,18 @@ PACKAGES-$(PTXCONF_LIBCGICC) += libcgicc
 #
 # Paths and names
 #
-LIBCGICC_VERSION	:= 3.2.9
-LIBCGICC_MD5		:= 9c62692a2f08e2ee48c3ccc401047e80
+LIBCGICC_VERSION	:= 3.2.19
+LIBCGICC_MD5		:= a795531556aef314018834981a1466c9
 LIBCGICC		:= cgicc-$(LIBCGICC_VERSION)
 LIBCGICC_SUFFIX		:= tar.gz
 LIBCGICC_URL		:= $(call ptx/mirror, GNU, cgicc/$(LIBCGICC).$(LIBCGICC_SUFFIX))
 LIBCGICC_SOURCE		:= $(SRCDIR)/$(LIBCGICC).$(LIBCGICC_SUFFIX)
 LIBCGICC_DIR		:= $(BUILDDIR)/$(LIBCGICC)
+LIBCGICC_LICENSE	:= LGPL-3.0-or-later AND GFDL-1.2
+LIBCGICC_LICENSE_FILES	:= \
+	file://cgicc/Cgicc.cpp;md5=ef3b35fffb8b4e9cedc6e796bca50756;startline=9;endline=22 \
+	file://COPYING.DOC;md5=a923195d9202d0665777c5ab55746c5b \
+	file://COPYING.LIB;md5=60627c3fa530266bd8c2d1f15b554b86
 
 # ----------------------------------------------------------------------------
 # Prepare

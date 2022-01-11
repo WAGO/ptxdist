@@ -5,8 +5,6 @@
 #               2005-2008 by Marc Kleine-Budde <mkl@pengutronix.de>, Pengutronix
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,10 +14,8 @@
 #
 PACKAGES-$(PTXCONF_GCCLIBS) += gcclibs
 
-ifeq ($(shell which $(CROSS_CC) 2>/dev/null),)
-GCCLIBS_VERSION	:= unknown
-else
-GCCLIBS_VERSION	:= $(shell $(CROSS_CC) -dumpversion)
+ifdef PTXCONF_GCCLIBS
+GCCLIBS_VERSION	:= $(or $(call ptx/force-sh, $(CROSS_CC) -dumpversion),unknown)
 endif
 # for license information
 -include $(PTXDIST_PLATFORMDIR)/selected_toolchain/../share/compliance/gcclibs.make
@@ -45,12 +41,24 @@ ifdef PTXCONF_GCCLIBS_CXX
 	@$(call install_copy_toolchain_lib, gcclibs, libstdc++.so)
 endif
 
+ifdef PTXCONF_GCCLIBS_ATOMIC
+	@$(call install_copy_toolchain_lib, gcclibs, libatomic.so)
+endif
+
 ifdef PTXCONF_GCCLIBS_GCJ
 	@$(call install_copy_toolchain_lib, gcclibs, libgcj.so)
 endif
 
 ifdef PTXCONF_GCCLIBS_LIBASAN
 	@$(call install_copy_toolchain_lib, gcclibs, libasan.so)
+endif
+
+ifdef PTXCONF_GCCLIBS_LIBLSAN
+	@$(call install_copy_toolchain_lib, gcclibs, liblsan.so)
+endif
+
+ifdef PTXCONF_GCCLIBS_LIBTSAN
+	@$(call install_copy_toolchain_lib, gcclibs, libtsan.so)
 endif
 
 ifdef PTXCONF_GCCLIBS_LIBUBSAN

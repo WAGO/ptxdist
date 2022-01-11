@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Guillaume Gourat <guillaume.forum@free.fr>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBCGI_SUFFIX	:= tar.gz
 LIBCGI_URL	:= $(call ptx/mirror, SF, libcgi/$(LIBCGI).$(LIBCGI_SUFFIX))
 LIBCGI_SOURCE	:= $(SRCDIR)/$(LIBCGI).$(LIBCGI_SUFFIX)
 LIBCGI_DIR	:= $(BUILDDIR)/$(LIBCGI)
-LIBCGI_LICENSE	:= LGPL-2.1
+LIBCGI_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

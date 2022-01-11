@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Andreas Geisenhainer <andreas.geisenhainer@atsonline.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,8 @@ LIBMNL_SUFFIX	:= tar.bz2
 LIBMNL_URL		:= http://ftp.netfilter.org/pub/libmnl/$(LIBMNL).$(LIBMNL_SUFFIX)
 LIBMNL_SOURCE	:= $(SRCDIR)/$(LIBMNL).$(LIBMNL_SUFFIX)
 LIBMNL_DIR		:= $(BUILDDIR)/$(LIBMNL)
-LIBMNL_LICENSE	:= GPL-2.0
+LIBMNL_LICENSE	:= LGPL-2.1-or-later
+LIBMNL_LICENSE_FILES := file://COPYING;md5=4fbd65380cdd255951079008b364516c
 
 #
 # autoconf

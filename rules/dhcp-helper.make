@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 Dr. Neuhaus Telekommunikation GmbH, Hamburg Germany, Oliver Graute <oliver.graute@neuhaus.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ DHCP_HELPER_SUFFIX	:= tar.gz
 DHCP_HELPER_URL		:= http://www.thekelleys.org.uk/dhcp-helper/$(DHCP_HELPER).$(DHCP_HELPER_SUFFIX)
 DHCP_HELPER_SOURCE	:= $(SRCDIR)/$(DHCP_HELPER).$(DHCP_HELPER_SUFFIX)
 DHCP_HELPER_DIR		:= $(BUILDDIR)/$(DHCP_HELPER)
-DHCP_HELPER_LICENSE	:= GPL-2.0
+DHCP_HELPER_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

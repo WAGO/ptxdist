@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ AVAHI_SUFFIX	:= tar.gz
 AVAHI_URL	:= http://avahi.org/download/$(AVAHI).$(AVAHI_SUFFIX)
 AVAHI_SOURCE	:= $(SRCDIR)/$(AVAHI).$(AVAHI_SUFFIX)
 AVAHI_DIR	:= $(BUILDDIR)/$(AVAHI)
-AVAHI_LICENSE	:= LGPL-2.1+
+AVAHI_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -149,6 +147,13 @@ ifdef PTXCONF_AVAHI_SYSTEMD_UNIT
 	@$(call install_link, avahi, ../avahi-daemon.service, \
 		/usr/lib/systemd/system/multi-user.target.wants/avahi-daemon.service)
 endif
+endif
+ifdef PTXCONF_AVAHI_UTILS
+	@$(call install_copy, avahi, 0, 0, 0755, -, /usr/bin/avahi-browse)
+	@$(call install_link, avahi, avahi-browse, /usr/bin/avahi-browse-domains)
+	@$(call install_copy, avahi, 0, 0, 0755, -, /usr/bin/avahi-publish)
+	@$(call install_copy, avahi, 0, 0, 0755, -, /usr/bin/avahi-resolve)
+	@$(call install_copy, avahi, 0, 0, 0755, -, /usr/bin/avahi-set-host-name)
 endif
 endif
 

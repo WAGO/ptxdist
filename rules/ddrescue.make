@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,19 @@ PACKAGES-$(PTXCONF_DDRESCUE) += ddrescue
 #
 # Paths and names
 #
-DDRESCUE_VERSION	:= 1.15
-DDRESCUE_MD5		:= 6b445f6246074a7fa02f3b2599031096
+DDRESCUE_VERSION	:= 1.23
+DDRESCUE_MD5		:= cd85a82d510d9abf790132fb0da1bf3c
 DDRESCUE		:= ddrescue-$(DDRESCUE_VERSION)
-DDRESCUE_SUFFIX		:= tar.gz
+DDRESCUE_SUFFIX		:= tar.lz
 DDRESCUE_URL		:= $(call ptx/mirror, GNU, ddrescue/$(DDRESCUE).$(DDRESCUE_SUFFIX))
 DDRESCUE_SOURCE		:= $(SRCDIR)/$(DDRESCUE).$(DDRESCUE_SUFFIX)
 DDRESCUE_DIR		:= $(BUILDDIR)/$(DDRESCUE)
-DDRESCUE_LICENSE	:= unknown
+DDRESCUE_LICENSE	:= GPL-2.0-or-later AND BSD-2-Clause
+DDRESCUE_LICENSE_FILES	:= \
+	file://COPYING;md5=76d6e300ffd8fb9d18bd9b136a9bba13 \
+	file://main.cc;startline=1;endline=16;md5=a01d61d3293ce28b883d8ba0c497e968 \
+	file://arg_parser.cc;startline=1;endline=18;md5=41d1341d0d733a5d24b26dc3cbc1ac42
+
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Daniel Schnell
 #		2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,18 @@ PACKAGES-$(PTXCONF_LIGHTTPD) += lighttpd
 #
 # Paths and names
 #
-LIGHTTPD_VERSION	:= 1.4.45
-LIGHTTPD_MD5		:= a128e1eda76899ce3fd115efae5fe631
+LIGHTTPD_VERSION	:= 1.4.55
+LIGHTTPD_MD5		:= be4bda2c28bcbdac6eb941528f6edf03
 LIGHTTPD		:= lighttpd-$(LIGHTTPD_VERSION)
 LIGHTTPD_SUFFIX		:= tar.xz
 LIGHTTPD_URL		:= http://download.lighttpd.net/lighttpd/releases-1.4.x/$(LIGHTTPD).$(LIGHTTPD_SUFFIX)
 LIGHTTPD_SOURCE		:= $(SRCDIR)/$(LIGHTTPD).$(LIGHTTPD_SUFFIX)
 LIGHTTPD_DIR		:= $(BUILDDIR)/$(LIGHTTPD)
-LIGHTTPD_LICENSE	:= BSD-3-Clause
+LIGHTTPD_LICENSE	:= BSD-3-Clause AND OML AND RSA-MD
+LIGHTTPD_LICENSE_FILES	:= \
+	file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579 \
+	file://src/fastcgi.h;startline=7;endline=15;md5=fe9ffe753772839aace9c90e814bc356 \
+	file://src/md5.c;startline=6;endline=26;md5=b5be3b6afd4afa7bb89b16361244f9b6
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -43,16 +45,21 @@ LIGHTTPD_CONF_OPT	:= \
 	--enable-extra-warnings \
 	--without-libev \
 	--without-mysql \
+	--without-pgsql \
+	--without-dbi \
+	--without-sasl \
 	--without-ldap \
+	--without-pam \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_ATTR)-attr \
 	--without-valgrind \
 	--without-libunwind \
 	--without-krb5 \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_OPENSSL)-openssl \
+	--without-wolfssl \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_PCRE)-pcre \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_ZLIB)-zlib \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_BZ2LIB)-bzip2 \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_FAM)-fam \
+	--without-fam \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-webdav-props \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-libxml \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-sqlite \
@@ -60,6 +67,7 @@ LIGHTTPD_CONF_OPT	:= \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_LOCKS)-uuid \
 	--without-gdbm \
 	--without-geoip \
+	--without-maxminddb \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_MEMCACHED)-memcached \
 	--$(call ptx/wwo, PTXCONF_LIGHTTPD_LUA)-lua
 
@@ -87,6 +95,7 @@ LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_CML)		+= mod_cml
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_COMPRESS)	+= mod_compress
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_FASTCGI)	+= mod_fastcgi
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_MAGNET)		+= mod_magnet
+LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_OPENSSL)		+= mod_openssl
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_REWRITE)	+= mod_rewrite
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_TRIGGER_B4_DL)	+= mod_trigger_b4_dl
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_WEBDAV)		+= mod_webdav
@@ -161,19 +170,19 @@ endif
 
 ifdef PTXCONF_LIGHTTPD_GENERIC_SITE
 ifdef PTXCONF_LIGHTTPD_MOD_FASTCGI_PHP
-	@$(call install_copy, lighttpd, 12, 102, 0644, \
+	@$(call install_copy, lighttpd, www, www, 0644, \
 		$(PTXDIST_TOPDIR)/projectroot/var/www/lighttpd.html, \
 		/var/www/index.html)
 
-	@$(call install_copy, lighttpd, 12, 102, 0644, \
+	@$(call install_copy, lighttpd, www, www, 0644, \
 		$(PTXDIST_TOPDIR)/projectroot/var/www/bottles.php, \
 		/var/www/bottles.php)
 
-	@$(call install_copy, lighttpd, 12, 102, 0644, \
+	@$(call install_copy, lighttpd, www, www, 0644, \
 		$(PTXDIST_TOPDIR)/projectroot/var/www/more_bottles.php, \
 		/var/www/more_bottles.php)
 else
-	@$(call install_copy, lighttpd, 12, 102, 0644, \
+	@$(call install_copy, lighttpd, www, www, 0644, \
 		$(PTXDIST_TOPDIR)/projectroot/var/www/httpd.html, \
 		/var/www/index.html)
 endif

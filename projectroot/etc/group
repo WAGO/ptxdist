@@ -1,8 +1,11 @@
 root:x:0:
 daemon:x:1:
 adm:x:4:
+wheel:x:10:
+kvm:x:36:
 shadow:x:42:
 utmp:x:43:
+tss:x:98:
 users:x:100:
 ftp:x:101:
 www:x:102:
@@ -20,9 +23,13 @@ lock:x:114:
 audio:x:115:
 input:x:116:
 mysql:x:117:
+mosquitto:x:118:
 systemd-journal:x:201:
 systemd-network:x:202:
 systemd-journal-gateway:x:206:
 systemd-journal-remote:x:203:
 systemd-journal-upload:x:208:
+render:x:209:
+pulse:x:210:
+chrony:x:211:
 nogroup:x:65534:

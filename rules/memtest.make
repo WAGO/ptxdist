@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2004 by Robert Schwebel
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ MEMTEST_SUFFIX		:= tar.bz2
 MEMTEST_URL		:= http://www.madsgroup.org/~quintela/memtest/$(MEMTEST).$(MEMTEST_SUFFIX)
 MEMTEST_SOURCE		:= $(SRCDIR)/$(MEMTEST).$(MEMTEST_SUFFIX)
 MEMTEST_DIR		:= $(BUILDDIR)/$(MEMTEST)
-MEMTEST_LICENSE		:= GPL-2.0
+MEMTEST_LICENSE		:= GPL-2.0-only
 MEMTEST_LICENSE_FILES	:= file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f
 
 # ----------------------------------------------------------------------------

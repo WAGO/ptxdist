@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ RRDTOOL_SUFFIX	:= tar.gz
 RRDTOOL_URL	:= http://oss.oetiker.ch/rrdtool/pub/$(RRDTOOL).$(RRDTOOL_SUFFIX)
 RRDTOOL_SOURCE	:= $(SRCDIR)/$(RRDTOOL).$(RRDTOOL_SUFFIX)
 RRDTOOL_DIR	:= $(BUILDDIR)/$(RRDTOOL)
-RRDTOOL_LICENSE	:= GPL-2.0+
+RRDTOOL_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

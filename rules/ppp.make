@@ -4,8 +4,6 @@
 #                       GYRO net GmbH <info@gyro-net.de>, Hannover, Germany
 #               2008, 2009 by Juergen Beisert <juergen@kreuzholzen.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,7 +23,7 @@ PPP_SUFFIX	:= tar.gz
 PPP_URL		:= http://ftp.samba.org/pub/ppp/$(PPP).$(PPP_SUFFIX)
 PPP_SOURCE	:= $(SRCDIR)/$(PPP).$(PPP_SUFFIX)
 PPP_DIR		:= $(BUILDDIR)/$(PPP)
-PPP_LICENSE	:= BSD,GPL-2.0
+PPP_LICENSE	:= BSD AND GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -119,12 +117,6 @@ ifdef PTXCONF_PPP_MS_CBCP
 	@$(call enable_sh,$(PPP_DIR)/pppd/Makefile,CBCP=y)
 else
 	@$(call disable_sh,$(PPP_DIR)/pppd/Makefile,CBCP=y)
-endif
-
-ifdef PTXCONF_PPP_NEEDS_CRYPT
-	@$(call enable_sh,$(PPP_DIR)/pppd/Makefile,USE_CRYPT=y)
-else
-	@$(call disable_sh,$(PPP_DIR)/pppd/Makefile,USE_CRYPT=y)
 endif
 
 ifdef PTXCONF_PPP_TDB
@@ -233,10 +225,6 @@ endif
 ifdef PTXCONF_PPP_OE
 	@$(call install_copy, ppp, 0, 0, 0644, -, \
 		$(PPP_SHARED_INST_PATH)/rp-pppoe.so)
-endif
-ifdef PTXCONF_PPP_PLUGIN_RP_PPPOE_DISCOVERY
-	@$(call install_copy, ppp, 0, 0, 0755, -, \
-		$(PPP_SHARED_INST_PATH)/pppoe-discovery)
 endif
 ifdef PTXCONF_PPP_MINCONN
 	@$(call install_copy, ppp, 0, 0, 0644, -, \

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Tim Sander <tim.sander@hbm.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBNIH_SUFFIX	:= tar.gz
 LIBNIH_URL	:= http://launchpad.net/libnih/1.0/$(LIBNIH_VERSION)/+download/$(LIBNIH).$(LIBNIH_SUFFIX)
 LIBNIH_DIR	:= $(BUILDDIR)/$(LIBNIH)
 LIBNIH_SOURCE	:= $(SRCDIR)/$(LIBNIH).$(LIBNIH_SUFFIX)
-LIBNIH_LICENSE	:= GPL-2.0+
+LIBNIH_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

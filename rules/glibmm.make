@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,10 @@ GLIBMM_SUFFIX	:= tar.bz2
 GLIBMM_URL	:= http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.30/$(GLIBMM).$(GLIBMM_SUFFIX)
 GLIBMM_SOURCE	:= $(SRCDIR)/$(GLIBMM).$(GLIBMM_SUFFIX)
 GLIBMM_DIR	:= $(BUILDDIR)/$(GLIBMM)
+GLIBMM_LICENSE	:= LGPL-2.1-only AND GPL-2.0-only
+GLIBMM_LICENSE_FILES	:= \
+	file://COPYING;md5=d8045f3b8f929c1cb29a1e3fd737b499 \
+	file://COPYING.tools;md5=751419260aa954499f7abaabaa882bbe
 
 # ----------------------------------------------------------------------------
 # Prepare

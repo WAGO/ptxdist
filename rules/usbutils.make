@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Sascha Hauer
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ USBUTILS_SUFFIX		:= tar.xz
 USBUTILS_URL		:= $(call ptx/mirror, KERNEL, utils/usb/usbutils/$(USBUTILS).$(USBUTILS_SUFFIX))
 USBUTILS_SOURCE		:= $(SRCDIR)/$(USBUTILS).$(USBUTILS_SUFFIX)
 USBUTILS_DIR		:= $(BUILDDIR)/$(USBUTILS)
-USBUTILS_LICENSE	:= GPL-2.0
+USBUTILS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Lars Munch <lars@segv.dk>
 #               2010 by Ryan Raasch <ryan.raasch@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -14,15 +12,16 @@ PACKAGES-$(PTXCONF_LIBMXML) += libmxml
 #
 # Paths and names
 #
-LIBMXML_VERSION	:= 2.11
-LIBMXML_MD5	:= 479281fc365706343b36e3b2012a6f28
+LIBMXML_VERSION	:= 2.12
+LIBMXML_MD5	:= 35f8416ee2d27ceab653ea2ff64c794c
 LIBMXML		:= mxml-$(LIBMXML_VERSION)
 LIBMXML_SUFFIX	:= tar.gz
 LIBMXML_URL	:= https://github.com/michaelrsweet/mxml/releases/download/v$(LIBMXML_VERSION)/$(LIBMXML).$(LIBMXML_SUFFIX)
-LIBMXML_SOURCE	:= $(SRCDIR)/$(LIBMXML).$(LIBMXML_SUFFIX)
+# TODO: remove 'v2' with next version bump
+# needed for 2.12 because of incompatible tarball changes
+LIBMXML_SOURCE	:= $(SRCDIR)/$(LIBMXML)v2.$(LIBMXML_SUFFIX)
 LIBMXML_DIR	:= $(BUILDDIR)/mxml-$(LIBMXML_VERSION)
-LIBMXML_LICENSE	:= LGPL-2.0
-LIBMXML_STRIP_LEVEL := 0
+LIBMXML_LICENSE	:= LGPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

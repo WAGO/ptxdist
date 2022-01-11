@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_GST_VALIDATE1) += gst-validate1
 #
 # Paths and names
 #
-GST_VALIDATE1_VERSION	:= 1.12.3
-GST_VALIDATE1_MD5	:= 623edc479a1e5c1e76bd7e1cf8393253
+GST_VALIDATE1_VERSION	:= 1.16.2
+GST_VALIDATE1_MD5	:= 688f42c52d62e8c5e506df911553fb2c
 GST_VALIDATE1		:= gst-validate-$(GST_VALIDATE1_VERSION)
 GST_VALIDATE1_SUFFIX	:= tar.xz
 GST_VALIDATE1_URL	:= http://gstreamer.freedesktop.org/data/src/gst-validate/$(GST_VALIDATE1).$(GST_VALIDATE1_SUFFIX)
 GST_VALIDATE1_SOURCE	:= $(SRCDIR)/$(GST_VALIDATE1).$(GST_VALIDATE1_SUFFIX)
 GST_VALIDATE1_DIR	:= $(BUILDDIR)/$(GST_VALIDATE1)
-GST_VALIDATE1_LICENSE	:= LGPL-2.1+
+GST_VALIDATE1_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,7 +30,7 @@ GST_VALIDATE1_LICENSE	:= LGPL-2.1+
 GST_VALIDATE1_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	ac_cv_prog_enable_sphinx_doc=no \
-	ac_cv_path_PYTHON=/usr/bin/python
+	ac_cv_path_PYTHON=$(CROSS_PYTHON3)
 
 #
 # autoconf
@@ -46,7 +44,7 @@ GST_VALIDATE1_CONF_OPT	:= \
 	--disable-debug \
 	--disable-valgrind \
 	--disable-gcov \
-	--disable-introspection \
+	--$(call ptx/endis, PTXCONF_GSTREAMER1_INTROSPECTION)-introspection \
 	--disable-docbook \
 	--disable-gtk-doc \
 	--disable-gtk-doc-html \
@@ -90,6 +88,11 @@ $(STATEDIR)/gst-validate1.targetinstall:
 	@$(call install_tree, gst-validate1, 0, 0, -, \
 		/usr/share/gstreamer-1.0/validate/scenarios)
 
+ifdef PTXCONF_GSTREAMER1_INTROSPECTION
+	@$(call install_copy, gst-validate1, 0, 0, 644, -, \
+		/usr/lib/girepository-1.0/GstValidate-1.0.typelib)
+endif
+
 ifdef PTXCONF_GST_VALIDATE1_VIDEO
 	@$(call install_lib, gst-validate1, 0, 0, 0644, \
 		libgstvalidatevideo-1.0)
@@ -105,11 +108,9 @@ ifdef PTXCONF_GST_VALIDATE1_LAUNCHER
 	@$(call install_copy, gst-validate1, 0, 0, 0755, -, \
 		/usr/bin/gst-validate-launcher)
 
-	@cd $(GST_VALIDATE1_PKGDIR)/usr/lib/gst-validate-launcher/python && \
-		for file in `find launcher/ -name "*.pyc"`; do \
-			$(call install_copy, gst-validate1, 0, 0, 0644, -, \
-				/usr/lib/gst-validate-launcher/python/$${file}); \
-		done
+	# internal magic is broken when .py files are missing
+	$(call install_glob, gst-validate1, 0, 0, -, \
+		/usr/lib/gst-validate-launcher/python,*.py)
 endif
 
 	@$(call install_finish, gst-validate1)

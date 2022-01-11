@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ USTR_SUFFIX	:= tar.bz2
 USTR_URL	:= http://www.and.org/ustr/$(USTR_VERSION)/$(USTR).$(USTR_SUFFIX)
 USTR_SOURCE	:= $(SRCDIR)/$(USTR).$(USTR_SUFFIX)
 USTR_DIR	:= $(BUILDDIR)/$(USTR)
-USTR_LICENSE	:= LGPL-2.0+,MIT,BSD
+USTR_LICENSE	:= LGPL-2.0-or-later AND MIT AND BSD
 
 # ----------------------------------------------------------------------------
 # Prepare

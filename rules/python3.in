@@ -3,21 +3,23 @@
 menuconfig PYTHON3
 	tristate "python3                       "
 	select HOST_PYTHON3
+	select HOST_PYTHON3_ZLIB	if PYTHON3_ENSUREPIP
+	select HOST_PYTHON3_SETUPTOOLS
 	select LIBC_DL
 	select LIBC_CRYPT
 	select LIBC_M
-	select LIBC_NSL
 	select LIBC_UTIL
 	select LIBC_PTHREAD
 	select GCCLIBS_CXX
 	select EXPAT
 	select LIBFFI
+	select LIBUUID
+	select ZLIB
 	select NCURSES		if PYTHON3_NCURSES
 	select SQLITE		if PYTHON3_SQLITE
 	select BZIP2		if PYTHON3_BZ2
 	select BZIP2_LIBBZ2	if PYTHON3_BZ2
 	select XZ		if PYTHON3_LZMA
-	select ZLIB		if PYTHON3_ZLIB
 	select READLINE		if PYTHON3_READLINE
 	select DB		if PYTHON3_DB
 	select OPENSSL		if PYTHON3_SSL
@@ -31,29 +33,26 @@ menuconfig PYTHON3
 
 if PYTHON3
 
-config PYTHON3_NCURSES
-	bool "ncurses bindings"
-
-config PYTHON3_SQLITE
-	bool "sqlite bindings"
-
 config PYTHON3_BZ2
-	bool "libbz2 bindings"
-
-config PYTHON3_LZMA
-	bool "lzma bindings"
-
-config PYTHON3_ZLIB
-	bool "zlib bindings"
-
-config PYTHON3_READLINE
-	bool "readline bindings"
+	bool "bz2 bindings"
 
 config PYTHON3_DB
 	bool "db bindings"
 
+config PYTHON3_LZMA
+	bool "lzma bindings"
+
+config PYTHON3_NCURSES
+	bool "ncurses bindings"
+
+config PYTHON3_READLINE
+	bool "readline bindings"
+
+config PYTHON3_SQLITE
+	bool "sqlite bindings"
+
 config PYTHON3_SSL
-	bool "ssl bindings"
+	bool "ssl & hashlib bindings"
 
 config PYTHON3_SYMLINK
         depends on !PYTHON_SYMLINK
@@ -61,17 +60,14 @@ config PYTHON3_SYMLINK
 	prompt "install symbolic link /usr/bin/python"
 	default y if !PYTHON_SYMLINK
 
-config PYTHON3_LIBTK
-	bool
-	prompt "Include TK packages"
-
-config PYTHON3_IDLELIB
-	bool
-	prompt "Include idlelib packages"
-
 config PYTHON3_DISTUTILS
 	bool
 	prompt "Include distutils packages"
+
+config PYTHON3_ENSUREPIP
+	select PYTHON3_SSL
+	bool
+	prompt "Include bundled pip"
 
 endif
 

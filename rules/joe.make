@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Carsten Schlote
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,8 @@ JOE_SUFFIX	:= tar.gz
 JOE_URL		:= $(call ptx/mirror, SF, joe-editor/$(JOE).$(JOE_SUFFIX))
 JOE_SOURCE	:= $(SRCDIR)/$(JOE).$(JOE_SUFFIX)
 JOE_DIR		:= $(BUILDDIR)/$(JOE)
-
+JOE_LICENSE	:= GPL-1.0-only
+JOE_LICENSE_FILES	:= file://COPYING;md5=da10ed7cf8038981c580e11c1d3e8fb6
 
 # ----------------------------------------------------------------------------
 # Prepare

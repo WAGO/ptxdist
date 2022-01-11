@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Markus Pargmann <mpa@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ NBD_SUFFIX	:= tar.xz
 NBD_URL		:= $(call ptx/mirror, SF, nbd/$(NBD).$(NBD_SUFFIX))
 NBD_SOURCE	:= $(SRCDIR)/$(NBD).$(NBD_SUFFIX)
 NBD_DIR		:= $(BUILDDIR)/$(NBD)
-NBD_LICENSE	:= GPL-2.0
+NBD_LICENSE	:= GPL-2.0-only
 
 #
 # autoconf

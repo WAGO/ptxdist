@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Ladislav Michl
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -38,6 +36,7 @@ ZIP_MAKE_OPT	:= \
 	$(CROSS_ENV_CC) \
 	$(CROSS_ENV_CPP) \
 	$(CROSS_ENV_AS) \
+	IZ_BZIP2=missing \
 	-f unix/Makefile generic
 
 ZIP_INSTALL_OPT	:= \

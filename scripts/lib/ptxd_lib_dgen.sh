@@ -3,8 +3,6 @@
 # Copyright (C) 2006, 2007 by the PTXdist project
 #               2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -15,8 +13,7 @@ ptxd_kconfig_dep_all() {
     while [ ${#} -gt 0 ]; do
 	ptxd_kconfig dep "${1}" || {
 	    ptxd_dialog_msgbox \
-		"error: error during generation of dependencies\n" \
-		"	(maybe amd64 executable on x86)"
+		"error: error during generation of dependencies"
 	    return 1
 	}
 	shift
@@ -38,11 +35,12 @@ ptxd_dgen_configdeps() {
 
     {
 	PTXDIST_DEP_TARGET="build" ptxd_kconfig_dep_all "${config[@]}" \
-	    | sed -ne "s~DEP:\([^:]*\):\(.*\)~PTX_MAP_B_DEP_\1=\2~p"
+	    | sed -ne "s~\([A-Z]*\):\([^:]*\):\(.*\)~PTX_MAP_B_\1_\2=\3~p"
+	check_pipe_status || return
 	PTXDIST_DEP_TARGET="run" ptxd_kconfig_dep_all "${config[@]}" \
-	    | sed -ne "s~DEP:\([^:]*\):\(.*\)~PTX_MAP_R_DEP_\1=\2~p"
+	    | sed -ne "s~\([A-Z]*\):\([^:]*\):\(.*\)~PTX_MAP_R_\1_\2=\3~p"
+	check_pipe_status || return
     } > "${PTX_MAP_DEPS}.tmp"
-    check_pipe_status || return
 }
 
 #
@@ -103,6 +101,10 @@ ptxd_dgen() {
     mkdir -p -- \
 	"${STATEDIR}" \
 	"${PTXDIST_DGEN_DIR}" || return
+
+    if "${PTXCONF_SETUP_HOST_MAKE}" --version | grep -q "GNU Make 3"; then
+	export PTXDIST_OLD_MAKE=1
+    fi
 
     ptxd_dgen_configdeps &&
     ptxd_dgen_rulesfiles &&

@@ -1,9 +1,9 @@
 ## SECTION=hosttools_noprompt
-## SECTION=hosttools_platform
 
 config HOST_GLIB
 	tristate
-	default ALLYES
-	select HOST_ZLIB
+	default y if ALLYES
 	select HOST_LIBFFI
 	select HOST_LIBPCRE
+	select HOST_MESON
+	select HOST_ZLIB

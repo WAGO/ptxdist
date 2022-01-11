@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBSHOUT_SUFFIX		:= tar.gz
 LIBSHOUT_URL		:= http://downloads.xiph.org/releases/libshout/$(LIBSHOUT).$(LIBSHOUT_SUFFIX)
 LIBSHOUT_SOURCE		:= $(SRCDIR)/$(LIBSHOUT).$(LIBSHOUT_SUFFIX)
 LIBSHOUT_DIR		:= $(BUILDDIR)/$(LIBSHOUT)
-LIBSHOUT_LICENSE	:= LGPL-2.0+
+LIBSHOUT_LICENSE	:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

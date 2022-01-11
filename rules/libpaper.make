@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Roland Hieber <r.hieber@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -26,19 +24,21 @@ LIBPAPER_SUFFIX		:= tar.gz
 LIBPAPER_URL		:= http://snapshot.debian.org/archive/debian-debug/20161113T151229Z/pool/main/libp/libpaper/libpaper_$(LIBPAPER_VERSION).$(LIBPAPER_SUFFIX)
 LIBPAPER_SOURCE		:= $(SRCDIR)/$(LIBPAPER).$(LIBPAPER_SUFFIX)
 LIBPAPER_DIR		:= $(BUILDDIR)/$(LIBPAPER)
-LIBPAPER_LICENSE	:= GPL-2.0
+LIBPAPER_LICENSE	:= GPL-2.0-only
+LIBPAPER_LICENSE_FILES	:= file://COPYING;md5=0278281246c1e59af1ef0ae1784a4948
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBPAPER_CONF_ENV	:= \
-	$(CROSS_ENV) \
-	PAPERSIZE=$(PTXCONF_LIBPAPER_SIZE)
 #
 # autoconf
 #
-LIBPAPER_CONF_TOOL := autoconf
+LIBPAPER_CONF_TOOL	:= autoconf
+LIBPAPER_CONF_OPT	:= \
+	$(CROSS_AUTOCONF_USR) \
+	--with-default-paper=$(PTXCONF_LIBPAPER_SIZE)
+
 #
 # ----------------------------------------------------------------------------
 # Target-Install

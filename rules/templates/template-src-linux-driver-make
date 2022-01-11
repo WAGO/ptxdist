@@ -2,8 +2,6 @@
 #
 # Copyright (C) @YEAR@ by @AUTHOR@
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,11 +16,11 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 #
 @PACKAGE@_VERSION	:= @VERSION@
 @PACKAGE@		:= @package@-$(@PACKAGE@_VERSION)
-@PACKAGE@_URL		:= lndir://$(PTXDIST_WORKSPACE)/local_src/@package@
+@PACKAGE@_URL		:= lndir://local_src/@package@
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
 @PACKAGE@_LICENSE	:= unknown
 
-ifdef PTXCONF_@PACKAGE@
+ifneq ($(filter $(if $(PTX_COLLECTION),y,y m),$(PTXCONF_@PACKAGE@)),)
 $(STATEDIR)/kernel.targetinstall.post: $(STATEDIR)/@package@.targetinstall
 endif
 
@@ -30,21 +28,19 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-$(STATEDIR)/@package@.prepare:
-	@$(call targetinfo)
-	@$(call touch)
+@PACKAGE@_WRAPPER_BLACKLIST = $(KERNEL_WRAPPER_BLACKLIST)
+
+@PACKAGE@_CONF_TOOL := NO
 
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
 
-$(STATEDIR)/@package@.compile:
-	@$(call targetinfo)
-	$(KERNEL_PATH) $(KERNEL_ENV) $(MAKE) $(KERNEL_MAKEVARS) \
-		-C $(KERNEL_DIR) \
-		M=$(@PACKAGE@_DIR) \
-		modules
-	@$(call touch)
+@PACKAGE@_MAKE_OPT = \
+	$(KERNEL_MODULE_OPT) \
+	-C $(KERNEL_DIR) \
+	M=$(@PACKAGE@_DIR) \
+	modules
 
 # ----------------------------------------------------------------------------
 # Install
@@ -60,18 +56,7 @@ $(STATEDIR)/@package@.install:
 
 $(STATEDIR)/@package@.targetinstall:
 	@$(call targetinfo)
-	$(KERNEL_PATH) $(KERNEL_ENV) $(MAKE) $(KERNEL_MAKEVARS) \
-		-C $(KERNEL_DIR) \
-		M=$(@PACKAGE@_DIR) \
-		modules_install
+	@$(call compile, @PACKAGE@, $(@PACKAGE@_MAKE_OPT)_install)
 	@$(call touch)
-
-# ----------------------------------------------------------------------------
-# Clean
-# ----------------------------------------------------------------------------
-
-#$(STATEDIR)/@package@.clean:
-#	@$(call targetinfo)
-#	@$(call clean_pkg, @PACKAGE@)
 
 # vim: syntax=make

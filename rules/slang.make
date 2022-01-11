@@ -4,8 +4,6 @@
 #               2007 by Robert Schwebel
 #               2009, 2016 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,8 +16,8 @@ PACKAGES-$(PTXCONF_SLANG) += slang
 #
 # Paths and names
 #
-SLANG_VERSION	:= 2.3.0
-SLANG_MD5	:= 3bcc790460d52db1316c20395b7ac2f1
+SLANG_VERSION	:= 2.3.2
+SLANG_MD5	:= c2d5a7aa0246627da490be4e399c87cb
 SLANG		:= slang-$(SLANG_VERSION)
 SLANG_SUFFIX	:= tar.bz2
 SLANG_URL	:= \
@@ -27,6 +25,8 @@ SLANG_URL	:= \
     http://www.jedsoft.org/releases/slang/old/$(SLANG).$(SLANG_SUFFIX)
 SLANG_SOURCE	:= $(SRCDIR)/$(SLANG).$(SLANG_SUFFIX)
 SLANG_DIR	:= $(BUILDDIR)/$(SLANG)
+SLANG_LICENSE	:= GPL-2.0-or-later
+SLANG_LICENSE_FILES	:= file://COPYING;md5=a52a18a472d4f7e45479b06563717c02
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -38,6 +38,8 @@ SLANG_DIR	:= $(BUILDDIR)/$(SLANG)
 SLANG_CONF_TOOL	:= autoconf
 SLANG_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--without-readline \
 	--without-x \
 	--without-pcre \
 	--without-onig \

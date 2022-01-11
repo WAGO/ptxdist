@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_SM) += xorg-lib-sm
 #
 # Paths and names
 #
-XORG_LIB_SM_VERSION	:= 1.2.2
-XORG_LIB_SM_MD5		:= 499a7773c65aba513609fe651853c5f3
+XORG_LIB_SM_VERSION	:= 1.2.3
+XORG_LIB_SM_MD5		:= 87c7fad1c1813517979184c8ccd76628
 XORG_LIB_SM		:= libSM-$(XORG_LIB_SM_VERSION)
 XORG_LIB_SM_SUFFIX	:= tar.bz2
 XORG_LIB_SM_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_SM).$(XORG_LIB_SM_SUFFIX))

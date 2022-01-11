@@ -4,8 +4,6 @@
 #                       Pengutronix <info@pengutronix.de>, Germany
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -30,6 +28,8 @@ LIBPNG_LICENSE	:= Zlib
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+LIBPNG_WRAPPER_BLACKLIST := TARGET_DEBUG_FULL
 
 LIBPNG_CONF_TOOL:= autoconf
 LIBPNG_CONF_OPT := \

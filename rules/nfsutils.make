@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2003-2006 by Pengutronix e.K., Hildesheim, Germany
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ NFSUTILS_SUFFIX		:= tar.bz2
 NFSUTILS_URL		:= $(call ptx/mirror, SF, nfs/$(NFSUTILS).$(NFSUTILS_SUFFIX))
 NFSUTILS_SOURCE		:= $(SRCDIR)/$(NFSUTILS).$(NFSUTILS_SUFFIX)
 NFSUTILS_DIR		:= $(BUILDDIR)/$(NFSUTILS)
-NFSUTILS_LICENSE	:= GPL-2.0+
+NFSUTILS_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -76,10 +74,9 @@ $(STATEDIR)/nfsutils.targetinstall:
 	@$(call install_fixup, nfsutils,PRIORITY,optional)
 	@$(call install_fixup, nfsutils,SECTION,base)
 	@$(call install_fixup, nfsutils,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
-	@$(call install_fixup, nfsutils,DESCRIPTION,missing)
+	@$(call install_fixup, nfsutils,DESCRIPTION,"Network Filesystem Support")
 
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/nfsstat)
-	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/nfsiostat)
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/showmount)
 
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/rpc.statd)
@@ -119,6 +116,10 @@ ifdef PTXCONF_NFSUTILS_SERVER
 
 	@$(call install_alternative, nfsutils, 0, 0, 0644, \
 		/etc/exports)
+endif
+
+ifdef PTXCONF_NFSUTILS_PYTHON
+	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/nfsiostat)
 endif
 
 #	#

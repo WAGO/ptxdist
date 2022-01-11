@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ POLICYCOREUTILS_SUFFIX	:= tar.gz
 POLICYCOREUTILS_URL	:= https://raw.githubusercontent.com/wiki/SELinuxProject/selinux/files/releases/20120924/$(POLICYCOREUTILS).$(POLICYCOREUTILS_SUFFIX)
 POLICYCOREUTILS_SOURCE	:= $(SRCDIR)/$(POLICYCOREUTILS).$(POLICYCOREUTILS_SUFFIX)
 POLICYCOREUTILS_DIR	:= $(BUILDDIR)/$(POLICYCOREUTILS)
-POLICYCOREUTILS_LICENSE	:= GPL-2.0+
+POLICYCOREUTILS_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_APP_SETXKBMAP) += xorg-app-setxkbmap
 #
 # Paths and names
 #
-XORG_APP_SETXKBMAP_VERSION	:= 1.3.0
-XORG_APP_SETXKBMAP_MD5		:= 1001771344608e120e943a396317c33a
+XORG_APP_SETXKBMAP_VERSION	:= 1.3.2
+XORG_APP_SETXKBMAP_MD5		:= 93e736c98fb75856ee8227a0c49a128d
 XORG_APP_SETXKBMAP		:= setxkbmap-$(XORG_APP_SETXKBMAP_VERSION)
 XORG_APP_SETXKBMAP_SUFFIX	:= tar.bz2
 XORG_APP_SETXKBMAP_URL		:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_SETXKBMAP).$(XORG_APP_SETXKBMAP_SUFFIX))

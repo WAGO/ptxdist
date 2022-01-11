@@ -4,8 +4,8 @@
 \defaultfontfeatures{Scale=MatchLowercase,Mapping=tex-text}
 \IfFileExists{iffont.sty}{
   \usepackage{iffont}
-  \settofirstfound{\mainfont}{LTProjekt, DejaVu Sans, Liberation Sans}
-  \settofirstfound{\boldfont}{LTProjekt Heavy, DejaVu Sans Bold, Liberation Sans Bold}
+  \settofirstfound{\mainfont}{Open Sans, DejaVu Sans, Liberation Sans}
+  \settofirstfound{\boldfont}{Open Sans Bold, DejaVu Sans Bold, Liberation Sans Bold}
   \setmainfont[BoldFont=\boldfont]{\mainfont}
   \setsansfont[BoldFont=\boldfont]{\mainfont}
   \settofirstfound{\monofont}{Inconsolata, DejaVu Sans Mono, Liberation Sans Mono}
@@ -46,7 +46,7 @@
   \renewcommand{\footrulewidth}{0.4pt}
 }
 
-\renewenvironment{notice}[2]{
+\newenvironment{ptxdistwarning}[2]{
   \def\py@noticetype{#1}
   \csname py@noticestart@#1\endcsname
   \begin{minipage}[c]{\textwidth}
@@ -69,6 +69,15 @@
   \end{center}
   \end{minipage}
 \csname py@noticeend@\py@noticetype\endcsname }
+
+% compatibility to old sphinx versions
+\ifdefined\sphinxadmonition
+\let\sphinxadmonition\ptxdistwarning
+\let\endsphinxadmonition\endptxdistwarning
+\else
+\let\notice\ptxdistwarning
+\let\endnotice\endptxdistwarning
+\fi
 
 \definecolor{VerbatimColor}{gray}{0.95}
 \definecolor{VerbatimBorderColor}{gray}{0.75}

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_CONNMAN) += connman
 #
 # Paths and names
 #
-CONNMAN_VERSION	:= 1.30
-CONNMAN_MD5	:= 3e4006236e53b61c966213331df91f35
+CONNMAN_VERSION	:= 1.35
+CONNMAN_MD5	:= c082f39423ceed0cbf8f5fde07f4c9af
 CONNMAN		:= connman-$(CONNMAN_VERSION)
 CONNMAN_SUFFIX	:= tar.gz
 CONNMAN_URL	:= $(call ptx/mirror, KERNEL, network/connman/$(CONNMAN).$(CONNMAN_SUFFIX))
 CONNMAN_SOURCE	:= $(SRCDIR)/$(CONNMAN).$(CONNMAN_SUFFIX)
 CONNMAN_DIR	:= $(BUILDDIR)/$(CONNMAN)
-CONNMAN_LICENSE	:= GPL-2.0
+CONNMAN_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,7 +33,9 @@ CONNMAN_LICENSE	:= GPL-2.0
 CONNMAN_CONF_TOOL	:= autoconf
 CONNMAN_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--enable-optimization \
 	--disable-debug \
+	--enable-pie \
 	--disable-hh2serial-gps \
 	--disable-openconnect \
 	--disable-openvpn \
@@ -53,6 +53,7 @@ CONNMAN_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_CONNMAN_ETHERNET)-ethernet \
 	--$(call ptx/endis, PTXCONF_CONNMAN_GADGET)-gadget \
 	--$(call ptx/endis, PTXCONF_CONNMAN_WIFI)-wifi \
+	--disable-iwd \
 	--$(call ptx/endis, PTXCONF_CONNMAN_BLUETOOTH)-bluetooth \
 	--disable-ofono \
 	--disable-dundee \
@@ -63,7 +64,9 @@ CONNMAN_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_CONNMAN_CLIENT)-client \
 	--enable-datafiles \
 	--with-dbusconfdir=/usr/share \
-	--with-systemdunitdir=/usr/lib/systemd/system
+	--with-systemdunitdir=/usr/lib/systemd/system \
+	--with-tmpfilesdir=/usr/lib/tmpfiles.d \
+	--with-firewall=iptables
 
 CONNMAN_TESTS := \
 	backtrace \
@@ -110,10 +113,6 @@ CONNMAN_TESTS := \
 $(STATEDIR)/connman.install:
 	@$(call targetinfo)
 	@$(call install, CONNMAN)
-ifdef PTXCONF_CONNMAN_CLIENT
-	install -D -m 755 "$(CONNMAN_DIR)/client/connmanctl" \
-		"$(CONNMAN_PKGDIR)/usr/sbin/connmanctl"
-endif
 ifdef PTXCONF_CONNMAN_TESTS
 	@$(foreach test, $(CONNMAN_TESTS), \
 		install -D -m 755 "$(CONNMAN_DIR)/test/$(test)" \
@@ -166,6 +165,7 @@ ifdef PTXCONF_CONNMAN_POLKIT
 endif
 
 #	# ship settings which enable wired interfaces per default
+	@$(call install_copy, connman, 0, 0, 0755, /var/lib/connman)
 	@$(call install_alternative, connman, 0, 0, 0600, \
 		/var/lib/connman/settings)
 
@@ -174,7 +174,7 @@ endif
 
 #	# command line client
 ifdef PTXCONF_CONNMAN_CLIENT
-	@$(call install_copy, connman, 0, 0, 0755, -, /usr/sbin/connmanctl)
+	@$(call install_copy, connman, 0, 0, 0755, -, /usr/bin/connmanctl)
 endif
 
 #	# python tests

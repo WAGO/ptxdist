@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2007 by Bjoern Buerger <b.buerger@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LESS) += less
 #
 # Paths and names
 #
-LESS_VERSION	:= 487
-LESS_MD5	:= dcc8bf183a83b362d37fe9ef8df1fb60
+LESS_VERSION	:= 530
+LESS_MD5	:= 6a39bccf420c946b0fd7ffc64961315b
 LESS		:= less-$(LESS_VERSION)
 LESS_SUFFIX	:= tar.gz
 LESS_URL	:= $(call ptx/mirror, GNU, less/$(LESS).$(LESS_SUFFIX))
 LESS_SOURCE	:= $(SRCDIR)/$(LESS).$(LESS_SUFFIX)
 LESS_DIR	:= $(BUILDDIR)/$(LESS)
-LESS_LICENSE	:= GPL-3.0+, BSD-2-Clause
+LESS_LICENSE	:= GPL-3.0-or-later AND BSD-2-Clause
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -33,10 +31,10 @@ LESS_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	ac_cv_lib_tinfo_tgoto=no \
 	ac_cv_lib_xcurses_initscr=no \
-	ac_cv_lib_ncursesw_initscr=$(call ptx/ifdef,PTXCONF_LESS_NCURSESW,yes,no) \
-	ac_cv_lib_ncurses_initscr=$(call ptx/ifdef,PTXCONF_LESS_NCURSES,yes,no) \
+	ac_cv_lib_ncursesw_initscr=$(call ptx/yesno, PTXCONF_LESS_NCURSESW) \
+	ac_cv_lib_ncurses_initscr=$(call ptx/yesno, PTXCONF_LESS_NCURSES) \
 	ac_cv_lib_curses_initscr=no \
-	ac_cv_lib_termcap_tgetent=$(call ptx/ifdef,PTXCONF_LESS_USE_TERMCAP,yes,no) \
+	ac_cv_lib_termcap_tgetent=$(call ptx/yesno, PTXCONF_LESS_USE_TERMCAP) \
 	ac_cv_lib_termlib_tgetent=no
 
 #

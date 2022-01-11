@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Andreas Pretzsch <apr@cn-eng.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,7 +15,7 @@ ARCHIVEMOUNT_SUFFIX	:= tar.gz
 ARCHIVEMOUNT_URL	:= http://www.cybernoia.de/software/archivemount/$(ARCHIVEMOUNT).$(ARCHIVEMOUNT_SUFFIX)
 ARCHIVEMOUNT_SOURCE	:= $(SRCDIR)/$(ARCHIVEMOUNT).$(ARCHIVEMOUNT_SUFFIX)
 ARCHIVEMOUNT_DIR	:= $(BUILDDIR)/$(ARCHIVEMOUNT)
-ARCHIVEMOUNT_LICENSE	:= LGPL-2.0
+ARCHIVEMOUNT_LICENSE	:= LGPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

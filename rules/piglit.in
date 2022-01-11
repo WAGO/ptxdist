@@ -4,13 +4,13 @@ menuconfig PIGLIT
 	tristate
 	prompt "piglit                        "
 	select HOST_CMAKE
-	select HOST_SYSTEM_PYTHON
-	select HOST_SYSTEM_PYTHON_SIX
-	select HOST_SYSTEM_PYTHON_NUMPY
+	select HOST_SYSTEM_PYTHON3
+	select HOST_SYSTEM_PYTHON3_MAKO
+	select HOST_SYSTEM_PYTHON3_NUMPY
+	select HOST_SYSTEM_PYTHON3_SIX
 	select LIBPNG
 	select PYTHON3
 	select PYTHON3_BZ2
-	select PYTHON3_ZLIB
 	select PYTHON3_LZMA
 	select PYTHON3_MAKO
 	select PYTHON3_SIX
@@ -30,7 +30,7 @@ if PIGLIT
 
 config PIGLIT_WAYLAND
 	bool
-	default MESALIB_EGL_WAYLAND
+	default MESALIB_EGL_WAYLAND || WAFFLE_WAYLAND
 
 # OpenGL tests need some more dependencies sorted out
 
@@ -49,6 +49,5 @@ config PIGLIT_TESTS_OPENGLES2
 config PIGLIT_TESTS_OPENGLES3
 	bool
 	prompt "build OpenGL ES3 tests"
-	depends on BROKEN
 
 endif

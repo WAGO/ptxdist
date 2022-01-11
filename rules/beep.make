@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Bastian Stender <bst@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ BEEP_SUFFIX	:= tar.gz
 BEEP_URL	:= http://www.johnath.com/beep/$(BEEP).$(BEEP_SUFFIX)
 BEEP_SOURCE	:= $(SRCDIR)/$(BEEP).$(BEEP_SUFFIX)
 BEEP_DIR	:= $(BUILDDIR)/$(BEEP)
-BEEP_LICENSE	:= GPL-2.0
+BEEP_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

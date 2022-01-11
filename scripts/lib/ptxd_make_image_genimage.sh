@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -31,13 +29,21 @@ ptxd_make_image_genimage_config() {
 	ptxd_replace_magic "${cfg}" > "${tmp}" &&
 
     genimage_configs[${#genimage_configs[@]}]="${tmp}" &&
-    echo "${image_image}: \$(call genimage/config, ${1})" >> "${pkg_genimage_deps}"
+    ptxd_get_alternative_list config/images "${1}"
+    echo "${image_image}: \$(firstword \$(wildcard ${ptxd_reply[*]}))" >> "${pkg_genimage_deps}"
 
     includes=( $(sed -n "s/.*\<include(['\"]\(.*\)['\"]).*/\1/p" "${tmp}") ) &&
     sed  -i "s:\(.*\<include(['\"]\)\(.*\)\(['\"]).*\):\1${configdir}/\2\3:" "${tmp}" &&
     for inc in "${includes[@]}"; do
-        ptxd_make_image_genimage_config "${inc}"
+	ptxd_make_image_genimage_config "${inc}"
     done
+    if [ "${PTXDIST_VERBOSE}" -ne 0 ]; then
+	echo "'$(ptxd_print_path ${cfg})' after substitutions:"
+	echo "----------------"
+	cat "${tmp}"
+	echo "----------------"
+	echo
+    fi
 }
 export -f ptxd_make_image_genimage_config
 

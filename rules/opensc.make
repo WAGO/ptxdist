@@ -3,8 +3,6 @@
 # Copyright (C) 2010 by Juergen Beisert <jbe@pengutronix.de>
 #               2015 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,17 @@ PACKAGES-$(PTXCONF_OPENSC) += opensc
 #
 # Paths and names
 #
-OPENSC_VERSION	:= 0.15.0
-OPENSC_MD5	:= 01e6b803865f7b7574ee65a7b2d63c17
-OPENSC		:= opensc-$(OPENSC_VERSION)
+OPENSC_VERSION	:= 0.19.0
+OPENSC_MD5	:= 40734b2343cf83c62c4c403f8a37475e
+OPENSC		:= OpenSC-$(OPENSC_VERSION)
 OPENSC_SUFFIX	:= tar.gz
-OPENSC_URL	:= $(call ptx/mirror, SF, opensc/OpenSC/$(OPENSC)/$(OPENSC).$(OPENSC_SUFFIX))
+OPENSC_URL	:= https://github.com/OpenSC/OpenSC/releases/download/$(OPENSC_VERSION)/$(OPENSC).$(OPENSC_SUFFIX)
 OPENSC_SOURCE	:= $(SRCDIR)/$(OPENSC).$(OPENSC_SUFFIX)
 OPENSC_DIR	:= $(BUILDDIR)/$(OPENSC)
-OPENSC_LICENSE	:= LGPL-2.1+ AND Expat AND ISC
+OPENSC_LICENSE	:= LGPL-2.1-or-later AND Expat AND ISC
+ifdef PTXCONF_OPENSC_TESTSUITE
+OPENSC_DEVPKG	:= NO
+endif
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,17 +38,25 @@ OPENSC_CONF_TOOL := autoconf
 OPENSC_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--sysconfdir=/etc/opensc \
+	--enable-optimization \
+	--disable-strict \
+	--disable-pedantic \
+	--enable-thread-locking \
 	--enable-zlib \
 	--$(call ptx/endis,PTXCONF_OPENSC_READLINE)-readline \
-	--disable-openssl \
+	--$(call ptx/endis,PTXCONF_OPENSC_OPENSSL)-openssl \
+	--disable-openpace \
 	--$(call ptx/endis,PTXCONF_OPENSC_OPENCT)-openct \
 	--$(call ptx/endis,PTXCONF_OPENSC_PCSC)-pcsc \
+	--disable-cryptotokenkit \
 	--disable-ctapi \
 	--disable-minidriver \
 	--enable-sm \
 	--disable-man \
 	--disable-doc \
 	--disable-dnie-ui \
+	--disable-notify \
+	--$(call ptx/endis,PTXCONF_OPENSC_TESTSUITE)-tests \
 	--disable-static
 
 # ----------------------------------------------------------------------------

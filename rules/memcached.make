@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by NovaTech-LLC
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,7 +18,9 @@ MEMCACHED_VERSION	:= 1.4.13
 MEMCACHED_MD5		:= 6d18c6d25da945442fcc1187b3b63b7f
 MEMCACHED		:= memcached-$(MEMCACHED_VERSION)
 MEMCACHED_SUFFIX	:= tar.gz
-MEMCACHED_URL		:= http://memcached.googlecode.com/files/$(MEMCACHED).$(MEMCACHED_SUFFIX)
+MEMCACHED_URL		:= \
+	https://www.memcached.org/files/$(MEMCACHED).$(MEMCACHED_SUFFIX) \
+	https://www.memcached.org/files/old/$(MEMCACHED).$(MEMCACHED_SUFFIX)
 MEMCACHED_SOURCE	:= $(SRCDIR)/$(MEMCACHED).$(MEMCACHED_SUFFIX)
 MEMCACHED_DIR		:= $(BUILDDIR)/$(MEMCACHED)
 

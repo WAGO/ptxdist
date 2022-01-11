@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -35,7 +33,7 @@ ptxd_get_ipkg_files() {
 	ipkg_files="${image_ipkg_repo_dirs[@]/%//${1}_*.ipk}"
 
 	# take first hit
-	if ptxd_get_path "${ipkg_files[@]}"; then
+	if ptxd_get_path ${ipkg_files[*]}; then
 	    ptxd_reply_ipkg_files[${#ptxd_reply_ipkg_files[@]}]="${ptxd_reply}"
 	    if [ -z "$(ptxd_get_ptxconf PTXCONF_IMAGE_INSTALL_FROM_IPKG_REPOSITORY)" ]; then
 		ptxd_reply_perm_files[${#ptxd_reply_perm_files[@]}]="${ptxd_reply%/*/*}/state/${1}.perms"
@@ -60,14 +58,20 @@ export -f ptxd_get_ipkg_files
 # initialize variables needed for image creation
 #
 ptxd_make_image_init() {
+    ptxd_make_world_env_init || return
+
     if [ -z "$(ptxd_get_ptxconf PTXCONF_IMAGE_INSTALL_FROM_IPKG_REPOSITORY)" ]; then
 	image_ipkg_repo_dirs=( "${ptx_pkg_dir}" )
     else
 	image_ipkg_repo_dirs=( "${image_repo_dist_dir}" )
     fi
 
-    if [ -n "${PTXDIST_BASE_PLATFORMDIR}" ]; then
-	image_ipkg_repo_dirs[${#image_ipkg_repo_dirs[@]}]="${PTXDIST_BASE_PLATFORMDIR}/packages"
+    if [ -n "${image_label}" ]; then
+	image_label_args=( --label "${image_label}" )
+    else
+	image_label_args=()
     fi
+
+    exec 2>&${PTXDIST_FD_LOGERR}
 }
 export -f ptxd_make_image_init

@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Sascha Hauer
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,11 +15,11 @@ PACKAGES-$(PTXCONF_XORG_DATA_XBITMAPS) += xorg-data-xbitmaps
 #
 # Paths and names
 #
-XORG_DATA_XBITMAPS_VERSION	:= 1.1.0
-XORG_DATA_XBITMAPS_MD5		:= f9ddd4e70a5375508b3acaf17be0d0ab
+XORG_DATA_XBITMAPS_VERSION	:= 1.1.2
+XORG_DATA_XBITMAPS_MD5		:= cedeef095918aca86da79a2934e03daf
 XORG_DATA_XBITMAPS		:= xbitmaps-$(XORG_DATA_XBITMAPS_VERSION)
 XORG_DATA_XBITMAPS_SUFFIX	:= tar.bz2
-XORG_DATA_XBITMAPS_URL		:= $(call ptx/mirror, XORG, individual/app/$(XORG_DATA_XBITMAPS).$(XORG_DATA_XBITMAPS_SUFFIX))
+XORG_DATA_XBITMAPS_URL		:= $(call ptx/mirror, XORG, individual/data/$(XORG_DATA_XBITMAPS).$(XORG_DATA_XBITMAPS_SUFFIX))
 XORG_DATA_XBITMAPS_SOURCE	:= $(SRCDIR)/$(XORG_DATA_XBITMAPS).$(XORG_DATA_XBITMAPS_SUFFIX)
 XORG_DATA_XBITMAPS_DIR		:= $(BUILDDIR)/$(XORG_DATA_XBITMAPS)
 

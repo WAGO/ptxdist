@@ -11,6 +11,7 @@ if INITMETHOD
 
 choice
 	prompt "init method"
+	default INITMETHOD_SYSTEMD
 
 	config INITMETHOD_BBINIT
 		bool
@@ -27,6 +28,7 @@ choice
 
 	config INITMETHOD_INITRAMFS
 		bool
+		select INITRAMFS_TOOLS
 		prompt "initramfs init  "
  
 endchoice

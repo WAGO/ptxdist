@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ VORBIS_TOOLS_SUFFIX	:= tar.gz
 VORBIS_TOOLS_URL	:= http://downloads.xiph.org/releases/vorbis/$(VORBIS_TOOLS).$(VORBIS_TOOLS_SUFFIX)
 VORBIS_TOOLS_SOURCE	:= $(SRCDIR)/$(VORBIS_TOOLS).$(VORBIS_TOOLS_SUFFIX)
 VORBIS_TOOLS_DIR	:= $(BUILDDIR)/$(VORBIS_TOOLS)
-VORBIS_TOOLS_LICENSE	:= GPL-2.0
+VORBIS_TOOLS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

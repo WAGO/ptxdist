@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ BOOTCHART_TARBALL	:= bootchart_$(BOOTCHART_VERSION)-3.$(BOOTCHART_SUFFIX)
 BOOTCHART_URL		:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(BOOTCHART_TARBALL)
 BOOTCHART_SOURCE	:= $(SRCDIR)/$(BOOTCHART_TARBALL)
 BOOTCHART_DIR		:= $(BUILDDIR)/$(BOOTCHART)
-BOOTCHART_LICENSE	:= GPL-3.0
+BOOTCHART_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

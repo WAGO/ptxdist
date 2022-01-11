@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Luotao Fu <lfu@pengutronix.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ HOST_PACKAGES-$(PTXCONF_HOST_XORG_APP_BDFTOPCF) += host-xorg-app-bdftopcf
 #
 # Paths and names
 #
-HOST_XORG_APP_BDFTOPCF_VERSION	:= 1.0.3
-HOST_XORG_APP_BDFTOPCF_MD5	:= 4a7a4a848c43c42f7d499b60666434a4
+HOST_XORG_APP_BDFTOPCF_VERSION	:= 1.0.5
+HOST_XORG_APP_BDFTOPCF_MD5	:= 53a48e1fdfec29ab2e89f86d4b7ca902
 HOST_XORG_APP_BDFTOPCF		:= bdftopcf-$(HOST_XORG_APP_BDFTOPCF_VERSION)
 HOST_XORG_APP_BDFTOPCF_SUFFIX	:= tar.bz2
 HOST_XORG_APP_BDFTOPCF_URL	:= $(call ptx/mirror, XORG, individual/app/$(HOST_XORG_APP_BDFTOPCF).$(HOST_XORG_APP_BDFTOPCF_SUFFIX))

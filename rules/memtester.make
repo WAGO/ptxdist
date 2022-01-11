@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Sascha Hauer
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,14 +22,14 @@ MEMTESTER_SUFFIX	:= tar.gz
 MEMTESTER_URL		:= http://pyropus.ca/software/memtester/old-versions/$(MEMTESTER).$(MEMTESTER_SUFFIX)
 MEMTESTER_SOURCE	:= $(SRCDIR)/$(MEMTESTER).$(MEMTESTER_SUFFIX)
 MEMTESTER_DIR		:= $(BUILDDIR)/$(MEMTESTER)
-MEMTESTER_LICENSE	:= GPL-2.0
+MEMTESTER_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 MEMTESTER_PATH := PATH=$(CROSS_PATH)
-MEMTESTER_COMPILE_ENV := $(CROSS_ENV)
+MEMTESTER_MAKE_ENV := $(CROSS_ENV)
 
 $(STATEDIR)/memtester.prepare:
 	@$(call targetinfo)

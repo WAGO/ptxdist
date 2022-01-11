@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Juergen Borleis <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBAIO_SUFFIX	:= tar.gz
 LIBAIO_URL	:= http://pkgs.fedoraproject.org/repo/pkgs/libaio/libaio-0.3.110.tar.gz/2a35602e43778383e2f4907a4ca39ab8/$(LIBAIO).$(LIBAIO_SUFFIX)
 LIBAIO_SOURCE	:= $(SRCDIR)/$(LIBAIO).$(LIBAIO_SUFFIX)
 LIBAIO_DIR	:= $(BUILDDIR)/$(LIBAIO)
-LIBAIO_LICENSE	:= LGPL-2.1
+LIBAIO_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare + Compile

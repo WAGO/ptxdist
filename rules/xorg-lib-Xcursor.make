@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XCURSOR) += xorg-lib-xcursor
 #
 # Paths and names
 #
-XORG_LIB_XCURSOR_VERSION	:= 1.1.14
-XORG_LIB_XCURSOR_MD5		:= 1e7c17afbbce83e2215917047c57d1b3
+XORG_LIB_XCURSOR_VERSION	:= 1.2.0
+XORG_LIB_XCURSOR_MD5		:= 9b9be0e289130fb820aedf67705fc549
 XORG_LIB_XCURSOR		:= libXcursor-$(XORG_LIB_XCURSOR_VERSION)
 XORG_LIB_XCURSOR_SUFFIX		:= tar.bz2
 XORG_LIB_XCURSOR_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XCURSOR).$(XORG_LIB_XCURSOR_SUFFIX))

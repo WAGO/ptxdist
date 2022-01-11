@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,17 +21,20 @@ UNSTRUNG_SUFFIX		:= tar.gz
 UNSTRUNG_URL		:= http://unstrung.sandelman.ca/downloads/$(UNSTRUNG).$(UNSTRUNG_SUFFIX)
 UNSTRUNG_SOURCE		:= $(SRCDIR)/$(UNSTRUNG).$(UNSTRUNG_SUFFIX)
 UNSTRUNG_DIR		:= $(BUILDDIR)/$(UNSTRUNG)
-UNSTRUNG_LICENSE	:= GPL-2.0+
+UNSTRUNG_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 UNSTRUNG_CONF_TOOL	:= NO
-UNSTRUNG_COMPILE_ENV	:= \
+UNSTRUNG_MAKE_ENV	:= \
 	$(CROSS_ENV) \
 	ARCH=$(PTXCONF_ARCH_STRING) \
 	EMBEDDED=$(call ptx/ifdef,PTXCONF_UNSTRUNG_TESTING,,1)
+
+UNSTRUNG_MAKE_OPT = \
+	BUILDNUMBER="$(shell date --utc --date @$(SOURCE_DATE_EPOCH) '+%Y%m%d_%s')"
 
 # ----------------------------------------------------------------------------
 # Target-Install

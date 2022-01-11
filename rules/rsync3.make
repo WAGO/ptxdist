@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2003 by wschmitt@envicomp.de
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,31 +21,26 @@ RSYNC3_SUFFIX	:= tar.gz
 RSYNC3_URL	:= http://rsync.samba.org/ftp/rsync/src/$(RSYNC3).$(RSYNC3_SUFFIX)
 RSYNC3_SOURCE	:= $(SRCDIR)/$(RSYNC3).$(RSYNC3_SUFFIX)
 RSYNC3_DIR	:= $(BUILDDIR)/$(RSYNC3)
-RSYNC3_LICENSE	:= GPL-3.0
+RSYNC3_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-RSYNC3_PATH	:= PATH=$(CROSS_PATH)
-RSYNC3_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
 RSYNC3_AUTOCONF  := \
-	 $(CROSS_AUTOCONF_USR) \
-	$(GLOBAL_IPV6_OPTION) \
+	$(CROSS_AUTOCONF_USR) \
+	--disable-debug \
+	--disable-profile \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	$(GLOBAL_IPV6_OPTION) \
+	--disable-locale \
+	--$(call ptx/endis, PTXCONF_ICONV)-iconv \
 	--$(call ptx/endis, PTXCONF_RSYNC3_ACL)-acl-support \
 	--$(call ptx/endis, PTXCONF_RSYNC3_ATTR)-xattr-support \
-	--with-included-popt \
-	--disable-debug \
-	--disable-locale
-
-ifneq ($(call remove_quotes,$(PTXCONF_RSYNC3_CONFIG_FILE)),)
-RSYNC3_AUTOCONF += --with-rsync3d-conf=$(PTXCONF_RSYNC3_CONFIG_FILE)
-endif
+	--with-included-popt
 
 # ----------------------------------------------------------------------------
 # Target-Install

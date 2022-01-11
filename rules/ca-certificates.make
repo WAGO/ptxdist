@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -27,8 +25,8 @@ CA_CERTIFICATES_SOURCE		:= $(SRCDIR)/certdata-$(CA_CERTIFICATES_VERSION).$(CA_CE
 CA_CERTIFICATES_DIR		:= $(BUILDDIR)/$(CA_CERTIFICATES)
 CA_CERTIFICATES_LICENSE		:= MPL-2.0
 # Use '=' to delay $(shell ...) calls until this is needed
-CA_CERTIFICATES_CERTDATA2PEM	 = $(shell ptxd_in_path PTXDIST_PATH_SCRIPTS certdata2pem.py && echo "$${ptxd_reply}")
-CA_CERTIFICATES_BLACKLIST	 = $(shell ptxd_get_alternative config/ca-certificates blacklist.txt && echo "$${ptxd_reply}")
+CA_CERTIFICATES_CERTDATA2PEM	 = $(call ptx/in-path, PTXDIST_PATH_SCRIPTS, certdata2pem.py)
+CA_CERTIFICATES_BLACKLIST	 = $(call ptx/get-alternative, config/ca-certificates, blacklist.txt)
 
 # ----------------------------------------------------------------------------
 # Extract
@@ -54,7 +52,7 @@ CA_CERTIFICATES_CONF_TOOL	:= NO
 
 $(STATEDIR)/ca-certificates.compile:
 	@$(call targetinfo)
-	@cd $(CA_CERTIFICATES_DIR) && $(CA_CERTIFICATES_CERTDATA2PEM)
+	@$(call world/execute, CA_CERTIFICATES, $(CA_CERTIFICATES_CERTDATA2PEM))
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -63,8 +61,8 @@ $(STATEDIR)/ca-certificates.compile:
 
 $(STATEDIR)/ca-certificates.install:
 	@$(call targetinfo)
-	@rm -rf $(CA_CERTIFICATES_PKGDIR)
-	@install -d -m 0755 $(CA_CERTIFICATES_PKGDIR)/etc/ssl/certs/
+	@$(call world/execute, CA_CERTIFICATES, \
+		install -d -m 0755 $(CA_CERTIFICATES_PKGDIR)/etc/ssl/certs/)
 ifdef PTXCONF_CA_CERTIFICATES_BUNDLE
 	@for crt in $(CA_CERTIFICATES_DIR)/*.crt; do \
 		sed -e '$$a\\' "$${crt}" >> \
@@ -74,8 +72,9 @@ endif
 ifdef PTXCONF_CA_CERTIFICATES_CERTS
 	@install -m 0644 $(CA_CERTIFICATES_DIR)/*.crt \
 		$(CA_CERTIFICATES_PKGDIR)/etc/ssl/certs/
-	@OPENSSL_CONF=$(SYSROOT)/usr/lib/ssl/openssl.cnf SSL_CERT_FILE="" \
-		c_rehash $(CA_CERTIFICATES_PKGDIR)/etc/ssl/certs/
+	@$(call execute, CA_CERTIFICATES, \
+		OPENSSL_CONF=$(SYSROOT)/usr/lib/ssl/openssl.cnf SSL_CERT_FILE="" \
+		c_rehash $(CA_CERTIFICATES_PKGDIR)/etc/ssl/certs/)
 endif
 	@$(call touch)
 

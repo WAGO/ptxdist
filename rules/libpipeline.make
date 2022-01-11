@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Juergen Beisert <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBPIPELINE_SUFFIX	:= tar.gz
 LIBPIPELINE_URL		:= http://download.savannah.gnu.org/releases/libpipeline/$(LIBPIPELINE).$(LIBPIPELINE_SUFFIX)
 LIBPIPELINE_SOURCE	:= $(SRCDIR)/$(LIBPIPELINE).$(LIBPIPELINE_SUFFIX)
 LIBPIPELINE_DIR		:= $(BUILDDIR)/$(LIBPIPELINE)
-LIBPIPELINE_LICENSE	:= GPL-3.0
+LIBPIPELINE_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

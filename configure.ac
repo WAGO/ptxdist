@@ -30,9 +30,17 @@ AC_PROG_CC
 AC_PROG_CXX
 
 dnl
+dnl Check for pkg-config
+dnl
+PKG_PROG_PKG_CONFIG
+AS_IF([test -z "$PKG_CONFIG"], AC_MSG_ERROR([pkg-config not found.]))
+
+dnl
 dnl Check header files, mostly for lxdialog & kconfig
 dnl
 AC_HEADER_STDC
+
+AC_CHECK_HEADERS([fcntl.h inttypes.h libintl.h limits.h locale.h malloc.h stddef.h stdlib.h string.h sys/time.h unistd.h])
 
 AC_CHECK_HEADER([regex.h], [], AC_MSG_ERROR([Cannot find regex.h.]))
 
@@ -41,28 +49,36 @@ AC_SEARCH_LIBS(regcomp, [regex gnuregex],,
 CONF_LIBS=${LIBS}
 AC_SUBST(CONF_LIBS)
 
-AC_SEARCH_LIBS(mvaddch, [curses ncurses pdcurses], [CURSES_LIB=$ac_lib],
-	[AC_MSG_ERROR([curses development library not found, please install libncurses-dev])])
-MCONF_LIBS=${LIBS}
+PKG_CHECK_MODULES([NCURSES], [ncurses],, [
+	AC_MSG_ERROR([Cannot find ncurses library.])])
+MCONF_LIBS="${LIBS} ${NCURSES_LIBS}"
 AC_SUBST(MCONF_LIBS)
 
+PKG_CHECK_MODULES([NCURSES_PANEL], [panel],,
+	AC_MSG_ERROR([Cannot find ncurses panel library.])])
+PKG_CHECK_MODULES([NCURSES_MENU], [menu],,
+	AC_MSG_ERROR([Cannot find ncurses menu library.])])
+NCONF_LIBS="${LIBS} ${NCURSES_LIBS} ${NCURSES_PANEL_LIBS} ${NCURSES_MENU_LIBS}"
+AC_SUBST(NCONF_LIBS)
+
 AC_CHECK_HEADERS(
-	[curses.h ncurses.h ncurses/curses.h ncurses/ncurses.h pdcurses.h pdcurses/curses.h pdcurses/pdcurses.h],
+	[curses.h ncurses.h ncurses/curses.h ncurses/ncurses.h],
 	[CURSES_LOC="<$ac_header>";found_curses_headers=yes; break;])
 AS_IF([test "x$CURSES_LOC" = "x"],
-	[AC_MSG_ERROR([curses headers not found])])
+	[AC_MSG_ERROR([ncurses headers not found])])
 AC_SUBST(CURSES_LOC)
 
+CPPFLAGS="${NCURSES_CFLAGS}"
 AC_ARG_WITH(ncurses, AS_HELP_STRING([--with-ncurses],[Include path to the ncurses headers]),
 	[
 		if test "x$withval" != "xyes"; then
-			CPPFLAGS="-I$withval"
-			AC_SUBST(CPPFLAGS)
+			CPPFLAGS="-I$withval ${CPPFLAGS}"
 		fi
 		with_ncurses=yes
 	],[
 		with_ncurses=auto
 ])
+AC_SUBST(CPPFLAGS)
 
 AC_CHECK_HEADER(
 	[menu.h],
@@ -74,6 +90,29 @@ AC_CHECK_HEADER(
 	fi
 ])
 AM_CONDITIONAL(BUILD_NCONF, test "x$NCURSES_FOUND" = "xyes")
+
+dnl
+dnl Checks for typedefs, structures, and compiler characteristics.
+dnl
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT8_T
+AC_TYPE_OFF_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
+AC_TYPE_UINT8_T
+
+dnl
+dnl Checks for library functions.
+dnl
+AC_FUNC_ALLOCA
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
+AC_CHECK_FUNCS([bzero gettimeofday memmove memset mkdir regcomp setlocale strcasecmp strchr strcspn strdup strncasecmp strpbrk strrchr strspn strtol strtoull uname])
 
 
 AC_SYS_INTERPRETER
@@ -257,8 +296,9 @@ if test -z "$MAKE"; then
 	AC_MSG_ERROR([make could not be found, please install])
 fi
 MAKE_VERSION=`$MAKE --version 2>/dev/null | $SED -ne "s/^GNU Make \([[0-9]]\+\.[[0-9.]]\+\).*$/\1/p"`
+MAJOR_MAKE_VERSION="${MAKE_VERSION%%.*}"
 MINOR_MAKE_VERSION="${MAKE_VERSION#*.}"
-MAJOR_MAKE_VERSION="${MAKE_VERSION%.*}"
+MINOR_MAKE_VERSION="${MINOR_MAKE_VERSION%%.*}"
 if test -z "${MAJOR_MAKE_VERSION}"  -o -z "${MINOR_MAKE_VERSION}" ; then
 	AC_MSG_ERROR([could not parse make version. GNU make >= 3.81 required])
 fi
@@ -290,52 +330,6 @@ AC_SUBST(SPHINX)
 
 AC_PATH_PROGS(RST2MAN, rst2man,, $PATH)
 AC_SUBST(RST2MAN)
-
-dnl
-dnl Checks for Python, needed for ipkg-utils
-dnl
-AC_ARG_WITH(python, AS_HELP_STRING([--with-python],[name of the Python executable to use]),
-    [
-	PYTHON="$withval"
-	AC_SUBST(PYTHON)
-	AC_MSG_NOTICE([Using Python executable $PYTHON])
-    ],[
-	AC_PATH_PROGS(PYTHON, python2 python2.7 python2.6 python)
-	AC_SUBST(PYTHON)
-    ])
-
-dnl
-dnl Check for Python 2.x
-dnl
-AC_MSG_CHECKING([Python version])
-PYTHON_VERSION=`$PYTHON --version 2>&1 | $SED -ne "1 s/Python \([[0-9\+\.]]\+\).*/\1/p"`
-case "$PYTHON_VERSION" in
-2.*) ;;
-*)   AC_MSG_ERROR([we need Python version 2.x but found $PYTHON_VERSION]) ;;
-esac
-AC_MSG_RESULT([$PYTHON_VERSION])
-
-dnl
-dnl We need the Python distutils
-dnl
-AC_MSG_CHECKING(whether $PYTHON finds distutils)
-if test "`$PYTHON -c "import distutils" 2> /dev/null && echo yes`" = "yes"; then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-	AC_MSG_ERROR(Please install the Python distutils package)
-fi
-
-AC_MSG_CHECKING(whether Python development files are present)
-PYTHON_MAKEFILE=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_makefile_filename()" 2> /dev/null`
-if test -e "$PYTHON_MAKEFILE"; then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-	AC_MSG_ERROR([some Python development files could not be found, you are
-		      likely using suse or redhat system as host. In this case
-		      please install the python-devel packages])
-fi
 
 dnl Check for patch
 AC_ARG_WITH(patch, AS_HELP_STRING([--with-patch],[name of the patch executable to use]),

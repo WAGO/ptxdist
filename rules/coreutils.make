@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2003-2010 by Pengutronix e.K., Hildesheim, Germany
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,15 @@ PACKAGES-$(PTXCONF_COREUTILS) += coreutils
 #
 # Paths and names
 #
-COREUTILS_VERSION	:= 8.27
-COREUTILS_MD5		:= 502795792c212932365e077946d353ae
+COREUTILS_VERSION	:= 8.31
+COREUTILS_MD5		:= 0009a224d8e288e8ec406ef0161f9293
 COREUTILS		:= coreutils-$(COREUTILS_VERSION)
 COREUTILS_SUFFIX	:= tar.xz
 COREUTILS_URL		:= $(call ptx/mirror, GNU, coreutils/$(COREUTILS).$(COREUTILS_SUFFIX))
 COREUTILS_SOURCE	:= $(SRCDIR)/$(COREUTILS).$(COREUTILS_SUFFIX)
 COREUTILS_DIR		:= $(BUILDDIR)/$(COREUTILS)
-COREUTILS_LICENSE	:= GPL-3.0
+COREUTILS_LICENSE	:= GPL-3.0-or-later
+COREUTILS_LICENSE_FILES	:= file://COPYING;md5=d32239bcb673463ab874e80d47fae504
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -169,10 +168,15 @@ COREUTILS_CONF_OPT	:= \
 	--disable-libsmack \
 	--disable-xattr \
 	--disable-libcap \
+	--disable-gcc-warnings \
+	--disable-single-binary \
+	--disable-single-binary-exceptions \
 	--enable-no-install-program=$(subst $(space),$(comma),$(strip $(COREUTILS_INST-))) \
 	--disable-nls \
+	--without-linux-crypto \
 	--without-openssl \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_SELINUX)-selinux \
+	--with-tty-group=tty \
 	--without-gmp
 
 COREUTILS_MAKE_OPT	:= \

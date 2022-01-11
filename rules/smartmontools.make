@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_SMARTMONTOOLS) += smartmontools
 #
 # Paths and names
 #
-SMARTMONTOOLS_VERSION	:= 5.42
-SMARTMONTOOLS_MD5	:= 4460bf9a79a1252ff5c00ba52cf76b2a
+SMARTMONTOOLS_VERSION	:= 6.6
+SMARTMONTOOLS_MD5	:= 9ae2c6e7131cd2813edcc65cbe5f223f
 SMARTMONTOOLS		:= smartmontools-$(SMARTMONTOOLS_VERSION)
 SMARTMONTOOLS_SUFFIX	:= tar.gz
 SMARTMONTOOLS_URL	:= $(call ptx/mirror, SF, smartmontools/$(SMARTMONTOOLS).$(SMARTMONTOOLS_SUFFIX))
 SMARTMONTOOLS_SOURCE	:= $(SRCDIR)/$(SMARTMONTOOLS).$(SMARTMONTOOLS_SUFFIX)
 SMARTMONTOOLS_DIR	:= $(BUILDDIR)/$(SMARTMONTOOLS)
-SMARTMONTOOLS_LICENSE	:= GPL-2.0
+SMARTMONTOOLS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,8 +32,11 @@ SMARTMONTOOLS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-sample \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system \
+	--without-update-smart-drivedb \
+	--without-gnupg \
 	--without-selinux \
-	--without-libcap-ng
+	--without-libcap-ng \
+	--without-nvme-devicescan
 
 # ----------------------------------------------------------------------------
 # Target-Install

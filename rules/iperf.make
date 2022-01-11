@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2007 by Sascha Hauer
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_IPERF) += iperf
 #
 # Paths and names
 #
-IPERF_VERSION	:= 2.0.9
-IPERF_MD5	:= 351b018b71176b8cb25f20eef6a9e37c
+IPERF_VERSION	:= 2.0.13
+IPERF_MD5	:= 31ea1c6d5cbf80b16ff3abe4288dad5e
 IPERF		:= iperf-$(IPERF_VERSION)
 IPERF_SUFFIX	:= tar.gz
 IPERF_URL	:= $(call ptx/mirror, SF, iperf2/$(IPERF).$(IPERF_SUFFIX))
@@ -38,11 +36,16 @@ IPERF_ENV 	:= $(CROSS_ENV)
 IPERF_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_IPV6_OPTION) \
-	--disable-multicast \
+	--enable-multicast \
 	--enable-threads \
 	--disable-debuginfo \
 	--disable-web100 \
-	--enable-kalman
+	--enable-kalman \
+	--enable-seqno64b \
+	--enable-isochronous \
+	--disable-fastsampling \
+	--disable-checkprograms \
+	--enable-af-packet
 
 # ----------------------------------------------------------------------------
 # Target-Install

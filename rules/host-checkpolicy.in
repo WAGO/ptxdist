@@ -1,8 +1,10 @@
-## SECTION=hosttools_noprompt
+## SECTION=staging
+## old section:
+### SECTION=hosttools_noprompt
 
 config HOST_CHECKPOLICY
 	tristate
-	default ALLYES
+	default y if ALLYES
 	select HOST_LIBSELINUX
 	select HOST_LIBSEPOL
 	select HOST_FLEX

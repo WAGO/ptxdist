@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by Sascha Hauer
 #               2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,15 @@ PACKAGES-$(PTXCONF_READLINE) += readline
 #
 # Paths and names
 #
-READLINE_VERSION	:= 7.0
-READLINE_MD5		:= 205b03a87fc83dab653b628c59b9fc91
+READLINE_VERSION	:= 8.0
+READLINE_MD5		:= 7e6c1f16aee3244a69aba6e438295ca3
 READLINE		:= readline-$(READLINE_VERSION)
 READLINE_SUFFIX		:= tar.gz
 READLINE_URL		:= $(call ptx/mirror, GNU, readline/$(READLINE).$(READLINE_SUFFIX))
 READLINE_SOURCE		:= $(SRCDIR)/$(READLINE).$(READLINE_SUFFIX)
 READLINE_DIR		:= $(BUILDDIR)/$(READLINE)
-READLINE_LICENSE	:= GPL-3.0+
+READLINE_LICENSE	:= GPL-3.0-or-later
+READLINE_LICENSE_FILES	:= file://COPYING;md5=d32239bcb673463ab874e80d47fae504
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,6 +34,7 @@ READLINE_AUTOCONF := \
 	--disable-multibyte \
 	--enable-shared \
 	--disable-static\
+	--disable-install-examples \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--$(call ptx/wwo,PTXCONF_READLINE_NCURSES)-curses
 

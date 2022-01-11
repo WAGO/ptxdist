@@ -1,0 +1,6 @@
+## SECTION=hosttools_noprompt
+
+config HOST_LIBELF
+	tristate
+	select HOST_ZLIB
+	default y if ALLYES

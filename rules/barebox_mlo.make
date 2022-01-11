@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 Jan Weitzel <j.weitzel@phytec.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -21,25 +19,21 @@ BAREBOX_MLO_MD5		:= $(call remove_quotes,$(PTXCONF_BAREBOX_MLO_MD5))
 BAREBOX_MLO		:= barebox-$(BAREBOX_MLO_VERSION)
 BAREBOX_MLO_URL		= http://www.barebox.org/download/$(BAREBOX_MLO).$(BAREBOX_SUFFIX)
 BAREBOX_MLO_DIR		:= $(BUILDDIR)/barebox_mlo-$(BAREBOX_MLO_VERSION)
+BAREBOX_MLO_PKGDIR	:= $(PKGDIR)/barebox_mlo-$(BAREBOX_MLO_VERSION)
 BAREBOX_MLO_SOURCE	= $(SRCDIR)/$(BAREBOX_MLO).$(BAREBOX_SUFFIX)
-BAREBOX_MLO_LICENSE	:= GPL-2.0
+BAREBOX_MLO_LICENSE	:= GPL-2.0-only
 
-BAREBOX_MLO_CONFIG	:= $(call remove_quotes, \
-		$(PTXDIST_PLATFORMCONFIGDIR)/$(PTXCONF_BAREBOX_MLO_CONFIG))
+BAREBOX_MLO_CONFIG	:= $(call ptx/in-platformconfigdir, \
+		$(call remove_quotes, $(PTXCONF_BAREBOX_MLO_CONFIG)))
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 BAREBOX_MLO_WRAPPER_BLACKLIST := \
-	TARGET_HARDEN_RELRO \
-	TARGET_HARDEN_BINDNOW \
-	TARGET_HARDEN_PIE \
-	TARGET_DEBUG \
-	TARGET_BUILD_ID
+	$(PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST)
 
 BAREBOX_MLO_PATH	:= PATH=$(CROSS_PATH)
-BAREBOX_MLO_CONF_ENV	:= KCONFIG_NOTIMESTAMP=1
 BAREBOX_MLO_CONF_TOOL	:= kconfig
 BAREBOX_MLO_CONF_OPT	:= \
 			V=$(PTXDIST_VERBOSE) \
@@ -59,8 +53,6 @@ $(BAREBOX_MLO_CONFIG):
 	@echo
 	@exit 1
 endif
-
-$(STATEDIR)/barebox_mlo.prepare: $(BAREBOX_MLO_CONFIG)
 
 # ----------------------------------------------------------------------------
 # Install
@@ -105,7 +97,7 @@ $(STATEDIR)/barebox_mlo.clean:
 # oldconfig / menuconfig
 # ----------------------------------------------------------------------------
 
-barebox_mlo_oldconfig barebox_mlo_menuconfig: $(STATEDIR)/barebox_mlo.extract
+barebox_mlo_oldconfig barebox_mlo_menuconfig barebox_mlo_nconfig: $(STATEDIR)/barebox_mlo.extract
 	@if test -e $(BAREBOX_MLO_CONFIG); then \
 		cp $(BAREBOX_MLO_CONFIG) $(BAREBOX_MLO_DIR)/.config; \
 	fi

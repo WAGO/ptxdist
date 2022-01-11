@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,16 +14,16 @@ PACKAGES-$(PTXCONF_XZ) += xz
 #
 # Paths and names
 #
-XZ_VERSION	:= 5.2.3
-XZ_MD5		:= 1592e7ca3eece099b03b35f4d9179e7c
+XZ_VERSION	:= 5.2.5
+XZ_MD5		:= 33ab3ef79aa1146b83b778210e7b0a54
 XZ		:= xz-$(XZ_VERSION)
 XZ_SUFFIX	:= tar.bz2
 XZ_URL		:= http://tukaani.org/xz/$(XZ).$(XZ_SUFFIX)
 XZ_SOURCE	:= $(SRCDIR)/$(XZ).$(XZ_SUFFIX)
 XZ_DIR		:= $(BUILDDIR)/$(XZ)
-XZ_LICENSE	:= public_domain, LGPL-2.1+, GPL-2.0+, GPL-3.0+
+XZ_LICENSE	:= public_domain AND LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later
 XZ_LICENSE_FILES := \
-	file://COPYING;md5=c475b6c7dca236740ace4bba553e8e1c \
+	file://COPYING;md5=97d554a32881fee0aa283d96e47cb24a \
 	file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 	file://COPYING.GPLv3;md5=d32239bcb673463ab874e80d47fae504 \
 	file://COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c
@@ -54,6 +52,7 @@ XZ_CONF_OPT	:= \
 	--disable-doc \
 	--enable-symbol-versions \
 	--disable-sandbox \
+	--enable-shared \
 	--disable-static \
 	--disable-nls \
 	--disable-rpath \

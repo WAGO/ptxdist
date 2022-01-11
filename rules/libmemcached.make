@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by NovaTech-LLC
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,8 @@ LIBMEMCACHED_SUFFIX		:= tar.gz
 LIBMEMCACHED_URL		:= http://launchpad.net/libmemcached/1.0/$(LIBMEMCACHED_VERSION)/+download/$(LIBMEMCACHED).$(LIBMEMCACHED_SUFFIX)
 LIBMEMCACHED_SOURCE		:= $(SRCDIR)/$(LIBMEMCACHED).$(LIBMEMCACHED_SUFFIX)
 LIBMEMCACHED_DIR		:= $(BUILDDIR)/$(LIBMEMCACHED)
+LIBMEMCACHED_LICENSE		:= BSD-3-Clause
+LIBMEMCACHED_LICENSE_FILES	:= file://COPYING;md5=0b0ea33346dc4b11e1f4d1d7a6982018
 
 # ----------------------------------------------------------------------------
 # Prepare

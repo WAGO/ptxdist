@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,14 +22,18 @@ AT_TARBALL	:= at_$(AT_VERSION).orig.$(AT_SUFFIX)
 AT_URL		:= http://snapshot.debian.org/archive/debian/20091130T214753Z/pool/main/a/at/$(AT_TARBALL)
 AT_SOURCE	:= $(SRCDIR)/$(AT_TARBALL)
 AT_DIR		:= $(BUILDDIR)/$(AT)
-AT_LICENSE	:= unknown
+AT_LICENSE	:= GPL-2.0-or-later AND GPL-3.0-or-later AND ISC
+AT_LICENSE_FILES := \
+	file://COPYING;md5=4325afd396febcb659c36b49533135d4 \
+	file://Copyright;md5=dffa11c636884752fbf0b2a159b2883a
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-AT_PATH	:= PATH=$(CROSS_PATH)
-AT_ENV 	:= $(CROSS_ENV)
+AT_ENV	:= \
+	$(CROSS_ENV) \
+	ac_cv_header_security_pam_appl_h=$(call ptx/yesno, PTXCONF_GLOBAL_PAM)
 
 ifdef PTXCONF_AT_MAIL
 AT_SENDMAIL := $(PTXCONF_AT_SENDMAIL)
@@ -42,7 +44,9 @@ endif
 #
 # autoconf
 #
-AT_AUTOCONF := $(CROSS_AUTOCONF_USR) \
+AT_CONF_TOOL	:= autoconf
+AT_CONF_OPT	:= \
+	$(CROSS_AUTOCONF_USR) \
 	--with-loadavg_mx=1.5 \
 	--with-jobdir=/var/spool/cron/atjobs \
 	--with-atspool=/var/spool/cron/atspool \

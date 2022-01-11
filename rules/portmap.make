@@ -4,8 +4,6 @@
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,6 +23,10 @@ PORTMAP_SUFFIX	:= tgz
 PORTMAP_URL	:= http://fossies.org/linux/misc/old/portmap-$(PORTMAP_VERSION).$(PORTMAP_SUFFIX)
 PORTMAP_SOURCE	:= $(SRCDIR)/portmap-$(PORTMAP_VERSION).$(PORTMAP_SUFFIX)
 PORTMAP_DIR	:= $(BUILDDIR)/$(PORTMAP)
+PORTMAP_LICENSE := BSD-4-Clause-UC AND unknown
+PORTMAP_LICENSE_FILES := \
+	file://portmap.c;startline=1;endline=32;md5=eab9bc1a44f8936c130f91f7a079ff54 \
+	file://portmap.c;startline=45;endline=77;md5=031846750f4058d98079ec93d1a46d8b
 
 # ----------------------------------------------------------------------------
 # Compile
@@ -65,11 +67,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_PORTMAP_BBINIT_LINK)),)
 endif
 endif
 endif
-
-ifdef PTXCONF_PORTMAP_INETD_SERVER
-	@$(call install_alternative, portmap, 0, 0, 0644, /etc/inetd.conf.d/portmap, n)
-endif
-
 	@$(call install_finish, portmap)
 	@$(call touch)
 

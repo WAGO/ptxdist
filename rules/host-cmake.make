@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,20 +15,20 @@ HOST_PACKAGES-$(PTXCONF_HOST_CMAKE) += host-cmake
 #
 # Paths and names
 #
-HOST_CMAKE_VERSION	:= 3.7.2
-HOST_CMAKE_MD5		:= 79bd7e65cd81ea3aa2619484ad6ff25a
+HOST_CMAKE_VERSION	:= 3.13.4
+HOST_CMAKE_MD5		:= b5a544ffc73f6922a6cf371fcb6bae22
 HOST_CMAKE		:= cmake-$(HOST_CMAKE_VERSION)
 HOST_CMAKE_SUFFIX	:= tar.gz
-HOST_CMAKE_URL		:= http://www.cmake.org/files/v3.7/$(HOST_CMAKE).$(HOST_CMAKE_SUFFIX)
+HOST_CMAKE_URL		:= https://cmake.org/files/v$(basename $(HOST_CMAKE_VERSION))/$(HOST_CMAKE).$(HOST_CMAKE_SUFFIX)
 HOST_CMAKE_SOURCE	:= $(SRCDIR)/$(HOST_CMAKE).$(HOST_CMAKE_SUFFIX)
 HOST_CMAKE_DIR		:= $(HOST_BUILDDIR)/$(HOST_CMAKE)
 HOST_CMAKE_LICENSE	:= BSD-3-Clause AND Apache-2.0 AND bzip2-1.0.5 AND (MIT OR public_domain) AND MIT
 HOST_CMAKE_LICENSE_FILES := \
-	file://Copyright.txt;md5=7a64bc564202bf7401d9a8ef33c9564d \
+	file://Copyright.txt;md5=f61f5f859bc5ddba2b050eb10335e013 \
 	file://Utilities/GitSetup/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 	file://Utilities/cmbzip2/LICENSE;md5=7023994919680c533b77301b306ea1c9 \
-	file://Utilities/cmjsoncpp/LICENSE;md5=c56ee55c03a55f8105b969d8270632ce \
-	file://Utilities/cmlibuv/LICENSE;md5=bb5ea0d651f4c3519327171906045775
+	file://Utilities/cmjsoncpp/LICENSE;md5=fa2a23dd1dc6c139f35105379d76df2b \
+	file://Utilities/cmlibuv/LICENSE;md5=a68902a430e32200263d182d44924d47
 
 # ----------------------------------------------------------------------------
 # Prepare

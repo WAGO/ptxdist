@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Sascha Hauer
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_APP_XINIT) += xorg-app-xinit
 #
 # Paths and names
 #
-XORG_APP_XINIT_VERSION	:= 1.3.2
-XORG_APP_XINIT_MD5	:= 9c0943cbd83e489ad1b05221b97efd44
+XORG_APP_XINIT_VERSION	:= 1.4.1
+XORG_APP_XINIT_MD5	:= 6d506ab2efc17a08e87778654e099d37
 XORG_APP_XINIT		:= xinit-$(XORG_APP_XINIT_VERSION)
 XORG_APP_XINIT_SUFFIX	:= tar.bz2
 XORG_APP_XINIT_URL	:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_XINIT).$(XORG_APP_XINIT_SUFFIX))

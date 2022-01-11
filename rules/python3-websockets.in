@@ -1,0 +1,8 @@
+## SECTION=python3
+
+config PYTHON3_WEBSOCKETS
+	tristate
+	prompt "python3-websockets"
+	select PYTHON3
+	help
+	  An implementation of the WebSocket Protocol (RFC 6455 & 7692)

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,16 +14,16 @@ PACKAGES-$(PTXCONF_PULSEAUDIO) += pulseaudio
 #
 # Paths and names
 #
-PULSEAUDIO_VERSION	:= 8.0
-PULSEAUDIO_MD5		:= 8678442ba0bb4b4c33ac6f62542962df
+PULSEAUDIO_VERSION	:= 13.0
+PULSEAUDIO_MD5		:= e41d606f90254ed45c90520faf83d95c
 PULSEAUDIO		:= pulseaudio-$(PULSEAUDIO_VERSION)
 PULSEAUDIO_SUFFIX	:= tar.xz
 PULSEAUDIO_URL		:= http://freedesktop.org/software/pulseaudio/releases/$(PULSEAUDIO).$(PULSEAUDIO_SUFFIX)
 PULSEAUDIO_SOURCE	:= $(SRCDIR)/$(PULSEAUDIO).$(PULSEAUDIO_SUFFIX)
 PULSEAUDIO_DIR		:= $(BUILDDIR)/$(PULSEAUDIO)
-PULSEAUDIO_LICENSE	:= MIT, GPL-2.0+, LGPL-2.1+, Rdisc, ADRIAN
+PULSEAUDIO_LICENSE	:= MIT AND GPL-2.0-or-later AND LGPL-2.1-or-later AND Rdisc AND ADRIAN
 PULSEAUDIO_LICENSE_FILES	:= \
-	file://LICENSE;md5=d9ae089c8dc5339f8ac9d8563038a29f \
+	file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \
 	file://GPL;md5=4325afd396febcb659c36b49533135d4 \
 	file://LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \
 	file://src/pulsecore/g711.c;startline=2;endline=24;md5=663902612456e1794f328632f8b6a20a \
@@ -36,69 +34,57 @@ PULSEAUDIO_LICENSE_FILES	:= \
 # ----------------------------------------------------------------------------
 
 PULSEAUDIO_CONF_ENV	:= \
-	$(CROSS_ENV) \
+	$(CROSS_MESON_ENV) \
 	ORCC=orcc
 
 #
 # autoconf
 #
-PULSEAUDIO_CONF_TOOL	:= autoconf
+PULSEAUDIO_CONF_TOOL	:= meson
 PULSEAUDIO_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-nls \
-	--disable-rpath \
-	--enable-atomic-arm-linux-helpers \
-	--enable-atomic-arm-memory-barrier \
-	--$(call ptx/endis, PTXCONF_ARCH_ARM_NEON)-neon-opt \
-	$(GLOBAL_LARGE_FILE_OPTION) \
-	--disable-x11 \
-	--disable-tests \
-	--disable-samplerate \
-	--disable-oss-output \
-	--disable-oss-wrapper \
-	--disable-coreaudio-output \
-	--enable-alsa \
-	--disable-esound \
-	--disable-solaris \
-	--disable-waveout \
-	--disable-glib2 \
-	--disable-gtk3 \
-	--disable-gconf \
-	--disable-avahi \
-	--disable-jack \
-	--disable-asyncns \
-	--disable-tcpwrap \
-	--disable-tcpwrap \
-	--disable-dbus \
-	--disable-bluez4 \
-	--disable-bluez5 \
-	--disable-bluez5-ofono-headset \
-	--disable-bluez5-native-headset \
-	--enable-udev \
-	--disable-hal-compat \
-	$(GLOBAL_IPV6_OPTION) \
-	--disable-openssl \
-	--disable-xen \
-	--disable-gcov \
-	--enable-orc \
-	--$(call ptx/endis, PTXCONF_PULSEAUDIO_SYSTEMD)-systemd-daemon \
-	--disable-systemd-login \
-	--$(call ptx/endis, PTXCONF_PULSEAUDIO_SYSTEMD)-systemd-journal \
-	--disable-manpages \
-	--disable-per-user-esound-socket \
-	--disable-mac-universal \
-	--disable-webrtc-aec \
-	--enable-adrian-aec \
-	--disable-default-build-tests \
-	--disable-legacy-database-entry-format \
-	--disable-static-bins \
-	--disable-force-preopen \
-	--with-caps \
-	--with-database=simple \
-	--without-fftw \
-	--without-speex \
-	--without-soxr \
-	--with-systemduserunitdir=/usr/lib/systemd/user
+	$(CROSS_MESON_USR) \
+	-Daccess_group=pulse-access \
+	-Dadrian-aec=$(call ptx/falsetrue, PTXCONF_PULSEAUDIO_WEBRTC_AEC) \
+	-Dalsa=enabled \
+	-Dasyncns=disabled \
+	-Datomic-arm-linux-helpers=true \
+	-Datomic-arm-memory-barrier=true \
+	-Davahi=disabled \
+	-Dbluez5=$(call ptx/truefalse, PTXCONF_PULSEAUDIO_BLUETOOTH) \
+	-Dbluez5-native-headset=$(call ptx/truefalse, PTXCONF_PULSEAUDIO_BLUETOOTH) \
+	-Dbluez5-ofono-headset=false \
+	-Ddatabase=simple \
+	-Ddbus=$(call ptx/endis, PTXCONF_PULSEAUDIO_BLUETOOTH)d \
+	-Dfftw=disabled \
+	-Dgcov=false \
+	-Dglib=disabled \
+	-Dgsettings=disabled \
+	-Dgtk=disabled \
+	-Dhal-compat=false \
+	-Dipv6=$(call ptx/truefalse, PTXCONF_GLOBAL_IPV6) \
+	-Djack=disabled \
+	-Dlegacy-database-entry-format=false \
+	-Dlirc=disabled \
+	-Dman=false \
+	-Dmodlibexecdir=/usr/lib/pulse-$(PULSEAUDIO_VERSION)/modules \
+	-Dopenssl=disabled \
+	-Dorc=enabled \
+	-Dpadsplibdir= \
+	-Dpulsedsp-location= \
+	-Drunning-from-build-tree=false \
+	-Dsamplerate=disabled \
+	-Dsoxr=disabled \
+	-Dspeex=$(call ptx/endis, PTXCONF_PULSEAUDIO_SPEEX)d \
+	-Dsystem_group= \
+	-Dsystem_user= \
+	-Dsystemd=$(call ptx/endis, PTXCONF_PULSEAUDIO_SYSTEMD)d \
+	-Dsystemduserunitdir=/usr/lib/systemd/user \
+	-Dtests=false \
+	-Dudev=enabled \
+	-Dudevrulesdir=/lib/udev/rules.d \
+	-Dwebrtc-aec=$(call ptx/endis, PTXCONF_PULSEAUDIO_WEBRTC_AEC)d \
+	-Dx11=disabled \
+	-Dzshcompletiondir=
 
 PULSEAUDIO_LDFLAGS	:= -Wl,-rpath,/usr/lib/pulseaudio:/usr/lib/pulse-$(PULSEAUDIO_VERSION)/modules
 
@@ -129,6 +115,11 @@ $(STATEDIR)/pulseaudio.targetinstall:
 	@$(call install_alternative, pulseaudio, 0, 0, 0644, /etc/pulse/system.pa)
 	@$(call install_alternative, pulseaudio, 0, 0, 0644, /etc/pulse/default.pa)
 
+ifdef PTXCONF_PULSEAUDIO_BLUETOOTH
+	@$(call install_alternative, pulseaudio, 0, 0, 0644, \
+		/etc/dbus-1/system.d/pulseaudio-system.conf)
+endif
+
 ifdef PTXCONF_PULSEAUDIO_SYSTEMD
 	@$(call install_alternative, pulseaudio, 0, 0, 0644, \
 		/usr/lib/systemd/system/pulseaudio.service)
@@ -136,6 +127,14 @@ ifdef PTXCONF_PULSEAUDIO_SYSTEMD
 		/usr/lib/systemd/system/pulseaudio.socket)
 	@$(call install_link, pulseaudio, ../pulseaudio.socket, \
 		/usr/lib/systemd/system/sockets.target.wants/pulseaudio.socket)
+ifdef PTXCONF_PULSEAUDIO_SYSTEMD_USER
+	@$(call install_alternative, pulseaudio, 0, 0, 0644, \
+		/usr/lib/systemd/user/pulseaudio.service)
+	@$(call install_alternative, pulseaudio, 0, 0, 0644, \
+		/usr/lib/systemd/user/pulseaudio.socket)
+	@$(call install_link, pulseaudio, ../pulseaudio.socket, \
+		/usr/lib/systemd/user/sockets.target.wants/pulseaudio.socket)
+endif
 endif
 
 	@$(call install_copy, pulseaudio, 0, 0, 0755, -, /usr/bin/pulseaudio)

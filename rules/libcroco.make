@@ -3,8 +3,6 @@
 # Copyright (C) 2009 by Erwin Rol
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,10 @@ LIBCROCO_SUFFIX		:= tar.bz2
 LIBCROCO_URL		:= http://ftp.gnome.org/pub/GNOME/sources/libcroco/0.6/$(LIBCROCO).$(LIBCROCO_SUFFIX)
 LIBCROCO_SOURCE		:= $(SRCDIR)/$(LIBCROCO).$(LIBCROCO_SUFFIX)
 LIBCROCO_DIR		:= $(BUILDDIR)/$(LIBCROCO)
+LIBCROCO_LICENSE	:= LGPL-2.1-only
+LIBCROCO_LICENSE_FILES	:= \
+	file://src/cr-parser.c;md5=7f381b6ab4b4e203dcf9dc22c3f686e3;startline=7;endline=24 \
+	file://COPYING.LIB;md5=55ca817ccb7d5b5b66355690e9abc605
 
 # ----------------------------------------------------------------------------
 # Prepare

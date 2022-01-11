@@ -22,6 +22,13 @@ config GCCLIBS_CXX
 	  Installs the GNU Standard C++ Library
 	  libstdc++
 
+config GCCLIBS_ATOMIC
+	bool "libatomic"
+	select GCCLIBS
+	select LIBC_PTHREAD
+	help
+	  Installs the libatomic Library
+
 
 config GCCLIBS_GCJ
 	bool "libgcj"
@@ -38,6 +45,7 @@ config GCCLIBS_GCJ
 config GCCLIBS_LIBASAN
 	bool "libasan"
 	select GCCLIBS
+	select GCCLIBS_CXX
 	select GCCLIBS_GCC_S
 	select LIBC_DL
 	select LIBC_M
@@ -47,9 +55,36 @@ config GCCLIBS_LIBASAN
 	  Installs the AddressSanitizer runtime library
 	  libasan
 
+config GCCLIBS_LIBLSAN
+	bool "liblsan"
+	select GCCLIBS
+	select GCCLIBS_CXX
+	select GCCLIBS_GCC_S
+	select LIBC_DL
+	select LIBC_M
+	select LIBC_PTHREAD
+	select LIBC_RT
+	help
+	  Installs the LeakSanitizer runtime library
+	  liblsan
+
+config GCCLIBS_LIBTSAN
+	bool "libtsan"
+	select GCCLIBS
+	select GCCLIBS_CXX
+	select GCCLIBS_GCC_S
+	select LIBC_DL
+	select LIBC_M
+	select LIBC_PTHREAD
+	select LIBC_RT
+	help
+	  Installs the ThreadSanitizer runtime library
+	  libtsan
+
 config GCCLIBS_LIBUBSAN
 	bool "libubsan"
 	select GCCLIBS
+	select GCCLIBS_CXX
 	select GCCLIBS_GCC_S
 	select LIBC_DL
 	select LIBC_M

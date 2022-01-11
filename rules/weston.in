@@ -2,6 +2,7 @@
 
 menuconfig WESTON
 	tristate
+	select HOST_MESON
 	select LIBC_UTIL
 	select PIXMAN
 	select WAYLAND
@@ -12,8 +13,7 @@ menuconfig WESTON
 	select LIBINPUT
 	select CAIRO
 	select CAIRO_PNG
-	select LIBDRM			if WESTON_DRM_COMPOSITOR
-	select MTDEV			if WESTON_DRM_COMPOSITOR || WESTON_FBDEV_COMPOSITOR
+	select LIBDRM			if WESTON_DRM_COMPOSITOR || BUILDTIME
 	select UDEV			if WESTON_DRM_COMPOSITOR || WESTON_FBDEV_COMPOSITOR
 	select UDEV_LIBUDEV		if WESTON_DRM_COMPOSITOR || WESTON_FBDEV_COMPOSITOR
 	select MESALIB			if WESTON_DRM_COMPOSITOR
@@ -30,6 +30,15 @@ menuconfig WESTON
 	select XORG_SERVER_XWAYLAND	if WESTON_XWAYLAND && RUNTIME
 	select SYSTEMD			if WESTON_SYSTEMD
 	select SYSTEMD_LOGIND		if WESTON_SYSTEMD_LOGIND
+	select DBUS			if WESTON_SYSTEMD_LOGIND
+	select GSTREAMER1		if WESTON_REMOTING
+	select GST_PLUGINS_BASE1	if WESTON_REMOTING
+	select GST_PLUGINS_BASE1_APP	if WESTON_REMOTING
+	select GST_PLUGINS_GOOD1	if WESTON_REMOTING && RUNTIME
+	select GST_PLUGINS_GOOD1_JPEG	if WESTON_REMOTING && RUNTIME
+	select GST_PLUGINS_GOOD1_RTP	if WESTON_REMOTING && RUNTIME
+	select GST_PLUGINS_GOOD1_UDP	if WESTON_REMOTING && RUNTIME
+	select PANGO			if WESTON_IVISHELL_EXAMPLE
 	prompt "weston                        "
 	help
 	  Wayland compositor reference implementation
@@ -57,11 +66,23 @@ config WESTON_FBDEV_COMPOSITOR
 	bool
 	prompt "fbdev compositor"
 
+config WESTON_LAUNCH
+	bool
+	prompt "weston-launch support"
+	# needs pam
+	depends on BROKEN
+	help
+	  weston-launch is a setuid-root program which does privileged
+	  operations on Weston's behalf
+
+config WESTON_STARTSCRIPT
+	bool
+	default INITMETHOD_BBINIT
+	prompt "install /etc/init.d/weston-init"
+
 config WESTON_SYSTEMD
 	bool
-	depends on INITMETHOD_SYSTEMD
-	default y
-	prompt "systemd support"
+	default INITMETHOD_SYSTEMD
 
 config WESTON_SYSTEMD_LOGIND
 	bool
@@ -73,5 +94,48 @@ config WESTON_WCAP_TOOLS
 	prompt "wcap tools"
 	help
 	  Weston CAPture Tools
+
+config WESTON_INSTALL_CONFIG
+	bool
+	prompt "install configuration file"
+	help
+	  Install the Weston configuration file into /etc/xdg/weston
+
+config WESTON_IVISHELL
+	bool
+	prompt "IVI-Shell"
+
+config WESTON_IVISHELL_EXAMPLE
+	bool
+	depends on WESTON_IVISHELL
+	select WESTON_INSTALL_CONFIG
+	prompt "install example IVI-Shell user interface"
+	help
+	  Install the example hmi-controller, the IVI-Shell user interface
+	  application, a few demo clients and the weston.ini configuration for
+	  the IVI-Shell.
+
+config WESTON_PIPEWIRE
+	bool
+	prompt "pipewire plugin"
+	# needs pipewire
+	depends on BROKEN
+
+config WESTON_REMOTING
+	bool
+	prompt "remoting plugin"
+
+config WESTON_SIMPLE_CLIENTS
+	bool
+	prompt "simple clients"
+	help
+	  Install the weston-simple-* test clients.
+
+config WESTON_TOUCH_CALIBRATOR
+	bool
+	prompt "touch calibrator"
+	help
+	  Install weston-touch-calibrator tool, interface must be enabled in
+	  weston.ini.
 
 endif

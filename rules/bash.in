@@ -4,6 +4,7 @@ menuconfig BASH
 	select LIBC_DL
 	select GCCLIBS_GCC_S
 	select NCURSES if BASH_CURSES
+	select TERMCAP if !BASH_CURSES
 	help
 	  The GNU Bourne Again SHell
 	  Bash is an sh-compatible command language interpreter that executes
@@ -260,5 +261,9 @@ config BASH_STATIC
 config BASH_CURSES
 	bool
 	prompt "Use libcurses instead of libtermcap"
+
+config BASH_SH
+	bool
+	default BUSYBOX = n || BUSYBOX_SH_IS_NONE
 
 endif

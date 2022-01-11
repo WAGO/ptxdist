@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -96,9 +94,7 @@ configure_blacklist = [
 ]
 
 meson_blacklist = [
-	"c_std",
-	"cpp_debugstl",
-	"cpp_std",
+	"auto_features",
 	"b_asneeded",
 	"b_colorout",
 	"b_coverage",
@@ -107,19 +103,50 @@ meson_blacklist = [
 	"b_ndebug",
 	"b_pch",
 	"b_pgo",
+	"b_pie",
 	"b_sanitize",
 	"b_staticpic",
+	"backend_max_links",
 	"bindir",
+	"build.c_args",
+	"build.c_link_args",
+	"build.c_std",
+	"build.cmake_prefix_path",
+	"build.cpp_args",
+	"build.cpp_debugstl",
+	"build.cpp_eh",
+	"build.cpp_link_args",
+	"build.cpp_rtti",
+	"build.cpp_std",
+	"build.objc_args",
+	"build.objc_link_args",
+	"build.objcpp_args",
+	"build.objcpp_link_args",
+	"build.pkg_config_path",
+	"c_args",
+	"c_link_args",
+	"c_std",
+	"cmake_prefix_path",
+	"cpp_args",
+	"cpp_debugstl",
+	"cpp_eh",
+	"cpp_link_args",
+	"cpp_rtti",
+	"cpp_std",
 	"datadir",
+	"debug",
 	"default_library",
 	"errorlogs",
 	"includedir",
 	"infodir",
+	"install_umask",
 	"layout",
 	"libexecdir",
 	"localedir",
 	"localstatedir",
 	"mandir",
+	"optimization",
+	"pkg_config_path",
 	"sbindir",
 	"sharedstatedir",
 	"stdsplit",
@@ -128,8 +155,13 @@ meson_blacklist = [
 	"unity",
 	"warning_level",
 	"werror",
+	"wrap_mode",
 
 	"bashcompletiondir",
+]
+
+cmake_blacklist = [
+	"jconfig_dir",
 ]
 
 def abort(message):
@@ -137,25 +169,37 @@ def abort(message):
 	print("\nSee '%s --help' for more details." % cmd)
 	exit(1)
 
-def ask_ptxdist(pkg):
-	ptxdist = os.environ.get("ptxdist", "ptxdist")
-	p = subprocess.Popen([ ptxdist, "-k", "make",
+def ask_ptxdist(pkg, force):
+	ptxdist = os.environ.get("PTXDIST", os.environ.get("ptxdist", "ptxdist"))
+	cmdline = [ ptxdist, "-k", "make",
 		"/print-%s_DIR" % pkg,
 		"/print-%s_SUBDIR" % pkg,
 		"/print-%s_CONF_OPT" % pkg,
 		"/print-%s_AUTOCONF" % pkg,
 		"/print-%s_CONF_TOOL" %pkg,
 		"/print-CROSS_MESON_USR",
-		"/print-CROSS_AUTOCONF_USR"],
-		stdout=subprocess.PIPE,
-		universal_newlines=True)
+		"/print-CROSS_AUTOCONF_USR",
+		"/print-PTXDIST_SYSROOT_HOST" ]
+	if force:
+		cmdline.insert(1, "--force")
+
+	try:
+		p = subprocess.Popen(cmdline,
+			stdout=subprocess.PIPE,
+			universal_newlines=True)
+	except OSError as e:
+		print("Unable to execute ptxdist: ", cmdline)
+		raise
 
 	d = p.stdout.readline().strip()
 	subdir = p.stdout.readline().strip()
 	opt = shlex.split(p.stdout.readline().strip()) + shlex.split(p.stdout.readline().strip())
 	tool = p.stdout.readline().strip()
+	if not tool and opt:
+		tool = "autoconf"
 	meson_default = shlex.split(p.stdout.readline().strip())
 	autoconf_default = shlex.split(p.stdout.readline().strip())
+	sysroot_host = p.stdout.readline().strip()
 	if tool == "meson" and not opt:
 		opt = meson_default
 	if tool == "autoconf" and not opt:
@@ -164,7 +208,7 @@ def ask_ptxdist(pkg):
 		abort("'%s' is not a valid package: %s_DIR is undefined" % (pkg, pkg))
 	if not opt:
 		abort("'%s' is not a autoconf/meson package: %s_CONF_OPT and %s_AUTOCONF are undefined" % (pkg, pkg, pkg))
-	return (tool, d, subdir, opt)
+	return (tool, d, subdir, opt, sysroot_host)
 
 def blacklist_hit(name, blacklist):
 	for e in blacklist:
@@ -176,7 +220,10 @@ parse_args_re = re.compile("--((enable|disable|with|without|with\(out\))-)?\[?([
 def parse_configure_args(args, blacklist):
 	ret = []
 	for arg in args:
-		groups = parse_args_re.match(arg).groups()
+		match = parse_args_re.match(arg)
+		if not match:
+			continue
+		groups = match.groups()
 		if not groups[2]:
 			continue
 		found = False
@@ -202,7 +249,7 @@ def parse_meson_args(args, blacklist):
 			name = last
 			value = arg
 			# Most --* args show up as generic arguments at the end
-			if name != "cross-file":
+			if name != "cross-file" and name != "wrap-mode":
 				last_args.append("-D%s=%s" % (name, value))
 			last = None
 		else:
@@ -233,6 +280,20 @@ def parse_meson_args(args, blacklist):
 		ret.append({"name": name, "value": value,
 				"blacklist": blacklist_hit(name, blacklist)})
 	return (ret, new_args + sorted(last_args))
+
+cmake_parse_args_re = re.compile("-D([^:]*)(:[^=]*)?=(.*)")
+def parse_cmake_args(args, blacklist):
+	ret = []
+	for arg in args:
+		match = cmake_parse_args_re.match(arg)
+		if not match:
+			continue
+		groups = match.groups()
+		found = False
+		ret.append({"name": groups[0], "value": groups[2],
+				"type": groups[1],
+				"blacklist": blacklist_hit(groups[0], blacklist)})
+	return ret
 
 def build_args(parsed):
 	build = []
@@ -268,18 +329,22 @@ def handle_dir(d, subdir):
 
 	configure = d + "/configure"
 	meson_build = d + "/meson.build"
-	if not os.path.exists(configure) and not os.path.exists(meson_build):
-		abort("not a autoconf/meson package: configure script / meson.build file not found in '%s'" % d)
-		exit(1)
-
-	if os.path.exists(configure) and tool != "meson":
+	cmakelists = d + "/CMakeLists.txt"
+	if os.path.exists(configure) and tool in ("autoconf", ""):
 		return handle_dir_configure(d, configure)
-	if os.path.exists(meson_build):
+	elif os.path.exists(meson_build) and tool in ("meson", ""):
 		return handle_dir_meson(d)
+	elif os.path.exists(cmakelists) and tool in ("cmake", ""):
+		return handle_dir_cmake(d)
+	else:
+		abort("not a autoconf/meson/cmake package: configure script / meson.build / CMakeLists.txt file not found in '%s'" % d)
+		exit(1)
 
 def handle_dir_configure(d, configure):
 	configure_args = []
-	p = subprocess.Popen([ configure, "--help" ], stdout=subprocess.PIPE, universal_newlines=True)
+	p = subprocess.Popen([ "./" + os.path.basename(configure), "--help" ],
+			stdout=subprocess.PIPE, universal_newlines=True,
+			cwd=os.path.dirname(configure))
 	lines = p.stdout.read().splitlines()
 	for line in lines:
 		if not re.match("^\s.*", line):
@@ -304,7 +369,7 @@ def handle_dir_meson(d):
 		abort("package must be configured")
 		exit(1)
 	args = []
-	p = subprocess.Popen([ "meson", "introspect", meson_builddir, "--buildoptions" ], stdout=subprocess.PIPE, universal_newlines=True)
+	p = subprocess.Popen([ os.path.join(sysroot_host, "bin", "meson"), "introspect", meson_builddir, "--buildoptions" ], stdout=subprocess.PIPE, universal_newlines=True)
 	options = json.load(p.stdout)
 	for option in options:
 		try:
@@ -326,6 +391,56 @@ def handle_dir_meson(d):
 		args.append("\t-D%s=%s\n" % (option["name"], value))
 
 	label = os.path.basename(d)
+	return (options, args, label)
+
+def handle_dir_cmake(d):
+	cmake_builddir = d + "-build"
+	if not os.path.exists(cmake_builddir):
+		abort("package must be configured")
+		exit(1)
+	prefix = ["", "", ""]
+	args = []
+	options = []
+	p = subprocess.Popen([ os.path.join(sysroot_host, "bin", "cmake"), "-L", "-N", d, cmake_builddir ],
+			stdout=subprocess.PIPE, universal_newlines=True)
+	lines = p.stdout.read().splitlines()
+	line_re = re.compile("([^:]*):([^=]*)=(.*)")
+	for line in lines:
+		match = line_re.match(line)
+		if not match:
+			continue
+		groups = match.groups()
+
+		name = groups[0]
+		value = groups[2]
+		blacklist = blacklist_hit(groups[0], cmake_blacklist)
+		if name.startswith("pkgcfg_") or name.endswith("_DIR"):
+			blacklist = True
+		t = None
+		try:
+			i = next(index for (index, d) in enumerate(parsed_pkg_conf_opt) if d["name"] == name)
+			t = parsed_pkg_conf_opt[i]["type"]
+			value = parsed_pkg_conf_opt[i]["value"]
+			blacklist = parsed_pkg_conf_opt[i]["blacklist"]
+		except:
+			pass
+		type_string = t if t else ""
+		options.append({"name": name, "value": value, "type": t,
+				"blacklist": blacklist})
+		if blacklist:
+			continue
+		arg = "\t-D%s%s=%s\n" % (name, type_string, value)
+		if name == "CMAKE_INSTALL_PREFIX":
+			prefix[0] = arg
+		elif name == "CMAKE_BUILD_TYPE":
+			prefix[1] = arg
+		elif name == "CMAKE_TOOLCHAIN_FILE":
+			prefix[2] = arg
+		else:
+			args.append(arg)
+
+	label = os.path.basename(d)
+	args = prefix + args
 	return (options, args, label)
 
 def show_diff(old_opt, old_label, new_opt, new_label):
@@ -379,6 +494,8 @@ parser.add_argument("-s", "--only-src", help="the only source directory",
 	dest="only")
 parser.add_argument("--sort", help="sort the options before comparing",
 	dest="sort", action="store_true")
+parser.add_argument("-f", "--force", help="pass --force when calling ptxdist",
+	dest="force", action="store_true")
 
 args = parser.parse_args()
 
@@ -406,12 +523,14 @@ ptx_pkg_conf_opt = []
 pkg_subdir = ""
 tool = None
 if args.pkg:
-	(tool, d, pkg_subdir, pkg_conf_opt) = ask_ptxdist(ptx_PKG)
+	(tool, d, pkg_subdir, pkg_conf_opt, sysroot_host) = ask_ptxdist(ptx_PKG, args.force)
 	ptx_pkg_label = "rules/%s.make" % ptx_pkg
 	if tool == "autoconf":
 		parsed_pkg_conf_opt = parse_configure_args(pkg_conf_opt, [])
 	if tool == "meson":
 		(parsed_pkg_conf_opt, pkg_conf_opt) = parse_meson_args(pkg_conf_opt, [])
+	if tool == "cmake":
+		parsed_pkg_conf_opt = parse_cmake_args(pkg_conf_opt, [])
 
 	if args.only:
 		pass

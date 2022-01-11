@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBMMS_SUFFIX	:= tar.gz
 LIBMMS_URL	:= $(call ptx/mirror, SF, libmms/libmms-$(LIBMMS_VERSION).$(LIBMMS_SUFFIX))
 LIBMMS_SOURCE	:= $(SRCDIR)/$(LIBMMS).$(LIBMMS_SUFFIX)
 LIBMMS_DIR	:= $(BUILDDIR)/$(LIBMMS)
-LIBMMS_LICENSE	:= LGPL-2.1+
+LIBMMS_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

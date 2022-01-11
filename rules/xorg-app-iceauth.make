@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Sascha Hauer
 #               2010 by George McCollister <george.mccollister@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_APP_ICEAUTH) += xorg-app-iceauth
 #
 # Paths and names
 #
-XORG_APP_ICEAUTH_VERSION	:= 1.0.5
-XORG_APP_ICEAUTH_MD5		:= 08e3f6b523da8b0af179f22f339508b2
+XORG_APP_ICEAUTH_VERSION	:= 1.0.8
+XORG_APP_ICEAUTH_MD5		:= 3b9b79fa0f9928161f4bad94273de7ae
 XORG_APP_ICEAUTH		:= iceauth-$(XORG_APP_ICEAUTH_VERSION)
 XORG_APP_ICEAUTH_SUFFIX		:= tar.bz2
 XORG_APP_ICEAUTH_URL		:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_ICEAUTH).$(XORG_APP_ICEAUTH_SUFFIX))

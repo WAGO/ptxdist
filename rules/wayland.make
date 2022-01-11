@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Philipp Zabel <p.zabel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_WAYLAND) += wayland
 #
 # Paths and names
 #
-WAYLAND_VERSION	:= 1.14.0
-WAYLAND_MD5	:= 0235f6075c32c3be61cff94fa0b9f108
+WAYLAND_VERSION	:= 1.18.0
+WAYLAND_MD5	:= 23317697b6e3ff2e1ac8c5ba3ed57b65
 WAYLAND		:= wayland-$(WAYLAND_VERSION)
 WAYLAND_SUFFIX	:= tar.xz
 WAYLAND_URL	:= http://wayland.freedesktop.org/releases/$(WAYLAND).$(WAYLAND_SUFFIX)
@@ -71,6 +69,7 @@ $(STATEDIR)/wayland.targetinstall:
 	@$(call install_lib, wayland, 0, 0, 0644, libwayland-client)
 	@$(call install_lib, wayland, 0, 0, 0644, libwayland-server)
 	@$(call install_lib, wayland, 0, 0, 0644, libwayland-cursor)
+	@$(call install_lib, wayland, 0, 0, 0644, libwayland-egl)
 
 	@$(call install_finish, wayland)
 

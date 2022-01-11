@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_PYTHON3_SYSTEMD) += python3-systemd
 #
 # Paths and names
 #
-PYTHON3_SYSTEMD_VERSION	:= 232
-PYTHON3_SYSTEMD_MD5	:= e1645ff186712ade50c3c8e8a359c181
+PYTHON3_SYSTEMD_VERSION	:= 234
+PYTHON3_SYSTEMD_MD5	:= 752929b651d1c6b2a42d454f58b94974
 PYTHON3_SYSTEMD		:= python3-systemd-$(PYTHON3_SYSTEMD_VERSION)
 PYTHON3_SYSTEMD_SUFFIX	:= tar.gz
 PYTHON3_SYSTEMD_URL	:= https://github.com/systemd/python-systemd/archive/v$(PYTHON3_SYSTEMD_VERSION).$(PYTHON3_SYSTEMD_SUFFIX)
 PYTHON3_SYSTEMD_SOURCE	:= $(SRCDIR)/$(PYTHON3_SYSTEMD).$(PYTHON3_SYSTEMD_SUFFIX)
 PYTHON3_SYSTEMD_DIR	:= $(BUILDDIR)/$(PYTHON3_SYSTEMD)
-PYTHON3_SYSTEMD_LICENSE	:= LGPL-2.1+
+PYTHON3_SYSTEMD_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

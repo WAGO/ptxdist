@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Remy Bohmer <linux@bohmer.net>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,14 +21,14 @@ SCHED_SWITCH_SUFFIX	:= tgz
 SCHED_SWITCH_URL	:= http://www.osadl.org/uploads/media/$(SCHED_SWITCH).$(SCHED_SWITCH_SUFFIX)
 SCHED_SWITCH_SOURCE	:= $(SRCDIR)/$(SCHED_SWITCH).$(SCHED_SWITCH_SUFFIX)
 SCHED_SWITCH_DIR	:= $(BUILDDIR)/$(SCHED_SWITCH)
-SCHED_SWITCH_LICENSE	:= GPL-2.0
+SCHED_SWITCH_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 SCHED_SWITCH_CONF_TOOL	:= NO
-SCHED_SWITCH_COMPILE_ENV:= $(CROSS_ENV_FLAGS)
+SCHED_SWITCH_MAKE_ENV	:= $(CROSS_ENV_FLAGS)
 SCHED_SWITCH_MAKE_OPT	:= $(CROSS_ENV_CC)
 SCHED_SWITCH_INSTALL_OPT:= \
 	$(SCHED_SWITCH_MAKE_OPT) \

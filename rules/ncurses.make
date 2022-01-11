@@ -1,8 +1,6 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2002-2009 by Pengutronix e.K., Hildesheim, Germany
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -15,76 +13,82 @@ PACKAGES-$(PTXCONF_NCURSES) += ncurses
 #
 # Paths and names
 #
-NCURSES_VERSION	:= 5.9
+NCURSES_VERSION	:= 6.2
 NCURSES_MAJOR	:= $(word 1,$(subst ., ,$(NCURSES_VERSION)))
-NCURSES_MD5	:= 8cb9c412e5f2d96bc6f459aa8c6282a1
+NCURSES_MD5	:= e812da327b1c2214ac1aed440ea3ae8d
 NCURSES		:= ncurses-$(NCURSES_VERSION)
 NCURSES_SUFFIX	:= tar.gz
 NCURSES_URL	:= $(call ptx/mirror, GNU, ncurses/$(NCURSES).$(NCURSES_SUFFIX))
 NCURSES_SOURCE	:= $(SRCDIR)/$(NCURSES).$(NCURSES_SUFFIX)
 NCURSES_DIR	:= $(BUILDDIR)/$(NCURSES)
 NCURSES_LICENSE	:= MIT
-NCURSES_LICENSE_FILES	:= \
-	file://include/curses.h.in;startline=2;endline=26;md5=3d0f6ef3745ae794471d5c62b7deb9c3
+NCURSES_LICENSE_FILES := file://COPYING;md5=910e05334f7e0b7631da6b4ebb1e1aab
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-NCURSES_ENV := \
+NCURSES_CONF_TOOL := autoconf
+NCURSES_CONF_ENV := \
 	$(CROSS_ENV) \
-	TIC_PATH="$(PTXCONF_SYSROOT_HOST)/bin/tic"
+	TIC_PATH="$(PTXDIST_SYSROOT_HOST)/bin/tic"
 
-NCURSES_AUTOCONF_SHARED := \
-	--without-cxx-binding \
-	--disable-echo \
-	--disable-nls \
-	--enable-const \
-	--enable-overwrite \
-	--libdir=/$(CROSS_LIB_DIR) \
-	--without-debug \
-	--without-normal \
-	--without-ada \
-	--without-gpm \
-	--without-manpages \
-	--without-tests \
-	--enable-mixed-case \
-	--with-ticlib=yes \
-	--disable-relink \
-	--disable-big-strings \
-	--disable-sp-funcs \
-	--disable-term-driver \
-	--disable-ext-mouse \
-	--disable-interop \
-	--disable-rpath \
-	--disable-rpath-hack \
-	--disable-ext-colors \
-	--without-pthread \
-	--disable-reentrant
+NCURSES_SHARED_TARGET	:= y
+NCURSES_SHARED_HOST	:=
 
 # NOTE: reentrant enables opaque, which breaks other packages
 # pthread enables reentrant, so don't enable it either
+NCURSES_AUTOCONF_SHARED = \
+	--without-ada \
+	--without-cxx \
+	--without-cxx-binding \
+	--enable-db-install \
+	--without-manpages \
+	--$(call ptx/wow,$(1))-progs \
+	--without-tack \
+	--without-tests \
+	--with-curses-h \
+	--with-pkg-config-libdir=/usr/lib/pkgconfig \
+	--$(call ptx/endis,$(1))-pc-files \
+	--enable-mixed-case \
+	--without-libtool \
+	--$(call ptx/wwo,$(1))-shared \
+	--with-normal \
+	--without-debug \
+	--without-profile \
+	--without-cxx-shared \
+	--without-termlib \
+	--without-ticlib \
+	--without-gpm \
+	--without-dlsym \
+	--without-pcre2 \
+	--without-sysmouse \
+	--disable-rpath \
+	--disable-relink \
+	--disable-rpath-hack \
+	--enable-overwrite \
+	--$(call ptx/endis,PTXCONF_NCURSES_BIG_CORE)-big-core \
+	--disable-big-strings \
+	--$(call ptx/endis,PTXCONF_NCURSES_WIDE_CHAR)-widec \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--enable-ext-funcs \
+	--enable-sp-funcs \
+	--disable-term-driver \
+	--enable-const \
+	--enable-ext-colors \
+	--disable-ext-mouse \
+	--disable-ext-putwin \
+	--disable-no-padding \
+	--disable-signed-char \
+	--disable-sigwinch \
+	--without-pthread \
+	--disable-reentrant \
+	--without-develop \
+	--disable-interop
 
-# enable wide char support on demand only
-ifdef PTXCONF_NCURSES_WIDE_CHAR
-NCURSES_AUTOCONF_SHARED += --enable-widec
-else
-NCURSES_AUTOCONF_SHARED += --disable-widec
-endif
-
-ifdef PTXCONF_NCURSES_BIG_CORE
-NCURSES_AUTOCONF_SHARED += --enable-big-core
-else
-NCURSES_AUTOCONF_SHARED += --disable-big-core
-endif
-
-NCURSES_AUTOCONF := \
+NCURSES_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
-	$(NCURSES_AUTOCONF_SHARED) \
-	--with-shared \
-	--without-progs
-
-NCURSES_CPPFLAGS := -P
+	$(call NCURSES_AUTOCONF_SHARED,NCURSES_SHARED_TARGET)
 
 # ----------------------------------------------------------------------------
 # Install
@@ -120,20 +124,25 @@ ifdef PTXCONF_NCURSES_WIDE_CHAR
 # Already built applications may continue to use the non wide library!
 # For this, the links at runtime are required
 #
-	for lib in $(NCURSES_LIBRARY_LIST); do \
+	@for lib in $(NCURSES_LIBRARY_LIST); do \
 		echo "INPUT(-l$${lib}w)" > $(NCURSES_PKGDIR)/$(CROSS_LIB_DIR)/lib$${lib}.so ; \
 	done
-	echo "INPUT(-lncursesw)" > $(NCURSES_PKGDIR)/$(CROSS_LIB_DIR)/libcurses.so
+	@echo "INPUT(-lncursesw)" > $(NCURSES_PKGDIR)/$(CROSS_LIB_DIR)/libcurses.so
 
-	ln -sf -- "ncursesw$(NCURSES_MAJOR)-config" \
+	@ln -sf "ncursesw$(NCURSES_MAJOR)-config" \
 		"$(NCURSES_PKGDIR)/usr/bin/ncurses$(NCURSES_MAJOR)-config"
+ifdef PTXCONF_NCURSES_BACKWARD_COMPATIBLE_NON_WIDE_CHAR
+	@for lib in $(NCURSES_LIBRARY_LIST); do \
+		ln -vs "$${lib}w.pc" "$(NCURSES_PKGDIR)/usr/$(CROSS_LIB_DIR)/pkgconfig/$${lib}.pc"; \
+	done
+endif
 endif
 	@$(call touch)
 
 $(STATEDIR)/ncurses.install.post:
 	@$(call targetinfo)
 	@$(call world/install.post, NCURSES)
-	@cp -dp -- "$(NCURSES_PKGDIR)/usr/bin/"*config* "$(PTXCONF_SYSROOT_CROSS)/bin"
+	@cp -dp -- "$(NCURSES_PKGDIR)/usr/bin/"*config* "$(PTXDIST_SYSROOT_CROSS)/bin"
 	@$(call touch)
 
 # ----------------------------------------------------------------------------

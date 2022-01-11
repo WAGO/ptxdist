@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -34,11 +32,23 @@ export -f ptxd_check_obsolete_perm
 # $1: permissions file
 #
 ptxd_dopermissions() {
-	ptxd_check_obsolete_perm "${@}"
-	gawk -f "${PTXDIST_LIB_DIR}/ptxd_lib_dopermissions.awk" "${@}"
+	ptxd_check_obsolete_perm "${@}" &&
+	ptxd_in_path PTXDIST_PATH_SCRIPTS lib/ptxd_lib_dopermissions.awk &&
+	gawk -f "${ptxd_reply}" "${@}"
 }
 export -f ptxd_dopermissions
 
+#
+# If multiple packages create the same directory with different ownership
+# or permissions, then the result depends on the installation order.
+# Avoid this by verifying that such a mismatch does not happen.
+#
+ptxd_check_dir_permissions() {
+	ptxd_check_obsolete_perm "${@}"
+	ptxd_in_path PTXDIST_PATH_SCRIPTS lib/ptxd_lib_check_dir_permissions.awk &&
+	gawk -f "${ptxd_reply}" "${@}"
+}
+export -f ptxd_check_dir_permissions
 
 #
 # ptxd_do_xpkg_map - do the mapping from package name to xpkg name(s)
@@ -56,11 +66,14 @@ export -f ptxd_dopermissions
 # ptxd_reply (array)
 #
 ptxd_do_xpkg_map() {
-    if [ -n "${PTXDIST_BASE_PLATFORMDIR}" ]; then
-	set -- "${@/#/${ptx_state_dir}/}" "${@/#/${PTXDIST_BASE_PLATFORMDIR}/state/}"
-    else
-	set -- "${@/#/${ptx_state_dir}/}"
-    fi
+    local pkg
+    for pkg in "${@}"; do
+	if ! [[ " ${ptx_packages_selected} " =~ " ${pkg} " ]]; then
+	    ptxd_bailout "${pkg} is not a package or not selected"
+	fi
+    done
+    set -- "${@/#/${ptx_state_dir}/}"
+
     ptxd_reply=( $(cat "${@/%/.xpkg.map}" 2>/dev/null) )
 
     [ ${#ptxd_reply[@]} -ne 0 ]

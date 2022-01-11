@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Jan Luebbe <jlu@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,22 +21,34 @@ CRDA_SUFFIX	:= tar.xz
 CRDA_URL	:= $(call ptx/mirror, KERNEL, ../software/network/crda/$(CRDA).$(CRDA_SUFFIX))
 CRDA_SOURCE	:= $(SRCDIR)/$(CRDA).$(CRDA_SUFFIX)
 CRDA_DIR	:= $(BUILDDIR)/$(CRDA)
-CRDA_LICENSE	:= ISC, copyleft-next-0.3.0
+CRDA_LICENSE	:= ISC AND copyleft-next-0.3.0
 CRDA_LICENSE_FILES := \
 	file://LICENSE;md5=ef8b69b43141352d821fd66b64ff0ee7 \
 	file://copyleft-next-0.3.0;md5=8743a2c359037d4d329a31e79eabeffe
 
+CRDA_REGDB_VERSION	:= 2019.06.03
+CRDA_REGDB_MD5		:= e16f223ec2ecb4937b1a8ef9ce8dda99
+CRDA_REGDB		:= wireless-regdb-$(CRDA_REGDB_VERSION)
+CRDA_REGDB_SUFFIX	:= tar.gz
+CRDA_REGDB_URL		:= \
+	https://www.kernel.org/pub/software/network/wireless-regdb/$(CRDA_REGDB).$(CRDA_REGDB_SUFFIX)
+CRDA_REGDB_SOURCE	:= $(SRCDIR)/$(CRDA_REGDB).$(CRDA_REGDB_SUFFIX)
+$(CRDA_REGDB_SOURCE)	:= CRDA_REGDB
+CRDA_REGDB_DIR		:= $(CRDA_DIR)
+CRDA_REGDB_STRIP_LEVEL	:= 0
+
+CRDA_SOURCES		+= $(CRDA_REGDB_SOURCE)
+
 # ----------------------------------------------------------------------------
-# Prepare
+# Extract
 # ----------------------------------------------------------------------------
 
-$(STATEDIR)/crda.prepare:
+$(STATEDIR)/crda.extract:
 	@$(call targetinfo)
-ifdef PTXCONF_ARCH_LP64
-	@cp $(CRDA_DIR)/keys-ssl.c.64 $(CRDA_DIR)/keys-ssl.c
-else
-	@cp $(CRDA_DIR)/keys-ssl.c.32 $(CRDA_DIR)/keys-ssl.c
-endif
+	@$(call clean, $(CRDA_DIR))
+	@$(call extract, CRDA)
+	@$(call extract, CRDA_REGDB)
+	@$(call patchin, CRDA)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -47,12 +57,28 @@ endif
 
 CRDA_MAKE_ENV	:= \
 	$(CROSS_ENV) \
-	LIBDIR=/usr/lib \
 	SBINDIR=/usr/sbin/ \
 	UDEV_RULE_DIR=/usr/lib/udev/rules.d/ \
-	USE_OPENSSL=1
+	USE_OPENSSL=1 \
+	RUNTIME_PUBKEY_DIR=/usr/lib/crda/pubkeys \
+	RUNTIME_PUBKEY_ONLY=1
 
 CRDA_MAKE_OPT	:= all_noverify
+
+# ----------------------------------------------------------------------------
+# Install
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/crda.install:
+	@$(call targetinfo)
+	@$(call world/install, CRDA)
+	@install -vD -m 644 $(CRDA_REGDB_DIR)/$(CRDA_REGDB)/regulatory.bin \
+		$(CRDA_PKGDIR)/usr/lib/crda/regulatory.bin
+	@install -vD -m 644 $(CRDA_REGDB_DIR)/pubkeys/linville.key.pub.pem \
+		$(CRDA_PKGDIR)/usr/lib/crda/pubkeys/linville.key.pub.pem
+	@install -vD -m 644 $(CRDA_REGDB_DIR)/pubkeys/sforshee.key.pub.pem \
+		$(CRDA_PKGDIR)/usr/lib/crda/pubkeys/sforshee.key.pub.pem
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -73,8 +99,8 @@ $(STATEDIR)/crda.targetinstall:
 		/usr/lib/udev/rules.d/85-regulatory.rules)
 	@$(call install_lib, crda, 0, 0, 0644, libreg)
 
-	# regulatory.bin was downloaded from:
-	# https://git.kernel.org/cgit/linux/kernel/git/sforshee/wireless-regdb.git/plain/regulatory.bin
+	@$(call install_alternative_tree, crda, 0, 0, \
+		/usr/lib/crda/pubkeys)
 	@$(call install_alternative, crda, 0, 0, 0644, \
 		/usr/lib/crda/regulatory.bin)
 

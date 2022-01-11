@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Steven Scholz <steven.scholz@imc-berlin.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,7 +23,7 @@ SSMTP_SRC		:= ssmtp_$(SSMTP_VERSION).orig.$(SSMTP_SUFFIX)
 SSMTP_URL		:= $(call ptx/mirror, DEB, pool/main/s/ssmtp/$(SSMTP_SRC))
 SSMTP_SOURCE		:= $(SRCDIR)/$(SSMTP_SRC)
 SSMTP_DIR		:= $(BUILDDIR)/ssmtp-$(SSMTP_VERSION)
-SSMTP_LICENSE		:= GPL-2.0+
+SSMTP_LICENSE		:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

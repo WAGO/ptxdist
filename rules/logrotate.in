@@ -5,6 +5,7 @@ menuconfig LOGROTATE
 	prompt "logrotate                     "
 	select LIBPOPT
 	select ACL if LOGROTATE_ACL
+	select ROOTFS_VAR_LIB		if RUNTIME
 	help
 	  The logrotate utility is designed to simplify the
 	  administration of log files on a system which generates a lot
@@ -13,6 +14,14 @@ menuconfig LOGROTATE
 	  be set to handle a log file daily, weekly, monthly or when the
 	  log file gets to a certain size. Normally, logrotate runs as
 	  a daily cron job.
+
+	  In order to make 'logrotate' work at run-time, a directory
+	  '/etc/logrotate.d' is required which must contain your own 'logrotate'
+	  config files (refer the manpage). There are no defaults in this
+	  package.
+
+	  Note: on a read-only root filesystem this package still requires a
+	  writable '/var/lib' for its run-time state information.
 
 if LOGROTATE
 

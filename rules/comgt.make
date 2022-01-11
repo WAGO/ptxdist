@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Bernhard Walle <bernhard@bwalle.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ COMGT_SUFFIX	:= tgz
 COMGT_URL	:= $(call ptx/mirror, SF, comgt/$(COMGT).$(COMGT_SUFFIX))
 COMGT_SOURCE	:= $(SRCDIR)/$(COMGT).$(COMGT_SUFFIX)
 COMGT_DIR	:= $(BUILDDIR)/$(COMGT)
-COMGT_LICENSE	:= GPL-2.0
+COMGT_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

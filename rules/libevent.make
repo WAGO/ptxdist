@@ -3,8 +3,6 @@
 # Copyright (C) 2009 by Michael Olbrich <m.olbrich@pengutronix.de>
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBEVENT_SUFFIX		:= tar.gz
 LIBEVENT_URL		:= https://github.com/libevent/libevent/releases/download/release-$(LIBEVENT_VERSION)-stable/$(LIBEVENT).$(LIBEVENT_SUFFIX)
 LIBEVENT_SOURCE		:= $(SRCDIR)/$(LIBEVENT).$(LIBEVENT_SUFFIX)
 LIBEVENT_DIR		:= $(BUILDDIR)/$(LIBEVENT)
-LIBEVENT_LICENSE	:= BSD-3-Clause, 0BSD
+LIBEVENT_LICENSE	:= BSD-3-Clause AND 0BSD
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Sascha Hauer <s.hauer@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_DT_UTILS) += dt-utils
 #
 # Paths and names
 #
-DT_UTILS_VERSION	:= 2017.03.0
-DT_UTILS_MD5		:= f7c6790358e2925654fd8efa8313768d
+DT_UTILS_VERSION	:= 2019.01.0
+DT_UTILS_MD5		:= d83ebf99b07fa4516aeaa329afb2a6eb
 DT_UTILS		:= dt-utils-$(DT_UTILS_VERSION)
 DT_UTILS_SUFFIX		:= tar.xz
-DT_UTILS_URL		:= http://pengutronix.de/software/dt-utils/download/$(DT_UTILS).$(DT_UTILS_SUFFIX)
+DT_UTILS_URL		:= https://public.pengutronix.de/software/dt-utils/$(DT_UTILS).$(DT_UTILS_SUFFIX)
 DT_UTILS_SOURCE		:= $(SRCDIR)/$(DT_UTILS).$(DT_UTILS_SUFFIX)
 DT_UTILS_DIR		:= $(BUILDDIR)/$(DT_UTILS)
-DT_UTILS_LICENSE	:= GPL-2.0
+DT_UTILS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

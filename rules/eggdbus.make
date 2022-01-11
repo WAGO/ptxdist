@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ EGGDBUS_SUFFIX	:= tar.gz
 EGGDBUS_URL	:= http://hal.freedesktop.org/releases/$(EGGDBUS).$(EGGDBUS_SUFFIX)
 EGGDBUS_SOURCE	:= $(SRCDIR)/$(EGGDBUS).$(EGGDBUS_SUFFIX)
 EGGDBUS_DIR	:= $(BUILDDIR)/$(EGGDBUS)
-EGGDBUS_LICENSE	:= LGPL-2.0
+EGGDBUS_LICENSE	:= LGPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,7 +35,7 @@ EGGDBUS_AUTOCONF := \
 	--disable-verbose-mode \
 	--disable-man-pages \
 	--disable-gtk-doc \
-	--with-eggdbus-tools=$(PTXCONF_SYSROOT_HOST)/bin
+	--with-eggdbus-tools=$(PTXDIST_SYSROOT_HOST)/bin
 
 # ----------------------------------------------------------------------------
 # Target-Install

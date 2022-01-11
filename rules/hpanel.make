@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Luotao Fu <lfu@pengutronix.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,8 @@ HPANEL_SUFFIX	:= tar.gz
 HPANEL_URL	:= http://www.phrat.de/$(HPANEL).$(HPANEL_SUFFIX)
 HPANEL_SOURCE	:= $(SRCDIR)/$(HPANEL).$(HPANEL_SUFFIX)
 HPANEL_DIR	:= $(BUILDDIR)/$(HPANEL)
+HPANEL_LICENSE	:= MIT
+HPANEL_LICENSE_FILES	:= file://COPYING;md5=bb987bce816478c28b4d8cd25b96eadd
 
 # ----------------------------------------------------------------------------
 # Prepare

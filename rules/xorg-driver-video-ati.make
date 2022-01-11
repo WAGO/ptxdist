@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -12,14 +10,13 @@
 #
 # We provide this package
 #
-PACKAGES-$(PTXCONF_ARCH_X86)-$(PTXCONF_XORG_DRIVER_VIDEO_ATI) += xorg-driver-video-ati
-PACKAGES-$(PTXCONF_ARCH_PPC)-$(PTXCONF_XORG_DRIVER_VIDEO_ATI) += xorg-driver-video-ati
+PACKAGES-$(PTXCONF_XORG_DRIVER_VIDEO_ATI) += xorg-driver-video-ati
 
 #
 # Paths and names
 #
-XORG_DRIVER_VIDEO_ATI_VERSION	:= 7.4.0
-XORG_DRIVER_VIDEO_ATI_MD5	:= 8ee095009e927d61be522f392bdb843e
+XORG_DRIVER_VIDEO_ATI_VERSION	:= 19.0.1
+XORG_DRIVER_VIDEO_ATI_MD5	:= 47eccf71823206ade9629cba69de7ef6
 XORG_DRIVER_VIDEO_ATI		:= xf86-video-ati-$(XORG_DRIVER_VIDEO_ATI_VERSION)
 XORG_DRIVER_VIDEO_ATI_SUFFIX	:= tar.bz2
 XORG_DRIVER_VIDEO_ATI_URL	:= $(call ptx/mirror, XORG, individual/driver/$(XORG_DRIVER_VIDEO_ATI).$(XORG_DRIVER_VIDEO_ATI_SUFFIX))

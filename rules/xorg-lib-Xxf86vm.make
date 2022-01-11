@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XXF86VM) += xorg-lib-xxf86vm
 #
 # Paths and names
 #
-XORG_LIB_XXF86VM_VERSION	:= 1.1.3
-XORG_LIB_XXF86VM_MD5		:= e46f6ee4f4567349a3189044fe1bb712
+XORG_LIB_XXF86VM_VERSION	:= 1.1.4
+XORG_LIB_XXF86VM_MD5		:= 298b8fff82df17304dfdb5fe4066fe3a
 XORG_LIB_XXF86VM		:= libXxf86vm-$(XORG_LIB_XXF86VM_VERSION)
 XORG_LIB_XXF86VM_SUFFIX		:= tar.bz2
 XORG_LIB_XXF86VM_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XXF86VM).$(XORG_LIB_XXF86VM_SUFFIX))

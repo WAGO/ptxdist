@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Remy Bohmer <linux@bohmer.net>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,17 +18,18 @@ LATENCYTOP_VERSION	:= 0.5
 LATENCYTOP_MD5		:= 73bb3371c6ee0b0e68e25289027e865c
 LATENCYTOP		:= latencytop-$(LATENCYTOP_VERSION)
 LATENCYTOP_SUFFIX	:= tar.gz
-LATENCYTOP_URL		:= https://www.latencytop.org/download/$(LATENCYTOP).$(LATENCYTOP_SUFFIX);no-check-certificate
-LATENCYTOP_SOURCE	:= $(SRCDIR)/$(LATENCYTOP).$(LATENCYTOP_SUFFIX)
+LATENCYTOP_TARBALL	:= latencytop_$(LATENCYTOP_VERSION).orig.$(LATENCYTOP_SUFFIX)
+LATENCYTOP_URL		:= http://snapshot.debian.org/archive/debian/20180814T030639Z/pool/main/l/latencytop/$(LATENCYTOP_TARBALL)
+LATENCYTOP_SOURCE	:= $(SRCDIR)/$(LATENCYTOP_TARBALL)
 LATENCYTOP_DIR		:= $(BUILDDIR)/$(LATENCYTOP)
-LATENCYTOP_LICENSE	:= GPL-2.0
+LATENCYTOP_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 LATENCYTOP_CONF_TOOL	:= NO
-LATENCYTOP_COMPILE_ENV	:= $(CROSS_ENV_FLAGS)
+LATENCYTOP_MAKE_ENV	:= $(CROSS_ENV_FLAGS)
 LATENCYTOP_MAKE_OPT	:= \
 	$(CROSS_ENV_CC) \
 	HAS_GTK_GUI=

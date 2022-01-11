@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ AUDIOFILE_SUFFIX	:= tar.gz
 AUDIOFILE_URL		:= http://audiofile.68k.org/$(AUDIOFILE).$(AUDIOFILE_SUFFIX)
 AUDIOFILE_SOURCE	:= $(SRCDIR)/$(AUDIOFILE).$(AUDIOFILE_SUFFIX)
 AUDIOFILE_DIR		:= $(BUILDDIR)/$(AUDIOFILE)
-AUDIOFILE_LICENSE	:= GPL-2.0, LGPL-2.0
+AUDIOFILE_LICENSE	:= GPL-2.0-only AND LGPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

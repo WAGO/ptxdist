@@ -4,8 +4,6 @@
 #               2003 by Auerswald GmbH & Co. KG, Schandelah, Germany
 #               2009, 2012 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,13 +16,13 @@ PACKAGES-$(PTXCONF_GDB) += gdb
 #
 # Paths and names
 #
-GDB_VERSION	:= $(call remove_quotes,$(PTXCONF_GDB_VERSION))
-GDB_MD5		:= $(call remove_quotes,$(PTXCONF_GDB_MD5))
+GDB_VERSION	 = $(SHARED_GDB_VERSION)
+GDB_MD5		 = $(SHARED_GDB_MD5)
 GDB		:= gdb-$(GDB_VERSION)
-GDB_SUFFIX	:= tar.gz
+GDB_SUFFIX	:= tar.xz
 GDB_SOURCE	:= $(SRCDIR)/$(GDB).$(GDB_SUFFIX)
 GDB_DIR		:= $(BUILDDIR)/$(GDB)
-GDB_LICENSE	:= GPL-3.0+
+GDB_LICENSE	:= GPL-3.0-or-later
 
 GDB_URL := \
 	$(call ptx/mirror, GNU, gdb/$(GDB).$(GDB_SUFFIX)) \

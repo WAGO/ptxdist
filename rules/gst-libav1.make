@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,43 +14,27 @@ PACKAGES-$(PTXCONF_GST_LIBAV1) += gst-libav1
 #
 # Paths and names
 #
-GST_LIBAV1_VERSION	:= 1.12.3
-GST_LIBAV1_MD5		:= 81f62d58279108698b321209fc6696ce
+GST_LIBAV1_VERSION	:= 1.16.2
+GST_LIBAV1_MD5		:= eacebd0136ede3a9bd3672eeb338806b
 GST_LIBAV1		:= gst-libav-$(GST_LIBAV1_VERSION)
 GST_LIBAV1_SUFFIX	:= tar.xz
 GST_LIBAV1_URL		:= http://gstreamer.freedesktop.org/src/gst-libav/$(GST_LIBAV1).$(GST_LIBAV1_SUFFIX)
 GST_LIBAV1_SOURCE	:= $(SRCDIR)/$(GST_LIBAV1).$(GST_LIBAV1_SUFFIX)
 GST_LIBAV1_DIR		:= $(BUILDDIR)/$(GST_LIBAV1)
-GST_LIBAV1_LICENSE	:= unknown
+GST_LIBAV1_LICENSE	:= GPL-2.0-or-later AND LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-GST_LIBAV1_ENV		:= \
-	$(CROSS_ENV) \
-	AS=$(CROSS_CC)
-
 #
-# autoconf
+# meson
 #
-GST_LIBAV1_CONF_TOOL	:= autoconf
+GST_LIBAV1_CONF_TOOL	:= meson
 GST_LIBAV1_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--enable-orc \
-	--disable-fatal-warnings \
-	--enable-extra-check \
-	--disable-valgrind \
-	--disable-gcov \
-	--disable-gtk-doc \
-	--disable-gtk-doc-html \
-	--disable-gtk-doc-pdf \
-	--disable-gobject-cast-checks \
-	--disable-glib-asserts \
-	--disable-static-plugins \
-	--disable-gpl \
-	--with-package-origin="PTXdist" \
-	--without-system-libav
+	$(CROSS_MESON_USR) \
+	-Dpackage-name="GStreamer FFMPEG Plug-ins source release" \
+	-Dpackage-origin=PTXdist
 
 # ----------------------------------------------------------------------------
 # Target-Install

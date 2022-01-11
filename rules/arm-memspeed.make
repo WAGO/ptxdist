@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Juergen Beisert <juergen@kreuzholzen.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ ARM_MEMSPEED_SUFFIX	:= tar.bz2
 ARM_MEMSPEED_URL	:= http://www.kreuzholzen.de/src/arm-memspeed/$(ARM_MEMSPEED).$(ARM_MEMSPEED_SUFFIX)
 ARM_MEMSPEED_SOURCE	:= $(SRCDIR)/$(ARM_MEMSPEED).$(ARM_MEMSPEED_SUFFIX)
 ARM_MEMSPEED_DIR	:= $(BUILDDIR)/$(ARM_MEMSPEED)
-ARM_MEMSPEED_LICENSE	:= GPL-2.0
+ARM_MEMSPEED_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

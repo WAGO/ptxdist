@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Sascha Hauer
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_APP_XVINFO) += xorg-app-xvinfo
 #
 # Paths and names
 #
-XORG_APP_XVINFO_VERSION	:= 1.1.1
-XORG_APP_XVINFO_MD5	:= c88feb501083951a8f47a21aaeb1529d
+XORG_APP_XVINFO_VERSION	:= 1.1.4
+XORG_APP_XVINFO_MD5	:= b13afec137b9b331814a9824ab03ec80
 XORG_APP_XVINFO		:= xvinfo-$(XORG_APP_XVINFO_VERSION)
 XORG_APP_XVINFO_SUFFIX	:= tar.bz2
 XORG_APP_XVINFO_URL	:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_XVINFO).$(XORG_APP_XVINFO_SUFFIX))

@@ -3,8 +3,6 @@
 # Copyright (C) 2004, 2005, 2006, 2007, 2008 by the PTXdist project
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -29,12 +27,8 @@ define ptx/escape/1
 $(subst $(1),\$(1),$(2))
 endef
 
-define ptx/escape/2
-$(subst $(1),\\$(1),$(2))
-endef
-
 define ptx/escape
-$(strip $(call ptx/escape/2,$(ptx/def/dollar),$(call ptx/escape/1,$(ptx/def/dquote),$(1))))
+$(strip $(call ptx/escape/1,$(ptx/def/dollar),$(call ptx/escape/1,$(ptx/def/dquote),$(1))))
 endef
 
 

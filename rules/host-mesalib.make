@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,57 +15,70 @@ HOST_PACKAGES-$(PTXCONF_HOST_MESALIB) += host-mesalib
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_MESALIB_CONF_ENV := \
-	$(HOST_ENV) \
-	ac_cv_prog_PYTHON2=$(PTXDIST_TOPDIR)/bin/python
-
-HOST_MESALIB_BUILD_OOT	:= YES
-HOST_MESALIB_CONF_TOOL	:= autoconf
+HOST_MESALIB_CONF_TOOL	:= meson
 HOST_MESALIB_CONF_OPT	:= \
-	$(HOST_AUTOCONF) \
-	--enable-static \
-	--disable-shared \
-	--disable-debug \
-	--disable-mangling \
-	--disable-texture-float \
-	--disable-asm \
-	--disable-selinux \
-	--enable-opengl \
-	--disable-gles1 \
-	--disable-gles2 \
-	--disable-dri \
-	--disable-gallium-extra-hud \
-	--disable-lmsensors \
-	--disable-dri3 \
-	--disable-glx \
-	--disable-osmesa \
-	--disable-gallium-osmesa \
-	--disable-egl \
-	--disable-xa \
-	--disable-gbm \
-	--disable-nine \
-	--disable-xvmc \
-	--disable-vdpau \
-	--disable-va \
-	--disable-omx \
-	--disable-opencl \
-	--disable-opencl-icd \
-	--disable-gallium-tests \
-	--enable-shared-glapi \
-	--disable-glx-read-only-text \
-	--disable-driglx-direct \
-	--disable-glx-tls \
-	--disable-llvm-shared-libs \
-	--disable-gallium-llvm \
-	--disable-libglvnd \
-	--with-gallium-drivers= \
-	--with-dri-drivers= \
-	--without-vulkan-drivers \
-	--with-platforms=
+	$(HOST_MESON_OPT) \
+	-Dbuild-tests=false \
+	-Dd3d-drivers-path=/usr/lib/d3d \
+	-Ddri-drivers= \
+	-Ddri-drivers-path=/usr/lib/dri \
+	-Ddri-search-path=/usr/lib/dri \
+	-Ddri3=false \
+	-Degl=false \
+	-Degl-lib-suffix= \
+	-Dgallium-drivers= \
+	-Dgallium-extra-hud=false \
+	-Dgallium-nine=false \
+	-Dgallium-omx=disabled \
+	-Dgallium-opencl=disabled \
+	-Dgallium-va=false \
+	-Dgallium-vdpau=false \
+	-Dgallium-xa=false \
+	-Dgallium-xvmc=false \
+	-Dgbm=false \
+	-Dgles-lib-suffix= \
+	-Dgles1=false \
+	-Dgles2=false \
+	-Dglvnd=false \
+	-Dglx=disabled \
+	-Dglx-direct=false \
+	-Dglx-read-only-text=false \
+	-Dinstall-intel-gpu-tests=false \
+	-Dlibunwind=false \
+	-Dllvm=false \
+	-Dlmsensors=false \
+	-Domx-libs-path=/usr/lib/dri \
+	-Dopencl-spirv=false \
+	-Dopengl=true \
+	-Dosmesa=none \
+	-Dosmesa-bits=8 \
+	-Dplatform-sdk-version=25 \
+	-Dplatforms= \
+	-Dpower8=false \
+	-Dprefer-iris=true \
+	-Dselinux=false \
+	-Dshader-cache=false \
+	-Dshared-glapi=true \
+	-Dshared-llvm=false \
+	-Dshared-swr=true \
+	-Dswr-arches=[] \
+	-Dtools=glsl \
+	-Dva-libs-path=/usr/lib/dri \
+	-Dvalgrind=false \
+	-Dvdpau-libs-path=/usr/lib/vdpau \
+	-Dvulkan-drivers=[] \
+	-Dvulkan-icd-dir=/etc/vulkan/icd.d \
+	-Dvulkan-overlay-layer=false \
+	-Dxlib-lease=false \
+	-Dxvmc-libs-path=/usr/lib \
+	-Dzstd=false
+
+HOST_MESALIB_MAKE_OPT	:= \
+	src/compiler/glsl/glsl_compiler
 
 $(STATEDIR)/host-mesalib.install:
 	@$(call targetinfo)
-	install -D -m755 $(HOST_MESALIB_DIR)-build/src/compiler/glsl_compiler $(HOST_MESALIB_PKGDIR)/bin/mesa/glsl_compiler
+	install -D -m755 $(HOST_MESALIB_DIR)-build/src/compiler/glsl/glsl_compiler $(HOST_MESALIB_PKGDIR)/bin/mesa/glsl_compiler
 	@$(call touch)
 
 # vim: syntax=make

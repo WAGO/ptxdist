@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,13 +14,15 @@ HOST_PACKAGES-$(PTXCONF_HOST_MESON) += host-meson
 #
 # Paths and names
 #
-HOST_MESON_VERSION	:= 0.40.0
-HOST_MESON_MD5		:= a4975aea4323a519aad9223ef059737d
+HOST_MESON_VERSION	:= 0.53.1
+HOST_MESON_MD5		:= 9bf73f7b5a2426a7c8674a809bb8cae2
 HOST_MESON		:= meson-$(HOST_MESON_VERSION)
 HOST_MESON_SUFFIX	:= tar.gz
-HOST_MESON_URL		:= https://github.com/mesonbuild/meson/archive/$(HOST_MESON_VERSION).$(HOST_MESON_SUFFIX)
+HOST_MESON_URL		:= https://github.com/mesonbuild/meson/releases/download/$(HOST_MESON_VERSION)/$(HOST_MESON).$(HOST_MESON_SUFFIX)
 HOST_MESON_SOURCE	:= $(SRCDIR)/$(HOST_MESON).$(HOST_MESON_SUFFIX)
 HOST_MESON_DIR		:= $(HOST_BUILDDIR)/$(HOST_MESON)
+HOST_MESON_LICENSE	:= Apache-2.0
+HOST_MESON_LICENSE_FILES	:= file://COPYING;md5=3b83ef96387f14655fc854ddc3c6bd57
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,8 +36,7 @@ HOST_MESON_CONF_TOOL	:= NO
 
 $(STATEDIR)/host-meson.compile:
 	@$(call targetinfo)
-	cd $(HOST_MESON_DIR) && \
-		$(SYSTEMPYTHON3) setup.py build
+	@$(call world/execute, HOST_MESON, $(SYSTEMPYTHON3) setup.py build)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -48,17 +47,16 @@ $(STATEDIR)/host-meson.compile:
 HOST_MESON_INSTALL_OPT	:= \
 	install \
 	--prefix=/ \
-	--install-lib=/share/meson \
-	--install-scripts=/share/meson \
+	--install-lib=/lib/meson \
+	--install-scripts=/lib/meson \
 	--root=$(HOST_MESON_PKGDIR)
 
 $(STATEDIR)/host-meson.install:
 	@$(call targetinfo)
-	@rm -rf $(HOST_MESON_PKGDIR)
-	@cd $(HOST_MESON_DIR) && \
-		$(SYSTEMPYTHON3) setup.py $(HOST_MESON_INSTALL_OPT)
+	@$(call world/execute, HOST_MESON, \
+		$(SYSTEMPYTHON3) setup.py $(HOST_MESON_INSTALL_OPT))
 	@mkdir -vp $(HOST_MESON_PKGDIR)/bin
-	@ln -svf ../share/meson/meson $(HOST_MESON_PKGDIR)/bin/meson
+	@ln -svf ../lib/meson/meson $(HOST_MESON_PKGDIR)/bin/meson
 	@$(call touch)
 
 $(STATEDIR)/host-meson.install.post: $(PTXDIST_MESON_CROSS_FILE)

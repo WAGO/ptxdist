@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,7 +17,7 @@ PACKAGES-$(PTXCONF_MEMEDIT) += memedit
 #
 MEMEDIT_VERSION	:= 0.9
 MEMEDIT_MD5	:= fd8eb827c3072baf8678d9d33e5d6458
-MEMEDIT_LICENSE	:= GPL-2.0
+MEMEDIT_LICENSE	:= GPL-2.0-only
 MEMEDIT		:= memedit-$(MEMEDIT_VERSION)
 MEMEDIT_SUFFIX	:= tar.gz
 MEMEDIT_URL	:= http://www.pengutronix.de/software/memedit/downloads/$(MEMEDIT).$(MEMEDIT_SUFFIX)

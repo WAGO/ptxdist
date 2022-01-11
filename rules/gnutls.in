@@ -2,10 +2,10 @@
 
 menuconfig GNUTLS
 	tristate
-	select LIBGCRYPT
 	select LIBTASN1
 	select NETTLE
-	select OPENSSL		if GNUTLS_OPENSSL
+	select GCCLIBS_CXX	if GNUTLS_CXX
+	select CRYPTODEV_API	if GNUTLS_CRYPTODEV && BUILDTIME
 	prompt "gnutls                        "
 	help
 	  GnuTLS is a secure communications library implementing the SSL,
@@ -17,6 +17,16 @@ menuconfig GNUTLS
 	  security and interoperability.
 
 if GNUTLS
+
+config GNUTLS_CXX
+	bool
+	prompt "install C++ runtime library"
+
+config GNUTLS_CRYPTODEV
+	bool
+	prompt "enable cryptodev support"
+	help
+	  Enable the BSD cryptodev engine even if we are not using BSD.
 
 config GNUTLS_OPENSSL
 	bool

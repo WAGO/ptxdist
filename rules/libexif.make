@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Markus Pargmann <mpa@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBEXIF_SUFFIX		:= tar.bz2
 LIBEXIF_URL		:= http://sourceforge.net/projects/libexif/files/libexif/$(LIBEXIF_VERSION)/$(LIBEXIF).$(LIBEXIF_SUFFIX)
 LIBEXIF_SOURCE		:= $(SRCDIR)/$(LIBEXIF).$(LIBEXIF_SUFFIX)
 LIBEXIF_DIR		:= $(BUILDDIR)/$(LIBEXIF)
-LIBEXIF_LICENSE		:= LGPL-2.0+
+LIBEXIF_LICENSE		:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

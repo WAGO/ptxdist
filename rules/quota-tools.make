@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,20 +14,35 @@ PACKAGES-$(PTXCONF_QUOTA_TOOLS) += quota-tools
 #
 # Paths and names
 #
-QUOTA_TOOLS_VERSION	:= 3.17
-QUOTA_TOOLS_MD5		:= cb3e98a039c0cf98e7c1ad4b50a5bda7
-QUOTA_TOOLS		:= quota-tools
+QUOTA_TOOLS_VERSION	:= 4.04
+QUOTA_TOOLS_MD5		:= f46f3b0b5141f032f25684005dac49d3
+QUOTA_TOOLS		:= quota-$(QUOTA_TOOLS_VERSION)
 QUOTA_TOOLS_SUFFIX	:= tar.gz
-QUOTA_TOOLS_PACKAGE	:= quota-$(QUOTA_TOOLS_VERSION).${QUOTA_TOOLS_SUFFIX}
-QUOTA_TOOLS_URL		:= $(call ptx/mirror, SF, linuxquota/$(QUOTA_TOOLS_PACKAGE))
-QUOTA_TOOLS_SOURCE	:= $(SRCDIR)/$(QUOTA_TOOLS_PACKAGE)
+QUOTA_TOOLS_URL		:= $(call ptx/mirror, SF, linuxquota/$(QUOTA_TOOLS).$(QUOTA_TOOLS_SUFFIX))
+QUOTA_TOOLS_SOURCE	:= $(SRCDIR)/$(QUOTA_TOOLS).$(QUOTA_TOOLS_SUFFIX)
 QUOTA_TOOLS_DIR		:= $(BUILDDIR)/$(QUOTA_TOOLS)
-QUOTA_TOOLS_LICENSE	:= GPL-2.0
+QUOTA_TOOLS_LICENSE	:= GPL-2.0-only
 
 #
 # autoconf
 #
 QUOTA_TOOLS_CONF_TOOL	:= autoconf
+
+QUOTA_TOOLS_AUTOCONF := \
+	$(CROSS_AUTOCONF_USR) \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-nls \
+	--disable-rpath \
+	--disable-werror \
+	--disable-ldapmail \
+	--$(call ptx/endis, PTXCONF_QUOTA_TOOLS_QUOTACHECK_EXT2)-ext2direct \
+	--disable-netlink \
+	--disable-libwrap \
+	--$(call ptx/endis, PTXCONF_QUOTA_TOOLS_RQUOTAD)-rpc \
+	--disable-rpcsetquota \
+	--disable-xfs-roothack \
+	--enable-bsd-behaviour \
+	--with-proc-mounts=/proc/self/mounts
 
 # ----------------------------------------------------------------------------
 # Compile

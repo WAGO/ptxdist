@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,11 +14,11 @@ PACKAGES-$(PTXCONF_ARCH_X86)-$(PTXCONF_LIBVA_INTEL_DRIVER) += libva-intel-driver
 #
 # Paths and names
 #
-LIBVA_INTEL_DRIVER_VERSION	:= 1.8.1
-LIBVA_INTEL_DRIVER_MD5		:= 1c655c62cecea4bd076fef3a393925ec
+LIBVA_INTEL_DRIVER_VERSION	:= 2.4.1
+LIBVA_INTEL_DRIVER_MD5		:= 073fce0f409559109ad2dd0a6531055d
 LIBVA_INTEL_DRIVER		:= intel-vaapi-driver-$(LIBVA_INTEL_DRIVER_VERSION)
 LIBVA_INTEL_DRIVER_SUFFIX	:= tar.bz2
-LIBVA_INTEL_DRIVER_URL		:= http://www.freedesktop.org/software/vaapi/releases/libva-intel-driver/$(LIBVA_INTEL_DRIVER).$(LIBVA_INTEL_DRIVER_SUFFIX)
+LIBVA_INTEL_DRIVER_URL		:= https://github.com/intel/intel-vaapi-driver/releases/download/$(LIBVA_INTEL_DRIVER_VERSION)/$(LIBVA_INTEL_DRIVER).$(LIBVA_INTEL_DRIVER_SUFFIX)
 LIBVA_INTEL_DRIVER_SOURCE	:= $(SRCDIR)/$(LIBVA_INTEL_DRIVER).$(LIBVA_INTEL_DRIVER_SUFFIX)
 LIBVA_INTEL_DRIVER_DIR		:= $(BUILDDIR)/$(LIBVA_INTEL_DRIVER)
 LIBVA_INTEL_DRIVER_LICENSE	:= MIT
@@ -35,7 +33,6 @@ LIBVA_INTEL_DRIVER_LICENSE	:= MIT
 LIBVA_INTEL_DRIVER_CONF_TOOL	:= autoconf
 LIBVA_INTEL_DRIVER_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--enable-drm \
 	--$(call ptx/endis, PTXCONF_LIBVA_INTEL_DRIVER_X11)-x11 \
 	--$(call ptx/endis, PTXCONF_LIBVA_INTEL_DRIVER_WAYLAND)-wayland \
 	--disable-hybrid-codec \

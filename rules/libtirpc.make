@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBTIRPC) += libtirpc
 #
 # Paths and names
 #
-LIBTIRPC_VERSION	:= 1.0.2
-LIBTIRPC_MD5		:= d5a37f1dccec484f9cabe2b97e54e9a6
+LIBTIRPC_VERSION	:= 1.2.6
+LIBTIRPC_MD5		:= b25f9cc18bfad50f7c446c77f4ae00bb
 LIBTIRPC		:= libtirpc-$(LIBTIRPC_VERSION)
 LIBTIRPC_SUFFIX		:= tar.bz2
 LIBTIRPC_URL		:= $(call ptx/mirror, SF, libtirpc/$(LIBTIRPC).$(LIBTIRPC_SUFFIX))

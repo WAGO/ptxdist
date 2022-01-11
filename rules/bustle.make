@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,14 +21,14 @@ BUSTLE_SUFFIX	:= tar.gz
 BUSTLE_URL	:= http://www.willthompson.co.uk/bustle/releases/$(BUSTLE).$(BUSTLE_SUFFIX)
 BUSTLE_SOURCE	:= $(SRCDIR)/$(BUSTLE).$(BUSTLE_SUFFIX)
 BUSTLE_DIR	:= $(BUILDDIR)/$(BUSTLE)
-BUSTLE_LICENSE	:= GPL-2.0+, LGPL-2.1+
+BUSTLE_LICENSE	:= GPL-2.0-or-later AND LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 BUSTLE_PATH	:= PATH=$(CROSS_PATH)
-BUSTLE_COMPILE_ENV := $(CROSS_ENV)
+BUSTLE_MAKE_ENV := $(CROSS_ENV)
 
 $(STATEDIR)/bustle.prepare:
 	@$(call targetinfo)

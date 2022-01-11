@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Juergen Borleis <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LIBNDP) += libndp
 #
 # Paths and names
 #
-LIBNDP_VERSION	:= 1.6
-LIBNDP_MD5	:= 1e54d26bcb4a4110bc3f90c5dd04f1a7
+LIBNDP_VERSION	:= 1.7
+LIBNDP_MD5	:= ea4a2a3351991c1d561623772364ae14
 LIBNDP		:= libndp-$(LIBNDP_VERSION)
 LIBNDP_SUFFIX	:= tar.gz
 LIBNDP_URL	:= http://libndp.org/files/$(LIBNDP).$(LIBNDP_SUFFIX)
 LIBNDP_SOURCE	:= $(SRCDIR)/$(LIBNDP).$(LIBNDP_SUFFIX)
 LIBNDP_DIR	:= $(BUILDDIR)/$(LIBNDP)
-LIBNDP_LICENSE	:= LGPL-2.1
+LIBNDP_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

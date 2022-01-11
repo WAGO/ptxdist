@@ -4,8 +4,6 @@
 #           (C) 2010 by Carsten Schlote
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,18 +16,20 @@ PACKAGES-$(PTXCONF_DTC) += dtc
 DTC_VERSION := 1.0.0
 DTC_LICENSE := ignore
 
+ifeq ($(PTXCONF_KERNEL_ARCH_STRING),)
+ifneq ($(subst PTXCONF_KERNEL_ARCH_STRING,,$(value PTXCONF_DTC_OFTREE_DTS_PATH)),$(value PTXCONF_DTC_OFTREE_DTS_PATH))
+$(warning *** invalid value for PTXCONF_DTC_OFTREE_DTS_PATH:)
+$(warning *** PTXCONF_KERNEL_ARCH_STRING is no longer defined.)
+$(warning *** Use GENERIC_KERNEL_ARCH instead)
+$(error )
+endif
+endif
+
 # ----------------------------------------------------------------------------
 # Target-Install
 # ----------------------------------------------------------------------------
 
 ptx/dtb = $(notdir $(basename $(strip $(1)))).dtb
-ptx/dts = $(shell p=$(PTXCONF_DTC_OFTREE_DTS_PATH) ptxd_in_path p "$(strip $(1))" && echo "$${ptxd_reply}")
-
-ifdef PTXCONF_DTC_OFTREE_DTS
-# Note: this must match the magic in ptxd_make_dts_dtb
-DTC_OFTREE_DTS := $(foreach dts, $(call remove_quotes,$(PTXCONF_DTC_OFTREE_DTS)), \
-	$(if $(filter /%,$(dts)),$(dts),$(call ptx/dts,$(dts))))
-endif
 
 dts/env = \
 	$(call ptx/env) \

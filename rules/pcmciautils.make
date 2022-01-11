@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Steven Scholz <steven.scholz@imc-berlin.de>
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -39,6 +37,7 @@ PCMCIAUTILS_COMPILE_ENV := \
 
 PCMCIAUTILS_MAKEVARS := \
 	prefix=/usr \
+	mandir=/usr/share/man \
 	CROSS=$(COMPILER_PREFIX) \
 	V=1 \
 	STRIP=echo \

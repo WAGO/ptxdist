@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_GZIP) += gzip
 #
 # Paths and names
 #
-GZIP_VERSION	:= 1.8
-GZIP_MD5	:= f7caabb65cddc1a4165b398009bd05b9
+GZIP_VERSION	:= 1.9
+GZIP_MD5	:= 9492c6ccb2239ff679a5475a7bb543ed
 GZIP		:= gzip-$(GZIP_VERSION)
 GZIP_SUFFIX	:= tar.xz
 GZIP_URL	:= $(call ptx/mirror, GNU, gzip/$(GZIP).$(GZIP_SUFFIX))
 GZIP_SOURCE	:= $(SRCDIR)/$(GZIP).$(GZIP_SUFFIX)
 GZIP_DIR	:= $(BUILDDIR)/$(GZIP)
-GZIP_LICENSE	:= GPL-3.0
+GZIP_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -38,7 +36,8 @@ GZIP_CONF_OPT	:= \
 	--runstatedir=/run \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-threads=posix \
-	--disable-rpath
+	--disable-rpath \
+	--disable-gcc-warnings
 
 # ----------------------------------------------------------------------------
 # Target-Install

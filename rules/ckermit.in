@@ -11,5 +11,3 @@ config CKERMIT
 	help
 	  Columbia Univ 'kermit' terminal program: Basic file transfer &
           terminal control.
-
-

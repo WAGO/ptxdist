@@ -6,23 +6,26 @@ menuconfig FONTCONFIG
 	select HOST_GPERF
 	select FREETYPE
 	select EXPAT
+	select LIBUUID
+	select RC_ONCE		if FONTCONFIG_UTILS && RUNTIME
 	help
 	  Fontconfig is a font configuration and
 	  customization library, which does not depend on
 	  the X Window System.  It is designed to locate
- 	  fonts within the system and select them according
+	  fonts within the system and select them according
 	  to requirements specified by applications.
 
 	  Fontconfig is not a rasterization library, nor
 	  does it impose a particular rasterization library
 	  on the application.  The X-specific library 'Xft'
 	  uses fontconfig along with freetype to specify and
- 	  rasterize fonts.
+	  rasterize fonts.
 
 if FONTCONFIG
 
 config FONTCONFIG_UTILS
-	bool "install utilities for Fontconfig     "
+	bool
+	prompt "install utilities for Fontconfig     "
 	help
 	  The fontconfig utilities package contains fc-list,
 	  fc-match, and fc-cache.

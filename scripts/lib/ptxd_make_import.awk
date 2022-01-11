@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008-2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -77,12 +75,16 @@ FNR == 1 {
 	$0 = add_prefix($0);
 }
 
+/^[[:space:]]*(int|hex|string|bool|boolean|tristate|prompt)[[:space:]]+"[^"]*"[[:space:]]+if[[:space:]]+/ {
+	match($0, "(.*)([[:space:]]if[[:space:]].*)", tmp)
+	$0 = tmp[1] add_prefix(tmp[2])
+}
 
 #
 # put "source"d file to argument, in order to convert them, too
 # add prefix to sourced files
 #
-/^[[:space:]]*source[[:space:]]+/ {
+/^[[:space:]]*source[[:space:]]+[^[:space:]]+$/ {
 	# remove quotes from file
 	gsub(/(^"|"$)/, "", $2);
 	ARGC++;

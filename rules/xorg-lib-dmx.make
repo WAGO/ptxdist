@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_DMX) += xorg-lib-dmx
 #
 # Paths and names
 #
-XORG_LIB_DMX_VERSION	:= 1.1.3
-XORG_LIB_DMX_MD5	:= ba983eba5a9f05d152a0725b8e863151
+XORG_LIB_DMX_VERSION	:= 1.1.4
+XORG_LIB_DMX_MD5	:= d2f1f0ec68ac3932dd7f1d9aa0a7a11c
 XORG_LIB_DMX		:= libdmx-$(XORG_LIB_DMX_VERSION)
 XORG_LIB_DMX_SUFFIX	:= tar.bz2
 XORG_LIB_DMX_URL	:= $(call ptx/mirror, XORG, individual/lib//$(XORG_LIB_DMX).$(XORG_LIB_DMX_SUFFIX))

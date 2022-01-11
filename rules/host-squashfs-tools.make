@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Jon Ringle <jon@ringle.org>
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,12 @@ HOST_SQUASHFS_TOOLS_SUBDIR	:= squashfs-tools
 # Compile
 # ----------------------------------------------------------------------------
 
-HOST_SQUASHFS_TOOLS_MAKE_OPT := LZO_SUPPORT=1 XZ_SUPPORT=1
+HOST_SQUASHFS_TOOLS_MAKE_OPT := \
+	LZO_SUPPORT=$(call ptx/ifdef, PTXCONF_HOST_SQUASHFS_TOOLS_LZO_SUPPORT,1,0) \
+	LZ4_SUPPORT=$(call ptx/ifdef, PTXCONF_HOST_SQUASHFS_TOOLS_LZ4_SUPPORT,1,0) \
+	XZ_SUPPORT=$(call ptx/ifdef, PTXCONF_HOST_SQUASHFS_TOOLS_XZ_SUPPORT,1,0) \
+	ZSTD_SUPPORT=$(call ptx/ifdef, PTXCONF_HOST_SQUASHFS_TOOLS_ZSTD_SUPPORT,1,0)
+
 HOST_SQUASHFS_TOOLS_MAKE_ENV := $(HOST_ENV) EXTRA_LDFLAGS="-L$(PTXDIST_SYSROOT_HOST)/lib/xz"
 HOST_SQUASHFS_TOOLS_MAKE_PAR := NO
 HOST_SQUASHFS_TOOLS_INSTALL_OPT = install INSTALL_DIR="$(HOST_SQUASHFS_TOOLS_PKGDIR)/sbin"

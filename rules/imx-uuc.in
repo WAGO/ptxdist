@@ -1,0 +1,8 @@
+## SECTION=communication
+
+config IMX_UUC
+	tristate
+	select HOST_DOSFSTOOLS
+	prompt "imx-uuc"
+	help
+	  A Daemon wait for Freescale/NXP mfgtools host's command.

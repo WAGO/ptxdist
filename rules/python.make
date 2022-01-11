@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_PYTHON) += python
 #
 # Paths and names
 #
-PYTHON_VERSION		:= 2.7.13
-PYTHON_MD5		:= 53b43534153bb2a0363f08bae8b9d990
+PYTHON_VERSION		:= 2.7.18
+PYTHON_MD5		:= fd6cc8ec0a78c44036f825e739f36e5a
 PYTHON_MAJORMINOR	:= $(basename $(PYTHON_VERSION))
 PYTHON_SITEPACKAGES	:= /usr/lib/python$(PYTHON_MAJORMINOR)/site-packages
 PYTHON			:= Python-$(PYTHON_VERSION)
@@ -25,12 +23,13 @@ PYTHON_SUFFIX		:= tar.xz
 PYTHON_SOURCE		:= $(SRCDIR)/$(PYTHON).$(PYTHON_SUFFIX)
 PYTHON_DIR		:= $(BUILDDIR)/$(PYTHON)
 PYTHON_LICENSE		:= PYTHON
+PYTHON_DEVPKG		:= NO
 
 PYTHON_URL		:= \
 	http://python.org/ftp/python/$(PYTHON_VERSION)/$(PYTHON).$(PYTHON_SUFFIX) \
 	http://python.org/ftp/python/$(PYTHON_MAJORMINOR)/$(PYTHON).$(PYTHON_SUFFIX)
 
-CROSS_PYTHON		:= $(PTXCONF_SYSROOT_CROSS)/bin/python$(PYTHON_MAJORMINOR)
+CROSS_PYTHON		:= $(PTXDIST_SYSROOT_CROSS)/bin/python$(PYTHON_MAJORMINOR)
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -39,7 +38,7 @@ CROSS_PYTHON		:= $(PTXCONF_SYSROOT_CROSS)/bin/python$(PYTHON_MAJORMINOR)
 PYTHON_PATH	:= PATH=$(CROSS_PATH)
 PYTHON_CONF_ENV	:= \
 	$(CROSS_ENV) \
-	PYTHON_FOR_BUILD=$(PTXCONF_SYSROOT_CROSS)/bin/build-python \
+	PYTHON_FOR_BUILD=$(PTXDIST_SYSROOT_CROSS)/bin/build-python \
 	ac_sys_system=Linux \
 	ac_sys_release=2 \
 	MACHDEP=linux2 \
@@ -79,7 +78,7 @@ PYTHON_AUTOCONF := \
 	--without-ensurepip
 
 PYTHON_BUILD_PYTHONPATH := \
-	$(PTXCONF_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/lib-dynload \
+	$(PTXDIST_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/lib-dynload \
 	$(PYTHON_DIR)/build/lib.linux2-$(PTXCONF_ARCH_STRING)-$(PYTHON_MAJORMINOR) \
 	$(PYTHON_DIR)/Lib \
 	$(PYTHON_DIR)/Lib/plat-linux2
@@ -87,26 +86,26 @@ PYTHON_BUILD_PYTHONPATH := \
 $(STATEDIR)/python.prepare:
 	@$(call targetinfo)
 
-	@rm -f 	$(PTXCONF_SYSROOT_CROSS)/bin/{link,build}-python
-	@ln -s $(PTXCONF_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR) \
-		$(PTXCONF_SYSROOT_CROSS)/bin/link-python
-	@echo '#!/bin/sh'						>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@echo ''							>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@echo '_PYTHON_PROJECT_BASE="$(PYTHON_DIR)"'			>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@echo '_PYTHON_HOST_PLATFORM=linux2-$(PTXCONF_ARCH_STRING)'	>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
+	@rm -f 	$(PTXDIST_SYSROOT_CROSS)/bin/{link,build}-python
+	@ln -s $(PTXDIST_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR) \
+		$(PTXDIST_SYSROOT_CROSS)/bin/link-python
+	@echo '#!/bin/sh'						>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@echo ''							>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@echo '_PYTHON_PROJECT_BASE="$(PYTHON_DIR)"'			>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@echo '_PYTHON_HOST_PLATFORM=linux2-$(PTXCONF_ARCH_STRING)'	>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
 	@echo 'PYTHONPATH=$(subst $(space),:,$(PYTHON_BUILD_PYTHONPATH))' \
-									>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
+									>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
 	@echo 'export _PYTHON_PROJECT_BASE _PYTHON_HOST_PLATFORM  PYTHONPATH' \
-									>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@echo ''							>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@echo 'exec $(PTXCONF_SYSROOT_CROSS)/bin/link-python "$${@}"'	>> $(PTXCONF_SYSROOT_CROSS)/bin/build-python
-	@chmod a+x $(PTXCONF_SYSROOT_CROSS)/bin/build-python
+									>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@echo ''							>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@echo 'exec $(PTXDIST_SYSROOT_CROSS)/bin/link-python "$${@}"'	>> $(PTXDIST_SYSROOT_CROSS)/bin/build-python
+	@chmod a+x $(PTXDIST_SYSROOT_CROSS)/bin/build-python
 
 	@$(call world/prepare, PYTHON)
 	@$(call touch)
 
 PYTHON_MAKE_OPT := \
-	PGEN_FOR_BUILD=$(PTXCONF_SYSROOT_HOST)/bin/pgen
+	PGEN_FOR_BUILD=$(PTXDIST_SYSROOT_HOST)/bin/pgen
 
 # ----------------------------------------------------------------------------
 # Install
@@ -117,21 +116,21 @@ $(STATEDIR)/python.install:
 	@$(call install, PYTHON)
 	@sed -i \
 		-e "s:$(SYSROOT):@SYSROOT@:g" \
-		-e "s:$(PTXCONF_SYSROOT_HOST):@SYSROOT_HOST@:g" \
+		-e "s:$(PTXDIST_SYSROOT_HOST):@SYSROOT_HOST@:g" \
 		$(PYTHON_PKGDIR)/usr/lib/python$(PYTHON_MAJORMINOR)/config/Makefile
 	@$(call touch)
 
 PYTHON_PYTHONPATH := \
 	$(SYSROOT)/usr/lib/python$(PYTHON_MAJORMINOR) \
 	$(SYSROOT)/usr/lib/python$(PYTHON_MAJORMINOR)/plat-linux2 \
-	$(PTXCONF_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/lib-dynload \
-	$(PTXCONF_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/site-packages
+	$(PTXDIST_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/lib-dynload \
+	$(PTXDIST_SYSROOT_HOST)/lib/python$(PYTHON_MAJORMINOR)/site-packages
 
 $(STATEDIR)/python.install.post:
 	@$(call targetinfo)
 	@sed -i \
 		-e "s:@SYSROOT@:$(SYSROOT):g" \
-		-e "s:@SYSROOT_HOST@:$(PTXCONF_SYSROOT_HOST):g" \
+		-e "s:@SYSROOT_HOST@:$(PTXDIST_SYSROOT_HOST):g" \
 		$(PYTHON_PKGDIR)/usr/lib/python$(PYTHON_MAJORMINOR)/config/Makefile
 
 	@$(call world/install.post, PYTHON)
@@ -143,7 +142,7 @@ $(STATEDIR)/python.install.post:
 	@echo 'PYTHONPATH=$(subst $(space),:,$(PYTHON_PYTHONPATH))'	>> "$(CROSS_PYTHON)"
 	@echo 'export _PYTHON_HOST_PLATFORM PYTHONPATH PYTHONHOME'	>> "$(CROSS_PYTHON)"
 	@echo ''							>> "$(CROSS_PYTHON)"
-	@echo 'exec $(PTXCONF_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR) "$${@}"' \
+	@echo 'exec $(PTXDIST_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR) "$${@}"' \
 									>> "$(CROSS_PYTHON)"
 	@chmod a+x "$(CROSS_PYTHON)"
 
@@ -151,12 +150,12 @@ $(STATEDIR)/python.install.post:
 		> "$(CROSS_PYTHON)-config"
 	@echo "exec \
 		\"$(CROSS_PYTHON)\" \
-		\"$(PTXCONF_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR)-config\" \
+		\"$(PTXDIST_SYSROOT_HOST)/bin/python$(PYTHON_MAJORMINOR)-config\" \
 		\"\$${@}\"" \
 		>> "$(CROSS_PYTHON)-config"
 	@chmod a+x "$(CROSS_PYTHON)-config"
 	@ln -sf "python$(PYTHON_MAJORMINOR)-config" \
-		"$(PTXCONF_SYSROOT_CROSS)/bin/python-config"
+		"$(PTXDIST_SYSROOT_CROSS)/bin/python-config"
 
 	@$(call touch)
 
@@ -164,8 +163,7 @@ $(STATEDIR)/python.install.post:
 # Target-Install
 # ----------------------------------------------------------------------------
 
-PYTHON_SKIP-$(call ptx/opt-dis, PTXCONF_PYTHON_LIBTK)		+= lib-tk
-PYTHON_SKIP-$(call ptx/opt-dis, PTXCONF_PYTHON_IDLELIB)		+= idlelib
+PYTHON_SKIP-y							:= lib-tk idlelib
 PYTHON_SKIP-$(call ptx/opt-dis, PTXCONF_PYTHON_DISTUTILS)	+= distutils
 
 ifneq ($(PYTHON_SKIP-y),)
@@ -175,6 +173,9 @@ PYTHON_SKIP_LIST_POST :=/*$(quote)
 PYTHON_SKIP_LIST := $(subst $(space),$(PYTHON_SKIP_LIST_POST) $(PYTHON_SKIP_LIST_PRE),$(PYTHON_SKIP-y))
 PYTHON_SKIP_LIST := $(PYTHON_SKIP_LIST_PRE)$(PYTHON_SKIP_LIST)$(PYTHON_SKIP_LIST_POST)
 endif
+
+# may add extra dependencies and is not useful for embedded
+PYTHON_SKIP_LIST += -a \! -name nis.*
 
 $(STATEDIR)/python.targetinstall:
 	@$(call targetinfo)

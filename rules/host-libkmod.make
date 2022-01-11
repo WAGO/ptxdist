@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -27,13 +25,14 @@ HOST_LIBKMOD_CONF_OPT	:= \
 	--enable-shared \
 	--enable-tools \
 	--disable-manpages \
+	--disable-test-modules \
 	--disable-logging \
 	--disable-debug \
-	--disable-gtk-doc \
-	--disable-gtk-doc-html \
-	--disable-gtk-doc-pdf \
+	--disable-python \
+	--disable-coverage \
 	--without-xz \
-	--without-zlib
+	--without-zlib \
+	--without-openssl
 
 # ----------------------------------------------------------------------------
 # Install

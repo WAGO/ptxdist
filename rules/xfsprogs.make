@@ -3,8 +3,6 @@
 # Copyright (C) 2010 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 # Copyright (C) 2015 by Lucas Stach <dev@lynxeye.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,18 +15,22 @@ PACKAGES-$(PTXCONF_XFSPROGS) += xfsprogs
 #
 # Paths and names
 #
-XFSPROGS_VERSION:= 4.5.0
-XFSPROGS_MD5	:= fcba94b6c74b726dac956d7a650c0c31
+XFSPROGS_VERSION:= 4.19.0
+XFSPROGS_MD5	:= 955b3dad9cbe01d6b21a562cc0100e04
 XFSPROGS	:= xfsprogs-$(XFSPROGS_VERSION)
 XFSPROGS_SUFFIX	:= tar.gz
-XFSPROGS_URL	:= ftp://oss.sgi.com/projects/xfs/cmd_tars/$(XFSPROGS).$(XFSPROGS_SUFFIX)
+XFSPROGS_URL	:= $(call ptx/mirror, KERNEL, utils/fs/xfs/xfsprogs/$(XFSPROGS).$(XFSPROGS_SUFFIX))
 XFSPROGS_SOURCE	:= $(SRCDIR)/$(XFSPROGS).$(XFSPROGS_SUFFIX)
 XFSPROGS_DIR	:= $(BUILDDIR)/$(XFSPROGS)
-XFSPROGS_LICENSE:= GPL-2.0, LGPL-2.1
+XFSPROGS_LICENSE:= GPL-2.0-only AND LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+XFSPROGS_CONF_ENV	:= \
+	$(CROSS_ENV) \
+	ac_cv_search_dm_task_create=no
 
 XFSPROGS_CONF_TOOL	:= autoconf
 XFSPROGS_CONF_OPT	:= \
@@ -44,6 +46,11 @@ XFSPROGS_CONF_OPT	:= \
 	--disable-termcap \
 	--disable-lib64
 
+XFSPROGS_INSTALL_OPT	:= \
+	PKG_ROOT_LIB_DIR=/usr/lib \
+	PKG_ROOT_SBIN_DIR=/usr/sbin \
+	install
+
 # ----------------------------------------------------------------------------
 # Target-Install
 # ----------------------------------------------------------------------------
@@ -58,12 +65,12 @@ $(STATEDIR)/xfsprogs.targetinstall:
 	@$(call install_fixup, xfsprogs,DESCRIPTION,missing)
 
 ifdef PTXCONF_XFSPROGS_INSTALL_MKXFS
-	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /sbin/mkfs.xfs)
+	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /usr/sbin/mkfs.xfs)
 endif
 
 ifdef PTXCONF_XFSPROGS_INSTALL_XFS_REPAIR
-	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /sbin/xfs_repair)
-	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /sbin/fsck.xfs)
+	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /usr/sbin/xfs_repair)
+	@$(call install_copy, xfsprogs, 0, 0, 0755, -, /usr/sbin/fsck.xfs)
 endif
 
 ifdef PTXCONF_XFSPROGS_INSTALL_GROWFS

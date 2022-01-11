@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,10 +15,6 @@ HOST_PACKAGES-$(PTXCONF_HOST_GOBJECT_INTROSPECTION) += host-gobject-introspectio
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_GOBJECT_INTROSPECTION_CONF_ENV	:= \
-	$(HOST_ENV) \
-	PYTHON=python
-
 #
 # autoconf
 #
@@ -31,7 +25,8 @@ HOST_GOBJECT_INTROSPECTION_CONF_OPT	:= \
 	--disable-gtk-doc-html \
 	--disable-gtk-doc-pdf \
 	--disable-doctool \
-	--without-cairo
+	--without-cairo \
+	--with-python=$(SYSTEMPYTHON3)
 
 # ----------------------------------------------------------------------------
 # Install
@@ -63,7 +58,7 @@ $(STATEDIR)/host-gobject-introspection.install.post:
 		"$(PTXDIST_SYSROOT_HOST)/bin/g-ir-scanner" \
 		"$(PTXDIST_SYSROOT_HOST)/bin/g-ir-annotation-tool"
 
-	@sed -i 's;'/lib';'$(PTXDIST_SYSROOT_HOST)/lib';' \
+	@sed -i "s;'/lib';'$(PTXDIST_SYSROOT_HOST)/lib';" \
 		"$(PTXDIST_SYSROOT_HOST)/bin/g-ir-scanner" \
 		"$(PTXDIST_SYSROOT_HOST)/bin/g-ir-annotation-tool"
 

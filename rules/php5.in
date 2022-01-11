@@ -1,22 +1,28 @@
-## SECTION=scripting_languages
+## SECTION=staging
+## old section:
+### SECTION=scripting_languages
 # php5 configuration
 
 menuconfig PHP5
 	tristate
 	prompt "php5                          "
-	select APACHE2		if PHP5_SAPI_APXS2 || PHP5_SAPI_APXS2FILTER
 	select LIBCURL		if PHP5_EXT_CURL
 	select LIBXML2		if PHP5_XML_LIBXML2
 	select LIBXML2_C14N	if PHP5_XML_LIBXML2
 	select LIBXML2_DTD	if PHP5_XML_LIBXML2
 	select LIBXML2_XINCLUDE	if PHP5_XML_LIBXML2
+	select LIBXML2_READER	if PHP5_XML_LIBXML2_READER
+	select LIBXML2_WRITER	if PHP5_XML_LIBXML2_WRITER
 	select LIBXSLT		if PHP5_XML_LIBXML2_XSLT
 	select MYSQLDB		if PHP5_EXT_MYSQL
 	select PHP5_XML		if PHP5_EXT_SOAP
-	select XMLRPC_C		if PHP5_XML_LIBXML2_XMLRPC
 	select SQLITE		if PHP5_EXT_SQLITE3
 	select ZLIB		if PHP5_EXT_ZLIB
 	select OPENSSL		if PHP5_EXT_OPENSSL
+	help
+	  STAGING: remove in ptxdist-2021.05.0
+	  Old version that need to be updated. Fails to build with gcc >= 9.x on
+	  on some architectures (AArch64).
 
 if PHP5
 
@@ -47,6 +53,8 @@ config PHP5_SAPI_AOLSERVER
 
 config PHP5_SAPI_APXS2FILTER
 	bool
+	# needs apache
+	depends on BROKEN
 	prompt "apxs2filter"
 	help
 	  EXPERIMENTAL: Build shared Apache 2.0 Filter module. FILE is the optional
@@ -54,6 +62,8 @@ config PHP5_SAPI_APXS2FILTER
 
 config PHP5_SAPI_APXS2
 	bool
+	# needs apache
+	depends on BROKEN
 	prompt "apache mod_php (apxs2)"
 	help
 	  Build shared Apache 2.0 Handler module.
@@ -223,12 +233,6 @@ config PHP5_XML_LIBXML2_SIMPLEXML
 	help
 	  simple xml support
 
-config PHP5_XML_LIBXML2_XMLRPC
-	bool
-	prompt "xmlrpc support"
-	help
-	  xmlrpc support
-
 endif	# PHP5_XML_LIBXML2
 
 endif	# PHP5_XML
@@ -278,6 +282,8 @@ config PHP5_EXT_ZLIB
 
 config PHP5_EXT_OPENSSL
 	bool
+	# Fails to build with OpenSSL 1.1.x
+	depends on BROKEN
 	prompt "openssl"
 	help
 	  Enable openssl support for PHP.

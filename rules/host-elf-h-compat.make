@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Bernhard Walle <bernhard@bwalle.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,14 +21,14 @@ HOST_ELF_H_COMPAT_SUFFIX	:= tar.bz2
 HOST_ELF_H_COMPAT_URL		:= http://bwalle.de/programme/$(HOST_ELF_H_COMPAT).$(HOST_ELF_H_COMPAT_SUFFIX)
 HOST_ELF_H_COMPAT_SOURCE	:= $(SRCDIR)/$(HOST_ELF_H_COMPAT).$(HOST_ELF_H_COMPAT_SUFFIX)
 HOST_ELF_H_COMPAT_DIR		:= $(HOST_BUILDDIR)/$(HOST_ELF_H_COMPAT)
-HOST_ELF_H_COMPAT_LICENSE	:= GPL-2.0+
+HOST_ELF_H_COMPAT_LICENSE	:= GPL-2.0-or-later
 
 #
 # autoconf
 #
 HOST_ELF_H_COMPAT_CONF_TOOL	:= autoconf
 
-ifneq ($(shell uname -s),Linux)
+ifneq ($(call ptx/force-sh, uname -s),Linux)
 $(STATEDIR)/base.prepare: $(STATEDIR)/host-elf-h-compat.install.post
 endif
 

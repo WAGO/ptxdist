@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Markus Rathgeb <rathgeb.markus@googlemail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -35,19 +33,19 @@ LINKS_ENV      := $(CROSS_ENV)
 LINKS_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
 	--$(call ptx/wwo, PTXCONF_LINKS_SSL)-ssl \
-	--$(call ptx/wwo, PTXCONF_LINKS_GPM)-gpm \
+	--without-gpm \
 	--$(call ptx/wwo, PTXCONF_LINKS_PNG)-png \
 	--$(call ptx/wwo, PTXCONF_LINKS_JPEG)-libjpeg \
-	--$(call ptx/wwo, PTXCONF_LINKS_FBCON)-fb \
+	--without-fb \
 	--$(call ptx/wwo, PTXCONF_LINKS_TIFF)-libtiff \
 	--$(call ptx/wwo, PTXCONF_LINKS_X)-x \
-	--$(call ptx/wwo, PTXCONF_LINKS_DIRECTFB)-directfb \
+	--without-directfb \
 	--$(call ptx/wwo, PTXCONF_LINKS_SDL)-sdl \
 	--$(call ptx/wwo, PTXCONF_LINKS_ZLIB)-zlib \
 	--$(call ptx/wwo, PTXCONF_LINKS_BZIP2)-bzip2 \
 	--$(call ptx/wwo, PTXCONF_LINKS_LZMA)-lzma \
 
-ifneq ($(PTXCONF_LINKS_X)$(PTXCONF_LINKS_FBCON)$(PTXCONF_LINKS_DIRECTFB),)
+ifneq ($(PTXCONF_LINKS_X),)
 LINKS_AUTOCONF += --enable-graphics
 else
 LINKS_AUTOCONF += --disable-graphics
@@ -55,9 +53,7 @@ endif
 
 # Note: ./configure only support 'gpm' features auto-detection, so
 # we use the autoconf trick (see Gentoo ebuild)
-ifndef PTXCONF_LINKS_GPM
 LINKS_ENV += ac_cv_lib_gpm_Gpm_Open=no
-endif
 
 # ----------------------------------------------------------------------------
 # Target-Install

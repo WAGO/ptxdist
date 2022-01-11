@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBGEE_SUFFIX	:= tar.bz2
 LIBGEE_URL	:= http://download.gnome.org/sources/libgee/0.5/$(LIBGEE).$(LIBGEE_SUFFIX)
 LIBGEE_SOURCE	:= $(SRCDIR)/$(LIBGEE).$(LIBGEE_SUFFIX)
 LIBGEE_DIR	:= $(BUILDDIR)/$(LIBGEE)
-LIBGEE_LICENSE	:= LGPL-2.1+
+LIBGEE_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

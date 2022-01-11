@@ -1,4 +1,6 @@
-## SECTION=multimedia_gstreamer
+## SECTION=staging
+## old section:
+### SECTION=multimedia_gstreamer
 
 menuconfig GST_PLUGINS_BAD
 	tristate
@@ -6,7 +8,6 @@ menuconfig GST_PLUGINS_BAD
 	select LIBOIL
 	select GSTREAMER
 	select GST_PLUGINS_BASE
-	select DIRECTFB		if GST_PLUGINS_BAD_DIRECTFB
 	select SDL		if GST_PLUGINS_BAD_SDL
 	select BZIP2		if GST_PLUGINS_BAD_BZ2
 	select BZIP2_LIBBZ2	if GST_PLUGINS_BAD_BZ2
@@ -19,6 +20,9 @@ menuconfig GST_PLUGINS_BAD
 	  good quality, but they're missing something - be it a good
 	  code review, some documentation, a set of tests, a real
 	  live maintainer, or some actual wide use.
+
+	  STAGING: remove in ptxdist-2021.05.0
+	  GStreamer 0.10 has been dead more than 8 years.
 
 
 if GST_PLUGINS_BAD
@@ -301,8 +305,8 @@ config GST_PLUGINS_BAD_DC1394
 
 config GST_PLUGINS_BAD_DIRECTFB
 	bool
-	depends on STAGING
 	prompt "directfb"
+	depends on BROKEN
 
 config GST_PLUGINS_BAD_DIRAC
 	bool

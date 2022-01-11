@@ -3,8 +3,6 @@
 # Copyright (C) 2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -28,7 +26,7 @@ ptxd_make_world_extract() {
 
     case "${pkg_url}" in
 	lndir://*)
-	    local url="${pkg_url//lndir:\/\//}"
+	    local url="$(ptxd_file_url_path "${pkg_url}")"
 	    if [ -n "${pkg_src}" ]; then
 		ptxd_bailout "<PKG>_SOURCE must not be defined when using a lndir:// URL!"
 	    fi
@@ -42,7 +40,7 @@ ptxd_make_world_extract() {
 	    fi
 	    ;;
 	file://*)
-	    local url="${pkg_url//file:\/\//}"
+	    local url="$(ptxd_file_url_path "${pkg_url}")"
 	    if [ -d "${url}" ]; then
 		echo "local directory instead of tar file, linking build dir"
 		ln -sf "$(ptxd_abspath "${url}")" "${pkg_dir}"

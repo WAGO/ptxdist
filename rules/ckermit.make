@@ -4,8 +4,6 @@
 # Copyright (C) 2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -43,7 +41,7 @@ CKERMIT_MAKEVARS := \
 	prefix=/usr \
 	CC=$(CROSS_CC) \
 	CC2=$(CROSS_CC) \
-	WART=$(PTXCONF_SYSROOT_HOST)/bin/wart \
+	WART=$(PTXDIST_SYSROOT_HOST)/bin/wart \
 	CFLAGS='$(CROSS_CPPFLAGS) $(CROSS_CFLAGS) -O2 -g -DLINUX -DFNFLOAT -DCK_POSIX_SIG -DCK_NEWTERM -DTCPSOCKET -DLINUXFSSTND -DNOCOTFMC -DPOSIX -DUSE_STRERROR -DCK_NCURSES -DHAVE_PTMX' \
 	LNKFLAGS='$(CROSS_LDFLAGS)' \
 	LIBS='-lncurses -lutil -lresolv -lcrypt -lm'

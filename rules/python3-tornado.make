@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Artur Wiebe <artur@4wiebe.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -13,11 +11,11 @@
 #
 PACKAGES-$(PTXCONF_PYTHON3_TORNADO) += python3-tornado
 
-PYTHON3_TORNADO_VERSION	:= 4.5.1
-PYTHON3_TORNADO_MD5	:= 838687d20923360af5ab59f101e9e02e
+PYTHON3_TORNADO_VERSION	:= 6.0.3
+PYTHON3_TORNADO_MD5	:= cab4b11480f6d032e46465586192d343
 PYTHON3_TORNADO		:= tornado-$(PYTHON3_TORNADO_VERSION)
 PYTHON3_TORNADO_SUFFIX	:= tar.gz
-PYTHON3_TORNADO_URL	:= https://pypi.python.org/packages/df/42/a180ee540e12e2ec1007ac82a42b09dd92e5461e09c98bf465e98646d187/$(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX)\#md5=$(PYTHON3_TORNADO_MD5)
+PYTHON3_TORNADO_URL	:= https://files.pythonhosted.org/packages/source/t/tornado/$(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX)
 PYTHON3_TORNADO_SOURCE	:= $(SRCDIR)/$(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX)
 PYTHON3_TORNADO_DIR	:= $(BUILDDIR)/$(PYTHON3_TORNADO)
 PYTHON3_TORNADO_LICENSE	:= Apache-2.0

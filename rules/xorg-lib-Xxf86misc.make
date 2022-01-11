@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XXF86MISC) += xorg-lib-xxf86misc
 #
 # Paths and names
 #
-XORG_LIB_XXF86MISC_VERSION	:= 1.0.3
-XORG_LIB_XXF86MISC_MD5		:= 6bc0bf78909fd71021c466c793d4385c
+XORG_LIB_XXF86MISC_VERSION	:= 1.0.4
+XORG_LIB_XXF86MISC_MD5		:= 37ad70f8b53b94b550f9290be97fbe2d
 XORG_LIB_XXF86MISC		:= libXxf86misc-$(XORG_LIB_XXF86MISC_VERSION)
 XORG_LIB_XXF86MISC_SUFFIX	:= tar.bz2
 XORG_LIB_XXF86MISC_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XXF86MISC).$(XORG_LIB_XXF86MISC_SUFFIX))

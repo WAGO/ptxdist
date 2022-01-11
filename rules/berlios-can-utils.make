@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010, 2012 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_BERLIOS_CAN_UTILS) += berlios-can-utils
 #
 # Paths and names
 #
-BERLIOS_CAN_UTILS_VERSION	:= 2014.01.0
-BERLIOS_CAN_UTILS_MD5		:= f643449f6607688a9f4662a48bc91aa0
-BERLIOS_CAN_UTILS		:= can-utils-$(BERLIOS_CAN_UTILS_VERSION)
-BERLIOS_CAN_UTILS_SUFFIX	:= tar.bz2
-BERLIOS_CAN_UTILS_URL		:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(BERLIOS_CAN_UTILS).$(BERLIOS_CAN_UTILS_SUFFIX)
+BERLIOS_CAN_UTILS_VERSION	:= v2020.02.04
+BERLIOS_CAN_UTILS_MD5		:= 5ca2e7b840bb5fbe8a30967e076dc16e
+BERLIOS_CAN_UTILS		:= canutils-$(BERLIOS_CAN_UTILS_VERSION)
+BERLIOS_CAN_UTILS_SUFFIX	:= tar.gz
+BERLIOS_CAN_UTILS_URL		:= https://github.com/linux-can/can-utils/archive/$(BERLIOS_CAN_UTILS_VERSION).$(BERLIOS_CAN_UTILS_SUFFIX)
 BERLIOS_CAN_UTILS_SOURCE	:= $(SRCDIR)/$(BERLIOS_CAN_UTILS).$(BERLIOS_CAN_UTILS_SUFFIX)
 BERLIOS_CAN_UTILS_DIR		:= $(BUILDDIR)/$(BERLIOS_CAN_UTILS)
-BERLIOS_CAN_UTILS_LICENSE	:= unknown
+BERLIOS_CAN_UTILS_LICENSE	:= GPL-2.0
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -59,6 +57,11 @@ BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_LOG2LONG) += /usr/bin/log2lon
 BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_SLCAN_ATTACH) += /usr/bin/slcan_attach
 BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_SLCAND) += /usr/bin/slcand
 BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_SLCANPTY) += /usr/bin/slcanpty
+BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_JSPY) += /usr/bin/jspy
+BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_JSR) += /usr/bin/jsr
+BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_JACD) += /usr/bin/jacd
+BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_JCAT) += /usr/bin/jcat
+BERLIOS_CAN_UTILS_INST-$(PTXCONF_BERLIOS_CAN_UTILS_TESTJ1939) += /usr/bin/testj1939
 
 $(STATEDIR)/berlios-can-utils.targetinstall:
 	@$(call targetinfo)

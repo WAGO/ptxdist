@@ -1,8 +1,6 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2003-2009 by Pengutronix e.K., Hildesheim, Germany
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,15 +21,20 @@ BASH_URL	:= $(call ptx/mirror, GNU, bash/$(BASH).$(BASH_SUFFIX))
 BASH_SOURCE	:= $(SRCDIR)/$(BASH).$(BASH_SUFFIX)
 BASH_DIR	:= $(BUILDDIR)/$(BASH)
 BASH_MAKE_PAR	:= NO
-BASH_LICENSE	:= GPL-3.0
+BASH_LICENSE	:= GPL-3.0-or-later
+BASH_LICENSE_FILES	:= \
+	file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
+	file://general.c;startline=1;endline=19;md5=c018785d21f8c206ca7a13fa7d027568
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 BASH_PATH	:= PATH=$(CROSS_PATH)
-BASH_ENV	:= $(CROSS_ENV)
-
+BASH_ENV	:= \
+	$(CROSS_ENV) \
+	bash_cv_job_control_missing=$(call ptx/ifdef, PTXCONF_BASH_JOBS, present, missing) \
+	bash_cv_termcap_lib=$(call ptx/ifdef, PTXCONF_BASH_CURSES, libncurses, libtermcap)
 
 BASH_AUTOCONF	:= \
 	$(CROSS_AUTOCONF_USR) \
@@ -71,15 +74,8 @@ BASH_AUTOCONF	:= \
 	--$(call ptx/endis, PTXCONF_BASH_SEP_HELPFILES)-separate-helpfiles \
 	--$(call ptx/endis, PTXCONF_BASH_SINGLE_HELPLINE)-single-help-strings \
 	--$(call ptx/endis, PTXCONF_BASH_GPROF)-profiling \
-	--$(call ptx/endis, PTXCONF_BASH_STATIC)-static-link
-
-ifdef PTXCONF_BASH_CURSES
-BASH_AUTOCONF += --with-curses
-endif
-
-ifdef PTXCONF_BASH_JOBS
-BASH_ENV	+= bash_cv_job_control_missing=present
-endif
+	--$(call ptx/endis, PTXCONF_BASH_STATIC)-static-link \
+	--$(call ptx/wwo, PTXCONF_BASH_CURSES)-curses
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -95,7 +91,7 @@ $(STATEDIR)/bash.targetinstall:
 	@$(call install_fixup, bash,DESCRIPTION,missing)
 
 	@$(call install_copy, bash, 0, 0, 0755, -, /usr/bin/bash)
-ifdef PTXCONF_BUSYBOX_SH_IS_NONE
+ifdef PTXCONF_BASH_SH
 	@$(call install_link, bash, bash, /usr/bin/sh)
 endif
 

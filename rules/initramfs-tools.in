@@ -1,66 +1,64 @@
 ## SECTION=initmethod
 
-if INITMETHOD_INITRAMFS
+if INITMETHOD_INITRAMFS || ALLYES
 
 menuconfig INITRAMFS_TOOLS
 	bool
-	prompt "initramfs-tools               "
+	prompt "initramfs-tools                 "
 	help
 	  Install initramfs skeleton framework
 
 if INITRAMFS_TOOLS
 
-config INITRAMFS_SPEC
-	bool
-	prompt "parse project specific initramfs_spec"
-	help
-	  parse the spec file which is expected to live in
-	  ${PTXDIST_WORKSPACE}/initramfs_spec. The format is the same
-	  as described in the kernelsource under
-
-	  Documentation/early-userspace/README.
-
-	  Files described in this file can either have an absolute or
-	  a relative path (relative to ${PTXDIST_WORKSPACE}).
-
-if INITRAMFS_SPEC
-
-config INITRAMFS_SPEC_FILE
-	string "initramfs spec filename"
-	default "${PTXDIST_WORKSPACE}/initramfs_spec"
-	help
-	  install using a spec file. Format is similar to what
-	  is described in the kernel source in
-	  Documentation/filesystems/ramfs-rootfs-initramfs.txt
-
-	  file  <name> <location> <mode> <uid> <gid>
-	  dir   <name> <mode> <uid> <gid>
-	  nod   <name> <mode> <uid> <gid> <dev_type> <maj> <min>
-	  slink <name> <target> <mode> <uid> <gid>
-
-	  file <location> can either have an absolute path or
-	  a relative path relative to any of the following paths:
-	    ${PTXDIST_WORKSPACE}/projectroot${PTXDIST_PLATFORMSUFFIX}/<location>
-	    ${PTXDIST_WORKSPACE}/projectroot/<location>${PTXDIST_PLATFORMSUFFIX}
-	    ${PTXDIST_WORKSPACE}/projectroot/<location>
-	    ${PTXDIST_TOPDIR}/projectroot/<location>
-	    ${pkg_pkg_dir}/<location>
-	    ${pkg_dir}/<location>
-
-endif
-
-config INITRAMFS_TOOLS_SCRIPTS_INIT
-	bool "install /scripts/init         "
+config INITRAMFS_TOOLS_SCRIPTS_INIT_TOP
+	bool "install /scripts/init-top/      "
+	default y
 	help
 	  FIXME
 
-config INITRAMFS_TOOLS_SCRIPTS_LOCAL
-	bool "install /scripts/local        "
+config INITRAMFS_TOOLS_SCRIPTS_INIT_PREMOUNT
+	bool "install /scripts/init-premount/ "
 	help
 	  FIXME
 
-config INITRAMFS_TOOLS_SCRIPTS_NFS
-	bool "install /scripts/nfs          "
+config INITRAMFS_TOOLS_SCRIPTS_INIT_BOTTOM
+	bool "install /scripts/init-bottom/   "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_LOCAL_TOP
+	bool "install /scripts/local-top/     "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_LOCAL_BLOCK
+	bool "install /scripts/local-block/   "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_LOCAL_PREMOUNT
+	bool "install /scripts/local-premount/"
+	default y
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_LOCAL_BOTTOM
+	bool "install /scripts/local-bottom/  "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_NFS_TOP
+	bool "install /scripts/nfs-top/       "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_NFS_PREMOUNT
+	bool "install /scripts/nfs-premount/  "
+	help
+	  FIXME
+
+config INITRAMFS_TOOLS_SCRIPTS_NFS_BOTTOM
+	bool "install /scripts/nfs-bottom/    "
 	help
 	  FIXME
 

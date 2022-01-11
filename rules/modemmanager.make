@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_MODEMMANAGER) += modemmanager
 #
 # Paths and names
 #
-MODEMMANAGER_VERSION	:= 1.6.10
-MODEMMANAGER_MD5	:= 67160b94c0eda90ebf95d1b620229ca1
+MODEMMANAGER_VERSION	:= 1.12.6
+MODEMMANAGER_MD5	:= 796bf7bfc156c4229cef1a9cb8c79f37
 MODEMMANAGER		:= ModemManager-$(MODEMMANAGER_VERSION)
 MODEMMANAGER_SUFFIX	:= tar.xz
-MODEMMANAGER_URL	:= http://www.freedesktop.org/software/ModemManager/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
+MODEMMANAGER_URL	:= https://www.freedesktop.org/software/ModemManager/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
 MODEMMANAGER_SOURCE	:= $(SRCDIR)/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
 MODEMMANAGER_DIR	:= $(BUILDDIR)/$(MODEMMANAGER)
-MODEMMANAGER_LICENSE	:= GPL-2.0+, GPL-3.0+, LGPL-2.1+
+MODEMMANAGER_LICENSE	:= GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -49,7 +47,10 @@ MODEMMANAGER_CONF_OPT	:= \
 	--with-dbus-sys-dir=/usr/share/dbus-1/system.d \
 	--with-udev-base-dir=/usr/lib/udev \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system \
+	--$(call ptx/wwo, PTXCONF_INITMETHOD_SYSTEMD)-systemd-suspend-resume \
+	--$(call ptx/wwo, PTXCONF_INITMETHOD_SYSTEMD)-systemd-journal \
 	--without-polkit \
+	--$(call ptx/wwo, PTXCONF_MODEMMANAGER_ALLOW_DBUS_AT_CMDS)-at-command-via-dbus \
 	--with-mbim \
 	--with-qmi
 

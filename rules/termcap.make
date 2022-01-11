@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2003, 2004, 2009 by Marc Kleine-Budde <kleine-budde@gmx.de>
 #          
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ TERMCAP_SUFFIX	:= tar.gz
 TERMCAP_URL	:= $(call ptx/mirror, GNU, termcap/$(TERMCAP).$(TERMCAP_SUFFIX))
 TERMCAP_SOURCE	:= $(SRCDIR)/$(TERMCAP).$(TERMCAP_SUFFIX)
 TERMCAP_DIR	:= $(BUILDDIR)/$(TERMCAP)
-TERMCAP_LICENSE	:= GPL-2.0
+TERMCAP_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

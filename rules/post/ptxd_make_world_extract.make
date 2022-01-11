@@ -2,11 +2,18 @@
 #
 # Copyright (C) 2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
+
+world/srchash = \
+	+$(call world/env, $1) \
+	ptxd_make_world_hash srchash
+
+$(STATEDIR)/%.srchash:
+	@$(call targetinfo)
+	@$(call world/srchash, $(PTX_MAP_TO_PACKAGE_$(basename $(*))))
+	@$(call touch)
 
 #
 # extract
@@ -26,17 +33,6 @@ extract = \
 world/patchin/post = \
 	$(call world/env, $(1)) \
 	ptxd_make_world_patchin_post
-
-### --- for KLIBC packages only ---
-
-$(STATEDIR)/klibc-%.extract:
-	@$(call targetinfo)
-	@$(call clean, $($(PTX_MAP_TO_PACKAGE_klibc-$(*))_DIR))
-	@$(call extract, $(PTX_MAP_TO_PACKAGE_klibc-$(*)), $(KLIBC_BUILDDIR))
-	@$(call patchin, $(PTX_MAP_TO_PACKAGE_klibc-$(*)), $($(PTX_MAP_TO_PACKAGE_klibc-$(*))_DIR))
-	@$(call touch)
-
-### --- all but KLIBC packages ---
 
 $(STATEDIR)/%.extract:
 	@$(call targetinfo)

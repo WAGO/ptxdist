@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_SYSSTAT) += sysstat
 #
 # Paths and names
 #
-SYSSTAT_VERSION	:= 11.0.7
-SYSSTAT_MD5	:= 2d9e43c14d7df7daabee06c3fe45cd05
+SYSSTAT_VERSION	:= 12.0.4
+SYSSTAT_MD5	:= 237ae1ba7a2073628b2cd7444ae3aed8
 SYSSTAT		:= sysstat-$(SYSSTAT_VERSION)
 SYSSTAT_SUFFIX	:= tar.xz
 SYSSTAT_URL	:= http://pagesperso-orange.fr/sebastien.godard/$(SYSSTAT).$(SYSSTAT_SUFFIX)
 SYSSTAT_SOURCE	:= $(SRCDIR)/$(SYSSTAT).$(SYSSTAT_SUFFIX)
 SYSSTAT_DIR	:= $(BUILDDIR)/$(SYSSTAT)
-SYSSTAT_LICENSE	:= GPL-2.0+
+SYSSTAT_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -42,10 +40,8 @@ SYSSTAT_CONF_OPT	:= \
 	--disable-sensors \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-nls \
-	--enable-yesterday \
-	--disable-man-group \
+	--disable-file-attr \
 	--disable-compress-manpg \
-	--enable-install-isag \
 	--enable-clean-sa-dir \
 	--disable-install-cron \
 	--enable-collect-all \
@@ -76,10 +72,7 @@ $(STATEDIR)/sysstat.targetinstall:
 
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/cifsiostat)
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/iostat)
-	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/isag)
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/mpstat)
-	@$(call install_copy, sysstat, 0, 0, 0755, -, \
-		/usr/bin/nfsiostat-sysstat)
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/pidstat)
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/sadf)
 	@$(call install_copy, sysstat, 0, 0, 0755, -, /usr/bin/sar)

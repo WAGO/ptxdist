@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Robert Schwebel
 #               2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ GSTREAMER_SUFFIX	:= tar.bz2
 GSTREAMER_URL		:= http://gstreamer.freedesktop.org/src/gstreamer/$(GSTREAMER).$(GSTREAMER_SUFFIX)
 GSTREAMER_SOURCE	:= $(SRCDIR)/$(GSTREAMER).$(GSTREAMER_SUFFIX)
 GSTREAMER_DIR		:= $(BUILDDIR)/$(GSTREAMER)
-GSTREAMER_LICENSE	:= LGPL-2.0+
+GSTREAMER_LICENSE	:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

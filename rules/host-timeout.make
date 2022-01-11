@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -33,7 +31,7 @@ HOST_TIMEOUT_MAKE_OPT	:= ../../bin/timeout
 $(STATEDIR)/host-timeout.install:
 	@$(call targetinfo)
 	@$(INSTALL) -v -m 755 -D $(HOST_TIMEOUT_DIR)/bin/timeout \
-		$(PTXCONF_SYSROOT_HOST)/bin/timeout
+		$(PTXDIST_SYSROOT_HOST)/bin/timeout
 	@$(call touch)
 
 # vim: syntax=make

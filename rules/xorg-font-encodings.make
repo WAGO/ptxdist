@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_FONT_ENCODINGS) += xorg-font-encodings
 #
 # Paths and names
 #
-XORG_FONT_ENCODINGS_VERSION	:= 1.0.4
-XORG_FONT_ENCODINGS_MD5		:= 0f2d6546d514c5cc4ecf78a60657a5c1
+XORG_FONT_ENCODINGS_VERSION	:= 1.0.5
+XORG_FONT_ENCODINGS_MD5		:= bbae4f247b88ccde0e85ed6a403da22a
 XORG_FONT_ENCODINGS		:= encodings-$(XORG_FONT_ENCODINGS_VERSION)
 XORG_FONT_ENCODINGS_SUFFIX	:= tar.bz2
 XORG_FONT_ENCODINGS_URL		:= $(call ptx/mirror, XORG, individual/font/$(XORG_FONT_ENCODINGS).$(XORG_FONT_ENCODINGS_SUFFIX))

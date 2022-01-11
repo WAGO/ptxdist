@@ -2,26 +2,25 @@
 
 menuconfig DTC
 	bool
-	select HOST_DTC		if !DTC_KERNEL
-	select KERNEL_DTC	if DTC_KERNEL
+	select HOST_DTC
 	select KERNEL
 	prompt "Build device tree             "
 	help
 	  Select this to build a device tree for your board.
 	  You will find the device tree binary blob under
-	  images/oftree in your workspace.
+	  platform-nnn/images/ in your workspace.
 
 if DTC
 
 config DTC_INSTALL_OFTREE
 	bool "install oftree to /boot"
 	help
-	  Creates an package to install the 'oftree' file to /boot
+	  Creates a package to install the 'oftree' file to /boot
 	  of your target system.
 
 config DTC_OFTREE_DTS_PATH
 	string "path to source dts file"
-	default "${PTXDIST_PLATFORMCONFIGDIR}/dts:${KERNEL_DIR}/arch/${PTXCONF_KERNEL_ARCH_STRING}/boot/dts"
+	default "${PTXDIST_PLATFORMCONFIG_SUBDIR}/dts:${KERNEL_DIR}/arch/${GENERIC_KERNEL_ARCH}/boot/dts"
 	help
 	  Define path to the dts source file. Multiple directories can be
 	  specified separated by ':'.
@@ -34,11 +33,6 @@ config DTC_OFTREE_DTS
 	  blob generation. For relative file names DTC_OFTREE_DTS_PATH
 	  is used as a search path for the device tree files specified
 	  here. Multiple dts files can be specified, separated by spaces.
-
-config DTC_KERNEL
-	bool
-	default y
-	prompt "use kernel dtc"
 
 config DTC_EXTRA_ARGS
 	string "extra options passed to dtc"

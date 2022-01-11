@@ -2,8 +2,6 @@
 #
 # Copyright (C) @YEAR@ by @AUTHOR@
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,10 +17,11 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 @PACKAGE@_VERSION	:= @VERSION@
 @PACKAGE@_MD5		:=
 @PACKAGE@		:= @package_filename@-$(@PACKAGE@_VERSION)
-@PACKAGE@_SUFFIX		:= @SUFFIX@
+@PACKAGE@_SUFFIX	:= @SUFFIX@
 @PACKAGE@_URL		:= @URL@/$(@PACKAGE@).$(@PACKAGE@_SUFFIX)
-@PACKAGE@_SOURCE		:= $(SRCDIR)/$(@PACKAGE@).$(@PACKAGE@_SUFFIX)
+@PACKAGE@_SOURCE	:= $(SRCDIR)/$(@PACKAGE@).$(@PACKAGE@_SUFFIX)
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
+@PACKAGE@_LICENSE	:= unknown
 
 ifdef PTXCONF_@PACKAGE@
 $(STATEDIR)/xorg-fonts.targetinstall.post: $(STATEDIR)/@package@.targetinstall

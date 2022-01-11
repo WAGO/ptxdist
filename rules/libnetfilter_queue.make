@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBNETFILTER_QUEUE_SUFFIX	:= tar.bz2
 LIBNETFILTER_QUEUE_URL		:= http://ftp.netfilter.org/pub/libnetfilter_queue/$(LIBNETFILTER_QUEUE).$(LIBNETFILTER_QUEUE_SUFFIX)
 LIBNETFILTER_QUEUE_SOURCE	:= $(SRCDIR)/$(LIBNETFILTER_QUEUE).$(LIBNETFILTER_QUEUE_SUFFIX)
 LIBNETFILTER_QUEUE_DIR		:= $(BUILDDIR)/$(LIBNETFILTER_QUEUE)
-LIBNETFILTER_QUEUE_LICENSE	:= GPL-2.0
+LIBNETFILTER_QUEUE_LICENSE	:= GPL-2.0-only
 
 #
 # autoconf

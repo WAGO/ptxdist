@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBWEBSOCKETS_SUFFIX	:= tar.gz
 LIBWEBSOCKETS_URL	:= https://github.com/warmcat/libwebsockets/archive/$(LIBWEBSOCKETS_VERSION).$(LIBWEBSOCKETS_SUFFIX)
 LIBWEBSOCKETS_SOURCE	:= $(SRCDIR)/$(LIBWEBSOCKETS).$(LIBWEBSOCKETS_SUFFIX)
 LIBWEBSOCKETS_DIR	:= $(BUILDDIR)/$(LIBWEBSOCKETS)
-LIBWEBSOCKETS_LICENSE	:= unknown
+LIBWEBSOCKETS_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Get
@@ -51,7 +49,7 @@ LIBWEBSOCKETS_CONF_OPT	:= \
 	-DLWS_WITH_LATENCY=OFF \
 	-DLWS_WITHOUT_DAEMONIZE=OFF \
 	-DLWS_WITH_LIBEV=OFF \
-	-DLWS_IPV6=$(call ptx/ifdef, PTXCONF_GLOBAL_IPV6,ON,OFF) \
+	-DLWS_IPV6=$(call ptx/onoff, PTXCONF_GLOBAL_IPV6) \
 	-DLWS_WITH_HTTP2=OFF
 
 

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,32 +14,28 @@ PACKAGES-$(PTXCONF_GST_PYTHON1) += gst-python1
 #
 # Paths and names
 #
-GST_PYTHON1_VERSION	:= 1.12.3
-GST_PYTHON1_MD5		:= 622125816c52a51205660d210f8e7b8b
+GST_PYTHON1_VERSION	:= 1.16.2
+GST_PYTHON1_MD5		:= 6ac709767334d8d0a71cb4e016f6abeb
 GST_PYTHON1		:= gst-python-$(GST_PYTHON1_VERSION)
 GST_PYTHON1_SUFFIX	:= tar.xz
 GST_PYTHON1_URL		:= http://gstreamer.freedesktop.org/src/gst-python/$(GST_PYTHON1).$(GST_PYTHON1_SUFFIX)
 GST_PYTHON1_SOURCE	:= $(SRCDIR)/$(GST_PYTHON1).$(GST_PYTHON1_SUFFIX)
 GST_PYTHON1_DIR		:= $(BUILDDIR)/$(GST_PYTHON1)
 GST_PYTHON1_BUILD_OOT	:= YES
-GST_PYTHON1_LICENSE	:= LGPL-2.1+
+GST_PYTHON1_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-GST_PYTHON1_CONF_ENV	:= \
-	$(CROSS_ENV) \
-	PYTHON=$(CROSS_PYTHON3)
-
 #
-# autoconf
+# meson
 #
-GST_PYTHON1_CONF_TOOL	:= autoconf
+GST_PYTHON1_CONF_TOOL	:= meson
 GST_PYTHON1_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-valgrind \
-	--with-libpython-dir=/usr/lib
+	$(CROSS_MESON_USR) \
+	-Dlibpython-dir=/usr/lib \
+	-Dpython=$(CROSS_PYTHON3)
 
 # ----------------------------------------------------------------------------
 # Install
@@ -66,12 +60,10 @@ $(STATEDIR)/gst-python1.targetinstall:
 	@$(call install_fixup, gst-python1,AUTHOR,"Michael Olbrich <m.olbrich@pengutronix.de>")
 	@$(call install_fixup, gst-python1,DESCRIPTION,missing)
 
-	@for file in `find $(GST_PYTHON1_PKGDIR)/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/gi  \
-			! -type d ! -name "*.py" ! -name "*.la" -printf "%P\n"`; do \
-		$(call install_copy, gst-python1, 0, 0, 0644, -, \
-			/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/gi/$$file); \
-	done
-	@$(call install_lib, gst-python1, 0, 0, 0644, gstreamer-1.0/libgstpythonplugin*)
+	@$(call install_glob, gst-python1, 0, 0, -, \
+		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/gi,, *.py *.la)
+
+	@$(call install_lib, gst-python1, 0, 0, 0644, gstreamer-1.0/libgstpython*)
 
 	@$(call install_finish, gst-python1)
 

@@ -8,9 +8,9 @@ menuconfig CUPS
 	select ROOTFS_VAR_RUN
 	select LIBC_M
 	select LIBC_CRYPT
+	select LIBC_PTHREAD
 	select ZLIB
 
-	select LIBC_PTHREAD		if CUPS_THREADING
 	select SYSTEMD			if CUPS_SYSTEMD_UNIT
 	select LIBPAPER			if CUPS_LIBPAPER
 	select LIBUSB			if CUPS_LIBUSB
@@ -60,6 +60,7 @@ config CUPS_PERL
 	bool "enable Perl support for web interface"
 
 config CUPS_PHP
+	depends on STAGING
 	bool "enable PHP support for web interface"
 
 if CUPS_PHP

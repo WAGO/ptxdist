@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ DBUS_PYTHON_SUFFIX	:= tar.gz
 DBUS_PYTHON_URL		:= http://dbus.freedesktop.org/releases/dbus-python/$(DBUS_PYTHON).$(DBUS_PYTHON_SUFFIX)
 DBUS_PYTHON_SOURCE	:= $(SRCDIR)/$(DBUS_PYTHON).$(DBUS_PYTHON_SUFFIX)
 DBUS_PYTHON_DIR		:= $(BUILDDIR)/$(DBUS_PYTHON)
-DBUS_PYTHON_LICENSE	:= AFL-2.1, GPL-2.0+
+DBUS_PYTHON_LICENSE	:= AFL-2.1 AND GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

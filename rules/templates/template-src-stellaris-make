@@ -2,8 +2,6 @@
 #
 # Copyright (C) @YEAR@ @AUTHOR@
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -29,28 +27,10 @@ endif
 #
 @PACKAGE@_VERSION	:= @VERSION@
 @PACKAGE@		:= @package@-$(@PACKAGE@_VERSION)
-@PACKAGE@_URL		:= file://$(PTXDIST_WORKSPACE)/local_src/@package@
+@PACKAGE@_URL		:= file://local_src/@package@
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
 @PACKAGE@_BUILD_OOT	:= YES
 @PACKAGE@_LICENSE	:= unknown
-
-# ----------------------------------------------------------------------------
-# Get
-# ----------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------
-# Extract
-# ----------------------------------------------------------------------------
-
-$(STATEDIR)/@package@.extract: $(STATEDIR)/autogen-tools
-
-$(STATEDIR)/@package@.extract:
-	@$(call targetinfo)
-	@$(call clean, $(@PACKAGE@_DIR))
-	@$(call extract, @PACKAGE@)
-	cd $(@PACKAGE@_DIR) && [ -f configure ] || sh autogen.sh
-	@$(call patchin, @PACKAGE@)
-	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Markus Pargmann <mpa@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,10 +21,18 @@ BATCTL_SUFFIX		:= tar.gz
 BATCTL_URL		:= http://downloads.open-mesh.org/batman/stable/sources/batctl/$(BATCTL).$(BATCTL_SUFFIX)
 BATCTL_SOURCE		:= $(SRCDIR)/$(BATCTL).$(BATCTL_SUFFIX)
 BATCTL_DIR		:= $(BUILDDIR)/$(BATCTL)
-BATCTL_LICENSE		:= GPL-2.0
+BATCTL_LICENSE		:= GPL-2.0-only
+
+# ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
 
 BATCTL_CONF_TOOL	:= NO
 BATCTL_MAKE_ENV		:= $(CROSS_ENV)
+
+BATCTL_INSTALL_OPT	:= \
+	PREFIX=/usr \
+	install
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -41,7 +47,7 @@ $(STATEDIR)/batctl.targetinstall:
 	@$(call install_fixup, batctl,AUTHOR,"Markus Pargmann <mpa@pengutronix.de>")
 	@$(call install_fixup, batctl,DESCRIPTION,missing)
 
-	@$(call install_copy, batctl, 0, 0, 0755, $(BATCTL_DIR)/batctl, /usr/bin/batctl)
+	@$(call install_copy, batctl, 0, 0, 0755, -, /usr/sbin/batctl)
 
 	@$(call install_finish, batctl)
 

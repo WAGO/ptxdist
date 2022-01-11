@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Robert Schwebel <r.schwebel@pengutronix.de>
 #               2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,6 +23,8 @@ CBMBASIC_URL		:= http://www.weihenstephan.org/~michaste/pagetable/recompiler/$(C
 CBMBASIC_SOURCE		:= $(SRCDIR)/$(CBMBASIC).$(CBMBASIC_SUFFIX)
 CBMBASIC_DIR		:= $(BUILDDIR)/$(CBMBASIC)-$(CBMBASIC_VERSION)
 CBMBASIC_STRIP_LEVEL	:= 0
+CBMBASIC_LICENSE	:= BSD-2-Clause
+CBMBASIC_LICENSE_FILES	:= file://cbmbasic.c;md5=14cd8a3b22d4aed06eac3c5b1f965a95;startline=1;endline=25
 
 # ----------------------------------------------------------------------------
 # Prepare

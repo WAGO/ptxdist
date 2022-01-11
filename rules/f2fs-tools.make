@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Jon Ringle
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,14 +16,14 @@ endif
 #
 # Paths and names
 #
-F2FS_TOOLS_VERSION	:= 1.8.0
-F2FS_TOOLS_MD5		:= d4132ab388d30da729cb270aeac32bf1
+F2FS_TOOLS_VERSION	:= 1.12.0
+F2FS_TOOLS_MD5		:= 52d8ab4d6b6e7b8d416cb1c0da518fb0
 F2FS_TOOLS		:= f2fs-tools-$(F2FS_TOOLS_VERSION)
 F2FS_TOOLS_SUFFIX	:= tar.xz
 F2FS_TOOLS_URL		:= git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git;tag=v$(F2FS_TOOLS_VERSION)
 F2FS_TOOLS_SOURCE	:= $(SRCDIR)/$(F2FS_TOOLS).$(F2FS_TOOLS_SUFFIX)
 F2FS_TOOLS_DIR		:= $(BUILDDIR)/$(F2FS_TOOLS)
-F2FS_TOOLS_LICENSE	:= GPL-2.0+ LGPL-2.1+
+F2FS_TOOLS_LICENSE	:= GPL-2.0-or-later LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Markus Niebel <Markus.Niebel@tq-group.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,8 +18,8 @@ PACKAGES-$(PTXCONF_KMSCUBE) += kmscube
 KMSCUBE_VERSION	:= 2017-03-13-g803bac5
 KMSCUBE		:= kmscube-$(KMSCUBE_VERSION)
 KMSCUBE_MD5	:= 781a59ab2d1d245e99a49df7c3dc1876
-KMSCUBE_URL	:= git://anongit.freedesktop.org/mesa/kmscube;tag=$(KMSCUBE_VERSION)
 KMSCUBE_SUFFIX	:= tar.gz
+KMSCUBE_URL	:= https://gitlab.freedesktop.org/mesa/kmscube/-/archive/$(KMSCUBE_VERSION)/$(KMSCUBE).$(KMSCUBE_SUFFIX)
 KMSCUBE_SOURCE	:= $(SRCDIR)/$(KMSCUBE).$(KMSCUBE_SUFFIX)
 KMSCUBE_DIR	:= $(BUILDDIR)/$(KMSCUBE)
 

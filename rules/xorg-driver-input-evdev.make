@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_DRIVER_INPUT_EVDEV) += xorg-driver-input-evdev
 #
 # Paths and names
 #
-XORG_DRIVER_INPUT_EVDEV_VERSION	:= 2.9.0
-XORG_DRIVER_INPUT_EVDEV_MD5	:= 9076ae2646f7aeb30963056e0bbfccf0
+XORG_DRIVER_INPUT_EVDEV_VERSION	:= 2.10.6
+XORG_DRIVER_INPUT_EVDEV_MD5	:= e8bd1edc6751f92e425cae7eba3c61eb
 XORG_DRIVER_INPUT_EVDEV		:= xf86-input-evdev-$(XORG_DRIVER_INPUT_EVDEV_VERSION)
 XORG_DRIVER_INPUT_EVDEV_SUFFIX	:= tar.bz2
 XORG_DRIVER_INPUT_EVDEV_URL	:= $(call ptx/mirror, XORG, individual/driver/$(XORG_DRIVER_INPUT_EVDEV).$(XORG_DRIVER_INPUT_EVDEV_SUFFIX))

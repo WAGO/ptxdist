@@ -1,0 +1,8 @@
+## SECTION=python3
+
+config PYTHON3_ASYNC_TIMEOUT
+	tristate
+	select PYTHON3
+	prompt "async-timeout"
+	help
+	  asyncio-compatible timeout class

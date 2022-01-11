@@ -2,4 +2,4 @@
 
 config HOST_KERNEL_HEADER
 	tristate
-	default ALLYES
+	default y if ALLYES

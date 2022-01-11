@@ -4,8 +4,6 @@
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,21 @@ ROOTFS_LICENSE	:= ignore
 # Target-Install
 # ----------------------------------------------------------------------------
 
+ROOTFS_STAMP := $(call remove_quotes, \
+	$(PTXCONF_PROJECT) \
+	$(PTXCONF_PROJECT_VERSION) \
+	$(PTXCONF_PLATFORM) \
+	$(PTXCONF_PLATFORM_VERSION) \
+	$(PTXDIST_VERSION_YEAR) \
+	$(PTXDIST_VERSION_MONTH) \
+	$(PTXDIST_VERSION_BUGFIX) \
+	$(PTXDIST_VERSION_SCM) \
+	$(PTXCONF_PROJECT_VENDOR) \
+	)
+
+# install new /etc/issue if versions change
+$(call ptx/cfghash, ROOTFS, $(ROOTFS_STAMP))
+
 $(STATEDIR)/rootfs.targetinstall:
 	@$(call targetinfo)
 
@@ -30,7 +43,7 @@ $(STATEDIR)/rootfs.targetinstall:
 	@$(call install_fixup, rootfs,PRIORITY,optional)
 	@$(call install_fixup, rootfs,SECTION,base)
 	@$(call install_fixup, rootfs,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
-	@$(call install_fixup, rootfs,DESCRIPTION,missing)
+	@$(call install_fixup, rootfs,DESCRIPTION, "Filesystem Hierarchy Standard")
 
 #	#
 #	# install directories in rootfs
@@ -50,34 +63,34 @@ ifdef PTXCONF_ROOTFS_HOME_ROOT
 	@$(call install_copy, rootfs, 0, 0, 0700, /root)
 endif
 ifdef PTXCONF_ROOTFS_MEDIA
-ifneq ($(PTXCONF_ROOTFS_MEDIA1),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA1)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA1))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA2),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA2)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA2))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA3),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA3)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA3))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA4),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA4)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA4))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA5),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA5)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA5))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA6),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA6)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA6))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA7),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA7)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA7))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA8),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA8)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA8))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA9),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA9)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA9))
 endif
-ifneq ($(PTXCONF_ROOTFS_MEDIA10),"")
+ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA10)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA10))
 endif
 endif
@@ -96,9 +109,7 @@ endif
 ifdef PTXCONF_ROOTFS_TMP
 	@$(call install_copy, rootfs, 0, 0, 1777, /tmp)
 endif
-ifdef PTXCONF_ROOTFS_VAR
 	@$(call install_copy, rootfs, 0, 0, 0755, /var)
-endif
 ifdef PTXCONF_ROOTFS_VAR_LOG
 	@$(call install_copy, rootfs, 0, 0, 0755, /var/log)
 endif
@@ -121,9 +132,18 @@ ifdef PTXCONF_ROOTFS_VAR_SPOOL_CRON
 	@$(call install_copy, rootfs, 0, 0, 0755, /var/spool/cron)
 endif
 ifdef PTXCONF_ROOTFS_VAR_TMP
-	@$(call install_copy, rootfs, 0, 0, 0755, /var/tmp)
+	@$(call install_copy, rootfs, 0, 0, 01777, /var/tmp)
 endif
-
+ifdef PTXCONF_ROOTFS_VAR_OVERLAYFS
+	@$(call install_alternative, rootfs, 0, 0, 0644, \
+		/usr/lib/systemd/system/run-varoverlayfs.mount)
+	@$(call install_alternative, rootfs, 0, 0, 0755, \
+		/usr/sbin/mount.varoverlayfs)
+	@$(call install_alternative, rootfs, 0, 0, 0644, \
+		/usr/lib/systemd/system/var.mount)
+	@$(call install_link, rootfs, ../var.mount, \
+		/usr/lib/systemd/system/local-fs.target.requires/var.mount)
+endif
 
 #	#
 #	# install files in rootfs
@@ -142,7 +162,9 @@ ifdef PTXCONF_ROOTFS_GSHADOW
 endif
 ifdef PTXCONF_ROOTFS_FSTAB
 	@$(call install_alternative, rootfs, 0, 0, 0644, /etc/fstab)
-endif
+	@$(call install_replace, rootfs, /etc/fstab, @VAR_OVERLAYFS@, \
+		$(call ptx/ifdef,PTXCONF_ROOTFS_VAR_OVERLAYFS,#))
+endif # PTXCONF_ROOTFS_FSTAB
 ifdef PTXCONF_ROOTFS_MTAB_FILE
 	@$(call install_alternative, rootfs, 0, 0, 0644, /etc/mtab)
 endif
@@ -194,10 +216,12 @@ ifdef PTXCONF_ROOTFS_ISSUE
 		$(call remove_quotes,$(PTXCONF_ROOTFS_ETC_HOSTNAME)))
 	@$(call install_replace_figlet, rootfs, /etc/issue, \
 		@FIGLET:VENDOR@, \
-		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_PROJECT_VENDOR)`)
+		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_PROJECT_VENDOR)`, \
+		etcissue)
 	@$(call install_replace_figlet, rootfs, /etc/issue, \
 		@FIGLET:HOSTNAME@, \
-		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_ROOTFS_ETC_HOSTNAME)`)
+		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_ROOTFS_ETC_HOSTNAME)`, \
+		etcissue)
 endif
 
 ifdef PTXCONF_ROOTFS_HOSTS
@@ -252,6 +276,7 @@ endif
 
 	@$(call install_finish, rootfs)
 
+	@echo "$(ROOTFS_STAMP)" > $(STATEDIR)/rootfs.stamp
 	@$(call touch)
 
 # vim: syntax=make

@@ -1,22 +1,29 @@
-## SECTION=system_libraries
+## SECTION=multimedia_sound
 
-config PULSEAUDIO
+menuconfig PULSEAUDIO
 	tristate
+	select HOST_MESON
 	select HOST_ORC
 	select LIBC_M
 	select LIBC_RT
 	select LIBC_PTHREAD
 	select ALSA_LIB
 	select ALSA_LIB_MIXER
-	select JSON_C
+	select ALSA_LIB_UCM
 	select LIBCAP
 	select LIBLTDL
 	select LIBSNDFILE
 	select ORC
-	select SYSTEMD		if PULSEAUDIO_SYSTEMD
+	select SYSTEMD			if PULSEAUDIO_SYSTEMD
+	select SBC			if PULSEAUDIO_BLUETOOTH
+	select DBUS			if PULSEAUDIO_BLUETOOTH
+	select BLUEZ			if PULSEAUDIO_BLUETOOTH
+	select SPEEXDSP			if PULSEAUDIO_SPEEX
+	select SPEEXDSP_FLOAT_API	if PULSEAUDIO_SPEEX
+	select WEBRTC_AUDIO_PROCESSING	if PULSEAUDIO_WEBRTC_AEC
 	select UDEV
 	select UDEV_LIBUDEV
-	prompt "pulseaudio"
+	prompt "pulseaudio                    "
 	help
 	  PulseAudio is a sound system for POSIX OSes, meaning that it is a
 	  proxy for your sound applications. It allows you to do advanced
@@ -28,5 +35,30 @@ if PULSEAUDIO
 config PULSEAUDIO_SYSTEMD
 	bool
 	default INITMETHOD_SYSTEMD
+
+config PULSEAUDIO_SYSTEMD_USER
+	bool
+	depends on PULSEAUDIO_SYSTEMD
+	default y if SYSTEMD_UNITS_USER
+
+config PULSEAUDIO_BLUETOOTH
+        bool
+        prompt "enable bluetooth support"
+
+config PULSEAUDIO_SPEEX
+	bool
+	default y
+	prompt "enable speex based resamplers"
+	help
+	  The speex based resamplers provide the best cost/quality
+	  trade-off on most platforms. It's recommended to only disable
+	  this when no resampling is required.
+
+config PULSEAUDIO_WEBRTC_AEC
+	bool
+	prompt "WebRTC-based echo canceller"
+	help
+	  Use the WebRTC audio processing library for echo cancellation. It
+	  provides better quality than the builtin 'Adrian' echo canceller.
 
 endif

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ FBV_URL		:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(FBV).$(FB
 #FBV_URL	:= http://s-tech.elsat.net.pl/fbv/$(FBV).$(FBV_SUFFIX)
 FBV_SOURCE	:= $(SRCDIR)/$(FBV).$(FBV_SUFFIX)
 FBV_DIR		:= $(BUILDDIR)/$(FBV)
-FBV_LICENSE	:= GPL-2.0+
+FBV_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

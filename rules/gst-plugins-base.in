@@ -1,4 +1,6 @@
-## SECTION=multimedia_gstreamer
+## SECTION=staging
+## old section:
+### SECTION=multimedia_gstreamer
 
 menuconfig GST_PLUGINS_BASE
 	tristate
@@ -20,6 +22,7 @@ menuconfig GST_PLUGINS_BASE
 	select LIBXML2		if GST_PLUGINS_BASE_SUBPARSE
 	select LIBXML2_HTML	if GST_PLUGINS_BASE_SUBPARSE
 	select ORC		if GST_PLUGINS_BASE_ORC
+	select ORC_TEST		if GST_PLUGINS_BASE_ORC
 	select ZLIB		if GST_PLUGINS_BASE_ZLIB
 
 	# x features need libx11 + Xv
@@ -38,6 +41,9 @@ menuconfig GST_PLUGINS_BASE
 
 	  This package contains the GStreamer plugins from the "base"
 	  set, an essential exemplary set of elements.
+
+	  STAGING: remove in ptxdist-2021.05.0
+	  GStreamer 0.10 has been dead more than 8 years.
 
 if GST_PLUGINS_BASE
 

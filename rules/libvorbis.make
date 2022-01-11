@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Robert Schwebel
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,7 @@ LIBVORBIS_SUFFIX	:= tar.gz
 LIBVORBIS_URL		:= http://downloads.xiph.org/releases/vorbis/$(LIBVORBIS).$(LIBVORBIS_SUFFIX)
 LIBVORBIS_SOURCE	:= $(SRCDIR)/$(LIBVORBIS).$(LIBVORBIS_SUFFIX)
 LIBVORBIS_DIR		:= $(BUILDDIR)/$(LIBVORBIS)
+LIBVORBIS_LICENSE	:= BSD-3-Clause
 
 # ----------------------------------------------------------------------------
 # Prepare

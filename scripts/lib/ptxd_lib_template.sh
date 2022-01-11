@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -32,6 +30,32 @@ ptxd_template_read() {
     export "${2}"
 }
 export -f ptxd_template_read
+#
+# Read a variable from user input, limited to an array of options
+#
+# $1 prompt prefix
+# $2 variable name
+# $3..$n options
+#
+ptxd_template_read_options() {
+    local -a options=("${@:3}")
+    local i=1
+    echo "${PTXDIST_LOG_PROMPT}select option by number:"
+    for option in "${options[@]}"; do
+	echo "${PTXDIST_LOG_PROMPT}[${i}] ${option}"
+	((i++))
+    done
+    while : ; do
+	ptxd_template_read "${1}" chosen
+	[ -n "${chosen}" ] && [ "${chosen}" -gt 0 ] &&
+	[ "${chosen}" -le "${#options[@]}" ] &&
+	break
+
+	echo "${PTXDIST_LOG_PROMPT}invalid option"
+    done
+    export "${2}=${options[$chosen-1]}"
+}
+export -f ptxd_template_read_options
 
 ptxd_template_read_name() {
     ptxd_template_read "enter package name" package_name
@@ -47,6 +71,8 @@ ptxd_template_check_existing() {
 	export ptxd_template_have_existing=1
 	action="${action}-existing-target"
 	template="${template}-existing-target"
+	conf_tool="$(sed -n 's/.*_CONF_TOOL[\t ]*:= \(.*\)/\1/p' "${ptxd_reply}")"
+	export conf_tool
     else
 	unset ptxd_template_have_existing
     fi
@@ -80,6 +106,64 @@ ptxd_template_read_section() {
 }
 export -f ptxd_template_read_section
 
+ptxd_template_read_conf_tool() {
+    if [ -z "${conf_tool}" ]; then
+	if [ "${AUTOCONF_CLASS}" = "HOST_CROSS_" ]; then
+	    export conf_tool="autoconf"
+	else
+		supported=("autoconf" "cmake" "kconfig" "meson" "perl"
+		    "python3" )
+	    if [ -z "${AUTOCONF_CLASS}" ]; then
+		supported[${#supported[*]}]="qmake"
+	    fi
+	    ptxd_template_read_options "conf tool" conf_tool "${supported[@]}"
+	fi
+    fi
+    export CONF_OPT=""
+    export  SELECT=""
+    export CONF_TOOL="$(tr "[a-z-]" "[A-Z_]" <<< "${conf_tool}")"
+    case "${conf_tool}" in
+    autoconf)
+	if [ -z "${AUTOCONF_CLASS}" ]; then
+	    CONF_OPT="\$(CROSS_AUTOCONF_USR)"
+	else
+	    CONF_OPT="\$(${AUTOCONF_CLASS}AUTOCONF)"
+	fi
+	;;
+    cmake|meson)
+	if [ -z "${AUTOCONF_CLASS}" ]; then
+	    CONF_OPT="\$(CROSS_${CONF_TOOL}_USR)"
+	else
+	    CONF_OPT="\$(HOST_${CONF_TOOL}_OPT)"
+	fi
+	SELECT="HOST_${CONF_TOOL}"
+	;;
+    qmake)
+	CONF_OPT="\$(CROSS_QMAKE_OPT)"
+	SELECT="QT5"
+	;;
+    perl)
+	SELECT="PERL"
+	;;
+    python3)
+	if [ -z "${AUTOCONF_CLASS}" ]; then
+	    SELECT="PYTHON3"
+	else
+	    SELECT="HOST_SYSTEM_PYTHON3"
+	fi
+	;;
+    esac
+    if [ -n "${CONF_OPT}" ]; then
+	CONF_OPT=" \\
+#	${CONF_OPT}"
+    fi
+    if [ -n "${SELECT}" ]; then
+	SELECT="	select ${SELECT}
+"
+    fi
+}
+export -f ptxd_template_read_conf_tool
+
 ptxd_template_read_basic() {
     ptxd_template_read_name &&
     ptxd_template_read_version
@@ -100,7 +184,8 @@ ptxd_template_read_remote_existing() {
     ptxd_template_read_version &&
     ptxd_template_read_url &&
     ptxd_template_read_author &&
-    ptxd_template_read_section
+    ptxd_template_read_section &&
+    ptxd_template_read_conf_tool
 }
 export -f ptxd_template_read_remote_existing
 
@@ -205,14 +290,20 @@ ptxd_template_write_src() {
     template_src="$(ptxd_template_file "${action}")" &&
     mkdir -p "${dst}" &&
     tar -C "${template_src}" -cf - --exclude .svn . | \
-	tar -C "${dst}" -xvf - &&
+	tar -C "${dst}" -xf - &&
 
-    if [ ! -e "${dst}/wizard.sh" ]; then
-	return
+    if [ -e "${dst}/wizard.sh" ]; then
+	template_dir=$(dirname "${template_src}") &&
+	(
+	    cd "${dst}" &&
+	    bash wizard.sh "${package}" "${template_dir}" "${VERSION}"
+	) &&
+	rm -f "${dst}/wizard.sh"
     fi &&
-    template_dir=$(dirname "${template_src}") &&
-    ( cd "${dst}" && bash wizard.sh "${package}" "${template_dir}") &&
-    rm -f "${dst}/wizard.sh"
+    echo &&
+    for file in "${dst}"/*; do
+	echo "generating $(ptxd_template_print_path "$file")"
+    done
 }
 export -f ptxd_template_write_src
 
@@ -223,9 +314,25 @@ ptxd_template_src_base() {
 }
 export -f ptxd_template_src_base
 
+ptxd_template_src_autogen() {
+    local link_target="${PTXDIST_WORKSPACE}/patches/autogen.sh"
+    local patches="${PTXDIST_WORKSPACE}/patches/${package}-${VERSION}"
+    local autogen="${patches}/autogen.sh"
+
+    mkdir -p "${patches}" &&
+    if [ ! -e "${link_target}" ]; then
+	echo "generating $(ptxd_template_print_path "${link_target}")"
+	cp "${PTXDIST_TOPDIR}/patches/autogen.sh" "${link_target}"
+    fi &&
+    echo "generating $(ptxd_template_print_path "${autogen}")" &&
+    ln -s "../autogen.sh" "${autogen}"
+}
+export -f ptxd_template_src_autogen
+
 ptxd_template_autoconf_base() {
     template=template-src-autoconf
-    ptxd_template_src_base
+    ptxd_template_src_base &&
+    ptxd_template_src_autogen
 }
 export -f ptxd_template_autoconf_base
 
@@ -283,6 +390,7 @@ ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for deve
 
 ptxd_template_new_target() {
     ptxd_template_read_remote &&
+    ptxd_template_read_conf_tool &&
     ptxd_template_write_rules
 }
 export -f ptxd_template_new_target
@@ -298,16 +406,6 @@ ptxd_template_new_cross() {
 export -f ptxd_template_new_cross
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="cross"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create cross development package"
-
-ptxd_template_new_klibc() {
-    ptxd_template_setup_class KLIBC_ &&
-    ptxd_template_read_remote_existing &&
-    ptxd_template_write_rules
-}
-export -f ptxd_template_new_klibc
-ptxd_template_help_list[${#ptxd_template_help_list[@]}]="klibc"
-ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for initramfs built against klibc"
-ptxd_template_help_list[${#ptxd_template_help_list[@]}]=""
 
 ptxd_template_new_src_autoconf_lib() {
     ptxd_template_autoconf_base
@@ -344,6 +442,13 @@ export -f ptxd_template_new_src_qmake_prog
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-qmake-prog"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create qmake binary"
 
+ptxd_template_new_src_meson_prog() {
+    ptxd_template_src_base
+}
+export -f ptxd_template_new_src_meson_prog
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-meson-prog"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create meson binary"
+
 ptxd_template_new_src_linux_driver() {
     ptxd_template_src_base
 }
@@ -359,7 +464,8 @@ ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-make-prog"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create a plain makefile binary"
 
 ptxd_template_new_src_stellaris() {
-    ptxd_template_src_base
+    ptxd_template_src_base &&
+    ptxd_template_src_autogen
 }
 export -f ptxd_template_new_src_stellaris
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-stellaris"
@@ -402,6 +508,13 @@ ptxd_template_new_barebox() {
 export -f ptxd_template_new_barebox
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="barebox"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for an extra barebox"
+
+ptxd_template_new_barebox_imx_habv4() {
+    ptxd_template_new_barebox
+}
+export -f ptxd_template_new_barebox_imx_habv4
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="barebox-imx-habv4"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for an extra barebox with i.MX HABv4 enabled"
 
 ptxd_template_new_image_tgz() {
     export class="image-"
@@ -458,3 +571,34 @@ ptxd_template_new_blspec_entry() {
 export -f ptxd_template_new_blspec_entry
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="blspec-entry"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for a bootloader spec entry"
+
+ptxd_template_new_code_signing_provider() {
+    export class="host-"
+    ptxd_template_read_basic &&
+    ptxd_template_read_author &&
+    ptxd_template_read_options "provider type" TYPE "SoftHSM" "HSM with OpenSC support" "other HSM"
+    package_filename="${package_filename}-code-signing"
+    local template_file="$(ptxd_template_file "${template}-choice-in")"
+    local filename="${PTXDIST_PLATFORMCONFIGDIR}/platforms/${class}${package_filename}-choice.in"
+    ptxd_template_filter "${template_file}" "${filename}"
+    template_file="$(ptxd_template_file "${template}-pre-make")"
+    filename="${PTXDIST_PLATFORMCONFIGDIR}/rules/pre/020-${package_filename}-hsm.make"
+    if [ "$TYPE" = "SoftHSM" ]; then
+	export EXTRA_DEPENDENCIES="select HOST_SOFTHSM"
+    elif [ "$TYPE" = "HSM with OpenSC support" ]; then
+	export EXTRA_DEPENDENCIES="select HOST_OPENSC
+	select HOST_OPENSC_PCSC"
+	export MODULE_PATH="\${PTXDIST_SYSROOT_HOST}/lib/pkcs11/opensc-pkcs11.so"
+	ptxd_template_filter "${template_file}" "${filename}"
+    elif [ "$TYPE" = "other HSM" ]; then
+	export EXTRA_DEPENDENCIES="select FIXME"
+	export MODULE_PATH="\${PTXDIST_SYSROOT_HOST}/fix/me"
+	ptxd_template_filter "${template_file}" "${filename}"
+    fi
+    ptxd_template_write_platform_rules
+    package="${package}-code-signing"
+    ptxd_template_write_src
+}
+export -f ptxd_template_new_code_signing_provider
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="code-signing-provider"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for a code signing provider"

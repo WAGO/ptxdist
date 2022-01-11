@@ -5,6 +5,8 @@ menuconfig NETWORKMANAGER
 	# intltool is unconditionally requested by configure
 	select HOST_GLIB
 	select HOST_INTLTOOL
+	select HOST_LIBXSLT
+	select HOST_MESON
 	select LIBC_M
 	select LIBC_DL
 	select LIBC_PTHREAD
@@ -16,9 +18,10 @@ menuconfig NETWORKMANAGER
 	select LIBCURL				if NETWORKMANAGER_CONCHECK
 	select LIBNDP
 	select LIBNEWT				if NETWORKMANAGER_NMTUI
-	select LIBNL3
 	select LIBUUID
+	select MOBILE_BROADBAND_PROVIDER_INFO	if NETWORKMANAGER_WWAN
 	select MODEMMANAGER			if NETWORKMANAGER_WWAN
+	select POLKIT				if NETWORKMANAGER_POLKIT
 	select PPP				if NETWORKMANAGER_PPP
 	select PPP_PLUGINS			if NETWORKMANAGER_PPP
 	select READLINE				if NETWORKMANAGER_NMCLI
@@ -27,12 +30,16 @@ menuconfig NETWORKMANAGER
 	select UDEV_LIBUDEV
 	select WPA_SUPPLICANT			if NETWORKMANAGER_WIRELESS && RUNTIME
 	select WPA_SUPPLICANT_CTRL_IFACE_DBUS	if NETWORKMANAGER_WIRELESS && RUNTIME
+	select ROOTFS_VAR_LIB			if RUNTIME
 	prompt "networkmanager                "
 	help
 	  NetworkManager is a tool to automate network configuration as far as
 	  possible. The project web site is here:
 
 	  http://projects.gnome.org/NetworkManager/
+
+	  Note: on a read-only root filesystem this package still requires a
+	  writable '/var/lib'.
 
 if NETWORKMANAGER
 
@@ -80,7 +87,11 @@ config NETWORKMANAGER_WWAN
 
 config NETWORKMANAGER_PPP
 	bool
+	depends on GLOBAL_IPV6
 	prompt "enable ppp support"
+
+comment "ppp support requires GLOBAL_IPV6!"
+	depends on !GLOBAL_IPV6
 
 config NETWORKMANAGER_CONCHECK
 	bool
@@ -89,6 +100,10 @@ config NETWORKMANAGER_CONCHECK
 config NETWORKMANAGER_EXAMPLES
 	bool
 	prompt "install examples for Network Manager"
+
+config NETWORKMANAGER_POLKIT
+	bool
+	prompt "polkit support"
 
 endif
 

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LSHW_SUFFIX	:= tar.gz
 LSHW_URL	:= http://www.ezix.org/software/files/$(LSHW).$(LSHW_SUFFIX)
 LSHW_SOURCE	:= $(SRCDIR)/$(LSHW).$(LSHW_SUFFIX)
 LSHW_DIR	:= $(BUILDDIR)/$(LSHW)
-LSHW_LICENSE	:= GPL-2.0
+LSHW_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

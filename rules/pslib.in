@@ -1,7 +1,8 @@
-## SECTION=system_libraries
+## SECTION=multimedia_libs
 
 menuconfig PSLIB
 	tristate
+	select HOST_GETTEXT
 	select LIBPNG	if PSLIB_LIBPNG
 	select LIBJPEG	if PSLIB_LIBJPEG
 	prompt "pslib                         "

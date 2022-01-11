@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -33,7 +31,9 @@ SYSLINUX_MAKE_ENV := \
 	$(CROSS_ENV) \
 	ICECC=no
 
-SYSLINUX_WRAPPER_BLACKLIST := TARGET_HARDEN_PIE
+SYSLINUX_WRAPPER_BLACKLIST := \
+	TARGET_HARDEN_STACKCLASH \
+	TARGET_HARDEN_PIE
 SYSLINUX_MAKE_OPT := $(CROSS_ENV_PROGS)
 SYSLINUX_INSTALL_OPT := install INSTALLROOT=$(SYSLINUX_PKGDIR)
 

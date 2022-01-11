@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Juergen Beisert
 #               2009-2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -27,7 +25,7 @@ QT4_URL		:= \
 QT4_SOURCE	:= $(SRCDIR)/$(QT4).$(QT4_SUFFIX)
 QT4_DIR		:= $(BUILDDIR)/$(QT4)
 QT4_BUILD_OOT	:= YES
-QT4_LICENSE	:= GPL3, LGPL-2.1
+QT4_LICENSE	:= GPL3 AND LGPL-2.1-only
 ifdef PTXCONF_QT4_EXAMPLES
 QT4_DEVPKG	:= NO
 endif
@@ -152,7 +150,6 @@ QT4_AUTOCONF += \
 
 # graphics drivers
 QT4_AUTOCONF-$(call ptx/qt-plugin, GFX_AHI)		+= gfx-ahi
-QT4_AUTOCONF-$(call ptx/qt-plugin, GFX_DIRECTFB)	+= gfx-directfb
 QT4_AUTOCONF-$(call ptx/qt-plugin, GFX_EGLNULLWS)	+= gfx-eglnullws
 QT4_AUTOCONF-$(call ptx/qt-plugin, GFX_LINUXFB)		+= gfx-linuxfb
 QT4_AUTOCONF-$(call ptx/qt-plugin, GFX_POWERVR)		+= gfx-powervr
@@ -380,7 +377,6 @@ ifdef PTXCONF_QT4_BUILD_SVG
 QT4_IMAGEFORMATS-				+= svg
 endif
 
-QT4_GFXDRIVERS-$(call ptx/qt-plugin, GFX_DIRECTFB)	+= directfbscreen
 QT4_GFXDRIVERS-$(call ptx/qt-plugin, GFX_EGLNULLWS)	+= eglnullws
 QT4_GFXDRIVERS-$(call ptx/qt-plugin, GFX_LINUXFB)	+= screenlinuxfb
 QT4_GFXDRIVERS-$(call ptx/qt-plugin, GFX_POWERVR)	+= gfxpvregl

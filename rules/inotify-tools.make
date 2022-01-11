@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Brandon Fosdick <bfosdick@dash.net>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,8 @@ INOTIFY_TOOLS_SUFFIX	:= tar.gz
 INOTIFY_TOOLS_URL	:= $(call ptx/mirror, SF, inotify-tools/$(INOTIFY_TOOLS).$(INOTIFY_TOOLS_SUFFIX))
 INOTIFY_TOOLS_SOURCE	:= $(SRCDIR)/$(INOTIFY_TOOLS).$(INOTIFY_TOOLS_SUFFIX)
 INOTIFY_TOOLS_DIR	:= $(BUILDDIR)/$(INOTIFY_TOOLS)
+INOTIFY_TOOLS_LICENSE	:= GPL-2.0-only
+INOTIFY_TOOLS_LICENSE_FILES	:= file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552
 
 # ----------------------------------------------------------------------------
 # Prepare

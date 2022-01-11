@@ -1,8 +1,7 @@
 ## SECTION=devicetree
 
 menuconfig HOST_DTC
-	tristate "dtc (standalone)              "
-	depends on !KERNEL_DTC
+	tristate "dtc                           "
 	help
 	  Select this if the HOST_DTC tool is required without
 	  building a device tree. (It is also used for building
@@ -12,12 +11,12 @@ if HOST_DTC
 
 config HOST_DTC_VERSION
 	string "Device tree compiler version"
-	default "1.4.1"
+	default "1.6.0"
 	help
 	  Specify the DTC version number to be used
 
 config HOST_DTC_MD5
 	string "dtc source md5sum"
-	default "e3543e76153c553cfce531ce147b9bfd"
+	default "cd36ac756290597f3cf1c5b6cfe12e77"
 
 endif

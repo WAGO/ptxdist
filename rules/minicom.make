@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Carsten Schlote <c.schlote@konzeptpark.de>
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,12 +17,13 @@ PACKAGES-$(PTXCONF_MINICOM) += minicom
 #
 MINICOM_VERSION	:= 2.6.2
 MINICOM_MD5	:= 203c56c4b447f45e2301b0cc4e83da3c
-MINICOM		:= minicom-$(MINICOM_VERSION)
 MINICOM_SUFFIX	:= tar.gz
-MINICOM_URL	:= https://alioth.debian.org/frs/download.php/file/3869/$(MINICOM).$(MINICOM_SUFFIX)
+MINICOM		:= minicom-$(MINICOM_VERSION)
+MINICOM_TARBALL	:= minicom_$(MINICOM_VERSION).orig.$(MINICOM_SUFFIX)
+MINICOM_URL	:= http://snapshot.debian.org/archive/debian/20130208T032801Z/pool/main/m/minicom/$(MINICOM_TARBALL)
 MINICOM_SOURCE	:= $(SRCDIR)/$(MINICOM).$(MINICOM_SUFFIX)
 MINICOM_DIR	:= $(BUILDDIR)/$(MINICOM)
-MINICOM_LICENSE	:= GPL-2.0
+MINICOM_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

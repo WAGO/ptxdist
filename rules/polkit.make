@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,10 @@ POLKIT_SUFFIX	:= tar.gz
 POLKIT_URL	:= https://www.freedesktop.org/software/polkit/releases/$(POLKIT).$(POLKIT_SUFFIX)
 POLKIT_SOURCE	:= $(SRCDIR)/$(POLKIT).$(POLKIT_SUFFIX)
 POLKIT_DIR	:= $(BUILDDIR)/$(POLKIT)
+POLKIT_LICENSE := GPL-2.0-or-later
+POLKIT_LICENSE_FILES := \
+	file://COPYING;md5=155db86cdbafa7532b41f390409283eb \
+	file://src/polkitd/main.c;startline=1;endline=20;md5=4a13d29c09d1ef6fa53a5c79ac2c6a28
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -42,6 +44,7 @@ POLKIT_CONF_OPT		:= \
 	--disable-examples \
 	--disable-nls \
 	--with-gnu-ld \
+	--with-systemdsystemunitdir=$(call ptx/ifdef,PTXCONF_POLKIT_SYSTEMD,/usr/lib/systemd/system) \
 	--with-authfw=shadow \
 	--with-os-type=ptxdist
 
@@ -60,7 +63,7 @@ $(STATEDIR)/polkit.targetinstall:
 
 # dbus
 	@$(call install_copy, polkit, 0, 0, 0644, -, \
-		/etc/dbus-1/system.d/org.freedesktop.PolicyKit1.conf)
+		/usr/share/dbus-1/system.d/org.freedesktop.PolicyKit1.conf)
 	@$(call install_copy, polkit, 0, 0, 0644, -, \
 		/usr/share/dbus-1/system-services/org.freedesktop.PolicyKit1.service)
 
@@ -72,6 +75,11 @@ $(STATEDIR)/polkit.targetinstall:
 		/etc/polkit-1/nullbackend.conf.d/50-nullbackend.conf)
 	@$(call install_copy, polkit, 0, 0, 0644, -, \
 		/usr/share/polkit-1/actions/org.freedesktop.policykit.policy)
+
+ifdef PTXCONF_POLKIT_SYSTEMD
+	@$(call install_copy, polkit, 0, 0, 0644, -, \
+		/usr/lib/systemd/system/polkit.service)
+endif
 
 # libs
 	@$(call install_lib, polkit, 0, 0, 0644, libpolkit-agent-1)

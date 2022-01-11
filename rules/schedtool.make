@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Martin Wagner <martin.wagner@neuberger.net>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ SCHEDTOOL_SUFFIX	:= tar.bz2
 SCHEDTOOL_URL		:= http://freequaos.host.sk/schedtool/$(SCHEDTOOL).$(SCHEDTOOL_SUFFIX)
 SCHEDTOOL_SOURCE	:= $(SRCDIR)/$(SCHEDTOOL).$(SCHEDTOOL_SUFFIX)
 SCHEDTOOL_DIR		:= $(BUILDDIR)/$(SCHEDTOOL)
-SCHEDTOOL_LICENSE	:= GPL-2.0
+SCHEDTOOL_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

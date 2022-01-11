@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -33,22 +31,6 @@ ptxd_init_arch() {
 		    ;;
 		*)
 		    ipkg_arch=arm
-		    ;;
-	    esac
-	    ;;
-
-	microblaze)
-	    local target="$(ptxd_get_ptxconf PTXCONF_GNU_TARGET)"
-
-	    case "${target}" in
-		microblaze-*gnu)
-		    ipkg_arch=mbeb
-		    ;;
-		microblazeel-*gnu)
-		    ipkg_arch=mbel
-		    ;;
-		*)
-		    ipkg_arch=mb
 		    ;;
 	    esac
 	    ;;
@@ -153,12 +135,6 @@ ptxd_init_ptxdist_path_sysroot() {
     local sysroot="$(ptxd_get_ptxconf PTXCONF_SYSROOT_TARGET)"
     local sysroot_prefix="${sysroot}:${sysroot}/usr"
 
-    local sysroot_base_platform
-    if ptxd_init_get_sysroot_base_platform; then
-	sysroot="${sysroot}:${sysroot_base_platform}"
-	sysroot_prefix="${sysroot_prefix}:${sysroot_base_platform}:${sysroot_base_platform}/usr"
-    fi
-
     local sysroot_all="${sysroot}"
     local sysroot_prefix_all="${sysroot_prefix}"
     if [ -n "${PTXDIST_SYSROOT_TOOLCHAIN}" ]; then
@@ -191,34 +167,6 @@ ptxd_init_ptxdist_path_sysroot_host() {
 
 
 #
-# fixup collectionconfig when using another platform
-#
-# out:
-# PTXDIST_BASE_PACKAGES		packages of the used platform (without 'm' when using a collection)
-# PTXDIST_COLLECTIONCONFIG	a modified collectionconfig (for packages from the other platform)
-#
-ptxd_init_collectionconfig() {
-    if [ -e "${PTXDIST_COLLECTIONCONFIG}" ]; then
-	local new_collection="${PTXDIST_TEMPDIR}/collectionconfig"
-	sed -e 's/=y$/=b/' "${PTXDIST_COLLECTIONCONFIG}" > "${new_collection}"
-	export PTXDIST_COLLECTIONCONFIG="${new_collection}"
-	PTXDIST_BASE_PACKAGES="$(PTXDIST_PTXCONFIG="${PTXDIST_BASE_PLATFORMDIR}/selected_ptxconfig"
-		PTXDIST_PLATFORMCONFIG="${PTXDIST_BASE_PLATFORMDIR}/selected_platformconfig"
-		PTXDIST_BASE_PLATFORMDIR=
-		ptxd_lib_init
-		ptxd_make_log "print-PACKAGES-y")"
-    else
-	PTXDIST_BASE_PACKAGES="$(PTXDIST_PTXCONFIG="${PTXDIST_BASE_PLATFORMDIR}/selected_ptxconfig"
-		PTXDIST_PLATFORMCONFIG="${PTXDIST_BASE_PLATFORMDIR}/selected_platformconfig"
-		PTXDIST_BASE_PLATFORMDIR=
-		ptxd_lib_init
-		ptxd_make_log "print-PACKAGES")"
-    fi
-    export PTXDIST_BASE_PACKAGES
-}
-
-
-#
 # out: 'lib' or 'lib64', derived from the ld-{linux,uClibc}.so.? from the compiler toolchain
 #
 ptxd_get_lib_dir() {
@@ -241,7 +189,6 @@ export -f ptxd_get_lib_dir
 # out:
 # PTXDIST_CROSS_CPPFLAGS		CPPFLAGS for cross-compiled packages
 # PTXDIST_CROSS_LDFLAGS			LDFLAGS for cross-compiled packages
-# PTXDIST_CROSS_ENV_PKG_CONFIG		PKG_CONFIG_* environemnt for cross pkg-config
 #
 ptxd_init_cross_env() {
 
@@ -264,56 +211,11 @@ ptxd_init_cross_env() {
     # add "-L<DIR>/lib -Wl,-rpath-link -Wl,<DIR>"
     local -a ldflags
     ldflags=( "${prefix[@]/%//${lib_dir}}" )
-    ldflags=( "${ldflags[@]/#/-L}" "${ldflags[@]/#/-Wl,-rpath-link -Wl,}" )
+    ldflags=( "${ldflags[@]/#/-B}" "${ldflags[@]/#/-L}" "${ldflags[@]/#/-Wl,-rpath-link -Wl,}" )
 
     export \
 	PTXDIST_CROSS_CPPFLAGS="${cppflags[*]}" \
 	PTXDIST_CROSS_LDFLAGS="${ldflags[*]}"
-
-
-
-    ######## PKG_CONFIG_LIBDIR, PKG_CONFIG_PATH ########
-
-    #
-    # PKG_CONFIG_LIBDIR contains the default pkg-config search
-    # directories. Set it to the components of
-    # PTXDIST_PATH_SYSROOT_PREFIX.
-    #
-
-    # add <DIR>/lib/pkgconfig and <DIR>/share/pkgconfig
-    local -a pkg_libdir pkg_lib_system_path pkg_system_incpath
-    pkg_libdir=( "${prefix[@]/%//${lib_dir}/pkgconfig}" "${prefix[@]/%//share/pkgconfig}" )
-    pkg_system_libpath=( "${pkg_libdir[@]/%//../../lib}" "${pkg_libdir[@]/%//../lib}" "/usr/lib" "/lib" )
-    pkg_system_incpath=( "${pkg_libdir[@]/%//../../include}" "${pkg_libdir[@]/%//../include}" "/usr/include" "/include" )
-
-    #
-    # PKG_CONFIG_PATH contains additional pkg-config search
-    # directories. It's searched before searching the path specified
-    # in _LIBDIR.
-    #
-
-    #
-    # If we have pkg_config_path defined in our ptxconfig,
-    # prefix them with sysroot and add to pkg_path.
-    #
-    # FIXME: we only take care of normal sysroot for now, no support
-    #        for production releases, though.
-    #
-    local -a pkg_path
-    local -a opt_pkg_path
-    if opt_pkg_path=( $(ptxd_get_ptxconf PTXCONF_PKG_CONFIG_PATH) ); then
-	IFS=":"
-	local -a sysroot
-	sysroot=( ${PTXDIST_PATH_SYSROOT} )
-	IFS="${orig_IFS}"
-
-	pkg_path=( "${opt_pkg_path[@]/#/${sysroot[0]}}" )
-    fi
-
-    IFS=":"
-    PTXDIST_CROSS_ENV_PKG_CONFIG="PKG_CONFIG_PATH='${pkg_path[*]}' PKG_CONFIG_LIBDIR='${pkg_libdir[*]}' PKG_CONFIG_SYSTEM_LIBRARY_PATH='${pkg_system_libpath[*]}' PKG_CONFIG_SYSTEM_INCLUDE_PATH='${pkg_system_incpath[*]}'"
-    export PTXDIST_CROSS_ENV_PKG_CONFIG
-    IFS="${orig_IFS}"
 }
 
 #
@@ -326,7 +228,6 @@ ptxd_init_cross_env() {
 # out:
 # PTXDIST_HOST_CPPFLAGS			CPPFLAGS for host packages
 # PTXDIST_HOST_LDFLAGS			LDFLAGS for host packages
-# PTXDIST_HOST_ENV_PKG_CONFIG		PKG_CONFIG_* environemnt for host pkg-config
 #
 ptxd_init_host_env() {
     ######## CPPFLAGS, LDFLAGS ########
@@ -348,30 +249,14 @@ ptxd_init_host_env() {
     local -a ldflags
     ldflags=( "${prefix[@]/%//${lib_dir}}" )
     ldflags=( \
-	"${ldflags[@]/#/-L}" \
+	"${ldflags[@]/#/-B}" \
 	"${ldflags[@]/#/-Wl,-rpath -Wl,}" \
-	"-Wl,-rpath" "-Wl,/this/is/a/long/path/to/make/host/tools/relocateable/with/chrpath/when/using/dev/packages"
+	'-Wl,-rpath,$ORIGIN/../lib:/with/some/extra/space'
     )
 
     export \
 	PTXDIST_HOST_CPPFLAGS="${cppflags[*]}" \
 	PTXDIST_HOST_LDFLAGS="${ldflags[*]}"
-
-    ######## PKG_CONFIG_LIBDIR, PKG_CONFIG_PATH ########
-
-    #
-    # PKG_CONFIG_LIBDIR contains the default pkg-config search
-    # directories.
-    #
-
-    # add <DIR>/lib/pkgconfig and <DIR>/share/pkgconfig
-    local -a pkg_libdir
-    pkg_libdir=( "${prefix[@]/%//${lib_dir}/pkgconfig}" "${prefix[@]/%//share/pkgconfig}" )
-
-    IFS=":"
-    PTXDIST_HOST_ENV_PKG_CONFIG="PKG_CONFIG_PATH='' PKG_CONFIG_LIBDIR='${pkg_libdir[*]}'"
-    export PTXDIST_HOST_ENV_PKG_CONFIG
-    IFS="${orig_IFS}"
 }
 
 ptxd_init_devpkg()
@@ -417,6 +302,10 @@ ptxd_init_save_wrapper_env() {
 	PTXDIST_HOST_CPPFLAGS="${PTXDIST_HOST_CPPFLAGS}"
 	PTXDIST_HOST_LDFLAGS="${PTXDIST_HOST_LDFLAGS}"
 	PTXDIST_PLATFORMDIR="${PTXDIST_PLATFORMDIR}"
+	PTXDIST_SYSROOT_TOOLCHAIN="${PTXDIST_SYSROOT_TOOLCHAIN}"
+	PTXDIST_ICECC_DIR="${PTXDIST_ICECC_DIR}"
+	PTXDIST_ICECC_REMOTE_CPP="${PTXDIST_ICECC_REMOTE_CPP}"
+	PTXDIST_ICECC_CLANG="${PTXDIST_ICECC_CLANG}"
 	EOF
 }
 
@@ -436,9 +325,6 @@ ptxd_make_init() {
 
     ptxd_init_devpkg &&
 
-    if [ -n "${PTXDIST_BASE_PLATFORMDIR}" ]; then
-	ptxd_init_collectionconfig
-    fi &&
     ptxd_init_cross_env &&
     ptxd_init_host_env &&
     ptxd_init_save_wrapper_env

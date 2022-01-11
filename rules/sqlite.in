@@ -18,7 +18,7 @@ config SQLITE_THREADSAFE
 	bool
 	prompt "Safe for use within a multi-threaded program"
 
-config SQLITE_LOAD_EXTENTION
+config SQLITE_LOAD_EXTENSION
 	bool
 	prompt "external extensions"
 	help
@@ -29,6 +29,14 @@ config SQLITE_READLINE
 	prompt "use readline"
 	help
 	  Enable readline support
+
+config SQLITE_FOREIGN_KEYS
+	bool
+	prompt "enable foreign keys by default"
+	help
+	  Enable foreign keys support by default on database
+	  connections. This ensures database schema constrains
+	  are enforced by default e.g. consistency between tables.
 
 comment "install options"
 

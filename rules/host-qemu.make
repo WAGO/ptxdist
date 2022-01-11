@@ -4,8 +4,6 @@
 #           (C) 2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #           (C) 2013 by Jan Luebbe <j.luebbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,13 +16,15 @@ HOST_PACKAGES-$(PTXCONF_HOST_QEMU) += host-qemu
 #
 # Paths and names
 #
-HOST_QEMU_VERSION	:= 2.9.0
-HOST_QEMU_MD5		:= 02781eb15b364aedef79da7a5113f5b7
+HOST_QEMU_VERSION	:= 5.0.0
+HOST_QEMU_MD5		:= ede6005d7143fe994dd089d31dc2cf6c
 HOST_QEMU		:= qemu-$(HOST_QEMU_VERSION)
-HOST_QEMU_SUFFIX	:= tar.bz2
-HOST_QEMU_URL		:= http://wiki.qemu.org/download/$(HOST_QEMU).$(HOST_QEMU_SUFFIX)
+HOST_QEMU_SUFFIX	:= tar.xz
+HOST_QEMU_URL		:= https://download.qemu.org/$(HOST_QEMU).$(HOST_QEMU_SUFFIX)
 HOST_QEMU_SOURCE	:= $(SRCDIR)/$(HOST_QEMU).$(HOST_QEMU_SUFFIX)
 HOST_QEMU_DIR		:= $(HOST_BUILDDIR)/$(HOST_QEMU)
+HOST_QEMU_LICENSE	:= GPL-2.0-only AND GPL-2.0-or-later AND MIT AND BSD-1-Clause AND BSD-2-Clause AND BSD-3-Clause
+HOST_QEMU_BUILD_OOT	:= YES
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,11 +35,12 @@ HOST_QEMU_DIR		:= $(HOST_BUILDDIR)/$(HOST_QEMU)
 #
 
 HOST_QEMU_BROKEN_ICECC	:= \
-	$(shell gcc -dumpversion | awk -F . '{ if ($$1*100 + $$2 < 409) print "y" }')
+	$(call ptx/sh, gcc -dumpversion | awk -F . '{ if ($$1*100 + $$2 < 409) print "y" }')
 
 ifeq ($(HOST_QEMU_BROKEN_ICECC),y)
 HOST_QEMU_MAKE_ENV	:= PTXDIST_ICECC=
 endif
+HOST_QEMU_MAKE_OPT	:= V=$(filter 1,$(PTXDIST_VERBOSE))
 
 HOST_QEMU_TARGETS	:= $(PTXCONF_ARCH_STRING)
 ifndef PTXCONF_ARCH_X86_64
@@ -62,6 +63,7 @@ HOST_QEMU_CONF_OPT	:= \
 		$(call ptx/ifdef, PTXCONF_HOST_QEMU_SYS,$(HOST_QEMU_SYS_TARGETS),) \
 		$(call ptx/ifdef, PTXCONF_HOST_QEMU_USR,$(HOST_QEMU_USR_TARGETS),) \
 	" \
+	--python=$(SYSTEMPYTHON3) \
 	--disable-werror \
 	--audio-drv-list= \
 	--block-drv-rw-whitelist= \
@@ -70,7 +72,6 @@ HOST_QEMU_CONF_OPT	:= \
 	--disable-tcg-interpreter \
 	--with-coroutine= \
 	--tls-priority=NORMAL \
-	--disable-xen-pv-domain-build \
 	--$(call ptx/endis, PTXCONF_HOST_QEMU_SYS)-system \
 	--disable-user \
 	--$(call ptx/endis, PTXCONF_HOST_QEMU_USR)-linux-user \
@@ -87,9 +88,7 @@ HOST_QEMU_CONF_OPT	:= \
 	--disable-nettle \
 	--disable-gcrypt \
 	--disable-sdl \
-	--with-sdlabi= \
 	--disable-gtk \
-	--with-gtkabi= \
 	--disable-vte \
 	--disable-curses \
 	--disable-vnc \
@@ -98,53 +97,71 @@ HOST_QEMU_CONF_OPT	:= \
 	--disable-vnc-png \
 	--disable-cocoa \
 	--enable-virtfs \
+	--disable-mpath \
 	--disable-xen \
 	--disable-xen-pci-passthrough \
 	--disable-brlapi \
 	--disable-curl \
 	--enable-fdt \
-	--disable-bluez \
-	--disable-kvm \
+	--enable-kvm \
 	--disable-hax \
 	--disable-rdma \
+	--disable-pvrdma \
 	--disable-netmap \
 	--disable-linux-aio \
-	--disable-cap-ng \
+	--disable-linux-io-uring \
+	--enable-cap-ng \
 	--enable-attr \
 	--enable-vhost-net \
+	--enable-vhost-vsock \
+	--enable-vhost-scsi \
+	--disable-vhost-crypto \
+	--disable-vhost-user \
 	--disable-spice \
 	--disable-rbd \
 	--disable-libiscsi \
 	--disable-libnfs \
 	--disable-smartcard \
 	--$(call ptx/endis, PTXCONF_HOST_QEMU_SYS)-libusb \
+	--disable-live-block-migration \
 	--disable-usb-redir \
 	--disable-lzo \
 	--disable-snappy \
 	--disable-bzip2 \
+	--disable-lzfse \
+	--disable-zstd \
 	--disable-seccomp \
-	--disable-coroutine-pool \
+	--enable-coroutine-pool \
 	--disable-glusterfs \
 	--disable-tpm \
-	--disable-libssh2 \
+	--disable-libssh \
 	--disable-numa \
+	--disable-libxml2 \
 	--disable-tcmalloc \
 	--disable-jemalloc \
 	--enable-replication \
-	--enable-vhost-vsock \
 	--disable-opengl \
 	--disable-virglrenderer \
 	--disable-xfsctl \
 	--disable-qom-cast-debug \
 	--disable-tools \
-	\
-	$(call ptx/ifdef, PTXCONF_HOST_QEMU_SYS,--with-system-pixman,--without-pixman) \
-	--enable-vhost-scsi
+	--disable-dmg \
+	--disable-vvfat \
+	--disable-qed \
+	--disable-parallels \
+	--disable-sheepdog \
+	--disable-crypto-afalg \
+	--disable-capstone \
+	--disable-debug-mutex \
+	--disable-libpmem \
+	--disable-xkbcommon \
+	--disable-plugins
 
 # Use '=' to delay $(shell ...) calls until this is needed
-QEMU_CROSS_QEMU = $(shell ptxd_get_alternative config/qemu qemu-cross && echo $$ptxd_reply)
+QEMU_CROSS_QEMU = $(call ptx/get-alternative, config/qemu, qemu-cross)
 QEMU_CROSS_DL = $(shell ptxd_cross_cc_v | sed -n -e 's/.* -dynamic-linker \([^ ]*\).*/\1/p')
-QEMU_CROSS_LD_LIBRARY_PATH := $(PTXDIST_SYSROOT_TOOLCHAIN)/lib:$(SYSROOT)/$(CROSS_LIB_DIR):$(SYSROOT)/usr/$(CROSS_LIB_DIR)
+QEMU_CROSS_TOOLEXECLIBDIR = $(shell dirname $$(realpath $$(ptxd_cross_cc -print-file-name=libatomic.so 2> /dev/null)))
+QEMU_CROSS_LD_LIBRARY_PATH = $(PTXDIST_SYSROOT_TOOLCHAIN)/lib:$(QEMU_CROSS_TOOLEXECLIBDIR):$(SYSROOT)/$(CROSS_LIB_DIR):$(SYSROOT)/usr/$(CROSS_LIB_DIR)
 
 QEMU_CROSS_QEMU_ENV = \
 	QEMU="$(PTXDIST_SYSROOT_HOST)/bin/qemu-$(HOST_QEMU_TARGETS)" \

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,15 @@ LIBZMQ_SUFFIX		:= tar.gz
 LIBZMQ_URL		:= http://download.zeromq.org/$(LIBZMQ).$(LIBZMQ_SUFFIX)
 LIBZMQ_SOURCE		:= $(SRCDIR)/$(LIBZMQ).$(LIBZMQ_SUFFIX)
 LIBZMQ_DIR		:= $(BUILDDIR)/$(LIBZMQ)
-LIBZMQ_LICENSE		:= LGPL-3.0+
+LIBZMQ_LICENSE		:= LGPL-3.0-or-later
+
+# ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
+
+LIBZMQ_CONF_ENV		:= \
+	$(CROSS_ENV) \
+	ac_cv_lib_sodium_sodium_init=no
 
 #
 # autoconf
@@ -31,10 +37,14 @@ LIBZMQ_LICENSE		:= LGPL-3.0+
 LIBZMQ_CONF_TOOL	:= autoconf
 LIBZMQ_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
-	--enable-shared \
 	--disable-static \
+	--enable-shared \
+	--disable-debug \
 	--with-gnu-ld \
-	--without-documentation
+	--without-gcov \
+	--without-documentation \
+	--with-poller=epoll \
+	--without-pgm
 
 # ----------------------------------------------------------------------------
 # Target-Install

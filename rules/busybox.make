@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2003-2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,15 +14,16 @@ PACKAGES-$(PTXCONF_BUSYBOX) += busybox
 #
 # Paths and names
 #
-BUSYBOX_VERSION	:= 1.27.2
-BUSYBOX_MD5	:= 476186f4bab81781dab2369bfd42734e
+BUSYBOX_VERSION	:= 1.31.1
+BUSYBOX_MD5	:= 70913edaf2263a157393af07565c17f0
 BUSYBOX		:= busybox-$(BUSYBOX_VERSION)
 BUSYBOX_SUFFIX	:= tar.bz2
 BUSYBOX_URL	:= https://www.busybox.net/downloads/$(BUSYBOX).$(BUSYBOX_SUFFIX)
 BUSYBOX_SOURCE	:= $(SRCDIR)/$(BUSYBOX).$(BUSYBOX_SUFFIX)
 BUSYBOX_DIR	:= $(BUILDDIR)/$(BUSYBOX)
 BUSYBOX_KCONFIG	:= $(BUSYBOX_DIR)/Config.in
-BUSYBOX_LICENSE	:= GPL-2.0
+BUSYBOX_LICENSE	:= GPL-2.0-only
+BUSYBOX_LICENSE_FILES := file://LICENSE;md5=de10de48642ab74318e893a61105afbb
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -44,28 +43,40 @@ $(STATEDIR)/busybox.prepare:
 
 	@$(call touch)
 
+BUSYBOX_ARCH := $(call remove_quotes,$(PTXCONF_ARCH_STRING))
+ifeq ($(BUSYBOX_ARCH),i386)
+BUSYBOX_ARCH := x86
+endif
+
+# ----------------------------------------------------------------------------
+# Compile
+# ----------------------------------------------------------------------------
+
+# does not build reproducibly unless we set KCONFIG_NOTIMESTAMP
 BUSYBOX_MAKE_OPT := \
 	KCONFIG_NOTIMESTAMP=1 \
 	V=$(PTXDIST_VERBOSE) \
-	ARCH=$(PTXCONF_ARCH_STRING) \
-	SUBARCH=$(PTXCONF_ARCH_STRING) \
+	ARCH=$(BUSYBOX_ARCH) \
+	SUBARCH=$(BUSYBOX_ARCH) \
 	CROSS_COMPILE=$(COMPILER_PREFIX)
 
+ifdef PTXCONF_KERNEL_HEADER
 BUSYBOX_CPPFLAGS := \
-	-I$(KERNEL_HEADERS_INCLUDE_DIR)
+	-isystem $(KERNEL_HEADERS_INCLUDE_DIR)
+endif
 
 BUSYBOX_MAKE_ENV := \
 	$(CROSS_ENV) \
 	SKIP_STRIP=y
 
+# ----------------------------------------------------------------------------
+# Install
+# ----------------------------------------------------------------------------
+
 BUSYBOX_INSTALL_OPT := \
 	$(BUSYBOX_MAKE_OPT) \
 	CONFIG_PREFIX=$(BUSYBOX_PKGDIR)/usr \
 	install
-
-# ----------------------------------------------------------------------------
-# Install
-# ----------------------------------------------------------------------------
 
 $(STATEDIR)/busybox.install:
 	@$(call targetinfo)

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Roland Hieber <r.hieber@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,8 @@ CUPS_SUFFIX	:= tar.gz
 CUPS_URL	:= https://github.com/apple/cups/releases/download/v$(CUPS_VERSION)/$(CUPS)-source.$(CUPS_SUFFIX)
 CUPS_SOURCE	:= $(SRCDIR)/$(CUPS)-source.$(CUPS_SUFFIX)
 CUPS_DIR	:= $(BUILDDIR)/cups-$(CUPS_VERSION)
-CUPS_LICENSE	:= LGPL-2.0 AND GPL-2.0
+CUPS_LICENSE	:= LGPL-2.0-only AND GPL-2.0-only
+CUPS_LICENSE_FILES	:= file://LICENSE.txt;md5=f212b4338db0da8cb892e94bf2949460
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -87,6 +86,7 @@ CUPS_CONF_OPT	+= \
 	--disable-default-shared \
 	--disable-raw-printing \
 	--$(call ptx/endis,PTXCONF_CUPS_WEBINTERFACE)-webif \
+	--with-dbusdir=/usr/share/dbus-1 \
 	--with-components=all \
 	--with-cachedir=/var/cache \
 	--with-logdir=/var/log \
@@ -154,7 +154,8 @@ ifdef PTXCONF_CUPS_SSL
 endif
 
 ifdef PTXCONF_CUPS_DBUS
-	@$(call install_alternative, cups, root, root, 0644, /etc/dbus-1/system.d/cups.conf)
+	@$(call install_alternative, cups, root, root, 0644, \
+		/usr/share/dbus-1/system.d/cups.conf)
 endif
 
 # ----- libraries

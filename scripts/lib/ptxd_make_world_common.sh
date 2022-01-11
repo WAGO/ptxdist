@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -150,7 +148,6 @@ ptxd_make_world_init_compat() {
     # pkg_sysroot_dir
     #
     case "${pkg_stamp}" in
-	klibc-*)             pkg_sysroot_dir="${PTXDIST_SYSROOT_TARGET}/usr/lib/klibc" ;;
 	host-*)              pkg_sysroot_dir="${PTXDIST_SYSROOT_HOST}" ;;
 	cross-*)             pkg_sysroot_dir="${PTXDIST_SYSROOT_CROSS}" ;;
 	*)                   pkg_sysroot_dir="${PTXDIST_SYSROOT_TARGET}" ;;
@@ -159,10 +156,6 @@ ptxd_make_world_init_compat() {
 
     # pkg_env
     pkg_env="SYSROOT='${pkg_sysroot_dir}' V=${PTXDIST_VERBOSE} VERBOSE=${PTXDIST_VERBOSE/0/}"
-    case "${pkg_type}" in
-	target)     pkg_env="${PTXDIST_CROSS_ENV_PKG_CONFIG} ${pkg_env}" ;;
-	host|cross) pkg_env="PKG_CONFIG_LIBDIR='${PTXDIST_SYSROOT_HOST}/lib/pkgconfig:${PTXDIST_SYSROOT_HOST}/share/pkgconfig' ${pkg_env}" ;;
-    esac
 }
 export -f ptxd_make_world_init_compat
 
@@ -183,6 +176,13 @@ ptxd_make_world_init_sanity_check() {
 export -f ptxd_make_world_init_sanity_check
 
 
+ptxd_make_world_env_init() {
+    ptx_packages_all="${PTX_PACKAGES_ALL}"
+    ptx_packages_selected="${PTX_PACKAGES_SELECTED}"
+    ptx_packages_disabled="${PTX_PACKAGES_DISABLED}"
+    image_pkgs_selected_target="${PTX_PACKAGES_INSTALL}"
+}
+export -f ptxd_make_world_env_init
 
 #
 # ptxd_make_world_init()
@@ -197,7 +197,18 @@ export -f ptxd_make_world_init_sanity_check
 # $pkg_make_par
 #
 ptxd_make_world_init() {
+    ptxd_make_world_env_init &&
     ptxd_make_world_init_sanity_check || return
+
+    # PTXDIST_LAYERS gets lost in 'make' so redefine it here
+    local orig_IFS="${IFS}"
+    IFS=:
+    PTXDIST_LAYERS=( ${PTXDIST_PATH_LAYERS} )
+    IFS="${orig_IFS}"
+    export PTXDIST_LAYERS
+
+    # make sure any make calls appear to be the toplevel make
+    unset MAKELEVEL
 
     #
     # type
@@ -240,6 +251,20 @@ ptxd_make_world_init() {
     unset path_ptr
 
     #
+    # ensure that the package is actually selected
+    #
+    case "${pkg_stage}" in
+    ${ptx_state_dir}/${pkg_label}.*)
+	# this is only relevant for package stages, not any other targets
+	if ! [[ " ${ptx_packages_selected} " =~ " ${pkg_label} " ]]; then
+	    ptxd_bailout "'${pkg_label}' is not selected." \
+		"This can happen if the ptxconfig is outdated or" \
+		"the package is disabled for the current architecture"
+	fi
+	;;
+    esac
+
+    #
     # check if we shall use a local work-in-progress tree instead
     # of the configured URL.
     #
@@ -250,7 +275,8 @@ ptxd_make_world_init() {
     if [ -d "$(readlink -f "${wip_sources}")" ]; then
 	pkg_url="file://${wip_sources}"
 	unset pkg_src
-	pkg_pkg=${pkg_pkg}-wip # don't apply patches
+	# always use a new timestamp for wip builds
+	SOURCE_DATE_EPOCH="$(echo $(date "+%s"))"
     fi
     unset wip_sources
 
@@ -307,43 +333,63 @@ ptxd_make_world_init() {
 	    local build_python_ptr="ptx_${pkg_conf_tool}_${pkg_type}"
 	    local env_ptr="ptx_conf_env_${pkg_type}"
 
-	    ptx_build_python="${!build_python_ptr}"
+	    if [[ " ${pkg_build_deps} " =~ " host-system-python " && "${pkg_conf_tool}" = python ]]; then
+		ptx_build_python=python
+	    elif [[ " ${pkg_build_deps} " =~ " host-system-python3 " && "${pkg_conf_tool}" = python3 ]]; then
+		ptx_build_python=python
+	    else
+		ptx_build_python="${!build_python_ptr}"
+	    fi
 	    pkg_make_env="${pkg_conf_env:-${!env_ptr}}"
 	    pkg_make_opt="${pkg_make_opt:-build}"
 	    ;;
+	scons)
+	    local env_ptr="ptx_conf_env_${pkg_type}"
+	    pkg_make_env="${pkg_conf_env:-${!env_ptr}}"
+	    pkg_make_opt="${pkg_conf_opt}"
+	    ;;
 	meson)
 	    local conf_opt_ptr="ptx_conf_opt_${pkg_conf_tool}_${pkg_type}${conf_opt_ext}"
+	    local conf_env_ptr="ptx_conf_env_${pkg_conf_tool}_${pkg_type}"
 
 	    pkg_conf_opt="${pkg_conf_opt:-${!conf_opt_ptr}}"
-	    pkg_conf_env="PTXDIST_ICECC= ${pkg_conf_env}"
-	    pkg_env="${pkg_env} LC_ALL='C.UTF-8'"
-	    if [ "${PTXDIST_VERBOSE}" = "1" ]; then
-		pkg_make_opt="-v ${pkg_make_opt}"
-		pkg_install_opt="-v ${pkg_install_opt}"
-	    fi
-	    # both jobserver and argument limit parallelism so both are needed
-	    pkg_env="${pkg_env} MAKEFLAGS='${PTXDIST_JOBSERVER_FLAGS}'"
-	    PTXDIST_PARALLELMFLAGS_INTERN="${PTXDIST_PARALLEL_FLAGS}"
+	    pkg_conf_env="PTXDIST_ICECC= CMAKE=false ${pkg_conf_env:-${!conf_env_ptr}}"
 
+	    # Try to find a suitable UTF-8 locale on all distros
+	    local c_locale
+	    if c_locale=$(locale -a | grep -i -m 1 "^C\.utf[-]\?8$") || \
+	       c_locale=$(locale -a | grep -i -m 1 "^en_US\.utf[-]\?8$") || \
+	       c_locale=$(locale -a | grep -i -m 1 "^en_.*\.utf[-]\?8$"); then
+		pkg_env="${pkg_env} LC_ALL='${c_locale}'"
+	    else
+		ptxd_warning "Failed to find a good UTF-8 locale for meson."
+		pkg_env="${pkg_env} LC_ALL='$(locale -a | grep -i -m 1 "\.utf[-]\?8")'"
+	    fi
+	    unset c_locale
 	    unset conf_opt_ptr
 	    ;;
-	*) ;;
-    esac
-    local pkgconfig_whitelist
-    pkgconfig_whitelist="$(echo $(
-	for dep in ${pkg_build_deps}; do
-	    cat "${ptx_state_dir}/${dep}.pkgconfig" 2>/dev/null;
-	done))"
-    pkg_env="PKGCONFIG_WHITELIST='${pkgconfig_whitelist}' PKGCONFIG_WHITELIST_SRC='${pkg_label}' ${pkg_env}"
+	*)
+	    local conf_env_ptr="ptx_conf_env_${pkg_type}"
+	    pkg_conf_env="PTXDIST_ICECC= ${pkg_conf_env:-${!conf_env_ptr}}"
 
-    # DESTDIR
-    if [[ "${pkg_conf_tool}" =~ "python" ]]; then
-	pkg_install_opt="${pkg_install_opt} --root=${pkg_pkg_dir}"
-    elif [ "${pkg_conf_tool}" = "meson" ]; then
-	    pkg_env="${pkg_env} DESTDIR=\"${pkg_pkg_dir}\""
-    else
-	pkg_install_opt="DESTDIR=\"${pkg_pkg_dir}\" INSTALL_ROOT=\"${pkg_pkg_dir}\" ${pkg_install_opt}"
-    fi
+	    unset conf_env_ptr
+	    ;;
+    esac
+    local -a deps_host deps_target
+    local whitelist_host whitelist_target
+    for dep in ${pkg_build_deps}; do
+	case "${dep}" in
+	    host-*|cross-*)
+		deps_host[${#deps_host[@]}]="${ptx_state_dir}/${dep}.pkgconfig"
+		;;
+	    *)
+		deps_target[${#deps_target[@]}]="${ptx_state_dir}/${dep}.pkgconfig"
+		;;
+	esac
+    done
+    whitelist_host="$(echo $(cat "${deps_host[@]}" /dev/null 2>/dev/null))"
+    whitelist_target="$(echo $(cat "${deps_target[@]}" /dev/null 2>/dev/null))"
+    pkg_env="PKGCONFIG_WHITELIST_HOST='${whitelist_host}' PKGCONFIG_WHITELIST_TARGET='${whitelist_target}' PKGCONFIG_WHITELIST_SRC='${pkg_label}' ${pkg_env}"
 
 
     #
@@ -358,36 +404,112 @@ ptxd_make_world_init() {
 	    esac
 	fi
 	case "${pkg_build_oot}" in
-	    "YES") pkg_build_dir="${pkg_dir}-build" ;;
+	    "YES"|"KEEP") pkg_build_dir="${pkg_dir}-build" ;;
 	    "NO")  pkg_build_dir="${pkg_conf_dir}" ;;
-	    *)     ptxd_bailout "<PKG>_BUILD_OOT: please set to YES or NO" ;;
+	    *)     ptxd_bailout "<PKG>_BUILD_OOT: please set to KEEP, YES or NO" ;;
 	esac
     fi
 
     #
     # out-of-tree
     #
-    unset pkg_build_oot
     if [ "${pkg_build_dir}" = "${pkg_conf_dir}" ]; then
+	unset pkg_build_oot
 	#
 	# some pkgs don't like a full path to their configure
 	# if building in tree
 	#
 	pkg_conf_dir="."
     else
-	pkg_build_oot=true
+	if [ -z "${pkg_build_oot}" ]; then
+	    pkg_build_oot=YES
+	fi
 	pkg_conf_dir="$(ptxd_abs2rel "${pkg_build_dir}" "${pkg_conf_dir}")"
     fi
+
+    #
+    # make or ninja
+    #
+    pkg_build_tool="${pkg_conf_tool}"
+    case "${pkg_conf_tool}" in
+	meson)
+	    pkg_build_tool=ninja
+	    ;;
+	cmake)
+	    if [ -e "${pkg_build_dir}/build.ninja" ]; then
+		pkg_build_tool=ninja
+	    fi
+    esac
+    if [ "${pkg_build_tool}" = "ninja" ]; then
+	if [ "${PTXDIST_VERBOSE}" = "1" ]; then
+	    pkg_make_opt="-v ${pkg_make_opt}"
+	    pkg_install_opt="-v ${pkg_install_opt}"
+	fi
+    fi
+
+    # DESTDIR
+    case "${pkg_build_tool}" in
+	python*)
+	    pkg_install_opt="${pkg_install_opt} --root=${pkg_pkg_dir}"
+	    ;;
+	ninja|scons)
+	    pkg_env="DESTDIR=\"${pkg_pkg_dir}\" ${pkg_env}"
+	    ;;
+	*)
+	    pkg_install_opt="DESTDIR=\"${pkg_pkg_dir}\" INSTALL_ROOT=\"${pkg_pkg_dir}\" ${pkg_install_opt}"
+	    ;;
+    esac
 
     #
     # parallelmake
     #
     case "${pkg_make_par}" in
-	"YES"|"") pkg_make_par="${PTXDIST_PARALLELMFLAGS_INTERN} ${PTXDIST_LOADMFLAGS}" ;;
-	"NO")	  pkg_make_par=-j1 ;;
+	YES) python_pkg_make_par="${PTXDIST_PARALLEL_FLAGS}" ;;
+	"") python_pkg_make_par= ;;
+	NO)
+	    unset PTXDIST_PARALLELMFLAGS_INTERN
+	    unset PTXDIST_PARALLEL_FLAGS
+	    unset PTXDIST_JOBSERVER_FLAGS
+	    ;;
 	*)	  ptxd_bailout "<PKG>_MAKE_PAR: please set to YES or NO" ;;
     esac
+    case "${pkg_build_tool}" in
+	ninja)
+	    # ninja needs explicit -j1 to avoid parallel building
+	    if [ -z "${PTXDIST_PARALLEL_FLAGS}" ]; then
+		PTXDIST_PARALLEL_FLAGS=-j1
+	    fi
+	    # pass jobserver via MAKEFLAGS to ninja
+	    if [ -n "${PTXDIST_JOBSERVER_FLAGS}" ]; then
+		pkg_env="${pkg_env} MAKEFLAGS='${PTXDIST_JOBSERVER_FLAGS}'"
+		# no -jX argument if the jobserver is used
+		unset PTXDIST_PARALLEL_FLAGS
+	    fi
+	    pkg_make_par="${PTXDIST_PARALLEL_FLAGS} ${PTXDIST_LOADMFLAGS}"
+	    ;;
+	python*)
+	    # no consistant support for parallel building
+	    pkg_make_par="${python_pkg_make_par}"
+	    ;;
+	scons)
+	    # only -jX is supported not other options
+	    pkg_make_par="${PTXDIST_PARALLEL_FLAGS}"
+	    ;;
+	*)
+	    pkg_make_par="${PTXDIST_PARALLELMFLAGS_INTERN} ${PTXDIST_LOADMFLAGS}"
+	    ;;
+    esac
+
+    #
+    # reproducible builds for kbuild
+    #
+    # use a date/time format without spaces to avoid problems
+    local kbuild_date="$(date --utc --date=@${SOURCE_DATE_EPOCH} -Iseconds)"
+    pkg_env="${pkg_env} KBUILD_BUILD_TIMESTAMP=${kbuild_date} KBUILD_BUILD_USER=ptxdist KBUILD_BUILD_HOST=ptxdist"
 
     exec 2>&${PTXDIST_FD_LOGERR}
+    if [ -n "${PTXDIST_QUIET}" ]; then
+	exec 9>&1
+    fi
 }
 export -f ptxd_make_world_init

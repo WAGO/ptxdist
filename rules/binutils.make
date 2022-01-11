@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Robert Schwebel
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,12 +15,8 @@ PACKAGES-$(PTXCONF_BINUTILS) += binutils
 #
 # Paths and names
 #
-ifeq ($(shell which $(CROSS_LD) 2>/dev/null),)
-BINUTILS_VERSION	:= unknown
-else
-BINUTILS_VERSION	:= $(shell $(CROSS_LD) -v | sed -e 's/.* \(.*\)$$/\1/g')
+BINUTILS_VERSION	:= $(or $(call ptx/force-sh, $(CROSS_LD) -v | sed -e 's/.* \(.*\)$$/\1/g'),unknown)
 BINUTILS_MD5		:= none
-endif
 BINUTILS		:= binutils-$(BINUTILS_VERSION)
 BINUTILS_SUFFIX		:= tar.bz2
 BINUTILS_URL		:= $(call ptx/mirror, GNU, binutils/$(BINUTILS).$(BINUTILS_SUFFIX))

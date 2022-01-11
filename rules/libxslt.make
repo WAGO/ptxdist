@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Robert Schwebel
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_LIBXSLT) += libxslt
 #
 # Paths and names
 #
-LIBXSLT_VERSION	:= 1.1.28
-LIBXSLT_MD5	:= 9667bf6f9310b957254fdcf6596600b7
+LIBXSLT_VERSION	:= 1.1.29
+LIBXSLT_MD5	:= a129d3c44c022de3b9dcf6d6f288d72e
 LIBXSLT		:= libxslt-$(LIBXSLT_VERSION)
 LIBXSLT_SUFFIX	:= tar.gz
 LIBXSLT_SOURCE	:= $(SRCDIR)/$(LIBXSLT).$(LIBXSLT_SUFFIX)
@@ -33,8 +31,9 @@ LIBXSLT_URL	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBXSLT_PATH	:= PATH=$(CROSS_PATH)
-LIBXSLT_ENV	:= $(CROSS_ENV)
+LIBXSLT_ENV	:= \
+	$(CROSS_ENV) \
+	ac_cv_path_XML_CONFIG=xml2-config
 
 #
 # autoconf

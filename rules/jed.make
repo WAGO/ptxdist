@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by Benedikt Spranger
 # Copyright (C) 2009 by Robert Schwebel
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,6 +23,10 @@ JED_URL		:= ftp://space.mit.edu/pub/davis/jed/v0.99/old/$(JED).$(JED_SUFFIX) \
 		   ftp://space.mit.edu/pub/davis/jed/v0.99/$(JED).$(JED_SUFFIX)
 JED_SOURCE	:= $(SRCDIR)/$(JED).$(JED_SUFFIX)
 JED_DIR		:= $(BUILDDIR)/$(JED)
+JED_LICENSE	:= GPL-2.0-or-later
+JED_LICENSE_FILES	:= \
+	file://COPYRIGHT;md5=557ce94834059624f9578212b25e32ce \
+	file://COPYING;md5=18810669f13b87348459e611d31ab760
 
 # ----------------------------------------------------------------------------
 # Prepare

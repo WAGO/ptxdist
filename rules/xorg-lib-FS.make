@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_FS) += xorg-lib-fs
 #
 # Paths and names
 #
-XORG_LIB_FS_VERSION	:= 1.0.6
-XORG_LIB_FS_MD5		:= a8a0dbd2299b2568d8c919883f5c8501
+XORG_LIB_FS_VERSION	:= 1.0.8
+XORG_LIB_FS_MD5		:= 4e1196275aa743d6ebd3d3d5ec1dff9c
 XORG_LIB_FS		:= libFS-$(XORG_LIB_FS_VERSION)
 XORG_LIB_FS_SUFFIX	:= tar.bz2
 XORG_LIB_FS_URL		:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_FS).$(XORG_LIB_FS_SUFFIX))

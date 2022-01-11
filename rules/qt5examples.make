@@ -18,10 +18,10 @@ endif
 endif
 
 ifdef PTXCONF_QT5_EXAMPLES
-$(STATEDIR)/qt5.targetinstall.post: $(STATEDIR)/qt5.targetinstall2
+$(STATEDIR)/qt5.targetinstall: $(STATEDIR)/qt5.targetinstall2
 endif
 
-$(STATEDIR)/qt5.targetinstall2: $(STATEDIR)/qt5.targetinstall
+$(STATEDIR)/qt5.targetinstall2: $(STATEDIR)/qt5.install.post
 	@$(call targetinfo)
 	@$(call install_init, qt5-examples)
 	@$(call install_fixup, qt5-examples,PRIORITY,optional)
@@ -100,9 +100,15 @@ ifdef PTXCONF_QT5_EXAMPLES_BLUETOOTH_QML_CHAT
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCONNECTIVITY)),)
-ifdef PTXCONF_QT5_EXAMPLES_BLUETOOTH_HEARTLISTENER
+ifdef PTXCONF_QT5_EXAMPLES_BLUETOOTH_HEARTRATE_GAME
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/bluetooth/heartlistener/heartlistener)
+		/usr/lib/qt5/examples/bluetooth/heartrate-game/heartrate-game)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCONNECTIVITY)),)
+ifdef PTXCONF_QT5_EXAMPLES_BLUETOOTH_HEARTRATE_SERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/bluetooth/heartrate-server/heartrate-server)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCONNECTIVITY)),)
@@ -131,132 +137,298 @@ ifdef PTXCONF_QT5_EXAMPLES_BLUETOOTH_QML_SCANNER
 		/usr/lib/qt5/examples/bluetooth/scanner/qml_scanner)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_FRAMEBUFFER
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_AREACHART
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/framebuffer/framebuffer)
+		/usr/lib/qt5/examples/charts/areachart/areachart)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_INTERACTION
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/interaction/3dmodels.txt)
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_AUDIO
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/interaction/interaction)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/interaction/readme.txt)
+		/usr/lib/qt5/examples/charts/audio/audio)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_JSONMODELS
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/jsonmodels/3dmodels.txt)
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_BARCHART
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/jsonmodels/jsonmodels)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/jsonmodels/readme.txt)
+		/usr/lib/qt5/examples/charts/barchart/barchart)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_QUICKITEMTEXTURE
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_BARMODELMAPPER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/quickitemtexture/quickitemtexture)
+		/usr/lib/qt5/examples/charts/barmodelmapper/barmodelmapper)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_TEXTUREANDLIGHT
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_BOXPLOTCHART
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/textureandlight/textureandlight)
+		/usr/lib/qt5/examples/charts/boxplotchart/boxplotchart)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_THREEJS_CELLPHONE
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_CALLOUT
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/cellphone/cellphone)
+		/usr/lib/qt5/examples/charts/callout/callout)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_THREEJS_ONEQT
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/Info.plist)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon29x29.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon29x29@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon29x29@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon29x29~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon40x40@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon40x40@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon40x40~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon50x50@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon50x50~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon57x57.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon57x57@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon60x60@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon72x72@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon72x72~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon76x76@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/ios/OneQtIcon76x76~ipad.png)
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_CANDLESTICKCHART
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/oneqt/oneqt)
+		/usr/lib/qt5/examples/charts/candlestickchart/candlestickchart)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCANVAS3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_CANVAS3D_THREEJS_PLANETS
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/images/plutobump1k.jpg)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/images/plutomap1k.jpg)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon29x29.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon29x29@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon29x29@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon29x29~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon40x40@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon40x40@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon40x40~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon50x50@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon50x50~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon57x57.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon57x57@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon60x60@2x.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon72x72@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon72x72~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon76x76@2x~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/AppIcon76x76~ipad.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/ios/Info.plist)
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_CHARTINTERACTIONS
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/canvas3d/threejs/planets/planets)
+		/usr/lib/qt5/examples/charts/chartinteractions/chartinteractions)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_CHARTTHEMES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/chartthemes/chartthemes)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_CUSTOMCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/customchart/customchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_DATETIMEAXIS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/datetimeaxis/datetimeaxis)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_DONUTBREAKDOWN
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/donutbreakdown/donutbreakdown)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_DONUTCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/donutchart/donutchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_DYNAMICSPLINE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/dynamicspline/dynamicspline)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_HORIZONTALBARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/horizontalbarchart/horizontalbarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_HORIZONTALPERCENTBARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/horizontalpercentbarchart/horizontalpercentbarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_HORIZONTALSTACKEDBARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/horizontalstackedbarchart/horizontalstackedbarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_LEGEND
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/legend/legend)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_LEGENDMARKERS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/legendmarkers/legendmarkers)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_LINEANDBAR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/lineandbar/lineandbar)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_LINECHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/linechart/linechart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_LOGVALUEAXIS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/logvalueaxis/logvalueaxis)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_MODELDATA
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/modeldata/modeldata)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_MULTIAXIS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/multiaxis/multiaxis)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_NESTEDDONUTS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/nesteddonuts/nesteddonuts)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_OPENGLSERIES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/openglseries/openglseries)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_PERCENTBARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/percentbarchart/percentbarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_PIECHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/piechart/piechart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_PIECHARTCUSTOMIZATION
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/piechartcustomization/piechartcustomization)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_PIECHARTDRILLDOWN
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/piechartdrilldown/piechartdrilldown)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_POLARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/polarchart/polarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLAXES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlaxes/qmlaxes)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLBOXPLOT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlboxplot/qmlboxplot)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLCANDLESTICK
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlcandlestick/qmlcandlestick)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlchart/qmlchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLCUSTOMIZATIONS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlcustomizations/qmlcustomizations)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLCUSTOMLEGEND
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlcustomlegend/qmlcustomlegend)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLF1LEGENDS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlf1legends/qmlf1legends)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLOSCILLOSCOPE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmloscilloscope/qmloscilloscope)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLPIECHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlpiechart/qmlpiechart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLPOLARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlpolarchart/qmlpolarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_QMLWEATHER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/qmlweather/qmlweather)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_SCATTERCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/scatterchart/scatterchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_SCATTERINTERACTIONS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/scatterinteractions/scatterinteractions)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_SPLINECHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/splinechart/splinechart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_STACKEDBARCHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/stackedbarchart/stackedbarchart)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_STACKEDBARCHARTDRILLDOWN
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/stackedbarchartdrilldown/stackedbarchartdrilldown)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_TEMPERATURERECORDS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/temperaturerecords/temperaturerecords)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTCHARTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_CHARTS_ZOOMLINECHART
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/charts/zoomlinechart/zoomlinechart)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -282,9 +454,27 @@ ifdef PTXCONF_QT5_EXAMPLES_CORELIB_IPC_SHAREDMEMORY
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_CORELIB_JSON_SAVEGAME
+ifdef PTXCONF_QT5_EXAMPLES_CORELIB_MIMETYPES_MIMETYPEBROWSER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/corelib/json/savegame/savegame)
+		/usr/lib/qt5/examples/corelib/mimetypes/mimetypebrowser/mimetypebrowser)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_CORELIB_SERIALIZATION_CBORDUMP
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/corelib/serialization/cbordump/cbordump)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_CORELIB_SERIALIZATION_CONVERT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/corelib/serialization/convert/convert)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_CORELIB_SERIALIZATION_SAVEGAME
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/corelib/serialization/savegame/savegame)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -327,6 +517,144 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_CORELIB_TOOLS_CUSTOMTYPESENDING
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/corelib/tools/customtypesending/customtypesending)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_AUDIOLEVELS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/audiolevels/audiolevels)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_BARS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/bars/bars)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_CUSTOMINPUT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/custominput/custominput)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_CUSTOMITEMS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/customitems/customitems)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_CUSTOMPROXY
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/customproxy/customproxy)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_DRAGGABLEAXES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/draggableaxes/draggableaxes)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_ITEMMODEL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/itemmodel/itemmodel)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLAXISDRAG
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlaxisdrag/qmlaxisdrag)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLAXISFORMATTER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlaxisformatter/qmlaxisformatter)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLBARS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlbars/qmlbars)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLCUSTOMINPUT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlcustominput/qmlcustominput)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLLEGEND
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmllegend/qmllegend)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLMULTIGRAPH
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlmultigraph/qmlmultigraph)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLOSCILLOSCOPE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmloscilloscope/qmloscilloscope)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLSCATTER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlscatter/qmlscatter)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLSPECTROGRAM
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlspectrogram/qmlspectrogram)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLSURFACE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlsurface/qmlsurface)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_QMLSURFACELAYERS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/qmlsurfacelayers/qmlsurfacelayers)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_ROTATIONS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/rotations/rotations)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_SCATTER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/scatter/scatter)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_SURFACE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/surface/surface)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_TEXTURESURFACE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/texturesurface/texturesurface)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDATAVIS3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_DATAVISUALIZATION_VOLUMETRIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/datavisualization/volumetric/volumetric)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -409,48 +737,24 @@ ifdef PTXCONF_QT5_EXAMPLES_DESIGNER_WORLDTIMECLOCKBUILDER
 		/usr/lib/qt5/examples/designer/worldtimeclockbuilder/worldtimeclockbuilder)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_QUICK_IMAGE_GALLERY
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTGAMEPAD)),)
+ifdef PTXCONF_QT5_EXAMPLES_GAMEPAD_KEYNAVIGATION
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/quick/image-gallery/image-gallery)
+		/usr/lib/qt5/examples/gamepad/keyNavigation/keyNavigation)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_QUICK_SOCIALTODOS
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTGAMEPAD)),)
+ifdef PTXCONF_QT5_EXAMPLES_GAMEPAD_MOUSEITEM
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/gamepad/mouseItem/mouseItem)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTGAMEPAD)),)
+ifdef PTXCONF_QT5_EXAMPLES_GAMEPAD_SIMPLE
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/enginio/quick/socialtodos/backendconfig/sharedtodo.zip)
+		/usr/lib/qt5/examples/gamepad/simple/android/AndroidManifest.xml)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/quick/socialtodos/socialtodos)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_QUICK_TODOS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/quick/todos/todos)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_QUICK_USERS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/quick/users/users)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_WIDGETS_CLOUDADDRESSBOOK
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/widgets/cloudaddressbook/cloudaddressbook)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_WIDGETS_IMAGE_GALLERY
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/widgets/image-gallery-cpp/image-gallery)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTENGINIO)),)
-ifdef PTXCONF_QT5_EXAMPLES_ENGINIO_WIDGETS_TODOS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/enginio/widgets/todos-cpp/todos)
+		/usr/lib/qt5/examples/gamepad/simple/simple)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -518,9 +822,25 @@ ifdef PTXCONF_QT5_EXAMPLES_LINGUIST_TROLLPRINT
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTLOCATION)),)
+ifdef PTXCONF_QT5_EXAMPLES_LOCATION_ITEMVIEW_TRANSITIONS
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/location/itemview_transitions/OsloListModel.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/location/itemview_transitions/itemview_transitions)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/location/itemview_transitions/main.qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTLOCATION)),)
 ifdef PTXCONF_QT5_EXAMPLES_LOCATION_QML_LOCATION_MAPVIEWER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/location/mapviewer/qml_location_mapviewer)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTLOCATION)),)
+ifdef PTXCONF_QT5_EXAMPLES_LOCATION_MINIMAL_MAP
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/location/minimal_map/minimal_map)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTLOCATION)),)
@@ -615,8 +935,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTMULTIMEDIA)),)
 ifdef PTXCONF_QT5_EXAMPLES_MULTIMEDIA_VIDEO_QMLVIDEOFX
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/multimedia/video/qmlvideofx/Info.plist)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/multimedia/video/qmlvideofx/android/AndroidManifest.xml)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/multimedia/video/qmlvideofx/qmlvideofx)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
@@ -659,12 +977,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTMULTIMEDIA)),)
 ifdef PTXCONF_QT5_EXAMPLES_MULTIMEDIAWIDGETS_CUSTOMVIDEOSURFACE_CUSTOMVIDEOWIDGET
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/multimediawidgets/customvideosurface/customvideowidget/customvideowidget)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_NETWORK_BEARERMONITOR
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/network/bearermonitor/bearermonitor)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -758,6 +1070,18 @@ ifdef PTXCONF_QT5_EXAMPLES_NETWORK_SECURESOCKETCLIENT
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_NETWORK_SECUREUDPCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/network/secureudpclient/secureudpclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_NETWORK_SECUREUDPSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/network/secureudpserver/secureudpserver)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_NETWORK_THREADEDFORTUNESERVER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/network/threadedfortuneserver/threadedfortuneserver)
@@ -803,10 +1127,28 @@ ifdef PTXCONF_QT5_EXAMPLES_NFC_QML_POSTER
 		/usr/lib/qt5/examples/nfc/poster/qml_poster)
 endif
 endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTNETWORKAUTH)),)
+ifdef PTXCONF_QT5_EXAMPLES_OAUTH_REDDITCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/oauth/redditclient/redditclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTNETWORKAUTH)),)
+ifdef PTXCONF_QT5_EXAMPLES_OAUTH_TWITTERTIMELINE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/oauth/twittertimeline/twittertimeline)
+endif
+endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_OPENGL_2DPAINTING
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/opengl/2dpainting/2dpainting)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_OPENGL_COMPUTEGLES31
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/opengl/computegles31/computegles31)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -891,8 +1233,16 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTLOCATION)),)
 ifdef PTXCONF_QT5_EXAMPLES_POSITIONING_WEATHERINFO
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/positioning/weatherinfo/icons/README.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/positioning/weatherinfo/icons/qt_attribution.json)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/positioning/weatherinfo/weatherinfo)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTPURCHASING)),)
+ifdef PTXCONF_QT5_EXAMPLES_PURCHASING_QTHANGMAN
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/purchasing/qthangman/qthangman)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
@@ -1017,6 +1367,8 @@ ifdef PTXCONF_QT5_EXAMPLES_QML_TUTORIALS_EXTENDING_QML_CHAPTER6_PLUGINS
 		/usr/lib/qt5/examples/qml/tutorials/extending-qml/chapter6-plugins/Charts/qmldir)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qml/tutorials/extending-qml/chapter6-plugins/chapter6-plugins)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/qml/tutorials/extending-qml/chapter6-plugins/import/qmldir)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -1032,21 +1384,21 @@ ifdef PTXCONF_QT5_EXAMPLES_QPA_WINDOWS
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_3D_TEXT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/qt3d/3d-text/3d-text)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_ADVANCEDCUSTOMMATERIAL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/qt3d/advancedcustommaterial/advancedcustommaterial)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
 ifdef PTXCONF_QT5_EXAMPLES_QT3D_ANAGLYPH_RENDERING
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qt3d/anaglyph-rendering/anaglyph-rendering)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_ASSIMP_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/assimp-cpp/assimp-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_ASSIMP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/assimp/assimp)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1062,27 +1414,9 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_BASICSHAPES_CPP
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_BIGMODEL_QML
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_COMPUTE_PARTICLES
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/bigmodel-qml/bigmodel-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_BIGSCENE_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/bigscene-cpp/bigscene-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_BIGSCENE_INSTANCED_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/bigscene-instanced-qml/bigscene-instanced-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CLIP_PLANES_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/clip-planes-qml/clip-planes-qml)
+		/usr/lib/qt5/examples/qt3d/compute-particles/compute-particles)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1092,69 +1426,9 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_CONTROLS
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CPP_EXAMPLE
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_CONTROLSUNDERLAY
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/cpp_example/cpp_example)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CUSTOM_MESH_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/custom-mesh-cpp/custom-mesh-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CUSTOM_MESH_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/custom-mesh-qml/custom-mesh-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CYLINDER_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/cylinder-cpp/cylinder-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_CYLINDER_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/cylinder-qml/cylinder-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_DEFERRED_RENDERER_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/deferred-renderer-cpp/deferred-renderer-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_DEFERRED_RENDERER_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/deferred-renderer-qml/deferred-renderer-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_DYNAMICSCENE_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/dynamicscene-cpp/dynamicscene-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_ENABLED_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/enabled-qml/enabled-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_GLTF
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/gltf/gltf)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_GOOCH_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/gooch-qml/gooch-qml)
+		/usr/lib/qt5/examples/qt3d/controlsunderlay/controlsunderlay)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1164,39 +1438,9 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_INSTANCED_ARRAYS_QML
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_KEYBOARDINPUT_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/keyboardinput-qml/keyboardinput-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
 ifdef PTXCONF_QT5_EXAMPLES_QT3D_LIGHTS
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qt3d/lights/lights)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_LOADER_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/loader-qml/loader-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_MATERIALS_CPP
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/materials-cpp/materials-cpp)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_MATERIALS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/materials/materials)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_MOUSEINPUT_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/mouseinput-qml/mouseinput-qml)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1206,9 +1450,15 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_MULTIVIEWPORT
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_PICKING_QML
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_PBR_MATERIALS
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/picking-qml/picking-qml)
+		/usr/lib/qt5/examples/qt3d/pbr-materials/pbr-materials)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_PHONG_CUBES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/qt3d/phong-cubes/phong-cubes)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1221,32 +1471,38 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_PLANETS_QML
 		/usr/lib/qt5/examples/qt3d/planets-qml/android/res/drawable-ldpi/icon.png)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/qt3d/planets-qml/android/res/drawable-mdpi/icon.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/qt3d/planets-qml/images/nasa/license.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/qt3d/planets-qml/images/nasa/qt_attribution.json)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/qt3d/planets-qml/images/solarsystemscope/qt_attribution.json)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qt3d/planets-qml/planets-qml)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_PLASMA
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_QARDBOARD
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/plasma/plasma)
+		/usr/lib/qt5/examples/qt3d/qardboard/qardboard)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_PLAYGROUND_QML
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_SCENE2D
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/playground-qml/playground-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_SCENE3D_LOADER
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/scene3d-loader/scene3d-loader)
+		/usr/lib/qt5/examples/qt3d/scene2d/scene2d)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
 ifdef PTXCONF_QT5_EXAMPLES_QT3D_SCENE3D
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qt3d/scene3d/scene3d)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_SCENE3DVIEW
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/qt3d/scene3dview/scene3dview)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1268,51 +1524,21 @@ ifdef PTXCONF_QT5_EXAMPLES_QT3D_SIMPLE_QML
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_SIMPLE_SHADERS_QML
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_SIMPLECUSTOMMATERIAL
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/simple-shaders-qml/simple-shaders-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_SKYBOX
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/skybox/skybox)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_TESSELLATION_MODES
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/tessellation-modes/tessellation-modes)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_TORUS_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/torus-qml/torus-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_TRANSFORMS_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/transforms-qml/transforms-qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_TRANSPARENCY_QML_SCENE3D
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/transparency-qml-scene3d/transparency-qml-scene3d)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
-ifdef PTXCONF_QT5_EXAMPLES_QT3D_TRANSPARENCY_QML
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/qt3d/transparency-qml/transparency-qml)
+		/usr/lib/qt5/examples/qt3d/simplecustommaterial/simplecustommaterial)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
 ifdef PTXCONF_QT5_EXAMPLES_QT3D_WAVE
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/qt3d/wave/wave)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
+ifdef PTXCONF_QT5_EXAMPLES_QT3D_WIDGETS_SCENE3D
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/qt3d/widgets-scene3d/widgets-scene3d)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QT3D)),)
@@ -1394,6 +1620,12 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICK_CANVAS
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_DELEGATECHOOSER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/delegatechooser/delegatechooser)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_DRAGANDDROP
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/draganddrop/draganddrop)
@@ -1421,6 +1653,12 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_KEYINTERACTION
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/keyinteraction/keyinteraction)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_LAYOUTS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/layouts/layouts)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
@@ -1455,8 +1693,26 @@ endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_SHADEREFFECTS
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/blur.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/colorize.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/genie.vert)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/outline.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/shadow.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/shadereffects/content/shaders/rhi/wobble.frag)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/shadereffects/shadereffects)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_SHAPES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/shapes/shapes)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
@@ -1520,104 +1776,6 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICK_CUSTOMITEMS_PROGRESSBAR
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_CUSTOMITEMS_SCROLLBAR
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/scrollbar/ScrollBar.qml)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/scrollbar/main.qml)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/scrollbar/pics/niagara_falls.jpg)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_CUSTOMITEMS_SEARCHBOX
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/searchbox/SearchBox.qml)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/searchbox/images/clear.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/searchbox/images/lineedit-bg-focus.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/searchbox/images/lineedit-bg.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/searchbox/main.qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_CUSTOMITEMS_SPINNER
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/spinner/content/Spinner.qml)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/spinner/content/spinner-bg.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/spinner/content/spinner-select.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/spinner/main.qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_CUSTOMITEMS_TABWIDGET
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/tabwidget/TabWidget.qml)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/customitems/tabwidget/main.qml)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_CALQLATR
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/calqlatr/calqlatr)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_CLOCKS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/clocks/clocks)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_MAROON
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/maroon/maroon)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_PHOTOSURFACE
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/photosurface/photosurface)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/demos/photosurface/resources/icon.png)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/demos/photosurface/resources/photosurface.icns)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/quick/demos/photosurface/resources/photosurface.ico)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_RSSNEWS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/rssnews/rssnews)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_SAMEGAME
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/samegame/samegame)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_STOCQT
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/stocqt/stocqt)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_DEMOS_TWEETSEARCH
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/demos/tweetsearch/tweetsearch)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_LOCALSTORAGE_LOCALSTORAGE
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/localstorage/localstorage/localstorage)
@@ -1672,6 +1830,26 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICK_PARTICLES_IMAGEPARTICLE
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_PARTICLES_ITEMPARTICLE
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/content/Delegate.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/content/Delegate2.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/content/ExpandingDelegate.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/content/bubble.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/content/script.js)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/delegates.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/itemparticle)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/particles/itemparticle/particleview.qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_PARTICLES_SYSTEM
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/particles/system/system)
@@ -1696,6 +1874,14 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_CUSTOMGEOMETRY
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_FBOITEM
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/fboitem/fboitem)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/fboitem/shaders/checker_rhi.frag)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_GRAPH
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/scenegraph/graph/graph)
@@ -1708,6 +1894,12 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_OPENGLUNDERQML
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_RENDERNODE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/rendernode/rendernode)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_SGENGINE
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/scenegraph/sgengine/sgengine)
@@ -1717,12 +1909,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_SIMPLEMATERIAL
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/scenegraph/simplematerial/simplematerial)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_TEXTUREINSGNODE
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quick/scenegraph/textureinsgnode/textureinsgnode)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
@@ -1739,14 +1925,144 @@ endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_TWOTEXTUREPROVIDERS
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/twotextureproviders/shaders/checker_rhi.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/twotextureproviders/shaders/xorblender_rhi.frag)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/twotextureproviders/shaders/xorblender_rhi.vert)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quick/scenegraph/twotextureproviders/twotextureproviders)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
-ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS_CONTROLS_BASICLAYOUTS
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_VULKANTEXTUREIMPORT
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/quickcontrols/controls/basiclayouts/basiclayouts)
+		/usr/lib/qt5/examples/quick/scenegraph/vulkantextureimport/vulkantextureimport)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_SCENEGRAPH_VULKANUNDERQML
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/scenegraph/vulkanunderqml/vulkanunderqml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_TABLEVIEW_GAMEOFLIFE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/tableview/gameoflife/gameoflife)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tableview/gameoflife/gosperglidergun.cells)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tableview/gameoflife/main.qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_TABLEVIEW_PIXELATOR
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tableview/pixelator/main.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick/tableview/pixelator/pixelator)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tableview/pixelator/qt.png)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_TUTORIALS_DYNAMICVIEW_DYNAMICVIEW4
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tutorials/dynamicview/dynamicview4/ListSelector.qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK_TUTORIALS_SAMEGAME_SAMEGAME3
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick/tutorials/samegame/samegame3/Dialog.qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_ANTIALIASING
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/antialiasing/antialiasing)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_CUSTOMMATERIAL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/custommaterial/custommaterial)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_CUSTOMSHADERS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/customshaders/customshaders)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_DYNAMICCREATION
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/dynamiccreation/dynamiccreation)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_DYNAMICTEXTURE
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick3d/dynamictexture/content/Panel.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick3d/dynamictexture/content/cork.jpg)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick3d/dynamictexture/content/note-yellow.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quick3d/dynamictexture/content/tack.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/dynamictexture/dynamictexture)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_EFFECTS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/effects/effects)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_HELLOCUBE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/hellocube/hellocube)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_LIGHTS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/lights/lights)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_PICKING
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/picking/picking)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_PRINCIPLEDMATERIAL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/principledmaterial/principledmaterial)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_QUICKITEMS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/quickitems/quickitems)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_SIMPLE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/simple/simple)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICK3D_VIEW3D
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quick3d/view3d/view3d)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
@@ -1828,103 +2144,471 @@ ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS_EXTRAS_GALLERY
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CONTACTLIST
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/ContactDelegate.ui.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/ContactDialog.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/ContactForm.ui.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/ContactView.ui.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/SectionDelegate.ui.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/contactlist)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/contactlist.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/designer/Backend/ContactModel.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/contactlist/designer/Backend/qmldir)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_FLATSTYLE
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/Flat/Button.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/Flat/CheckBox.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/Flat/Switch.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/MainForm.ui.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/flatstyle)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/flatstyle.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/imports/Theme/Theme.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/imports/Theme/qmldir)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/flatstyle/qtquickcontrols2.conf)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
 ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_GALLERY
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/quickcontrols2/gallery/gallery)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/gallery.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20/back.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20/drawer.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20/menu.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@2/back.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@2/drawer.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@2/menu.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@3/back.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@3/drawer.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@3/menu.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@4/back.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@4/drawer.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/20x20@4/menu.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/icons/gallery/index.theme)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrow.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrow@2x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrow@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrow@4x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrows.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrows@2x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrows@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/arrows@4x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/qt-logo.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/qt-logo@2x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/qt-logo@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/images/qt-logo@4x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/BusyIndicatorPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ButtonPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/CheckBoxPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ComboBoxPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/DelayButtonPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/DelegatePage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/DialPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/DialogPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/FramePage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/GroupBoxPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/PageIndicatorPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ProgressBarPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/RadioButtonPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/RangeSliderPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ScrollBarPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ScrollIndicatorPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ScrollablePage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/SliderPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/SpinBoxPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/StackViewPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/SwipeViewPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/SwitchPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/TabBarPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/TextAreaPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/TextFieldPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/ToolTipPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/pages/TumblerPage.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/gallery/qtquickcontrols2.conf)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_CALCULATOR
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_SIDEPANEL
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/images/qt-logo.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/images/qt-logo@2x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/images/qt-logo@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/images/qt-logo@4x.png)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/calculator/calculator)
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/sidepanel)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/sidepanel/sidepanel.qml)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_CONTEXT2D
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_SWIPETOREMOVE
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/swipetoremove/fonts/LICENSE.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/swipetoremove/fonts/fontello.ttf)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/context2d/context2d)
+		/usr/lib/qt5/examples/quickcontrols2/swipetoremove/swipetoremove)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/alpha.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/arc.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/bezier.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/clock.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/fill1.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/grad.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/linecap.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/linestye.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/moveto.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/moveto2.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/pacman.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/plasma.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/pong.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/quad.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/rgba.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/rotate.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/scale.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/stroke1.js)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/context2d/scripts/translate.js)
+		/usr/lib/qt5/examples/quickcontrols2/swipetoremove/swipetoremove.qml)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_CUSTOMCLASS
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_TEXTEDITOR
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/customclass/customclass)
+		/usr/lib/qt5/examples/quickcontrols2/texteditor/texteditor)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_DEFAULTPROTOTYPES
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/defaultprototypes/defaultprototypes)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_HELLOSCRIPT
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/helloscript/helloscript)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_MARSHAL
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/marshal/marshal)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_QSCRIPT
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/qscript/qscript)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_QSDBG
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_WEARABLE
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/script/qsdbg/example.js)
+		/usr/lib/qt5/examples/quickcontrols2/wearable/images/back@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/images/back@4x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/images/home@3x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/images/home@4x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/Navigation/images/marker.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/Settings/images/demo-mode.svg)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/Settings/images/theme.svg)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/WorldClock/images/clock-night.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/WorldClock/images/clock-night@2x.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/WorldClock/images/clock.png)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/wearable/qml/WorldClock/images/swissseconds.png)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/qsdbg/qsdbg)
+		/usr/lib/qt5/examples/quickcontrols2/wearable/wearable)
 endif
 endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCRIPT)),)
-ifdef PTXCONF_QT5_EXAMPLES_SCRIPT_QSTETRIX
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CHATTUTORIAL_CHAPTER1_SETTINGUP
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/script/qstetrix/qstetrix)
+		/usr/lib/qt5/examples/quickcontrols2/chattutorial/chapter1-settingup/chapter1-settingup)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CHATTUTORIAL_CHAPTER2_LISTS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/chattutorial/chapter2-lists/chapter2-lists)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CHATTUTORIAL_CHAPTER3_NAVIGATION
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/chattutorial/chapter3-navigation/chapter3-navigation)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CHATTUTORIAL_CHAPTER4_MODELS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/chattutorial/chapter4-models/chapter4-models)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_CHATTUTORIAL_CHAPTER5_STYLING
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/chattutorial/chapter5-styling/chapter5-styling)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_IMAGINE_AUTOMOTIVE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/automotive/automotive)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/automotive/qtquickcontrols2.conf)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTDECLARATIVE)),)
+ifdef PTXCONF_QT5_EXAMPLES_QUICKCONTROLS2_IMAGINE_MUSICPLAYER
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/musicplayer/icons/musicplayer/icons.svg)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/musicplayer/images/album-cover.jpg)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/musicplayer/musicplayer)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/musicplayer/musicplayer.qml)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/quickcontrols2/imagine/musicplayer/qtquickcontrols2.conf)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_CLIENTAPP
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/clientapp/clientapp)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_CPPCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/cppclient/CppClient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_MODELVIEWCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/modelviewclient/modelviewclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_MODELVIEWSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/modelviewserver/modelviewserver)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_QMLMODELVIEWCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/qmlmodelviewclient/qmlmodelviewclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/server/server)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SIMPLESWITCH_DIRECTCONNECTCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/directconnectclient/directconnectclient)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/directconnectclient/simpleswitch.rep)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SIMPLESWITCH_DIRECTCONNECTDYNAMICCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/directconnectdynamicclient/directconnectdynamicclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SIMPLESWITCH_DIRECTCONNECTSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/directconnectserver/directconnectserver)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SIMPLESWITCH_REGISTRYCONNECTEDCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/registryconnectedclient/registryconnectedclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SIMPLESWITCH_REGISTRYCONNECTEDSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/registryconnectedserver/registryconnectedserver)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/remoteobjects/simpleswitch/registryconnectedserver/simpleswitch.rep)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SSL_SSLCPPCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/ssl/sslcppclient/SslCppClient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_SSL_SSLSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/ssl/sslserver/sslserver)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_WEBSOCKETS_WSCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/websockets/wsclient/wsclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTREMOTEOBJECTS)),)
+ifdef PTXCONF_QT5_EXAMPLES_REMOTEOBJECTS_WEBSOCKETS_WSSERVER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/remoteobjects/websockets/wsserver/wsserver)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_CALCULATOR_QML
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/calculator-qml/calculator-qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_CALCULATOR_WIDGETS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/calculator-widgets/calculator-widgets)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_FTPCLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/ftpclient/ftpclient)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_INVOKE_DYNAMIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/invoke-dynamic/invoke-dynamic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_INVOKE_STATIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/invoke-static/invoke-static)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_MEDIAPLAYER_QML_CPPDATAMODEL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/mediaplayer-qml-cppdatamodel/mediaplayer-qml-cppdatamodel)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_MEDIAPLAYER_QML_DYNAMIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/mediaplayer-qml-dynamic/mediaplayer-qml-dynamic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_MEDIAPLAYER_QML_STATIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/mediaplayer-qml-static/mediaplayer-qml-static)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_MEDIAPLAYER_WIDGETS_DYNAMIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/mediaplayer-widgets-dynamic/mediaplayer-widgets-dynamic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_MEDIAPLAYER_WIDGETS_STATIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/mediaplayer-widgets-static/mediaplayer-widgets-static)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_PINBALL
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/pinball/pinball)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_SUDOKU
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/sudoku/sudoku)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_TRAFFICLIGHT_QML_DYNAMIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/trafficlight-qml-dynamic/trafficlight-qml-dynamic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_TRAFFICLIGHT_QML_SIMPLE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/trafficlight-qml-simple/trafficlight-qml-simple)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_TRAFFICLIGHT_QML_STATIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/trafficlight-qml-static/trafficlight-qml-static)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_TRAFFICLIGHT_WIDGETS_DYNAMIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/trafficlight-widgets-dynamic/trafficlight-widgets-dynamic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSCXML)),)
+ifdef PTXCONF_QT5_EXAMPLES_SCXML_TRAFFICLIGHT_WIDGETS_STATIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/scxml/trafficlight-widgets-static/trafficlight-widgets-static)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSENSORS)),)
@@ -1953,6 +2637,8 @@ ifdef PTXCONF_QT5_EXAMPLES_SENSORS_GRUE_APP
 		/usr/lib/qt5/examples/sensors/grue/icon.xcf)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/sensors/grue/import/import.json)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/sensors/grue/import/qmldir)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/sensors/grue/libgruesensor.prl)
 	@$(call install_link, qt5-examples, libgruesensor.so.1.0.0, \
@@ -1997,6 +2683,8 @@ ifdef PTXCONF_QT5_EXAMPLES_SENSORS_SENSOR_EXPLORER
 		/usr/lib/qt5/examples/sensors/sensor_explorer/Explorer/qmldir)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/sensors/sensor_explorer/import/import.json)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/sensors/sensor_explorer/import/qmldir)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/sensors/sensor_explorer/sensor_explorer)
 endif
@@ -2101,6 +2789,12 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSERIALPORT)),)
 ifdef PTXCONF_QT5_EXAMPLES_SERIALPORT_TERMINAL
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/serialport/terminal/terminal)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSPEECH)),)
+ifdef PTXCONF_QT5_EXAMPLES_SPEECH_HELLO_SPEAK
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/speech/hello_speak/hello_speak)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -2212,12 +2906,6 @@ ifdef PTXCONF_QT5_EXAMPLES_SVG_EMBEDDED_WEATHERINFO
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSVG)),)
-ifdef PTXCONF_QT5_EXAMPLES_SVG_NETWORK_BEARERCLOUD
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/svg/network/bearercloud/bearercloud)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSVG)),)
 ifdef PTXCONF_QT5_EXAMPLES_SVG_OPENGL_FRAMEBUFFEROBJECT
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/svg/opengl/framebufferobject/framebufferobject)
@@ -2227,30 +2915,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTSVG)),)
 ifdef PTXCONF_QT5_EXAMPLES_SVG_RICHTEXT_TEXTOBJECT
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/svg/richtext/textobject/textobject)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_TOUCH_DIALS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/touch/dials/dials)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_TOUCH_FINGERPAINT
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/touch/fingerpaint/fingerpaint)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_TOUCH_KNOBS
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/touch/knobs/knobs)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_TOUCH_PINCHZOOM
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/touch/pinchzoom/pinchzoom)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTTOOLS)),)
@@ -2263,6 +2927,154 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTTOOLS)),)
 ifdef PTXCONF_QT5_EXAMPLES_UITOOLS_TEXTFINDER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/uitools/textfinder/textfinder)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTVIRTUALKEYBOARD)),)
+ifdef PTXCONF_QT5_EXAMPLES_VIRTUALKEYBOARD_BASIC
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/virtualkeyboard/basic/basic)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_VULKAN_HELLOVULKANCUBES
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/vulkan/hellovulkancubes/hellovulkancubes)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_VULKAN_HELLOVULKANTEXTURE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/vulkan/hellovulkantexture/hellovulkantexture)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_VULKAN_HELLOVULKANTRIANGLE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/vulkan/hellovulkantriangle/hellovulkantriangle)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_VULKAN_HELLOVULKANWIDGET
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/vulkan/hellovulkanwidget/hellovulkanwidget)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_VULKAN_HELLOVULKANWINDOW
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/vulkan/hellovulkanwindow/hellovulkanwindow)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_HWLAYER_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/hwlayer-compositor/hwlayer-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_IVI_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/ivi-compositor/ivi-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_MINIMAL_CPP
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/wayland/minimal-cpp/README)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/minimal-cpp/minimal-cpp)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_MINIMAL_QML
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/minimal-qml/minimal-qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_MULTI_OUTPUT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/multi-output/multi-output)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_MULTI_SCREEN
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/multi-screen/multi-screen)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_OVERVIEW_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/overview-compositor/overview-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_PURE_QML
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/pure-qml/pure-qml)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_QWINDOW_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/qwindow-compositor/qwindow-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_SERVER_SIDE_DECORATION
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/server-side-decoration/server-side-decoration)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_SPANNING_SCREENS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/spanning-screens/spanning-screens)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_CUSTOM_EXTENSION_CUSTOM_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/custom-extension/compositor/custom-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_CUSTOM_EXTENSION_CPP_CLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/custom-extension/cpp-client/cpp-client)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_CUSTOM_EXTENSION_QML_CLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/custom-extension/qml-client/qml-client)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_SERVER_BUFFER_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/server-buffer/compositor/compositor)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/wayland/server-buffer/compositor/images/Siberischer_tiger_de_edit02.txt)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_SERVER_BUFFER_CPP_CLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/server-buffer/cpp-client/cpp-client)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_TEXTURE_SHARING_CUSTOM_COMPOSITOR
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/texture-sharing/custom-compositor/custom-compositor)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWAYLAND)),)
+ifdef PTXCONF_QT5_EXAMPLES_WAYLAND_TEXTURE_SHARING_QML_CLIENT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/wayland/texture-sharing/qml-client/qml-client)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBCHANNEL)),)
@@ -2282,6 +3094,18 @@ ifdef PTXCONF_QT5_EXAMPLES_WEBCHANNEL_STANDALONE
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_CUSTOMDIALOGS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webengine/customdialogs/customdialogs)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_LIFECYCLE
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webengine/lifecycle/lifecycle)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_MINIMAL
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/webengine/minimal/minimal)
@@ -2289,8 +3113,30 @@ endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_QUICKNANOBROWSER
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webengine/quicknanobrowser/icons/3rdparty/COPYING)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webengine/quicknanobrowser/icons/3rdparty/qt_attribution.json)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/webengine/quicknanobrowser/quicknanobrowser)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_RECIPEBROWSER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webengine/recipebrowser/recipebrowser)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webengine/recipebrowser/resources/pages/assets/3rdparty/MARKDOWN-LICENSE.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webengine/recipebrowser/resources/pages/assets/3rdparty/MARKED-LICENSE.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webengine/recipebrowser/resources/pages/assets/3rdparty/qt_attribution.json)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINE_WEBENGINEACTION
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webengine/webengineaction/webengineaction)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
@@ -2301,28 +3147,30 @@ endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_COOKIEBROWSER
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/cookiebrowser/3rdparty/COPYING)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/cookiebrowser/3rdparty/qt_attribution.json)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/webenginewidgets/cookiebrowser/cookiebrowser)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
-ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_DEMOBROWSER
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/webenginewidgets/demobrowser/Info_mac.plist)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_MAPS
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/webenginewidgets/demobrowser/demobrowser)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/webenginewidgets/demobrowser/demobrowser.icns)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/webenginewidgets/demobrowser/demobrowser.ico)
+		/usr/lib/qt5/examples/webenginewidgets/maps/maps)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_MARKDOWNEDITOR
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/webenginewidgets/markdowneditor/3RDPARTY.md)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/webenginewidgets/markdowneditor/markdowneditor)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/markdowneditor/resources/3rdparty/MARKDOWN-LICENSE.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/markdowneditor/resources/3rdparty/MARKED-LICENSE.txt)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/markdowneditor/resources/3rdparty/qt_attribution.json)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
@@ -2332,9 +3180,41 @@ ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_MINIMAL
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_NOTIFICATIONS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webenginewidgets/notifications/notifications)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_SIMPLEBROWSER
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/simplebrowser/data/3rdparty/COPYING)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/simplebrowser/data/3rdparty/qt_attribution.json)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/webenginewidgets/simplebrowser/simplebrowser)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_STYLESHEETBROWSER
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/stylesheetbrowser/3rdparty/COPYING)
+	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
+		/usr/lib/qt5/examples/webenginewidgets/stylesheetbrowser/3rdparty/qt_attribution.json)
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webenginewidgets/stylesheetbrowser/stylesheetbrowser)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_VIDEOPLAYER
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webenginewidgets/videoplayer/videoplayer)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBENGINE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WEBENGINEWIDGETS_WEBUI
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/webenginewidgets/webui/webui)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTWEBSOCKETS)),)
@@ -2392,6 +3272,12 @@ ifdef PTXCONF_QT5_EXAMPLES_WEBVIEW_MINIBROWSER
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_GALLERY
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/gallery/gallery)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_WINDOWCONTAINER
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/windowcontainer/windowcontainer)
@@ -2401,12 +3287,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_ANIMATION_ANIMATEDTILES
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/animation/animatedtiles/animatedtiles)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_ANIMATION_APPCHOOSER
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/widgets/animation/appchooser/appchooser)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -2469,12 +3349,6 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_DIALOGS_CLASSWIZARD
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/dialogs/classwizard/classwizard)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_DIALOGS_CONFIGDIALOG
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/widgets/dialogs/configdialog/configdialog)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -2557,12 +3431,6 @@ ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_EFFECTS_FADEMESSAGE
 		/usr/lib/qt5/examples/widgets/effects/fademessage/README)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/effects/fademessage/fademessage)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_EFFECTS_LIGHTING
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/widgets/effects/lighting/lighting)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -2703,6 +3571,12 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_ITEMVIEWS_FETCHMORE
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/itemviews/fetchmore/fetchmore)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_ITEMVIEWS_FLATTREEVIEW
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/itemviews/flattreeview/flattreeview)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -2969,6 +3843,36 @@ ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_STATEMACHINE_TWOWAYBUTTON
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/widgets/statemachine/twowaybutton/twowaybutton)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_TOUCH_DIALS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/touch/dials/dials)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_TOUCH_FINGERPAINT
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/touch/fingerpaint/fingerpaint)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_TOUCH_KNOBS
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/touch/knobs/knobs)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_TOUCH_PINCHZOOM
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/touch/pinchzoom/pinchzoom)
+endif
+endif
+ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_TUTORIALS_NOTEPAD
+	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
+		/usr/lib/qt5/examples/widgets/tutorials/notepad/notepad)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -3254,9 +4158,9 @@ ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_WIDGETS_STYLESHEET
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_WIDGETS_TABLET
+ifdef PTXCONF_QT5_EXAMPLES_WIDGETS_WIDGETS_QTTABLET
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/widgets/widgets/tablet/tablet)
+		/usr/lib/qt5/examples/widgets/widgets/tablet/qttablet)
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
@@ -3294,8 +4198,6 @@ ifdef PTXCONF_QT5_EXAMPLES_XML_DOMBOOKMARKS
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
 		/usr/lib/qt5/examples/xml/dombookmarks/dombookmarks)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/xml/dombookmarks/frank.xbel)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/xml/dombookmarks/jennifer.xbel)
 endif
 endif
@@ -3312,19 +4214,7 @@ ifdef PTXCONF_QT5_EXAMPLES_XML_RSSLISTING
 endif
 endif
 ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
-ifdef PTXCONF_QT5_EXAMPLES_XML_SAXBOOKMARKS
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/xml/saxbookmarks/frank.xbel)
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/xml/saxbookmarks/jennifer.xbel)
-	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \
-		/usr/lib/qt5/examples/xml/saxbookmarks/saxbookmarks)
-endif
-endif
-ifneq ($(strip $(PTXCONF_QT5_MODULE_QTBASE)),)
 ifdef PTXCONF_QT5_EXAMPLES_XML_STREAMBOOKMARKS
-	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
-		/usr/lib/qt5/examples/xml/streambookmarks/frank.xbel)
 	@$(call install_copy, qt5-examples, 0, 0, 0644, -, \
 		/usr/lib/qt5/examples/xml/streambookmarks/jennifer.xbel)
 	@$(call install_copy, qt5-examples, 0, 0, 0755, -, \

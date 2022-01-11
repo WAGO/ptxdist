@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Markus Pargmann <mpa@pengutronix.de
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ CBENCHSUITE_SUFFIX	:= tar.gz
 CBENCHSUITE_URL		:= https://github.com/scosu/cbenchsuite/archive/v$(CBENCHSUITE_VERSION).$(CBENCHSUITE_SUFFIX)
 CBENCHSUITE_SOURCE	:= $(SRCDIR)/$(CBENCHSUITE).$(CBENCHSUITE_SUFFIX)
 CBENCHSUITE_DIR		:= $(BUILDDIR)/$(CBENCHSUITE)
-CBENCHSUITE_LICENSE	:= GPL-2.0+
+CBENCHSUITE_LICENSE	:= GPL-2.0-or-later
 
 #
 # autoconf

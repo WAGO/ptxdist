@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LZ4) += lz4
 #
 # Paths and names
 #
-LZ4_VERSION	:= 1.8.0
-LZ4_MD5		:= 6247bf0e955899969d1600ff34baed6b
+LZ4_VERSION	:= 1.9.2
+LZ4_MD5		:= 3898c56c82fb3d9455aefd48db48eaad
 LZ4		:= lz4-$(LZ4_VERSION)
 LZ4_SUFFIX	:= tar.gz
 LZ4_URL		:= https://github.com/Cyan4973/lz4/archive/v$(LZ4_VERSION).$(LZ4_SUFFIX)
 LZ4_SOURCE	:= $(SRCDIR)/$(LZ4).$(LZ4_SUFFIX)
 LZ4_DIR		:= $(BUILDDIR)/$(LZ4)
-LZ4_LICENSE	:= BSD-2-Clause AND GPL-2.0+
+LZ4_LICENSE	:= BSD-2-Clause AND GPL-2.0-or-later
 LZ4_LICENSE_FILES := \
 	file://LICENSE;md5=d57c0d21cb917fb4e0af2454aa48b956 \
 	file://lib/LICENSE;md5=ebc2ea4814a64de7708f1571904b32cc \

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by KOAN sas, by Marco Cavallini <m.cavallini@koansoftware.com>
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ SED_SUFFIX	:= tar.bz2
 SED_URL		:= $(call ptx/mirror, GNU, sed/$(SED).$(SED_SUFFIX))
 SED_SOURCE	:= $(SRCDIR)/$(SED).$(SED_SUFFIX)
 SED_DIR		:= $(BUILDDIR)/$(SED)
-SED_LICENSE	:= GPL-3.0, GNU Free Documentation License
+SED_LICENSE	:= GPL-3.0-only AND GNU Free Documentation License
 SED_LICENSE_FILES := \
 	file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
 	file://COPYING.DOC;md5=10b9de612d532fdeeb7fe8fcd1435cc6

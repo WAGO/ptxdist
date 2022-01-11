@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Juergen Borleis <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LIBNEWT) += libnewt
 #
 # Paths and names
 #
-LIBNEWT_VERSION	:= 0.52.20
-LIBNEWT_MD5	:= 70b288f821234593a8e7920e435b259b
+LIBNEWT_VERSION	:= 0.52.21
+LIBNEWT_MD5	:= a0a5fd6b53bb167a65e15996b249ebb5
 LIBNEWT		:= newt-$(LIBNEWT_VERSION)
 LIBNEWT_SUFFIX	:= tar.gz
-LIBNEWT_URL	:= https://fedorahosted.org/releases/n/e/newt/$(LIBNEWT).$(LIBNEWT_SUFFIX)
+LIBNEWT_URL	:= https://releases.pagure.org/newt/$(LIBNEWT).$(LIBNEWT_SUFFIX)
 LIBNEWT_SOURCE	:= $(SRCDIR)/$(LIBNEWT).$(LIBNEWT_SUFFIX)
 LIBNEWT_DIR	:= $(BUILDDIR)/$(LIBNEWT)
-LIBNEWT_LICENSE	:= GPL-2.0
+LIBNEWT_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -38,6 +36,9 @@ LIBNEWT_CONF_OPT	:= \
 	--without-tcl \
 	--without-gpm-support \
 	--without-colorsfile
+
+LIBNEWT_MAKE_OPT	:= sharedlib
+LIBNEWT_INSTALL_OPT	:= install-sh
 
 # ----------------------------------------------------------------------------
 # Target-Install

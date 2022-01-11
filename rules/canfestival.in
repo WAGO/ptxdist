@@ -2,8 +2,8 @@
 
 config CANFESTIVAL
 	tristate
+	select HOST_SYSTEM_PYTHON
 	prompt "canfestival"
-	select KERNEL_HEADER
 	help
 	  CanFestival is an OpenSource CANOpen framework, licensed with GPLv2 and
 	  LGPLv2. For details, see the project web page:

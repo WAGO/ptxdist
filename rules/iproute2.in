@@ -10,6 +10,7 @@ menuconfig IPROUTE2
 	select LIBC_PTHREAD if IPROUTE2_ARPD
 	select GCCLIBS_GCC_S if IPROUTE2_IP || IPROUTE2_TC
 	select LIBSELINUX if GLOBAL_SELINUX
+	select LIBMNL if IPROUTE2_DEVLINK
 	help
 	  Networking and traffic control tools
 
@@ -27,7 +28,7 @@ config IPROUTE2_ARPD
 	bool
 	prompt "arpd"
 	help
-	  Enabling this extry will enlarge your system by the berkely
+	  Enabling this entry will enlarge your system by the berkely
 	  DB4.x library.
 
 config IPROUTE2_BRIDGE
@@ -41,6 +42,12 @@ config IPROUTE2_CTSTAT
 	prompt "ctstat"
 	help
 	  The connection status utility. Maybe linked to lnstat.
+
+config IPROUTE2_DEVLINK
+	bool
+	prompt "devlink"
+	help
+	  The devlink utility.
 
 config IPROUTE2_GENL
 	bool
@@ -129,14 +136,18 @@ config IPROUTE2_SS
 	help
 	  ss is used to dump socket statistics. It allows showing
 	  information similar to netstat. It can display more TCP
-	  and state informations than other tools.
+	  and state information than other tools.
 
 config IPROUTE2_TC
 	bool
+	depends on !BUSYBOX_TC || ALLYES
 	prompt "tc"
 	help
 	  tc is used to configure Traffic Control in the Linux Kernel, which
 	  consists of Shaping, Scheduling, Policing and Dropping.
 	  Processing of traffic is controlled by qdiscs, classes and filters.
+
+comment "busybox' tc is selected"
+	depends on BUSYBOX_TC
 
 endif

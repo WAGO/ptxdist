@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_DFU_UTIL) += dfu-util
 #
 # Paths and names
 #
-DFU_UTIL_VERSION	:= 0.7
-DFU_UTIL_MD5		:= 56844020177d4db4c1ea2e926fe9d588
+DFU_UTIL_VERSION	:= 0.9
+DFU_UTIL_MD5		:= 233bb1e08ef4b405062445d84e28fde6
 DFU_UTIL		:= dfu-util-$(DFU_UTIL_VERSION)
 DFU_UTIL_SUFFIX		:= tar.gz
-DFU_UTIL_URL		:= http://dfu-util.gnumonks.org/releases/$(DFU_UTIL).$(DFU_UTIL_SUFFIX)
+DFU_UTIL_URL		:= http://dfu-util.sourceforge.net/releases/$(DFU_UTIL).$(DFU_UTIL_SUFFIX)
 DFU_UTIL_SOURCE		:= $(SRCDIR)/$(DFU_UTIL).$(DFU_UTIL_SUFFIX)
 DFU_UTIL_DIR		:= $(BUILDDIR)/$(DFU_UTIL)
-DFU_UTIL_LICENSE	:= GPL-2.0
+DFU_UTIL_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Remy Bohmer, Netherlands
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,13 +15,13 @@ PACKAGES-$(PTXCONF_ATOP) += atop
 #
 # Paths and names
 #
-ATOP_VERSION		:= 1.24
-ATOP_MD5		:= 46522f7da28460e810e193ab46907af9
+ATOP_VERSION		:= 2.3.0
+ATOP_MD5		:= 48e1dbef8c7d826e68829a8d5fc920fc
 ATOP			:= atop-$(ATOP_VERSION)
 ATOP_URL		:= http://www.atoptool.nl/download/$(ATOP).tar.gz
 ATOP_SOURCE		:= $(SRCDIR)/$(ATOP).tar.gz
 ATOP_DIR		:= $(BUILDDIR)/$(ATOP)
-ATOP_LICENSE		:= GPL-2.0+
+ATOP_LICENSE		:= GPL-2.0-or-later
 ATOP_LICENSE_FILES	:= file://COPYING;md5=393a5ca445f6965873eca0259a17f833
 
 # ----------------------------------------------------------------------------
@@ -31,7 +29,11 @@ ATOP_LICENSE_FILES	:= file://COPYING;md5=393a5ca445f6965873eca0259a17f833
 # ----------------------------------------------------------------------------
 
 ATOP_CONF_TOOL		:= NO
-ATOP_COMPILE_ENV	:= $(CROSS_ENV)
+ATOP_MAKE_OPT		:= $(CROSS_ENV)
+ATOP_INSTALL_OPT	:= \
+        $(ATOP_MAKE_OPT) \
+        DESTDIR=$(ATOP_PKGDIR) \
+        genericinstall
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Alexander Stein <alexander.stein@systec-electronic.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBKSBA_SUFFIX	:= tar.bz2
 LIBKSBA_URL	:= ftp://ftp.gnupg.org/gcrypt/libksba/$(LIBKSBA).$(LIBKSBA_SUFFIX)
 LIBKSBA_SOURCE	:= $(SRCDIR)/$(LIBKSBA).$(LIBKSBA_SUFFIX)
 LIBKSBA_DIR	:= $(BUILDDIR)/$(LIBKSBA)
-LIBKSBA_LICENSE	:= GPL-2.0, GPL-3.0, LGPL-3.0
+LIBKSBA_LICENSE	:= GPL-2.0-only AND GPL-3.0-only AND LGPL-3.0-only
 LIBKSBA_LICENSE_FILES := \
 	file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 	file://COPYING.GPLv3;md5=2f31b266d3440dd7ee50f92cf67d8e6c \
@@ -38,7 +36,7 @@ LIBKSBA_LICENSE_FILES := \
 #
 LIBKSBA_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
-	--enable-build-timestamp="$(PTXDIST_VERSION_YEAR)-$(PTXDIST_VERSION_MONTH)-01T00:00+0000" \
+	--enable-build-timestamp="$(PTXDIST_BUILD_TIMESTAMP)" \
 	--enable-optimization
 
 # ----------------------------------------------------------------------------

@@ -7,8 +7,13 @@ menuconfig GNUPG
 	select LIBASSUAN
 	select LIBGCRYPT
 	select LIBKSBA
+	select NPTH
 	select READLINE
-	select ZLIB
+	select ZLIB if GNUPG_GPG_ZIP
+	select BZIP2 if GNUPG_GPG_BZIP2
+	select BZIP2_LIBBZ2 if GNUPG_GPG_BZIP2
+	# disabling GNUPG_GPG_EDDSA is broken
+	select GNUPG_GPG_EDDSA
 	help
 	  GnuPG - The GNU Privacy Guard suite of programs
 
@@ -25,5 +30,88 @@ config GNUPG_GPG
 config GNUPG_GPGV
 	bool
 	prompt "Install gpgv2"
+
+config GNUPG_GPG_AGENT
+	bool
+	prompt "Install gpg-agent"
+
+menu "public key algorithms"
+
+config GNUPG_GPG_RSA
+	bool
+	default y
+	prompt "RSA"
+
+config GNUPG_GPG_ECDH
+	bool
+	prompt "ECDH"
+
+config GNUPG_GPG_ECDSA
+	bool
+	prompt "ECDSA"
+
+config GNUPG_GPG_EDDSA
+	bool
+	prompt "EdDSA"
+
+endmenu
+
+menu "cipher algorithms"
+
+config GNUPG_GPG_AES
+	bool
+	default y
+	prompt "AES"
+
+config GNUPG_GPG_BLOWFISH
+	bool
+	prompt "Blowfish"
+
+config GNUPG_GPG_CAMELLIA
+	bool
+	prompt "Camellia"
+
+config GNUPG_GPG_CAST5
+	bool
+	prompt "CAST5"
+
+config GNUPG_GPG_IDEA
+	bool
+	prompt "IDEA"
+
+config GNUPG_GPG_TWOFISH
+	bool
+	prompt "Twofish"
+
+endmenu
+
+menu "hash algorithms"
+
+config GNUPG_GPG_SHA
+	bool
+	default y
+	prompt "SHA"
+
+config GNUPG_GPG_MD5
+	bool
+	prompt "MD5"
+
+config GNUPG_GPG_RMD160
+	bool
+	prompt "RIPE-MD160"
+
+endmenu
+
+menu "compression algorithms"
+
+config GNUPG_GPG_ZIP
+	bool
+	prompt "ZIP"
+
+config GNUPG_GPG_BZIP2
+	bool
+	prompt "BZIP2"
+
+endmenu
 
 endif

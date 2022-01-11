@@ -1,9 +1,7 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
-#               2015 by Marc Kleine-Budde <mkl@pengutronix.de>
-#
-# See CREDITS for details about who has contributed to this project.
+#               2015, 2018 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
 # For further information about the PTXdist project and license conditions
 # see the README file.
@@ -17,15 +15,15 @@ PACKAGES-$(PTXCONF_PCSC_LITE) += pcsc-lite
 #
 # Paths and names
 #
-PCSC_LITE_VERSION	:= 1.8.14
-PCSC_LITE_MD5		:= 439b2c8892f502e39e5b8997a7ae01ed
-PCSC_LITE		:= pcsc-lite-$(PCSC_LITE_VERSION)
+PCSC_LITE_VERSION	:= 1.8.23
+PCSC_LITE_MD5		:= 3ba4b45456a500b5f1f22bf56a2dee38
 PCSC_LITE_SUFFIX	:= tar.bz2
-PCSC_LITE_URL		:= https://alioth.debian.org/frs/download.php/file/4138/$(PCSC_LITE).$(PCSC_LITE_SUFFIX)
+PCSC_LITE		:= pcsc-lite-$(PCSC_LITE_VERSION)
+PCSC_LITE_URL		:= https://pcsclite.apdu.fr/files/$(PCSC_LITE).$(PCSC_LITE_SUFFIX)
 PCSC_LITE_SOURCE	:= $(SRCDIR)/$(PCSC_LITE).$(PCSC_LITE_SUFFIX)
 PCSC_LITE_DIR		:= $(BUILDDIR)/$(PCSC_LITE)
 PCSC_LITE_BUILD_OOT	:= YES
-# src/spy LICENSE := GPL-3.0+ - but file is not distributed
+# src/spy LICENSE := GPL-3.0-or-later - but file is not distributed
 PCSC_LITE_LICENSE	:= BSD-3-Clause AND BSD-2-Clause AND MIT AND ISC
 
 # ----------------------------------------------------------------------------
@@ -38,10 +36,16 @@ PCSC_LITE_LICENSE	:= BSD-3-Clause AND BSD-2-Clause AND MIT AND ISC
 PCSC_LITE_CONF_TOOL := autoconf
 PCSC_LITE_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
+	--$(call ptx/endis, PTXCONF_PCSC_LITE_SYSTEMD_UNIT)-libsystemd \
+	--disable-serial \
+	--disable-usb \
 	--$(call ptx/endis, PTXCONF_PCSC_LITE_LIBUDEV)-libudev \
 	--disable-libusb \
+	--disable-polkit \
+	--disable-embedded \
 	--enable-usbdropdir=/usr/lib/pcsc \
 	--$(call ptx/endis, PTXCONF_PCSC_LITE_DEBUGATR)-debugatr \
+	--disable-filter \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system
 
 # ----------------------------------------------------------------------------

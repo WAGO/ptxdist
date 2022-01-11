@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Robert Schwebel
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBDAEMON_SUFFIX	:= tar.gz
 LIBDAEMON_URL		:= http://0pointer.de/lennart/projects/libdaemon/$(LIBDAEMON).$(LIBDAEMON_SUFFIX)
 LIBDAEMON_SOURCE	:= $(SRCDIR)/$(LIBDAEMON).$(LIBDAEMON_SUFFIX)
 LIBDAEMON_DIR		:= $(BUILDDIR)/$(LIBDAEMON)
-LIBDAEMON_LICENSE	:= LGPL-2.1+
+LIBDAEMON_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

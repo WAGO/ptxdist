@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Markus Pargmann <mpa@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LIBOPING) += liboping
 #
 # Paths and names
 #
-LIBOPING_VERSION	:= 1.9.0
-LIBOPING_MD5		:= 28d085b95d1ca1acd541fc2606d5e02d
+LIBOPING_VERSION	:= 1.10.0
+LIBOPING_MD5		:= 3a11b18a92b651225da10108242f71a4
 LIBOPING		:= liboping-$(LIBOPING_VERSION)
 LIBOPING_SUFFIX		:= tar.gz
 LIBOPING_URL		:= http://verplant.org/liboping/files/$(LIBOPING).$(LIBOPING_SUFFIX)
 LIBOPING_SOURCE		:= $(SRCDIR)/$(LIBOPING).$(LIBOPING_SUFFIX)
 LIBOPING_DIR		:= $(BUILDDIR)/$(LIBOPING)
-LIBOPING_LICENSE	:= LGPL-2.1+
+LIBOPING_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBNETFILTER_CONNTRACK_SUFFIX	:= tar.bz2
 LIBNETFILTER_CONNTRACK_URL	:= http://ftp.netfilter.org/pub/libnetfilter_conntrack/$(LIBNETFILTER_CONNTRACK).$(LIBNETFILTER_CONNTRACK_SUFFIX)
 LIBNETFILTER_CONNTRACK_SOURCE	:= $(SRCDIR)/$(LIBNETFILTER_CONNTRACK).$(LIBNETFILTER_CONNTRACK_SUFFIX)
 LIBNETFILTER_CONNTRACK_DIR	:= $(BUILDDIR)/$(LIBNETFILTER_CONNTRACK)
-LIBNETFILTER_CONNTRACK_LICENSE	:= GPL-2.0
+LIBNETFILTER_CONNTRACK_LICENSE	:= GPL-2.0-only
 
 #
 # autoconf

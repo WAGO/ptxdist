@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Juergen Beisert <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBPCIACCESS) += libpciaccess
 #
 # Paths and names
 #
-LIBPCIACCESS_VERSION	:= 0.13.2
-LIBPCIACCESS_MD5	:= b7c0d3afce14eedca57312a3141ec13a
+LIBPCIACCESS_VERSION	:= 0.16
+LIBPCIACCESS_MD5	:= b34e2cbdd6aa8f9cc3fa613fd401a6d6
 LIBPCIACCESS		:= libpciaccess-$(LIBPCIACCESS_VERSION)
 LIBPCIACCESS_SUFFIX	:= tar.bz2
 LIBPCIACCESS_URL	:= $(call ptx/mirror, XORG, individual/lib/$(LIBPCIACCESS).$(LIBPCIACCESS_SUFFIX))
@@ -43,9 +41,11 @@ endif
 LIBPCIACCESS_CONF_TOOL	:= autoconf
 LIBPCIACCESS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-selective-werror \
 	--disable-strict-compilation \
 	--disable-linux-rom-fallback \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--with-pciids-path=/usr/share \
 	--$(call ptx/wwo, PTXCONF_LIBPCIACCESS_ZLIB)-zlib
 
 # ----------------------------------------------------------------------------

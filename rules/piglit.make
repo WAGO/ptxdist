@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Lucas Stach <l.stach@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,11 +14,11 @@ PACKAGES-$(PTXCONF_PIGLIT) += piglit
 #
 # Paths and names
 #
-PIGLIT_VERSION	:= b29747a00c6a
-PIGLIT_MD5	:= 9b3fe462a692feaf48d6675f5cf59ed3
+PIGLIT_VERSION	:= 2020-02-22-g6c0de1646ec0
+PIGLIT_MD5	:= 7ff7552117bd1e5fc05ed7ab2077b77c
 PIGLIT		:= piglit-$(PIGLIT_VERSION)
-PIGLIT_SUFFIX	:= tar.xz
-PIGLIT_URL	:= http://anongit.freedesktop.org/git/piglit.git;tag=$(PIGLIT_VERSION)
+PIGLIT_SUFFIX	:= tar.gz
+PIGLIT_URL	:= https://gitlab.freedesktop.org/mesa/piglit/-/archive/$(PIGLIT_VERSION)/$(PIGLIT).$(PIGLIT_SUFFIX)
 PIGLIT_SOURCE	:= $(SRCDIR)/$(PIGLIT).$(PIGLIT_SUFFIX)
 PIGLIT_DIR	:= $(BUILDDIR)/$(PIGLIT)
 PIGLIT_LICENSE	:= MIT AND GPLv2+ AND GPLv3 AND LGPLv2
@@ -32,8 +30,8 @@ PIGLIT_LICENSE	:= MIT AND GPLv2+ AND GPLv3 AND LGPLv2
 PIGLIT_BUILD_OOT	:= NO
 PIGLIT_CONF_TOOL	:= cmake
 
-PIGLIT_CONF_OPT	:= $(CROSS_CMAKE_USR) \
-	-DPYTHON_EXECUTABLE:FILEPATH=$(PTXDIST_TOPDIR)/bin/python \
+PIGLIT_CONF_OPT		:= $(CROSS_CMAKE_USR) \
+	-DPYTHON_EXECUTABLE:FILEPATH=$(SYSTEMPYTHON3) \
 	-DPIGLIT_USE_WAFFLE=1 \
 	-DPIGLIT_BUILD_GL_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGL,1,0) \
 	-DPIGLIT_BUILD_GLES1_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGLES1,1,0) \
@@ -41,6 +39,9 @@ PIGLIT_CONF_OPT	:= $(CROSS_CMAKE_USR) \
 	-DPIGLIT_BUILD_GLES3_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGLES3,1,0) \
 	-DPIGLIT_BUILD_CL_TESTS=0 \
 	-DHAVE_LIBCACA:BOOL=NO
+
+PIGLIT_MAKE_ENV		:= \
+	TMPDIR=$(PTXDIST_TEMPDIR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

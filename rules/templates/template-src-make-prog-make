@@ -2,8 +2,6 @@
 #
 # Copyright (C) @YEAR@ by @AUTHOR@
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,7 +15,6 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 # Paths and names
 #
 @PACKAGE@_VERSION	:= @VERSION@
-@PACKAGE@_MD5		:=
 @PACKAGE@		:= @package@-$(@PACKAGE@_VERSION)
 @PACKAGE@_URL		:= file://local_src/@package@
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)

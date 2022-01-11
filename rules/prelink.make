@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ PRELINK_TARBALL	:= prelink_$(PRELINK_VERSION).$(PRELINK_SUFFIX)
 PRELINK_URL	:= $(call ptx/mirror, DEB, pool/main/p/prelink/$(PRELINK_TARBALL))
 PRELINK_SOURCE	:= $(SRCDIR)/$(PRELINK_TARBALL)
 PRELINK_DIR	:= $(BUILDDIR)/$(PRELINK)
-PRELINK_LICENSE	:= GPL-2.0
+PRELINK_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

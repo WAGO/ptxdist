@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,8 +17,8 @@ ptxd_exist() {
 export -f ptxd_exist
 
 ptxd_install_error() {
-	echo Error: "$@"
-	exit 1
+    echo Error: "$@"
+    exit 1
 }
 export -f ptxd_install_error
 
@@ -92,15 +90,8 @@ ptxd_install_resolve_usr_grp() {
 }
 export -f ptxd_install_resolve_usr_grp
 
-ptxd_install_setup() {
-    local image
+ptxd_install_setup_global() {
     local -a nfsroot_dirs
-
-    case "${dst}" in
-	/bin/*|/sbin/*|/lib/*) dst="/usr${dst}" ;;
-	/*|"") ;;
-	*) ptxd_bailout "'dst' must be an absolute path!" ;;
-    esac
 
     nfsroot_dirs=("${ptx_nfsroot}" ${pkg_nfsroot_dirs})
 
@@ -119,11 +110,52 @@ ptxd_install_setup() {
     sdirs=("${nfsroot_dirs[@]}" "${pkg_xpkg_tmp}")
 
     # dirs with separate debug files
-    ddirs=("${nfsroot_dirs[@]}")
-    if [ "$(ptxd_get_ptxconf PTXCONF_DEBUG_PACKAGES)" = "y" -a \
-         "$(ptxd_get_ptxconf PTXCONF_TARGET_DEBUG_OFF)" != "y" ]; then
-	ddirs[${#ddirs[@]}]="${pkg_xpkg_dbg_tmp}"
+    ddirs=()
+    if [ "$(ptxd_get_ptxconf PTXCONF_TARGET_DEBUG_OFF)" != "y" ]; then
+	ddirs=("${nfsroot_dirs[@]}")
+	if [ "$(ptxd_get_ptxconf PTXCONF_DEBUG_PACKAGES)" = "y" ]; then
+	    ddirs[${#ddirs[@]}]="${pkg_xpkg_dbg_tmp}"
+	fi
     fi
+}
+export -f ptxd_install_setup_global
+
+ptxd_install_lock() {
+    local lockfile
+    mkdir -p "${PTXDIST_TEMPDIR}/locks"
+
+    if [ -n "${dst}" ]; then
+	lockfile="${PTXDIST_TEMPDIR}/locks/${dst//\//-}"
+    else
+	lockfile="${PTXDIST_TEMPDIR}/locks/other"
+    fi
+    if [ -n "${dst_lock}" ]; then
+	ptxd_bailout "dst_lock must not be set when ptxd_install_lock() is called"
+    fi
+    exec {dst_lock}>"${lockfile}" &&
+    flock "${dst_lock}"
+}
+export -f ptxd_install_lock
+
+ptxd_install_unlock() {
+    local ret=$?
+
+    if [ -z "${dst_lock}" ]; then
+	ptxd_bailout "dst_lock must be set when ptxd_install_unlock() is called"
+    fi
+    exec {dst_lock}>&-
+    unset dst_lock
+    # propagate the last error after unlocking
+    return "${ret}"
+}
+export -f ptxd_install_unlock
+
+ptxd_install_setup() {
+    case "${dst}" in
+	/bin/*|/sbin/*|/lib/*) dst="/usr${dst}" ;;
+	/*|"") ;;
+	*) ptxd_bailout "${FUNCNAME[${#FUNCNAME[@]}-5]}: 'dst' must be an absolute path!" ;;
+    esac
 
     mod_nfs="$(printf "0%o" $(( 0${mod} & ~06000 )))" &&
     mod_rw="$(printf "0%o" $(( 0${mod} | 0200 )))" &&
@@ -131,7 +163,12 @@ ptxd_install_setup() {
     #
     # mangle user/group
     #
-    ptxd_install_resolve_usr_grp
+    ptxd_install_resolve_usr_grp &&
+
+    #
+    # lock destination to avoid parallel building issues
+    #
+    ptxd_install_lock
 }
 export -f ptxd_install_setup
 
@@ -141,13 +178,10 @@ ptxd_install_setup_src_list() {
 	# if pkg_dir is empty we'll have some some empty entries in
 	# the array, but that's no problem for the "-e" below.
 	#
+	local -a ptxd_reply
+	ptxd_get_alternative_list projectroot "${1}"
 	list=( \
-	    "${PTXDIST_WORKSPACE}/projectroot${PTXDIST_PLATFORMSUFFIX}${1}" \
-	    "${PTXDIST_WORKSPACE}/projectroot${1}${PTXDIST_PLATFORMSUFFIX}" \
-	    "${PTXDIST_PLATFORMCONFIGDIR}/projectroot${1}${PTXDIST_PLATFORMSUFFIX}" \
-	    "${PTXDIST_WORKSPACE}/projectroot${1}" \
-	    "${PTXDIST_PLATFORMCONFIGDIR}/projectroot${1}" \
-	    "${PTXDIST_TOPDIR}/projectroot${1}" \
+	    "${ptxd_reply[@]}" \
 	    "${pkg_pkg_dir:+${pkg_pkg_dir}${1}}" \
 	    "${pkg_dir:+${pkg_dir}${1}}" \
 	    )
@@ -166,12 +200,15 @@ ptxd_install_setup_src() {
 
     if [ "${src}" = "-" -a -n "${dst}" ]; then
 	src="${pkg_pkg_dir}${dst}"
+	gdb_src="${pkg_pkg_dir}/usr/share/gdb/auto-load${dst}-gdb"
+    elif [ "${src#${pkg_pkg_dir}}" != "${src}" ]; then
+	gdb_src="${pkg_pkg_dir}/usr/share/gdb/auto-load${src#${pkg_pkg_dir}}-gdb"
     fi
 
     ptxd_install_setup || return
 
     legacy_src="${src#/usr}"
-    if [ "${legacy_src}" != "${src}" ]; then
+    if [ \( "${cmd}" = "alternative" -o "${cmd}" = "config" \) -a "${legacy_src}" != "${src}" ]; then
 	ptxd_install_setup_src_list "${legacy_src}"
 	if ptxd_get_path "${list[@]}"; then
 	    local tmp
@@ -218,17 +255,82 @@ ptxd_install_setup_src() {
 "
     echo -e "${list[*]}\n"
     IFS="${orig_IFS}"
+    return 1
 }
 export -f ptxd_install_setup_src
 
+ptxd_install_virtfs() {
+    local mod_virtfs="$(( 0${mod} | ${mod_type} ))"
+    local d dir file
+
+    if [ "${PTXCONF_SETUP_NFS_VIRTFS}" != "y" ]; then
+	return
+    fi
+
+    for d in "${ndirs[@]/%/${dst}}"; do
+	dir="${d%/*}/.virtfs_metadata"
+	file="${dir}/${d##*/}"&&
+	mkdir -p "${dir}" &&
+	cat <<- EOF > "${file}"
+	virtfs.uid=${usr}
+	virtfs.gid=${grp}
+	virtfs.mode=${mod_virtfs}
+	EOF
+	if [ -n "${major}" -a -n "${minor}" ]; then
+	    local rdev=$[ ${major} << 8 | ${minor} ] &&
+	    echo "virtfs.rdev=${rdev}" >> "${file}"
+	fi || break
+    done
+}
+export -f ptxd_install_virtfs
+
+ptxd_install_dir_impl() {
+    local mod_type=0040000
+
+    if [ "${dst}" != "" ]; then
+	ptxd_ensure_dir "${dst%/*}"
+    fi &&
+
+    install -m "${mod_nfs}" -d "${ndirs[@]/%/${dst}}" &&
+    install -m "${mod}" -o "${usr}" -g "${grp}" -d "${pdirs[@]/%/${dst}}" &&
+
+    ptxd_install_virtfs
+}
+export -f ptxd_install_dir_impl
+
+ptxd_ensure_dir() {
+    local dst="$1"
+    local usr="0"
+    local grp="0"
+    local mod="0755"
+    local mod_nfs="0755"
+    local mod_rw="0755"
+    local dir no_skip dst_lock
+
+    for dir in "${ndirs[@]/%/${dst}}"; do
+	if [ ! -d "${dir}" -o ! -e "${dir%/*}/.virtfs_metadata/${dir##*/}" ]; then
+	    no_skip=1
+	    break
+	fi
+    done
+    if [ "${no_skip}" != 1 ]; then
+	# just create the rest and continue if virtfs data already exists
+	install -d "${dirs[@]/%/${dst}}" &&
+	return
+    fi &&
+    ptxd_install_lock &&
+    ptxd_install_dir_impl
+    ptxd_install_unlock
+}
+export -f ptxd_ensure_dir
+
 ptxd_install_dir() {
     local sep="$(echo -e "\x1F")"
-    local dst="$1"
+    local dst="${1%/}"
     local usr="$2"
     local grp="$3"
     local mod="$4"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_nfs mod_rw dst_lock
 
     ptxd_install_setup &&
     echo "\
@@ -239,11 +341,10 @@ install directory:
   permissions=${mod}
 " &&
 
-    install -m "${mod_nfs}" -d "${ndirs[@]/%/${dst}}" &&
-    install -m "${mod}" -o "${usr}" -g "${grp}" -d "${pdirs[@]/%/${dst}}" &&
-
-    echo "f${sep}${dst}${sep}${usr}${sep}${grp}${sep}${mod}" >> "${pkg_xpkg_perms}" ||
+    ptxd_install_dir_impl &&
+    echo "d${sep}${dst}${sep}${usr}${sep}${grp}${sep}${mod}" >> "${pkg_xpkg_perms}" ||
     ptxd_install_error "install_dir failed!"
+    ptxd_install_unlock
 }
 export -f ptxd_install_dir
 
@@ -261,8 +362,12 @@ ptxd_install_file_extract_debug() {
     local dbg dir
     local bid=$(ptxd_extract_build_id)
 
+    if [ "${#ddirs[*]}" -eq 0 ]; then
+	return
+    fi
+
     if [ -z "${bid}" ]; then
-	dbg="$(dirname "${dst}")/.debug/.$(basename "${dst}").dbg"
+	dbg="${dst%/*}/.debug/.${dst##*/}.dbg"
     else
 	local path_component=${bid::-38}
 	local name_component=${bid:2:38}
@@ -283,6 +388,7 @@ ptxd_install_file_extract_debug() {
 	    "${CROSS_OBJCOPY}" ${ptxd_install_file_objcopy_args} "${src}" "${tmp}"
 	fi
     fi &&
+    echo "  debug file: ${dbg}" &&
     for dir in "${ddirs[@]}"; do
 	if [ -n "${bid}" -o -e "${dir}${dst}" ]; then
 	    install -D -m 644 "${tmp}" "${dir}/${dbg}"
@@ -313,7 +419,7 @@ ptxd_install_file_strip() {
     esac
 
     files=( "${sdirs[@]/%/${dst}}" )
-    install -d "$(dirname "${files[0]}")" &&
+    install -d "${files[0]%/*}" &&
     "${strip_cmd[@]}" -o "${files[0]}" "${src}" &&
     for (( i=1 ; ${i} < ${#files[@]} ; i=$[i+1] )); do
 	install -m "${mod_rw}" -D "${files[0]}" "${files[${i}]}" || return
@@ -341,8 +447,9 @@ ptxd_install_file_impl() {
     local grp="$4"
     local mod="$5"
     local strip="$6"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_type=0100000
+    local mod_nfs mod_rw dst_lock
+    local gdb_src
 
     ptxd_install_setup_src &&
     echo "\
@@ -351,8 +458,7 @@ install ${cmd}:
   dst=${dst}
   owner=${usr} ${usr_name}
   group=${grp} ${grp_name}
-  permissions=${mod}
-" &&
+  permissions=${mod}" &&
 
     ptxd_exist "${src}" &&
     rm -f "${dirs[@]/%/${dst}}" &&
@@ -371,12 +477,14 @@ install ${cmd}:
     fi &&
 
     if [ -z "${strip}" ]; then
-	if ! readelf -h "${src}" &> /dev/null; then
+	if ! "${CROSS_READELF}" -h "${src}" &> /dev/null; then
 	    strip="n"
 	else
 	    strip="y"
 	fi
     fi &&
+
+    ptxd_ensure_dir "${dst%/*}" &&
 
     case "${strip}" in
 	0|n|no|N|NO)
@@ -399,6 +507,19 @@ Usually, just remove the 6th parameter and everything works fine.
 	    ;;
     esac &&
 
+    if [ "${#ddirs[*]}" -gt 0 -a -n "${gdb_src}" ]; then
+	local gdb_file
+	local ddir="${dst%/*}"
+	for gdb_file in $(ls "${gdb_src}".* 2>/dev/null); do
+	    local gdb_dst="${ddir}/${gdb_file##*/}"
+	    echo "  debug file: ${gdb_dst}" &&
+	    for d in "${ddirs[@]/%/${gdb_dst}}"; do
+		install -m 644 -D "${gdb_file}" "${d}" || break
+	    done
+	done
+    fi &&
+    echo "" &&
+
     # now change to requested permissions
     chmod "${mod_nfs}" "${ndirs[@]/%/${dst}}" &&
     chmod "${mod}"     "${pdirs[@]/%/${dst}}" &&
@@ -406,7 +527,10 @@ Usually, just remove the 6th parameter and everything works fine.
     # now change to requested user and group
     chown "${usr}:${grp}" "${pdirs[@]/%/${dst}}" &&
 
+    ptxd_install_virtfs &&
+
     echo "f${sep}${dst}${sep}${usr}${sep}${grp}${sep}${mod}" >> "${pkg_xpkg_perms}"
+    ptxd_install_unlock
 }
 export -f ptxd_install_file_impl
 
@@ -415,8 +539,9 @@ ptxd_install_ln() {
     local dst="$2"
     local usr="${3:-0}"
     local grp="${4:-0}"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw rel
+    local mod="0777"
+    local mod_type=0120000
+    local mod_nfs mod_rw rel dst_lock
 
     ptxd_install_setup &&
     echo "\
@@ -435,7 +560,7 @@ install link:
     esac &&
 
     rm -f "${dirs[@]/%/${dst}}" &&
-    install -d "${dirs[@]/%/$(dirname "${dst}")}" &&
+    ptxd_ensure_dir "${dst%/*}" &&
     for d in "${ndirs[@]/%/${dst}}"; do
 	ln -s "${rel}${src}" "${d}" || return
     done &&
@@ -443,7 +568,10 @@ install link:
 	ln -s "${src}" "${d}" || return
     done &&
 
+    ptxd_install_virtfs &&
+
     chown --no-dereference "${usr}:${grp}" "${dirs[@]/%/${dst}}"
+    ptxd_install_unlock
 }
 export -f ptxd_install_ln
 
@@ -456,8 +584,13 @@ ptxd_install_mknod() {
     local type="$5"
     local major="$6"
     local minor="$7"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_nfs mod_rw mod_type dst_lock
+
+    case "${type}" in
+	c) mod_type=0020000 ;;
+	b) mod_type=0060000 ;;
+	p) mod_type=0010000 ;;
+    esac &&
 
     ptxd_install_setup &&
     echo "\
@@ -472,13 +605,17 @@ install device node:
 " &&
 
     rm -f "${pdirs[@]/%/${dst}}" &&
-    install -d "${dirs[@]/%/$(dirname "${dst}")}" &&
+    ptxd_ensure_dir "${dst%/*}" &&
     for d in "${pdirs[@]/%/${dst}}"; do
 	mknod -m "${mod}" "${d}" "${type}" ${major} ${minor} || return
     done &&
+    touch "${ndirs[@]/%/${dst}}" &&
     chown "${usr}:${grp}" "${pdirs[@]/%/${dst}}" &&
 
+    ptxd_install_virtfs &&
+
     echo "n${sep}${dst}${sep}${usr}${sep}${grp}${sep}${mod}${sep}${type}${sep}${major}${sep}${minor}" >> "${pkg_xpkg_perms}"
+    ptxd_install_unlock
 }
 export -f ptxd_install_mknod
 
@@ -528,8 +665,7 @@ ptxd_install_replace() {
     local dst="$1"
     local placeholder="$2"
     local value="$3"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_nfs mod_rw dst_lock
 
     ptxd_install_setup &&
     echo "\
@@ -542,6 +678,7 @@ install replace:
     sed -i -e "s,${placeholder//,/\\,},${value//,/\\,},g" "${dirs[@]/%/${dst}}" ||
 
     ptxd_install_error "install_replace failed!"
+    ptxd_install_unlock
 }
 export -f ptxd_install_replace
 
@@ -550,6 +687,7 @@ ptxd_install_script_replace() {
     local placeholder="$2"
     local value="$3"
 
+    ptxd_install_setup &&
     echo "\
 install script replace:
   script=${dst}
@@ -560,6 +698,7 @@ install script replace:
     sed -i -e "s,${placeholder},${value},g" "${pkg_xpkg_control_dir}/${dst}" ||
 
     ptxd_install_error "install_script_replace failed!"
+    ptxd_install_unlock
 }
 export -f ptxd_install_script_replace
 
@@ -567,22 +706,38 @@ ptxd_install_replace_figlet() {
     local dst="$1"
     local placeholder="$2"
     local value="$3"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local escapemode="$4"
+    local mod_nfs mod_rw dst_lock
 
     ptxd_install_setup &&
     echo "\
 install replace figlet:
   file=${dst}
-  '${placeholder}' -> '\`figlet ${value}\`'
+  '${placeholder}' -> '\$(figlet ${value})'
 " &&
 
     ptxd_exist "${dirs[@]/%/${dst}}" &&
-    figlet="$(figlet -d "${PTXDIST_SYSROOT_HOST}/share/figlet" -- "${value}" | \
-	awk '{ gsub("\\\\", "`"); if ($0 !~ "^ *$") printf("%s\\n", $0) }')" && #`
+    ptxd_figlet_helper() {
+	local value="$1"
+	local escapemode="$2"
+	figlet -d "${PTXDIST_SYSROOT_HOST}/share/figlet" -- "${value}" | \
+	case "$escapemode" in
+	    # /etc/issue needs each backslash quoted by another backslash. As
+	    # the string is interpreted by the shell once more below, another
+	    # level of quoting is needed such that every \ in the output of
+	    # figlet needs to be replaced by \\\\. As a \ in sed needs to be
+	    # quoted, too, this results in eight backslashes in the replacement
+	    # string.
+	    etcissue)	sed 's,\\,\\\\\\\\,g';;
+	    *)		;;
+	esac | \
+	awk '{ if ($0 !~ "^ *$") printf("%s\\n", $0) }'  # newlines for sed
+    } &&
+    figlet="$(ptxd_figlet_helper "$value" "$escapemode")" &&
     sed -i -e "s#${placeholder}#${figlet}#g" "${dirs[@]/%/${dst}}" ||
 
     ptxd_install_error "install_replace failed!"
+    ptxd_install_unlock
 }
 export -f ptxd_install_replace_figlet
 
@@ -596,7 +751,7 @@ ptxd_install_generic() {
     local -a stat
     local orig_IFS="${IFS}"
     local IFS=":"
-    stat=( $(stat -c "%u:%g:%a:0x%t:0x%T:%F" "${file}") ) &&
+    stat=( $(stat -c "%u:%g:0%a:0x%t:0x%T:%F" "${file}") ) &&
     IFS="${orig_IFS}"
     local usr="${usr:-${stat[0]}}" &&
     local grp="${grp:-${stat[1]}}" &&
@@ -606,23 +761,23 @@ ptxd_install_generic() {
     local type="${stat[5]}" &&
 
     case "${type}" in
-        "directory")
+	"directory")
 	    ptxd_install_dir "${dst}" "${usr}" "${grp}" "${mod}"
 	    ;;
-        "character special file")
+	"character special file")
 	    ptxd_install_mknod "${dst}" "${usr}" "${grp}" "${mod}" c "${major}" "${minor}"
 	    ;;
-        "block special file")
+	"block special file")
 	    ptxd_install_mknod "${dst}" "${usr}" "${grp}" "${mod}" b "${major}" "${minor}"
 	    ;;
-        "symbolic link")
+	"symbolic link")
 	    local src="$(readlink "${file}")" &&
 	    ptxd_install_ln "${src}" "${dst}" "${usr}" "${grp}"
 	    ;;
-        "regular file"|"regular empty file")
+	"regular file"|"regular empty file")
 	    ptxd_install_file "${file}" "${dst}" "${usr}" "${grp}" "${mod}" "${strip}"
 	    ;;
-        *)
+	*)
 	    echo "Error: File type '${type}' unkown!"
 	    return 1
 	    ;;
@@ -633,13 +788,14 @@ export -f ptxd_install_generic
 ptxd_install_find() {
     local src="${1%/}"
     local dst="${2%/}"
+    dst=${dst:-/}
     local usr="${3#-}"
     local grp="${4#-}"
     local strip="${5}"
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_nfs mod_rw dst_lock
+    local gdb_src
     if [ -z "${glob}" ]; then
-	local glob="-o -print"
+	local -a glob=( "-o" "-print" )
     fi
 
     ptxd_install_setup_src &&
@@ -648,12 +804,13 @@ ptxd_install_find() {
 	echo
 	return
     fi &&
-    test -d "${src}" &&
+    test -d "${src}"
+    ptxd_install_unlock &&
 
     find "${src}" ! -path "${src}" -a \( \
 		-path "*/.svn" -prune -o -path "*/.git" -prune -o \
 		-path "*/.pc" -prune -o -path "*/CVS" -prune \
-		${glob} \) | while read file; do
+		"${glob[@]}" \) | while read file; do
 	local dst_file="${dst}${file#${src}}"
 	ptxd_install_generic "${file}" "${dst_file}" "${usr}" "${grp}" "${strip}" || return
     done
@@ -675,19 +832,25 @@ ptxd_install_glob() {
     local cmd="file"
     local src="${1}"
     local dst="${2}"
+    set +B -f
     local yglob=( ${3} )
     local nglob=( ${4} )
-    local glob
+    set -B +f
+    local -a glob
 
     if [ -n "${3}" ]; then
-	yglob=( "${yglob[@]/#/-o -path }" )
-	glob="${yglob[*]/%/ -print }"
+	local pattern
+	for pattern in "${yglob[@]}"; do
+	    glob=( "${glob[@]}" "-o" "-path" "${pattern}" "-print" )
+	done
     else
-	glob="-o -print"
+	glob=( "-o" "-print" )
     fi
     if [ -n "${4}" ]; then
-	nglob=( "${nglob[@]/#/-o -path }" )
-	glob="${nglob[*]/%/ -prune } ${glob}"
+	local pattern
+	for pattern in "${nglob[@]}"; do
+	    glob=( "-o" "-path" "${pattern}" "-prune" "${glob[@]}" )
+	done
     fi
     shift 4
 
@@ -839,13 +1002,13 @@ ptxd_install_shared() {
     local grp="$4"
     local mod="$5"
     local strip="${6:-y}"
-    local filename="$(basename "${src}")"
+    local filename="${src##*/}"
 
     ptxd_install_file "${src}" "${dst}/${filename}" "${usr}" "${grp}" "${mod}" "${strip}" &&
 
-    find -H "$(dirname "${src}")" -maxdepth 1 -type l | while read file; do
+    find -H "${src%/*}" -maxdepth 1 -type l ! -name "*.so" | while read file; do
 	if [ "$(basename "$(readlink -f "${file}")")" = "${filename}" ]; then
-	    local link="${dst}/$(basename "${file}")"
+	    local link="${dst}/${file##*/}"
 	    ptxd_install_ln "${filename}" "${link}" "${usr}" "${grp}" || return
 	fi
     done
@@ -866,8 +1029,14 @@ ptxd_install_lib() {
 	fi
     fi
 
-    local file="$(for dir in "${pkg_pkg_dir}"${root_dir}{/,/usr/}${lib_dir}; do
-	    find "${dir}" -type f -path "${dir}/${lib}.so*" ! -name "*.debug"; done 2>/dev/null)"
+    local file="$(
+	for dir in "${pkg_pkg_dir}"${root_dir}{/,/usr/}${lib_dir}; do
+	    if [ -d "${dir}" ]; then
+		find "${dir}" -type f -path "${dir}/${lib}.so*" ! -name "*.debug"
+	    fi
+	done | while read f; do
+		grep -q '^INPUT(' "${f}" || echo "${f}"
+	    done)"
 
     if [ ! -f "${file}" ]; then
 	ptxd_install_error "ptxd_lib_install: cannot find library '${lib}'!"
@@ -882,8 +1051,7 @@ export -f ptxd_install_lib
 ptxd_install_run() {
     local script="${pkg_xpkg_control_dir}/${1}"
     local dir
-    local -a dirs ndirs pdirs sdirs ddirs
-    local mod_nfs mod_rw
+    local mod_nfs mod_rw dst_lock
 
     if [ -e "${script}" ]; then
 	ptxd_install_setup &&
@@ -893,13 +1061,14 @@ executing '${pkg_label}.${1}'
 	for dir in "${ndirs[@]}"; do
 	    DESTDIR="${dir}" /bin/sh "${script}"
 	done
+	ptxd_install_unlock
     fi ||
     ptxd_install_error "running '${1}' script failed!"
 }
 export -f ptxd_install_run
 
 ptxd_install_fixup_timestamps() {
-    local timestamp="${PTXDIST_VERSION_YEAR}-${PTXDIST_VERSION_MONTH}-01 UTC"
+    local timestamp="@${SOURCE_DATE_EPOCH}"
     local touch_args
     if touch --help | grep -q -- --no-dereference &> /dev/null; then
 	touch_args="--no-dereference"
@@ -914,6 +1083,9 @@ ptxd_make_xpkg_pkg() {
     local pkg_xpkg_dbg_tmp="$2"
     local pkg_xpkg_cmds="$3"
     local pkg_xpkg_perms="$4"
+    local -a dirs ndirs pdirs sdirs ddirs
+
+    ptxd_install_setup_global &&
 
     . "${pkg_xpkg_cmds}" &&
 

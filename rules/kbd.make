@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Luotao Fu <l.fu@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_KBD) += kbd
 #
 # Paths and names
 #
-KBD_VERSION	:= 2.0.4
-KBD_MD5		:= c69fce737a5fd0fa686cbfc4f611a220
+KBD_VERSION	:= 2.2.0
+KBD_MD5		:= 5b07c5cf73f2a2bdff5a489368969f70
 KBD		:= kbd-$(KBD_VERSION)
 KBD_SUFFIX	:= tar.gz
 KBD_URL		:= $(call ptx/mirror, KERNEL, utils/kbd/$(KBD).$(KBD_SUFFIX))
 KBD_SOURCE	:= $(SRCDIR)/$(KBD).$(KBD_SUFFIX)
 KBD_DIR		:= $(BUILDDIR)/$(KBD)
-KBD_LICENSE	:= GPL-2.0+
+KBD_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,12 +32,13 @@ KBD_LICENSE	:= GPL-2.0+
 #
 KBD_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-tests \
+	--disable-code-coverage \
 	--disable-nls \
 	--disable-rpath \
 	--disable-optional-progs \
 	--disable-libkeymap \
 	--disable-vlock \
+	--disable-tests \
 	--without-libiconv-prefix \
 	--without-libintl-prefix
 

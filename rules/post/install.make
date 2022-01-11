@@ -3,15 +3,13 @@
 # Copyright (C) 2005, 2006, 2007 Robert Schwebel <r.schwebel@pengutronix.de>
 #               2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
 
 install_check =										\
 	CMD="$(strip $(1))";								\
-	if [ ! -f "$(STATEDIR)/$$XPKG.cmds" ]; then					\
+	if [ ! -f "$(PTXDIST_TEMPDIR)/$(notdir $(@)).$$XPKG" ]; then			\
 		echo;									\
 		echo "Error: install_init was not called for package '$$XPKG'!";	\
 		echo "This is probably caused by a typo in the package name of:";	\
@@ -301,14 +299,16 @@ install_replace = \
 # $2: filename
 # $3: placeholder
 # $4: value
+# $5: escape mode (empty or 'etcissue')
 #
 install_replace_figlet = \
 	XPKG=$(subst _,-,$(strip $(1)));							\
 	FILE=$(strip $(2));									\
 	PLACEHOLDER=$(strip $(3));								\
 	VALUE=$(strip $(4));									\
+	ESCAPEMODE=$(strip $(5));									\
 	$(call install_check, install_replace);							\
-	echo "ptxd_install_replace_figlet '$$FILE' '$$PLACEHOLDER' '$$VALUE'" >> "$(STATEDIR)/$$XPKG.cmds"
+	echo "ptxd_install_replace_figlet '$$FILE' '$$PLACEHOLDER' '$$VALUE' '$$ESCAPEMODE'" >> "$(STATEDIR)/$$XPKG.cmds"
 
 #
 # install_script_replace

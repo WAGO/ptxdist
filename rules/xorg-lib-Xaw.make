@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Erwin Rol
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XAW) += xorg-lib-xaw
 #
 # Paths and names
 #
-XORG_LIB_XAW_VERSION	:= 1.0.12
-XORG_LIB_XAW_MD5	:= 7446f5fba888672aad068b29c0928ba3
+XORG_LIB_XAW_VERSION	:= 1.0.13
+XORG_LIB_XAW_MD5	:= e5e06eb14a608b58746bdd1c0bd7b8e3
 XORG_LIB_XAW		:= libXaw-$(XORG_LIB_XAW_VERSION)
 XORG_LIB_XAW_SUFFIX	:= tar.bz2
 XORG_LIB_XAW_URL	:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XAW).$(XORG_LIB_XAW_SUFFIX))

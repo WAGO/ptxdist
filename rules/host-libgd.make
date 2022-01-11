@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008, 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -32,7 +30,7 @@ HOST_LIBGD_AUTOCONF	:= \
 	$(HOST_AUTOCONF) \
 	--without-x \
 	--without-jpeg \
-	--with-png=$(PTXCONF_SYSROOT_HOST) \
+	--with-png=$(PTXDIST_SYSROOT_HOST) \
 	--without-xpm \
 	--without-freetype \
 	--without-fontconfig

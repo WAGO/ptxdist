@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Clemens Gruber <clemens.gruber@pqgruber.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_LIBGPIOD) += libgpiod
 #
 # Paths and names
 #
-LIBGPIOD_VERSION	:= 0.3.1
-LIBGPIOD_MD5		:= c2ddf21b2fd793510e24134694c3d888
+LIBGPIOD_VERSION	:= 1.3
+LIBGPIOD_MD5		:= 70a3d4738495f4ec0c5f3fa6aeb999ed
 LIBGPIOD		:= libgpiod-$(LIBGPIOD_VERSION)
 LIBGPIOD_SUFFIX		:= tar.gz
 LIBGPIOD_URL		:= https://www.kernel.org/pub/software/libs/libgpiod/$(LIBGPIOD).$(LIBGPIOD_SUFFIX)
 LIBGPIOD_SOURCE		:= $(SRCDIR)/$(LIBGPIOD).$(LIBGPIOD_SUFFIX)
 LIBGPIOD_DIR		:= $(BUILDDIR)/$(LIBGPIOD)
-LIBGPIOD_LICENSE	:= LGPL-2.1
+LIBGPIOD_LICENSE	:= LGPL-2.1-only
 LIBGPIOD_LICENSE_FILES	:= file://COPYING;md5=2caced0b25dfefd4c601d92bd15116de
 
 # ----------------------------------------------------------------------------
@@ -34,12 +32,19 @@ LIBGPIOD_CONF_TOOL	:= autoconf
 LIBGPIOD_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--$(call ptx/endis, PTXCONF_LIBGPIOD_TOOLS)-tools \
-	--disable-tests
+	--disable-install-tests \
+	--disable-tests \
+	--$(call ptx/endis, PTXCONF_LIBGPIOD_CXX)-bindings-cxx \
+	--$(call ptx/endis, PTXCONF_LIBGPIOD_PYTHON3)-bindings-python
+
+LIBGPIOD_CONF_ENV := \
+	$(CROSS_ENV) \
+	$(if $(PTXCONF_PYTHON3), ac_cv_path_PYTHON=$(CROSS_PYTHON3))
 
 # libgpiod requires kernel headers >= 4.8
 ifdef PTXCONF_KERNEL_HEADER
 LIBGPIOD_CPPFLAGS	:= \
-	-I$(KERNEL_HEADERS_INCLUDE_DIR)
+	-isystem $(KERNEL_HEADERS_INCLUDE_DIR)
 endif
 
 LIBGPIOD_TOOLS-$(PTXCONF_LIBGPIOD_GPIODETECT)	+= gpiodetect
@@ -68,6 +73,13 @@ $(STATEDIR)/libgpiod.targetinstall:
 		$(call install_copy, libgpiod, 0, 0, 0755, -, \
 			/usr/bin/$$tool); \
 	done
+
+ifdef PTXCONF_LIBGPIOD_CXX
+	@$(call install_lib, libgpiod, 0, 0, 0644, libgpiodcxx)
+endif
+ifdef PTXCONF_LIBGPIOD_PYTHON3
+	@$(call install_glob, libgpiod, 0, 0, -, $(PYTHON3_SITEPACKAGES),, gpiod.*)
+endif
 
 	@$(call install_finish, libgpiod)
 

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by University of Illinois
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,8 @@ HASERL_SUFFIX	:= tar.gz
 HASERL_URL	:= $(call ptx/mirror, SF, haserl/$(HASERL).$(HASERL_SUFFIX))
 HASERL_SOURCE	:= $(SRCDIR)/$(HASERL).$(HASERL_SUFFIX)
 HASERL_DIR	:= $(BUILDDIR)/$(HASERL)
+HASERL_LICENSE	:= GPL-2.0-only
+HASERL_LICENSE_FILES	:= file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f
 
 # ----------------------------------------------------------------------------
 # Prepare

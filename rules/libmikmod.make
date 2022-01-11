@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBMIKMOD_SUFFIX	:= tar.gz
 LIBMIKMOD_URL		:= $(call ptx/mirror, SF, mikmod/$(LIBMIKMOD).$(LIBMIKMOD_SUFFIX))
 LIBMIKMOD_SOURCE	:= $(SRCDIR)/$(LIBMIKMOD).$(LIBMIKMOD_SUFFIX)
 LIBMIKMOD_DIR		:= $(BUILDDIR)/$(LIBMIKMOD)
-LIBMIKMOD_LICENSE	:= LGPL-2.0+
+LIBMIKMOD_LICENSE	:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBGUDEV_SUFFIX		:= tar.xz
 LIBGUDEV_URL		:= https://download.gnome.org/sources/libgudev/$(LIBGUDEV_VERSION)/$(LIBGUDEV).$(LIBGUDEV_SUFFIX)
 LIBGUDEV_SOURCE		:= $(SRCDIR)/$(LIBGUDEV).$(LIBGUDEV_SUFFIX)
 LIBGUDEV_DIR		:= $(BUILDDIR)/$(LIBGUDEV)
-LIBGUDEV_LICENSE	:= LGPL-2.1+
+LIBGUDEV_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

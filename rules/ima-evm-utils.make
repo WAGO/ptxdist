@@ -3,8 +3,6 @@
 # Copyright (C) 2013 by Michael Grzeschik <mgr@pengutronix.de>
 #               2015 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,14 @@ PACKAGES-$(PTXCONF_IMA_EVM_UTILS) += ima-evm-utils
 #
 # Paths and names
 #
-IMA_EVM_UTILS_VERSION	:= 1.0
-IMA_EVM_UTILS_MD5	:= d0e4a4fb92b8fc7c22dfd092c50568ae
+IMA_EVM_UTILS_VERSION	:= 1.1
+IMA_EVM_UTILS_MD5	:= 77455aeee54fdc7a70c733bcb65d33cc
 IMA_EVM_UTILS		:= ima-evm-utils-$(IMA_EVM_UTILS_VERSION)
 IMA_EVM_UTILS_SUFFIX	:= tar.gz
-IMA_EVM_UTILS_URL	:= $(call ptx/mirror, SF, linux-ima/$(IMA_EVM_UTILS).$(IMA_EVM_UTILS_SUFFIX))
+IMA_EVM_UTILS_URL	:= $(call ptx/mirror, SF, linux-ima/ima-evm-utils/$(IMA_EVM_UTILS).$(IMA_EVM_UTILS_SUFFIX))
 IMA_EVM_UTILS_SOURCE	:= $(SRCDIR)/$(IMA_EVM_UTILS).$(IMA_EVM_UTILS_SUFFIX)
 IMA_EVM_UTILS_DIR	:= $(BUILDDIR)/$(IMA_EVM_UTILS)
-IMA_EVM_UTILS_LICENSE	:= LGPL-2.0+
+IMA_EVM_UTILS_LICENSE	:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

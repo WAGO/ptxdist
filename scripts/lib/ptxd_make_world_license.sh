@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -209,6 +207,71 @@ ptxd_make_world_license_write() {
 }
 export -f ptxd_make_world_license_write
 
+ptxd_make_world_license_yaml() {
+    do_echo() {
+	if [ -n "${2}" ]; then
+	    echo "${1} '${2}'"
+	fi
+    }
+    do_list() {
+	if [ -n "${2}" ]; then
+	    echo "${1}"
+	    awk "BEGIN { RS=\" \" } { if (\$1) print \"- '\" \$1 \"'\" }" <<<"${2}"
+	fi
+    }
+    do_echo "name:" "${pkg_label}"
+    do_echo "rulefile:" "${pkg_makefile}"
+    do_echo "menufile:" "${pkg_infile}"
+    do_list "builddeps:" "${pkg_build_deps}"
+    do_list "rundeps:" "${pkg_run_deps}"
+    do_echo "config:" "${pkg_config}"
+    do_echo "version:" "${pkg_version}"
+    do_list "url:" "${pkg_url}"
+    do_echo "md5:" "${pkg_md5}"
+    do_echo "source:" "${pkg_src}"
+    if [ -n "${pkg_md5s}" ]; then
+	echo "md5s:"
+	awk "BEGIN { RS=\" *:\\\\s*\"; FS=\":\" } { if (\$1) print \"- '\" \$1 \"'\" }" <<<"${pkg_md5s}"
+    fi
+    do_list "sources:" "${pkg_srcs}"
+    do_echo "patches:" "${pkg_patch_dir}"
+    if [ "${pkg_patch_series}" != "series" -a -n "${pkg_patch_dir}" ]; then
+	do_echo "series:" "${pkg_patch_series}"
+    fi
+    do_echo "srcdir:" "${pkg_dir}"
+    do_echo "builddir:" "${pkg_build_dir}"
+    do_echo "pkgdir:" "${pkg_pkg_dir}"
+    do_echo "section:" "${pkg_section}"
+    do_echo "licenses:" "${pkg_license}"
+    do_list "license-flags:" "${!pkg_license_flags[*]}"
+    if [ ${#pkg_license_texts[@]} -gt 0 -o ${#pkg_license_texts_guessed[@]} -gt 0 ]; then
+	echo "license-files:"
+    fi
+    local guess="false"
+    for license in "${pkg_license_texts[@]}" - "${pkg_license_texts_guessed[@]}"; do
+	if [ "${license}" = "-" ]; then
+	    guess="true"
+	    continue
+	fi
+	cat << EOF
+  $(basename "${license}"):
+    guessed: ${guess}
+    file: '${license}'
+    md5: '$(sed -n "s/\(.*\)  $(basename "${license}")\$/\1/p" "${pkg_license_dir}/license/MD5SUM")'
+EOF
+    done
+    if [ -e "${pkg_xpkg_map}" ]; then
+	echo "ipkgs:"
+	for xpkg in $(< "${pkg_xpkg_map}"); do
+	    echo "- '${ptx_pkg_dir}/${xpkg}_${pkg_version}_${PTXDIST_IPKG_ARCH_STRING}.ipk'"
+	done
+    fi
+    do_echo "image:" "${image_image}"
+    do_list "pkgs:" "${image_pkgs}"
+    do_list "files:" "${image_files}"
+}
+export -f ptxd_make_world_license_yaml
+
 # Copy all patches according to the series file
 # $1 full path to the series file
 # $2 source directory
@@ -288,12 +351,15 @@ ptxd_create_section_from_license()
     IFS=$'(), '
 
     for license in ${1}; do
+	local deprecated="false"
 	local osi="false"
 	local exception="false"
 	# remove the 'or later' modifier
 	license="${license%+}"
 	if ptxd_make_spdx "${license}"; then
-	    if [ "${osi}" == "true" ]; then
+	    if [ "${deprecated}" == "true" ]; then
+		section[deprecated]="true"
+	    elif [ "${osi}" == "true" ]; then
 		section[osi-conform]="true"
 	    elif [ "${exception}" != "true" ]; then
 		section[misc]="true"
@@ -328,7 +394,9 @@ ptxd_create_section_from_license()
 	echo "${!section[@]}"
 	return 0
     fi
-    if [ "${section[other]}" = "true" ]; then
+    if [ "${section[deprecated]}" = "true" ]; then
+	echo "deprecated"
+    elif [ "${section[other]}" = "true" ]; then
 	echo "other"
     else
 	echo "mixed"
@@ -377,7 +445,8 @@ ptxd_make_world_license_flags() {
 export -f ptxd_make_world_license_flags
 
 ptxd_make_world_license_init() {
-    ptxd_make_world_init || return
+    # use patchin_init for  pkg_patch_dir
+    ptxd_make_world_patchin_init || return
 
     local name
 
@@ -405,7 +474,6 @@ ptxd_make_world_license() {
     local -a pkg_license_texts
     local -a pkg_license_texts_guessed
     local pkg_dot
-    local pkg_tex
     local pkg_dot="${pkg_license_dir}/graph.dot"
     local pkg_tex="${pkg_license_dir}/graph.tex"
 
@@ -445,10 +513,7 @@ checksum of license file '$(ptxd_print_path "${file}")'
 changed: ${md5} -> $(md5sum "${lic}" | sed 's/ .*//')
 "
 	fi &&
-	(
-	cd "${pkg_license_dir}/license" &&
-	md5sum `basename ${lic}` >> MD5SUM 2>/dev/null
-	) &&
+	echo "${md5}  $(basename ${lic})" >> "${pkg_license_dir}/license/MD5SUM" &&
 	if [ -z "${guess}" ]; then
 	    pkg_license_texts[${#pkg_license_texts[@]}]="${lic}"
 	else
@@ -458,8 +523,10 @@ changed: ${md5} -> $(md5sum "${lic}" | sed 's/ .*//')
     done &&
 
     ptxd_make_world_license_write | \
-        sed -e 's/%/\\%/g' > "${pkg_license_dir}/license-report.tex" &&
+	sed -e 's/%/\\%/g' > "${pkg_license_dir}/license-report.tex" &&
     check_pipe_status &&
+
+    ptxd_make_world_license_yaml > "${pkg_license_dir}/license-report.yaml" &&
 
     echo "${pkg_license}" > "${pkg_license_dir}/license-name" &&
     if [ "${#pkg_license_flags[@]}" -gt 0 ]; then
@@ -484,9 +551,9 @@ ptxd_make_world_release() {
     mkdir -p ${pkg_release_dir} &&
 
     # BSP local packages do not have ${pkg_srcs} filled
-    if [[ -z "${pkg_srcs}" && "${pkg_url}" =~ "file://${PTXDIST_WORKSPACE}" && -f "${pkg_url#file://}" ]]; then
+    if [[ -z "${pkg_srcs}" && "${pkg_url}" =~ "file://" && -f "$(ptxd_file_url_path "${pkg_url}")" ]]; then
 	# Use the URL for local archives
-	pkg_srcs="${pkg_url#file://}"
+	pkg_srcs="$(ptxd_file_url_path "${pkg_url}")"
     fi
     if [ -z "${pkg_srcs}" ]; then
 	if [ -z "${pkg_url}" ]; then
@@ -494,10 +561,10 @@ ptxd_make_world_release() {
 	    # does not work, since some packages (udev for example, refer to systemd and has no own sources)
 	    echo "Error: unable to detect source files/archives for package '${pkg_label}'" > "${pkg_release_dir}/source"
 	else
-	    if [[ "${pkg_url}" =~ "file://${PTXDIST_WORKSPACE}" ]]; then
+	    if [[ "${pkg_url}" =~ "file://" ]]; then
 		echo "Note: this package has BSP internal source code" > "${pkg_release_dir}/source"
 	    else
-		if [[ "${pkg_url}" =~ "lndir://${PTXDIST_WORKSPACE}" ]]; then
+		if [[ "${pkg_url}" =~ "lndir://" ]]; then
 		    echo "Note: this package has BSP internal source code" > "${pkg_release_dir}/source"
 		else
 		    echo "Warning: direct/plain sources outside the BSP are unsupported!" > "${pkg_release_dir}/source"

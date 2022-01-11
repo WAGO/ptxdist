@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,12 @@ ptxd_make_world_install_prepare() {
     if [ -z "${pkg_pkg_dir}" ]; then
 	return
     fi &&
+    ptxd_make_world_clean_sysroot &&
     rm -rf -- "${pkg_pkg_dir}" &&
-    mkdir -p -- "${pkg_pkg_dir}"/{etc,{,usr/}{lib,{,s}bin,include,{,share/}{man/man{1,2,3,4,5,6,7,8,9},misc}}}
+    mkdir -p -- "${pkg_pkg_dir}"/{etc,{,usr/}{lib,{,s}bin,include,{,share/}{man/man{1,2,3,4,5,6,7,8,9},misc}}} &&
+    if [ "${pkg_type}" != "target" ]; then
+	ln -s "lib" "${pkg_pkg_dir}/lib64"
+    fi
 }
 export -f ptxd_make_world_install_prepare
 
@@ -67,7 +69,7 @@ ptxd_make_world_install() {
 
     ptxd_make_world_install_prepare &&
 
-    case "${pkg_conf_tool}" in
+    case "${pkg_build_tool}" in
 	python*)
 	cmd=( \
 	    cd "${pkg_build_dir}" '&&' \
@@ -79,12 +81,12 @@ ptxd_make_world_install() {
 	    setup.py \
 	    "${pkg_install_opt}" \
 	)
-        if [ "${pkg_type}" = target ]; then
+	if [ "${pkg_type}" = target ]; then
 	    cmd[${#cmd[@]}]='&&'
 	    cmd[${#cmd[@]}]=ptxd_make_world_install_python_cleanup
 	fi
 	;;
-	meson)
+	ninja)
 	cmd=( \
 	    "${pkg_path}" \
 	    "${pkg_env}" \
@@ -94,6 +96,17 @@ ptxd_make_world_install() {
 	    -C "${pkg_build_dir}" \
 	    "${pkg_install_opt}" \
 	    -j1 \
+	)
+	;;
+	scons)
+	cmd=( \
+	    "${pkg_path}" \
+	    "${pkg_env}" \
+	    "${pkg_make_env}" \
+	    scons \
+	    -C "${pkg_build_dir}" \
+	    "${pkg_make_opt}" \
+	    "${pkg_install_opt}" \
 	)
 	;;
 	*)
@@ -139,16 +152,7 @@ ptxd_make_world_install_unpack() {
     fi &&
     rm -rf -- "${pkg_pkg_dir}" &&
     mkdir -p -- "${ptx_pkg_dir}" &&
-    tar -x -C "${ptx_pkg_dir}" -z -f "${ptx_pkg_dev_dir}/${pkg_pkg_dev}" &&
-
-    # fix rpaths in host/cross tools
-    if [ "${pkg_type}" != "target" ]; then
-	find "${pkg_pkg_dir}" ! -type d -perm /111 -print | while read file; do
-	    if chrpath "${file}" > /dev/null 2>&1; then
-		chrpath --replace "${PTXDIST_SYSROOT_HOST}/lib" "${file}" || return
-	    fi
-	done
-    fi
+    tar -x -C "${ptx_pkg_dir}" -z -f "${ptx_pkg_dev_dir}/${pkg_pkg_dev}"
 }
 export -f ptxd_make_world_install_unpack
 
@@ -183,16 +187,31 @@ ptxd_make_world_install_pack() {
 	xargs -r -0 gawk -f "${PTXDIST_LIB_DIR}/ptxd_make_world_install_mangle_pc.awk" &&
     check_pipe_status &&
 
-    local pkg_sysroot_dir_nolink="$(readlink -f "${pkg_sysroot_dir}")" &&
-    # remove sysroot prefix from paths in la files
-    find "${pkg_pkg_dir}" -name "*.la" -print0 | xargs -r -0 -- \
-	sed -i \
-	-e "/^dependency_libs/s:\( \|-L\|-R\)\(\|${pkg_sysroot_dir}\|${pkg_sysroot_dir_nolink}\|${pkg_pkg_dir}\)/*\(/lib\|/usr/lib\):\1@SYSROOT@\3:g" \
-	-e "/^libdir=/s:\(libdir='\)\(\|${pkg_sysroot_dir}\|${pkg_sysroot_dir_nolink}\|${pkg_pkg_dir}\)/*\(/lib\|/usr/lib\):\1@SYSROOT@\3:g" &&
+    # relocatable rpaths in host/cross tools
+    if [ "${pkg_type}" != "target" ]; then
+	find "${pkg_pkg_dir}" -type f -print | while read file; do
+	    if chrpath "${file}" >& /dev/null; then
+		local rel="$(ptxd_abs2rel "$(dirname "${file}")" "${pkg_pkg_dir}/lib")"
+		chmod +w "${file}" &&
+		if ! chrpath --replace "\${ORIGIN}/${rel}" "${file}" > /dev/null; then
+		    ptxd_bailout "Failed to adjust rpath for '${file}'"
+		fi
+	    fi
+	done || return
+    fi
+
+    # remove la files. They are not needed
+    find "${pkg_pkg_dir}" \( -type f -o -type l \) -name "*.la" -print0 | xargs -r -0 rm &&
     check_pipe_status &&
+
+    local pkg_sysroot_dir_nolink="$(readlink -f "${pkg_sysroot_dir}")" &&
+    local pkg_build_dir_nolink="$(readlink -f "${pkg_build_dir}")" &&
     find "${pkg_pkg_dir}" -name "*.prl" -print0 | xargs -r -0 -- \
-	sed -i \
-	-e "/^QMAKE_PRL_LIBS/s:\( \|-L\|-R\)\(\|${pkg_sysroot_dir}\|${pkg_sysroot_dir_nolink}\|${pkg_pkg_dir}\)/*\(/lib\|/usr/lib\):\1@SYSROOT@\3:g" &&
+	sed -i -E \
+	-e "/^QMAKE_PRL_BUILD_DIR/d" \
+	-e "/^QMAKE_PRL_LIBS/s:(-L|-R)(${pkg_build_dir}|${pkg_build_dir_nolink})[^ ]* ::g" \
+	-e "/^QMAKE_PRL_LIBS/s:(-L|-R)(|${pkg_sysroot_dir}|${pkg_sysroot_dir_nolink}|${pkg_pkg_dir})/*(/lib|/usr/lib) ::g" \
+	-e "/^QMAKE_PRL_LIBS/s:(-L|-R)(|${pkg_sysroot_dir}|${pkg_sysroot_dir_nolink})/*(|/usr)/lib:\1\$\$[QT_INSTALL_LIBS]:g" &&
     check_pipe_status &&
     find "${pkg_pkg_dir}" ! -type d -name "${pkg_binconfig_glob}" -print0 | xargs -r -0 -- \
 	sed -i \
@@ -214,20 +233,31 @@ export -f ptxd_make_world_install_pack
 ptxd_make_world_install_post() {
     ptxd_make_world_init &&
     (
-	find "${pkg_pkg_dir}"/usr/{lib,share}/pkgconfig -name *.pc \
-	    -printf "%f\n" 2>/dev/null | sed 's/\.pc$//'
+	if [ -n "${pkg_pkg_dir}" -a -d "${pkg_pkg_dir}" ]; then
+	    find "${pkg_pkg_dir}"{,/usr}/{lib,share}/pkgconfig -name *.pc \
+		-printf "%f\n" 2>/dev/null | sed 's/\.pc$//'
+	elif [ "${pkg_type}" != "target" -a -n "${pkg_build_dir}" -a -d "${pkg_build_dir}" ]; then
+	    # workaround for packages that install directly to sysroot
+	    find "${pkg_build_dir}" -name *.pc \
+		-printf "%f\n" 2>/dev/null | sed 's/\.pc$//'
+	fi
 	for dep in ${pkg_build_deps}; do
-	    cat "${ptx_state_dir}/${dep}.pkgconfig" 2>/dev/null;
+	    case "${dep}" in
+		host-*|cross-*)
+		    if [ "${pkg_type}" = "target" ]; then
+			continue
+		    fi
+		    ;&
+		*)
+		    cat "${ptx_state_dir}/${dep}.pkgconfig" 2>/dev/null
+		    ;;
+	    esac
 	done
     ) | sort -u > "${ptx_state_dir}/${pkg_label}.pkgconfig"
     # do nothing if pkg_pkg_dir does not exist
     if [ \! -d "${pkg_pkg_dir}" ]; then
 	return
     fi &&
-    # prefix paths in la files with sysroot
-    find "${pkg_pkg_dir}" \( -name "*.la" -o -name "*.prl" \) -print0 | xargs -r -0 -- \
-	sed -i -e "s:@SYSROOT@:${pkg_sysroot_dir}:g" &&
-    check_pipe_status &&
 
     # fix *-config and copy into sysroot_cross for target packages
     local config &&
@@ -238,9 +268,11 @@ ptxd_make_world_install_post() {
 	fi
     done &&
 
-    # create directories first to avoid race contitions with -jeX
-    find "${pkg_pkg_dir}" -type d -printf "%P\0" | \
-	xargs -0 -I{} mkdir -p "${pkg_sysroot_dir}/{}" &&
+    if [ ! -e "${ptx_pkg_dir}/.${pkg_label}" -o -h "${ptx_pkg_dir}/.${pkg_label}" ]; then
+	ln -sfT $(basename "${pkg_pkg_dir}") "${ptx_pkg_dir}/.${pkg_label}"
+    fi &&
+    # avoid writing to sysroot in parallel with -jeX/-jX
+    flock "${pkg_sysroot_dir}" \
     cp -dpr --link --remove-destination -- "${pkg_pkg_dir}"/* "${pkg_sysroot_dir}" &&
 
     # host and cross packages

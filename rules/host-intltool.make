@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by mol@pengutronix.de
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ HOST_INTLTOOL_SUFFIX	:= tar.gz
 HOST_INTLTOOL_URL	:= http://launchpad.net/intltool/trunk/0.50.0/+download/$(HOST_INTLTOOL).$(HOST_INTLTOOL_SUFFIX)
 HOST_INTLTOOL_SOURCE	:= $(SRCDIR)/$(HOST_INTLTOOL).$(HOST_INTLTOOL_SUFFIX)
 HOST_INTLTOOL_DIR	:= $(HOST_BUILDDIR)/$(HOST_INTLTOOL)
-HOST_INTLTOOL_LICENSE	:= GPL-2.0
+HOST_INTLTOOL_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -41,7 +39,7 @@ HOST_INTLTOOL_CONF_TOOL	:= autoconf
 $(STATEDIR)/host-intltool.install.post:
 	@$(call targetinfo)
 	@$(call world/install.post, HOST_INTLTOOL)
-	@sed -i "s;^prefix=$$;prefix=$(PTXCONF_SYSROOT_HOST);" $(PTXCONF_SYSROOT_HOST)/bin/intltoolize
+	@sed -i "s;^prefix=$$;prefix=$(PTXDIST_SYSROOT_HOST);" $(PTXDIST_SYSROOT_HOST)/bin/intltoolize
 	@$(call touch)
 
 # vim: syntax=make

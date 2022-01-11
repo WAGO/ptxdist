@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ NSS_MDNS_SUFFIX		:= tar.gz
 NSS_MDNS_URL		:= http://0pointer.de/lennart/projects/nss-mdns/$(NSS_MDNS).$(NSS_MDNS_SUFFIX)
 NSS_MDNS_SOURCE		:= $(SRCDIR)/$(NSS_MDNS).$(NSS_MDNS_SUFFIX)
 NSS_MDNS_DIR		:= $(BUILDDIR)/$(NSS_MDNS)
-NSS_MDNS_LICENSE	:= LGPL-2.1+
+NSS_MDNS_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

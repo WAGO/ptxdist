@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Uwe Kleine-Koenig <u.kleine-koenig@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ PYGOBJECT_SUFFIX	:= tar.gz
 PYGOBJECT_URL		:= http://ftp.gnome.org/pub/GNOME/sources/pygobject/$(basename $(PYGOBJECT_VERSION))/$(PYGOBJECT).$(PYGOBJECT_SUFFIX)
 PYGOBJECT_SOURCE	:= $(SRCDIR)/$(PYGOBJECT).$(PYGOBJECT_SUFFIX)
 PYGOBJECT_DIR		:= $(BUILDDIR)/$(PYGOBJECT)
-PYGOBJECT_LICENSE	:= LGPL-2.1+
+PYGOBJECT_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

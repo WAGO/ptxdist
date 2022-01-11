@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -14,6 +12,7 @@
 PACKAGES-$(PTXCONF_USR_ROOTFS) += usr-rootfs
 
 USR_ROOTFS_VERSION	:= 1.0
+USR_ROOTFS_LICENSE	:= ignore
 
 # ----------------------------------------------------------------------------
 # Target-Install

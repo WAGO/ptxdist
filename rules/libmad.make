@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBMAD_SUFFIX	:= tar.gz
 LIBMAD_URL	:= ftp://ftp.mars.org/pub/mpeg/$(LIBMAD).$(LIBMAD_SUFFIX)
 LIBMAD_SOURCE	:= $(SRCDIR)/$(LIBMAD).$(LIBMAD_SUFFIX)
 LIBMAD_DIR	:= $(BUILDDIR)/$(LIBMAD)
-LIBMAD_LICENSE	:= GPL-2.0+
+LIBMAD_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

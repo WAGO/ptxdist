@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006-2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,13 +14,13 @@ PACKAGES-$(PTXCONF_GTK2) += gtk2
 #
 # Paths and names
 #
-GTK2_VERSION	:= 2.24.25
-GTK2_MD5		:= 612350704dd3aacb95355a4981930c6f
+GTK2_VERSION	:= 2.24.32
+GTK2_MD5	:= d5742aa42275203a499b59b4c382a784
 GTK2		:= gtk+-$(GTK2_VERSION)
 GTK2_SUFFIX	:= tar.xz
-GTK2_URL		:= ftp://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/$(GTK2).$(GTK2_SUFFIX)
+GTK2_URL	:= ftp://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/$(GTK2).$(GTK2_SUFFIX)
 GTK2_SOURCE	:= $(SRCDIR)/$(GTK2).$(GTK2_SUFFIX)
-GTK2_DIR		:= $(BUILDDIR)/$(GTK2)
+GTK2_DIR	:= $(BUILDDIR)/$(GTK2)
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,10 +38,21 @@ GTK2_CONF_TOOL	:= autoconf
 GTK2_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-static \
-	--enable-explicit-deps=yes \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-debug \
+	--disable-shm \
+	--enable-xkb \
+	--disable-xinerama \
+	--disable-rebuilds \
+	--enable-explicit-deps \
 	--disable-glibtest \
 	--disable-modules \
-	--disable-rebuilds \
+	--disable-introspection \
+	--disable-gtk-doc \
+	--disable-gtk-doc-html \
+	--disable-gtk-doc-pdf \
+	--disable-man \
+	--without-xinput \
 	--with-gdktarget=$(PTXCONF_GTK2_TARGET)
 
 # ----------------------------------------------------------------------------

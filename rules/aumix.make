@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,11 +21,15 @@ AUMIX_SUFFIX	:= tar.bz2
 AUMIX_URL	:= $(call ptx/mirror, SF, aumix/$(AUMIX).$(AUMIX_SUFFIX))
 AUMIX_SOURCE	:= $(SRCDIR)/$(AUMIX).$(AUMIX_SUFFIX)
 AUMIX_DIR	:= $(BUILDDIR)/$(AUMIX)
-AUMIX_LICENSE	:= GPL-2.0
+AUMIX_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+AUMIX_CONF_ENV := \
+	$(CROSS_ENV) \
+	ac_cv_path_MSGMERGE=:
 
 #
 # autoconf

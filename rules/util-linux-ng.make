@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Robert Schwebel
 #               2010 by Marc Kleine-Budde <mkl@penutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,20 +15,20 @@ PACKAGES-$(PTXCONF_UTIL_LINUX_NG) += util-linux-ng
 #
 # Paths and names
 #
-UTIL_LINUX_NG_VERSION	:= 2.30.2
-UTIL_LINUX_NG_MD5	:= 23a5dce0030144a42676b92310026bac
+UTIL_LINUX_NG_VERSION	:= 2.36
+UTIL_LINUX_NG_MD5	:= fe7c0f7e439f08970e462c9d44599903
 UTIL_LINUX_NG		:= util-linux-$(UTIL_LINUX_NG_VERSION)
 UTIL_LINUX_NG_SUFFIX	:= tar.xz
-UTIL_LINUX_NG_BASENAME	:= v$(shell echo $(UTIL_LINUX_NG_VERSION) | sed -e 's/\([0-9]*\.[0-9]*\)[\.[0-9]*]\?/\1/g')
+UTIL_LINUX_NG_BASENAME	:= v$(call ptx/sh, echo $(UTIL_LINUX_NG_VERSION) | sed -e 's/\([0-9]*\.[0-9]*\)[^0-9].*\?/\1/g')
 UTIL_LINUX_NG_URL	:= $(call ptx/mirror, KERNEL, utils/util-linux/$(UTIL_LINUX_NG_BASENAME)/$(UTIL_LINUX_NG).$(UTIL_LINUX_NG_SUFFIX))
 UTIL_LINUX_NG_SOURCE	:= $(SRCDIR)/$(UTIL_LINUX_NG).$(UTIL_LINUX_NG_SUFFIX)
 UTIL_LINUX_NG_DIR	:= $(BUILDDIR)/$(UTIL_LINUX_NG)
-UTIL_LINUX_NG_LICENSE	:= GPL-2.0, GPL-2.0+, GPL-3.0+, LGPL-2.0+, BSD-3-Clause, BSD-4-Clause, public_domain
+UTIL_LINUX_NG_LICENSE	:= GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later AND BSD-3-Clause AND BSD-4-Clause AND public_domain
 UTIL_LINUX_NG_LICENSE_FILES := \
-	file://Documentation/licenses/COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
-	file://Documentation/licenses/COPYING.BSD-3;md5=58dcd8452651fc8b07d1f65ce07ca8af \
-	file://Documentation/licenses/COPYING.UCB;md5=263860f8968d8bafa5392cab74285262 \
-	file://Documentation/licenses/COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c
+	file://Documentation/licenses/COPYING.GPL-2.0-or-later;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://Documentation/licenses/COPYING.BSD-3-Clause;md5=58dcd8452651fc8b07d1f65ce07ca8af \
+	file://Documentation/licenses/COPYING.BSD-4-Clause-UC;md5=263860f8968d8bafa5392cab74285262 \
+	file://Documentation/licenses/COPYING.LGPL-2.1-or-later;md5=4fbd65380cdd255951079008b364516c
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -52,8 +50,12 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--bindir=/usr/bin \
 	--sbindir=/usr/sbin \
+	--disable-werror \
+	--disable-asan \
+	--disable-ubsan \
 	--enable-shared \
 	--disable-static \
+	--enable-symvers \
 	--disable-gtk-doc \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-assert \
@@ -64,11 +66,13 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--enable-tls \
 	--disable-widechar \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBUUID)-libuuid \
+	--disable-libuuid-force-uuidd \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBBLKID)-libblkid \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBMOUNT)-libmount \
 	--disable-libmount-support-mtab \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBSMARTCOLS)-libsmartcols \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LIBFDISK)-libfdisk \
+	$(call ptx/ifdef, PTXCONF_UTIL_LINUX_NG_FDISKS,,--disable-fdisks) \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_MOUNT)-mount \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LOSETUP)-losetup \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_ZRAMCTL)-zramctl \
@@ -80,6 +84,7 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--disable-unshare \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_NSENTER)-nsenter \
 	--disable-setpriv \
+	--disable-hardlink \
 	--disable-eject \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_AGETTY)-agetty \
 	--disable-plymouth_support \
@@ -89,7 +94,7 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--disable-fdformat \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_HWCLOCK)-hwclock \
 	--disable-lslogins \
-	--disable-wdctl \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_WDCTL)-wdctl \
 	--disable-cal \
 	--disable-logger \
 	--disable-switch_root \
@@ -98,6 +103,9 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_CHMEM)-chmem \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_IPCRM)-ipcrm \
 	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_IPCS)-ipcs \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_IRQTOP)-irqtop \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LSIRQ)-lsirq \
+	--disable-rfkill \
 	--disable-tunelp \
 	--disable-kill \
 	--disable-last \
@@ -106,17 +114,16 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--disable-mesg \
 	--disable-raw \
 	--disable-rename \
-	--disable-reset \
 	--disable-vipw \
 	--disable-newgrp \
 	--disable-chfn-chsh-password \
 	--disable-chfn-chsh \
 	--disable-chsh-only-listed \
-	--disable-login \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_LOGIN)-login \
 	--disable-login-chown-vcs \
 	--disable-login-stat-mail \
 	--disable-nologin \
-	--disable-sulogin \
+	--$(call ptx/endis, PTXCONF_UTIL_LINUX_NG_SULOGIN)-sulogin \
 	--disable-su \
 	--disable-runuser \
 	--disable-ul \
@@ -148,12 +155,14 @@ UTIL_LINUX_NG_CONF_OPT	:= \
 	--without-readline \
 	--without-utempter \
 	--without-cap-ng \
+	--without-libmagic \
 	--without-libz \
 	--without-user \
 	--without-btrfs \
 	--without-systemd \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system \
 	--without-smack \
+	--without-econf \
 	--without-python
 
 # ----------------------------------------------------------------------------
@@ -197,6 +206,9 @@ endif
 ifdef PTXCONF_UTIL_LINUX_NG_LINE
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/line)
 endif
+ifdef PTXCONF_UTIL_LINUX_NG_GETOPT
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/getopt)
+endif
 ifdef PTXCONF_UTIL_LINUX_NG_DMESG
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/dmesg)
 endif
@@ -234,6 +246,9 @@ endif
 ifdef PTXCONF_UTIL_LINUX_NG_UMOUNT
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/umount)
 endif
+ifdef PTXCONF_UTIL_LINUX_NG_FLOCK
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/flock)
+endif
 ifdef PTXCONF_UTIL_LINUX_NG_FSCK
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/sbin/fsck)
 endif
@@ -245,6 +260,12 @@ ifdef PTXCONF_UTIL_LINUX_NG_FSTRIM
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_IPCS
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/ipcs)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_IRQTOP
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/irqtop)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_LSIRQ
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/lsirq)
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_IPCRM
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/ipcrm)
@@ -269,6 +290,9 @@ ifdef PTXCONF_UTIL_LINUX_NG_CHRT
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_HWCLOCK
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/sbin/hwclock)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_WDCTL
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/wdctl)
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_IONICE
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/ionice)
@@ -305,6 +329,15 @@ ifdef PTXCONF_UTIL_LINUX_NG_ZRAMCTL
 endif
 ifdef PTXCONF_UTIL_LINUX_NG_MKFS
 	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/sbin/mkfs)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_LSCPU
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/lscpu)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_LOGIN
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/bin/login)
+endif
+ifdef PTXCONF_UTIL_LINUX_NG_SULOGIN
+	@$(call install_copy, util-linux-ng, 0, 0, 0755, -, /usr/sbin/sulogin)
 endif
 
 	@$(call install_finish, util-linux-ng)

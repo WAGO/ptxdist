@@ -1,0 +1,2 @@
+0001-disable-Werror-as-it-tends-to-break-with-new-gcc-ver.patch
+0002-riscv-retval-workaround.patch

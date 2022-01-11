@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ PSLIB_SUFFIX	:= tar.gz
 PSLIB_URL	:= $(call ptx/mirror, SF, pslib/$(PSLIB).$(PSLIB_SUFFIX))
 PSLIB_SOURCE	:= $(SRCDIR)/$(PSLIB).$(PSLIB_SUFFIX)
 PSLIB_DIR	:= $(BUILDDIR)/$(PSLIB)
-PSLIB_LICENSE	:= LGPL-2.0+
+PSLIB_LICENSE	:= LGPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -31,7 +29,11 @@ PSLIB_LICENSE	:= LGPL-2.0+
 
 PSLIB_CONF_ENV	:= \
 	$(CROSS_ENV) \
-	ac_cv_prog_DOC_TO_MAN=
+	ac_cv_prog_DOC_TO_MAN= \
+	ac_cv_path_INTLTOOL_UPDATE=: \
+	ac_cv_path_INTLTOOL_MERGE=: \
+	ac_cv_path_INTLTOOL_EXTRACT=:
+
 #
 # autoconf
 #

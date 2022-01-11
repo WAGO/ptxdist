@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2005-2008 by Robert Schwebel
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,13 +14,17 @@ PACKAGES-$(PTXCONF_WGET) += wget
 #
 # Paths and names
 #
-WGET_VERSION	:= 1.19.1
-WGET_MD5	:= 87cea36b7161fd43e3fd51a4e8b89689
+WGET_VERSION	:= 1.20
+WGET_MD5	:= 9f1515d083b769e9ff7642ce6016518e
 WGET		:= wget-$(WGET_VERSION)
 WGET_SUFFIX	:= tar.gz
 WGET_URL	:= $(call ptx/mirror, GNU, wget/$(WGET).$(WGET_SUFFIX))
 WGET_SOURCE	:= $(SRCDIR)/$(WGET).$(WGET_SUFFIX)
 WGET_DIR	:= $(BUILDDIR)/$(WGET)
+WGET_LICENSE	:= GPL-3.0-or-later
+WGET_LICENSE_FILES := \
+	file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e \
+	file://src/main.c;startline=1;endline=28;md5=7b27873e910933ba54fa16589c4b8eed
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,7 +39,8 @@ WGET_ENV := \
 #
 # autoconf
 #
-WGET_AUTOCONF := \
+WGET_CONF_TOOL := autoconf
+WGET_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-opie \
 	--enable-digest \
@@ -54,11 +57,11 @@ WGET_AUTOCONF := \
 	--disable-pcre \
 	--disable-xattr \
 	--without-libpsl \
-	--without-ssl \
-	--without-zlib \
+	--with-ssl=$(call remove_quotes, $(PTXCONF_WGET_SSL)) \
+	--$(call ptx/wwo, PTXCONF_WGET_ZLIB)-zlib \
 	--with-metalink \
 	--without-cares \
-	--without-openssl \
+	--$(call ptx/wwo, PTXCONF_WGET_SSL_OPENSSL)-openssl \
 	--with-included-libunistring \
 	--without-included-regex \
 	--with-libidn=/usr \

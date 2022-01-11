@@ -1,4 +1,4 @@
-## SECTION=image2
+## SECTION=image
 
 menuconfig IMAGE_HDIMG
 	bool
@@ -11,9 +11,16 @@ menuconfig IMAGE_HDIMG
 	help
 	  Build a harddisk root image. The image will contain one partition
 	  containing the root.ext2 and a corresponding partition table. The
-	  image will bpe made bootable with the bootloader specified below.
+	  image will be made bootable with the bootloader specified below.
 
 if IMAGE_HDIMG
+
+config IMAGE_HDIMG_GPT
+	bool
+	prompt "GPT partition table"
+	help
+	  If selected then the image will be created with a GPT partition table.
+	  Otherwise a MBR partition table will be created.
 
 choice
 	prompt "bootloader"

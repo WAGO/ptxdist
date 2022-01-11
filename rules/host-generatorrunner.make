@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -46,8 +44,8 @@ HOST_GENERATORRUNNER_CONF_OPT	:= \
 $(STATEDIR)/host-generatorrunner.install.post:
 	@$(call targetinfo)
 	@$(call world/install.post, HOST_GENERATORRUNNER)
-	@sed -i -e 's,\(GENERATORRUNNER_PLUGIN_DIR "\)$(PTXCONF_SYSROOT_HOST),\1,g' \
-		'$(PTXCONF_SYSROOT_HOST)/lib/cmake/GeneratorRunner-$(HOST_GENERATORRUNNER_VERSION)/GeneratorRunnerConfig.cmake'
+	@sed -i -e 's,\(GENERATORRUNNER_PLUGIN_DIR "\)$(PTXDIST_SYSROOT_HOST),\1,g' \
+		'$(PTXDIST_SYSROOT_HOST)/lib/cmake/GeneratorRunner-$(HOST_GENERATORRUNNER_VERSION)/GeneratorRunnerConfig.cmake'
 	@$(call touch)
 
 # vim: syntax=make

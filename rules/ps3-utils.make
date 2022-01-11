@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Remy Bohmer <linux@bohmer.net>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,7 +16,7 @@ PACKAGES-$(PTXCONF_ARCH_PPC)-$(PTXCONF_PS3_UTILS) += ps3-utils
 #
 PS3_UTILS_VERSION	:= 2.3
 PS3_UTILS_MD5		:= 40ec16f4a7612c67c0ef5ea1828d1c7f
-PS3_UTILS_LICENSE	:= GPL-2.0
+PS3_UTILS_LICENSE	:= GPL-2.0-only
 PS3_UTILS		:= ps3-utils-$(PS3_UTILS_VERSION)
 PS3_UTILS_SUFFIX	:= tar.gz
 PS3_UTILS_URL		:= $(call ptx/mirror, KERNEL, kernel/people/geoff/cell/ps3-utils/$(PS3_UTILS).$(PS3_UTILS_SUFFIX))

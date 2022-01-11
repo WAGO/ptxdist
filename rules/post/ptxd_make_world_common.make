@@ -2,18 +2,11 @@
 #
 # Copyright (C) 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
 
 ptx/env = \
-	MAKE="$(call ptx/escape,$(MAKE))"					\
-	PTXDIST_SYSROOT_TARGET="$(call ptx/escape,$(PTXDIST_SYSROOT_TARGET))"	\
-	PTXDIST_SYSROOT_HOST="$(call ptx/escape,$(PTXDIST_SYSROOT_HOST))"	\
-	PTXDIST_SYSROOT_CROSS="$(call ptx/escape,$(PTXDIST_SYSROOT_CROSS))"	\
-										\
 	ptx_nfsroot="$(call ptx/escape,$(ROOTDIR))"				\
 										\
 	ptx_extract_dir_target="$(call ptx/escape,$(BUILDDIR))"			\
@@ -56,6 +49,10 @@ ptx/env = \
 	ptx_install_opt_python_host="$(call ptx/escape,$(HOST_PYTHON_INSTALL))"	\
 										\
 	ptx_conf_opt_meson_target="$(call ptx/escape,$(CROSS_MESON_USR))"	\
+	ptx_conf_env_meson_target="$(call ptx/escape,$(CROSS_MESON_ENV))"	\
+										\
+	ptx_conf_opt_meson_host="$(call ptx/escape,$(HOST_MESON_OPT))"		\
+	ptx_conf_env_meson_host="$(call ptx/escape,$(HOST_ENV))"		\
 										\
 	ptx_xpkg_extra_args=$(PTXCONF_IMAGE_XPKG_EXTRA_ARGS)
 
@@ -65,17 +62,27 @@ world/env/impl = \
 	pkg_pkg_dev="$(call ptx/escape,$($(1)_DEVPKG))"				\
 	pkg_license="$(call ptx/escape,$($(1)_LICENSE))"			\
 	pkg_build_deps="$(call ptx/escape,$(PTX_MAP_B_dep_$(1)))"		\
+	pkg_build_deps_all="$(call ptx/escape,$(PTX_MAP_B_dep_all_$(1)))"	\
 	pkg_run_deps="$(call ptx/escape,$(PTX_MAP_R_dep_$(1)))"			\
+	pkg_run_deps_all="$(call ptx/escape,$(PTX_MAP_R_dep_all_$(1)))"		\
 	pkg_license_files="$(call ptx/escape,$($(1)_LICENSE_FILES))"		\
+	pkg_makefile="$(call ptx/escape,$($(1)_MAKEFILE))"			\
+	pkg_infile="$(call ptx/escape,$($(1)_INFILE))"				\
 										\
 	pkg_pkg="$(call ptx/escape,$($(1)))"					\
 	pkg_version="$(call ptx/escape,$($(1)_VERSION))"			\
 	pkg_config="$(call ptx/escape,$($(1)_CONFIG))"				\
+	pkg_ref_config="$(call ptx/escape,$($(1)_REF_CONFIG))"			\
 	pkg_path="$(call ptx/escape,$($(1)_PATH))"				\
+	pkg_patch_series="$(call ptx/escape,$(call remove_quotes, $(PTXCONF_$(strip $(1))_SERIES)))"\
+	pkg_patch_dir="$(call ptx/escape,$($(1)_PATCH_DIR))"			\
 	pkg_src="$(call ptx/escape,$($(1)_SOURCE))"				\
 	pkg_srcs="$(call ptx/escape,$($(1)_SOURCES))"				\
+	pkg_md5s="$(call ptx/escape,$(foreach s,$($(1)_SOURCES),$($($(s))_MD5):))"\
 	pkg_md5="$(call ptx/escape,$($(1)_MD5))"				\
 	pkg_url="$(call ptx/escape,$($(1)_URL))"				\
+	pkg_cfghash="$(call ptx/escape,$($(1)_CFGHASH))"			\
+	pkg_srchash="$(call ptx/escape,$($(1)_EXTRACT_CFGHASH))"		\
 										\
 	pkg_dir="$(call ptx/escape,$($(1)_DIR))"				\
 	pkg_subdir="$(call ptx/escape,$($(1)_SUBDIR))"				\

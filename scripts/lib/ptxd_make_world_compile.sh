@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,7 +15,7 @@ ptxd_make_world_compile() {
 	# no build dir -> assume the package has nothing to build.
 	return
     fi &&
-    case "${pkg_conf_tool}" in
+    case "${pkg_build_tool}" in
 	python*)
 	(
 	ptxd_eval \
@@ -27,15 +25,25 @@ ptxd_make_world_compile() {
 	    "${pkg_make_env}" \
 	    "${ptx_build_python}" \
 	    setup.py \
-	    "${pkg_make_opt}"
+	    "${pkg_make_opt}" \
+	    "${pkg_make_par}"
 	)
 	;;
-	meson)
+	ninja)
 	ptxd_eval \
 	    "${pkg_path}" \
 	    "${pkg_env}" \
 	    "${pkg_make_env}" \
 	    ninja -C "${pkg_build_dir}" \
+	    "${pkg_make_opt}" \
+	    "${pkg_make_par}"
+	;;
+	scons)
+	ptxd_eval \
+	    "${pkg_path}" \
+	    "${pkg_env}" \
+	    "${pkg_make_env}" \
+	    scons -C "${pkg_build_dir}" \
 	    "${pkg_make_opt}" \
 	    "${pkg_make_par}"
 	;;

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by George McCollister <george.mccollister@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -33,12 +31,12 @@ HOST_OPENSSL_CONF_ENV	:= $(HOST_ENV)
 # no ':=' here
 HOST_OPENSSL_CONF_OPT = \
 	--prefix=/ \
-	--install_prefix=$(HOST_OPENSSL_PKGDIR) \
 	--libdir=/lib \
 	shared
 
 HOST_OPENSSL_INSTALL_OPT := \
-	install_sw
+	install_sw \
+	install_ssldirs
 
 #
 # Follow the directions in INSTALL section 1a.

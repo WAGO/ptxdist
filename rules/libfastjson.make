@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Clemens Gruber <clemens.gruber@pqgruber.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBFASTJSON) += libfastjson
 #
 # Paths and names
 #
-LIBFASTJSON_VERSION	:= 0.99.4
-LIBFASTJSON_MD5		:= 5a24c9adcd0bf5307c972de5e9ea4ce9
+LIBFASTJSON_VERSION	:= 0.99.8
+LIBFASTJSON_MD5		:= 730713ad1d851def7ac8898f751bbfdd
 LIBFASTJSON		:= libfastjson-$(LIBFASTJSON_VERSION)
 LIBFASTJSON_SUFFIX	:= tar.gz
 LIBFASTJSON_URL		:= https://codeload.github.com/rsyslog/libfastjson/$(LIBFASTJSON_SUFFIX)/v$(LIBFASTJSON_VERSION)

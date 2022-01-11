@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -14,7 +12,7 @@ world/compile = \
 
 compile = \
 	+$(call world/env, $(1)) \
-	pkg_make_opt="$(2)" \
+	pkg_make_opt="$(call ptx/escape,$(2))" \
 	ptxd_make_world_compile
 
 $(STATEDIR)/%.compile:

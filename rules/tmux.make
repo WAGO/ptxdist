@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Bernhard Walle <bernhard@bwalle.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ TMUX_SUFFIX	:= tar.gz
 TMUX_URL	:= https://github.com/tmux/tmux/releases/download/$(TMUX_VERSION)/$(TMUX).$(TMUX_SUFFIX)
 TMUX_SOURCE	:= $(SRCDIR)/$(TMUX).$(TMUX_SUFFIX)
 TMUX_DIR	:= $(BUILDDIR)/$(TMUX)
-TMUX_LICENSE	:= BSD
+TMUX_LICENSE	:= ISC
 
 # ----------------------------------------------------------------------------
 # Prepare

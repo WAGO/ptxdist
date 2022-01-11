@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by Robert Schwebel
 #               2008, 2009, 2010, 2016 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,15 +15,17 @@ PACKAGES-$(PTXCONF_LIBPCRE) += libpcre
 #
 # Paths and names
 #
-LIBPCRE_VERSION	:= 8.40
-LIBPCRE_MD5	:= 41a842bf7dcecd6634219336e2167d1d
+LIBPCRE_VERSION	:= 8.44
+LIBPCRE_MD5	:= cf7326204cc46c755b5b2608033d9d24
 LIBPCRE		:= pcre-$(LIBPCRE_VERSION)
 LIBPCRE_SUFFIX	:= tar.bz2
-LIBPCRE_URL	:= $(call ptx/mirror, SF, pcre/$(LIBPCRE).$(LIBPCRE_SUFFIX))
+LIBPCRE_URL	:= \
+	$(call ptx/mirror, SF, pcre/$(LIBPCRE).$(LIBPCRE_SUFFIX)) \
+	https://ftp.pcre.org/pub/pcre/$(LIBPCRE).$(LIBPCRE_SUFFIX)
 LIBPCRE_SOURCE	:= $(SRCDIR)/$(LIBPCRE).$(LIBPCRE_SUFFIX)
 LIBPCRE_DIR	:= $(BUILDDIR)/$(LIBPCRE)
 LIBPCRE_LICENSE	:= BSD-3-Clause
-LIBPCRE_LICENSE_FILES := file://LICENCE;md5=60da32d84d067f53e22071c4ecb4384d
+LIBPCRE_LICENSE_FILES := file://LICENCE;md5=3bb381a66a5385b246d4877922e7511e
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,16 +34,39 @@ LIBPCRE_LICENSE_FILES := file://LICENCE;md5=60da32d84d067f53e22071c4ecb4384d
 #
 # autoconf
 #
-LIBPCRE_AUTOCONF := \
+LIBPCRE_CONF_TOOL	:= autoconf
+LIBPCRE_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--enable-pcre8 \
+	--enable-pcre16 \
+	--enable-pcre32 \
+	--$(call ptx/endis, PTXCONF_LIBPCRE_LIBPCRECPP)-cpp \
+	--disable-jit \
+	--enable-pcregrep-jit \
+	--disable-rebuild-chartables \
+	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_UTF8)-utf \
+	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_UTF8)-unicode-properties \
+	--disable-newline-is-cr \
+	--$(call ptx/disen, PTXCONF_LIBPCRE_ENABLE_NEWLINE_IS_ANYCRLF)-newline-is-lf \
+	--disable-newline-is-crlf \
+	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_NEWLINE_IS_ANYCRLF)-newline-is-anycrlf \
+	--disable-newline-is-any \
+	--disable-bsr-anycrlf \
+	--disable-ebcdic \
+	--disable-ebcdic-nl25 \
+	--enable-stack-for-recursion \
 	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_PCREGREP_LIBZ)-pcregrep-libz \
 	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_PCREGREP_LIBBZ2)-pcregrep-libbz2 \
-	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_UTF8)-utf8 \
-	--$(call ptx/endis, PTXCONF_LIBPCRE_ENABLE_UTF8)-unicode-properties \
-
-ifdef PTXCONF_LIBPCRE_ENABLE_NEWLINE_IS_ANYCRLF
-LIBPCRE_AUTOCONF += --enable-newline-is-anycrlf
-endif
+	--disable-pcretest-libedit \
+	--disable-pcretest-libreadline \
+	--disable-valgrind \
+	--disable-coverage \
+	--with-pcregrep-bufsize=20480 \
+	--with-posix-malloc-threshold=10 \
+	--with-link-size=2 \
+	--with-parens-nest-limit=250 \
+	--with-match-limit=10000000 \
+	--with-match-limit-recursion=10000000
 
 # ----------------------------------------------------------------------------
 # Target-Install

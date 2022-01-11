@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XTRANS) += xorg-lib-xtrans
 #
 # Paths and names
 #
-XORG_LIB_XTRANS_VERSION	:= 1.3.5
-XORG_LIB_XTRANS_MD5	:= c5ba432dd1514d858053ffe9f4737dd8
+XORG_LIB_XTRANS_VERSION	:= 1.4.0
+XORG_LIB_XTRANS_MD5	:= ce2fb8100c6647ee81451ebe388b17ad
 XORG_LIB_XTRANS		:= xtrans-$(XORG_LIB_XTRANS_VERSION)
 XORG_LIB_XTRANS_SUFFIX	:= tar.bz2
 XORG_LIB_XTRANS_URL	:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XTRANS).$(XORG_LIB_XTRANS_SUFFIX))

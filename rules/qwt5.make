@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009,2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,15 +14,15 @@ PACKAGES-$(PTXCONF_QWT5) += qwt5
 #
 # Paths and names
 #
-QWT5_VERSION	:= 6.1.3
-QWT5_MD5	:= 19d1f5fa5e22054d22ee3accc37c54ba
+QWT5_VERSION	:= 6.1.5
+QWT5_MD5	:= d65582f99312796ed42c3be3208ed3db
 QWT5		:= qwt-$(QWT5_VERSION)
 QWT5_SUFFIX	:= tar.bz2
 QWT5_URL	:= $(call ptx/mirror, SF, qwt/$(QWT5).$(QWT5_SUFFIX))
 QWT5_SOURCE	:= $(SRCDIR)/$(QWT5).$(QWT5_SUFFIX)
 QWT5_DIR	:= $(BUILDDIR)/$(QWT5)
 QWT5_BUILD_OOT	:= YES
-QWT5_LICENSE	:= LGPL-2.1, QWT-1.0
+QWT5_LICENSE	:= LGPL-2.1-only AND QWT-1.0
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,6 +35,9 @@ QWT5_CONF_OPT	:= $(CROSS_QMAKE_OPT) TARGET_TEMPLATE=lib
 ifdef PTXCONF_QWT5_SVG
 QWT5_CONF_OPT += QWT5_CONFIG+=QwtSvg
 endif
+
+QWT5_MAKE_ENV := \
+	ICECC_REMOTE_CPP=0
 
 # ----------------------------------------------------------------------------
 # Target-Install

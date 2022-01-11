@@ -4,8 +4,6 @@
 #                       Pengutronix <info@pengutronix.de>, Germany
 #               2007, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,8 +16,8 @@ PACKAGES-$(PTXCONF_EXPAT) += expat
 #
 # Paths and names
 #
-EXPAT_VERSION	:= 2.2.4
-EXPAT_MD5	:= 6e3980aba29a224a9f478d88ac7ec207
+EXPAT_VERSION	:= 2.2.9
+EXPAT_MD5	:= 875a2c2ff3e8eb9e5a5cd62db2033ab5
 EXPAT		:= expat-$(EXPAT_VERSION)
 EXPAT_SUFFIX	:= tar.bz2
 EXPAT_URL	:= $(call ptx/mirror, SF, expat/$(EXPAT).$(EXPAT_SUFFIX))
@@ -38,9 +36,13 @@ EXPAT_CONF_TOOL	:= autoconf
 EXPAT_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-static \
+	--enable-xml-attr-info \
 	--enable-xml-context \
 	--without-xmlwf \
-	--without-libbsd
+	--without-examples \
+	--without-tests \
+	--without-libbsd \
+	--without-docbook
 
 # ----------------------------------------------------------------------------
 # Target-Install

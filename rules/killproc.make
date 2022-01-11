@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ KILLPROC_SUFFIX		:= tar.gz
 KILLPROC_URL		:= http://ftp.suse.com/pub/projects/init/$(KILLPROC).$(KILLPROC_SUFFIX)
 KILLPROC_SOURCE		:= $(SRCDIR)/$(KILLPROC).$(KILLPROC_SUFFIX)
 KILLPROC_DIR		:= $(BUILDDIR)/$(KILLPROC)
-KILLPROC_LICENSE	:= GPL-2.0
+KILLPROC_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

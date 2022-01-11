@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Sascha Hauer
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ SCREEN_SUFFIX	:= tar.gz
 SCREEN_URL	:= $(call ptx/mirror, GNU, screen/$(SCREEN).$(SCREEN_SUFFIX))
 SCREEN_SOURCE	:= $(SRCDIR)/$(SCREEN).$(SCREEN_SUFFIX)
 SCREEN_DIR	:= $(BUILDDIR)/$(SCREEN)
-SCREEN_LICENSE	:= GPL-2.0+
+SCREEN_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

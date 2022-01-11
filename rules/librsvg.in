@@ -5,6 +5,7 @@ menuconfig LIBRSVG
 	prompt "librsvg                       "
 	select GTK
 	select LIBXML2
+	select LIBXML2_PUSH
 	select LIBGSF	if LIBRSVG_SVGZ
 	select LIBCROCO	if LIBRSVG_CROCO
 	help
@@ -30,6 +31,7 @@ config LIBRSVG_SVGZ
 
 config LIBRSVG_CROCO
 	bool
+	depends on STAGING
 	prompt "libcroco support"
 	help
 	  Libcroco is a general CSS parsing and manipulation library.

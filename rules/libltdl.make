@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006-2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #          
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBLTDL_URL	:= $(call ptx/mirror, GNU, libtool/$(LIBLTDL).$(LIBLTDL_SUFFIX))
 LIBLTDL_SOURCE	:= $(SRCDIR)/$(LIBLTDL).$(LIBLTDL_SUFFIX)
 LIBLTDL_DIR	:= $(BUILDDIR)/$(LIBLTDL)
 # License for libltdl only
-LIBLTDL_LICENSE	:= LGPL-2.0+
+LIBLTDL_LICENSE	:= LGPL-2.0-or-later
 LIBLTDL_LICENSE_FILES := \
 	file://libltdl/COPYING.LIB;md5=4fbd65380cdd255951079008b364516c
 

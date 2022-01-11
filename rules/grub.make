@@ -1,8 +1,6 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2002-2009 by Pengutronix e.K., Hildesheim, Germany
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -37,8 +35,8 @@ GRUB_ENV	:= $(CROSS_ENV) CFLAGS=''
 GRUB_CFLAGS	:= -fgnu89-inline
 
 GRUB_WRAPPER_BLACKLIST := \
-	TARGET_HARDEN_PIE \
-	TARGET_BUILD_ID
+	$(PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST)
+
 GRUB_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
 	--without-curses \

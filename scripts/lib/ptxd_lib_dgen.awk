@@ -4,8 +4,6 @@
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,8 +17,13 @@ BEGIN {
 	DGEN_DEPS_PRE		= ENVIRON["PTX_DGEN_DEPS_PRE"];
 	DGEN_DEPS_POST		= ENVIRON["PTX_DGEN_DEPS_POST"];
 	DGEN_RULESFILES_MAKE	= ENVIRON["PTX_DGEN_RULESFILES_MAKE"];
+	OPTIMIZE_IO		= ENVIRON["PTXDIST_OPTIMIZE_IO"]
 	PTXDIST_TEMPDIR		= ENVIRON["PTXDIST_TEMPDIR"];
 	PARALLEL		= ENVIRON["PTXDIST_PARALLELMFLAGS_EXTERN"]
+	DIRTY			= ENVIRON["PTXDIST_DIRTY"];
+	PTXDIST_OLD_MAKE	= ENVIRON["PTXDIST_OLD_MAKE"];
+	DEP			= DIRTY == "true" ? "|" : ""
+	PTXDIST_HASHLIST	= PTXDIST_TEMPDIR "/pkghash.list"
 	CHECK_LICENSES		= 0
 }
 
@@ -34,7 +37,7 @@ FNR == 1 {
 	move_argc = ARGIND;
 
 	#
-	# "include" all mafile files which are _not_ pkgs explicidly
+	# "include" all makefile files which are _not_ pkgs explicitly.
 	# the make files which are actually pkgs will be "include"d
 	# in the END rule
 	#
@@ -43,17 +46,20 @@ FNR == 1 {
 
 	# remember the current opened file
 	old_filename = FILENAME;
+	lineno = 0;
 
 	# will be set later, if makefile belongs to a pkg
 	is_pkg = "";
 }
 
-
+/^/ {
+	lineno += 1;
+}
 
 #
 # skip comments and empty lines
 #
-/^\#|^$/ {
+/^#|^$/ {
 	next;
 }
 
@@ -79,13 +85,27 @@ $0 ~ /^include[[:space:]]+\/.*\.make$/ {
 
 
 #
+# warn user if an image, host, or cross package contains a targetinstall rule
+# which will not be executed
+#
+$1 ~ /^\$\(STATEDIR\)\/(image-.*|host-.*|cross-.*)\.targetinstall(.post)?:/ {
+	match($0, /\$\(STATEDIR\)\/((image-.*|host-.*|cross-.*)\.targetinstall(.post)?):/, m);
+	print "\nError in " old_filename " line " lineno ":\n" \
+		"  '" m[1] "' stage will be ignored.\n" \
+		"  See section 'Rule File Layout' in the PTXdist reference for more info:\n" \
+		"  https://www.ptxdist.org/doc/ref_manual.html#rule-file-layout"
+	exit 1;
+}
+
+
+#
 # parse "PACKAGES-$(PTXCONF_PKG) += pkg" lines, i.e. rules-files from
 # rules/*.make. Setup mapping between upper and lower case pkg names
 #
 # out:
 # PKG_to_pkg		array that maps from upper case to lower case pkg name
 # pkg_to_PKG		array that maps from lower case to upper case pkg name
-# PKG_to_filename	array that maps from upper case pkg name to filename
+# PKG_to_makefile	array that maps from upper case pkg name to makefile name
 #
 $1 ~ /^[A-Z_]*PACKAGES-/ {
 	this_PKG = gensub(/^[A-Z_]*PACKAGES-\$\(PTXCONF_([^\)]*)\)/, "\\1", "g", $1);
@@ -104,7 +124,7 @@ $1 ~ /^[A-Z_]*PACKAGES-/ {
 	pkg_to_PKG[this_pkg] = this_PKG;
 	# make sure each file is only included once
 	if (FILENAME) {
-		PKG_to_filename[this_PKG] = FILENAME;
+		PKG_to_makefile[this_PKG] = FILENAME;
 		FILENAME = "";
 	}
 
@@ -124,11 +144,11 @@ $1 ~ /^PTX_MAP_._DEP/ {
 	this_PKG = gensub(/PTX_MAP_._DEP_/, "", "g", $1);
 	dep_type = gensub(/PTX_MAP_(.)_DEP_.*/, "\\1", "g", $1);
 
-	# no pkg
-	if (!(this_PKG in PKG_to_pkg))
+	if ($2 ~ /\<VIRTUAL\>/)
+		virtual_pkg[this_PKG] = 1
+	else if (!(this_PKG in PKG_to_pkg)) # no pkg
 		next;
 
-	this_DEP = $2
 	n = split($2, this_DEP_array, ":");
 
 	# no deps
@@ -139,13 +159,8 @@ $1 ~ /^PTX_MAP_._DEP/ {
 	for (i = 1; i <= n; i++) {
 		this_DEP = this_DEP_array[i];
 
-		if (this_DEP ~ /^VIRTUAL$/) {
-			virtual_pkg[this_PKG] = 1
+		if (this_DEP ~ /^VIRTUAL$/)
 			continue;
-		}
-
-		if (!(this_DEP in PKG_to_pkg))
-			continue
 
 		if (this_DEP ~ /^BASE$/) {
 			base_PKG_to_pkg[this_PKG] = PKG_to_pkg[this_PKG];
@@ -173,12 +188,26 @@ $1 ~ /^PTX_MAP_._DEP/ {
 	next;
 }
 
+$1 ~ /^PTX_MAP_._SOURCE/ {
+	this_PKG = gensub(/PTX_MAP_._SOURCE_/, "", "g", $1);
+	if (this_PKG in PKG_to_pkg) {
+		if (index($2, "/") != 1)
+			tmp = PTXDIST_TEMPDIR "/kconfig/" $2;
+		else
+			tmp = $2
+		PKG_to_infile[this_PKG] = tmp;
+	}
+	next;
+}
 
 #
 # parse the ptx- and platformconfig
 # record yes and module packages
 #
 $1 ~ /^PTXCONF_/ {
+	if (old_filename ~ /.+\/rules\/.+\.make/)
+		next;
+
 	this_PKG = gensub(/^PTXCONF_/, "", "g", $1);
 
 	if ($2 ~ /^[ym]$/ && this_PKG in PKG_to_pkg)
@@ -188,44 +217,61 @@ $1 ~ /^PTXCONF_/ {
 		CHECK_LICENSES = 1;
 
 	do {
-		if (this_PKG in PKG_to_pkg) {
-			next_PKG_HASHFILE = PTXDIST_TEMPDIR "/pkghash-" this_PKG;
-			if (next_PKG_HASHFILE != PKG_HASHFILE) {
-				close(PKG_HASHFILE);
-				PKG_HASHFILE = next_PKG_HASHFILE;
+		if (this_PKG in PKG_to_pkg || this_PKG in virtual_pkg) {
+			PKG_HASHFILE = PTXDIST_TEMPDIR "/pkghash-" this_PKG;
+			if (PTXDIST_OLD_MAKE) {
+				if (PKG_HASHFILE != last_PKG_HASHFILE) {
+					close(last_PKG_HASHFILE);
+					last_PKG_HASHFILE = PKG_HASHFILE;
+				}
 			}
-			print $0 >> PKG_HASHFILE;
+			if (!($0 in allsym)) {
+				if (PTXDIST_OLD_MAKE)
+					print $0 >> PKG_HASHFILE;
+				else {
+					print "ifdef PTXDIST_SETUP_ONCE"			> DGEN_DEPS_POST;
+					print "$(file >>" PKG_HASHFILE "," $1 "=$(" $1 "))"	> DGEN_DEPS_POST;
+					print "endif"						> DGEN_DEPS_POST;
+				}
+			}
 			break;
 		}
 	} while (sub(/_+[^_]+$/, "", this_PKG));
 
+	allsym[$0] = 1
+
 	next;
 }
 
-function write_include(this_PKG) {
+function write_vars_all(this_PKG) {
 	#
 	# include this rules file
 	#
-	if (this_PKG in PKG_to_filename)
-		print "include " PKG_to_filename[this_PKG]		> DGEN_RULESFILES_MAKE;
+	if (this_PKG in PKG_to_makefile) {
+		print "include " PKG_to_makefile[this_PKG]		> DGEN_RULESFILES_MAKE;
+		print this_PKG "_MAKEFILE = " PKG_to_makefile[this_PKG]> DGEN_DEPS_PRE;
+	}
+	if (this_PKG in PKG_to_infile) {
+		print this_PKG "_INFILE = " PKG_to_infile[this_PKG]	> DGEN_DEPS_PRE;
+	}
+}
+
+function pkg_dep(this_PKG, dep_type) {
+	if (dep_type == "R")
+		return PKG_to_R_DEP[this_PKG];
+	else
+		return PKG_to_B_DEP[this_PKG];
 }
 
 function write_maps(this_PKG, dep_type) {
-	if (dep_type == "R")
-		this_PKG_DEP = PKG_to_R_DEP[this_PKG];
-	else
-		this_PKG_DEP = PKG_to_B_DEP[this_PKG];
-
+	this_PKG_DEP = pkg_dep(this_PKG, dep_type);
 	if (this_PKG_DEP == "")
 		return;
 
 	n = split(this_PKG_DEP, this_DEP_array, " ");
 	for (i = 1; i <= n; i++) {
 		if (this_DEP_array[i] in virtual_pkg) {
-			if (dep_type == "R")
-				virtual_PKG_DEP = PKG_to_R_DEP[this_DEP_array[i]];
-			else
-				virtual_PKG_DEP = PKG_to_B_DEP[this_DEP_array[i]];
+			virtual_PKG_DEP = pkg_dep(this_DEP_array[i], dep_type);
 			this_PKG_DEP = this_PKG_DEP " " virtual_PKG_DEP
 		}
 	}
@@ -237,7 +283,11 @@ function write_maps(this_PKG, dep_type) {
 	for (i = 1; i <= n; i++) {
 		if (last ==  this_DEP_array[i])
 			continue
-		if (this_DEP_array[i] in virtual_pkg)
+		if (this_DEP_array[i] in virtual_pkg) {
+			print "RULES: " this_PKG " " PTXDIST_TEMPDIR "/pkghash-" this_DEP_array[i] > PTXDIST_HASHLIST
+			continue
+		}
+		if (!(this_DEP_array[i] in PKG_to_pkg))
 			continue
 		this_PKG_DEP = this_PKG_DEP " " this_DEP_array[i];
 		this_PKG_dep = this_PKG_dep " " PKG_to_pkg[this_DEP_array[i]];
@@ -249,9 +299,44 @@ function write_maps(this_PKG, dep_type) {
 	else
 		 PKG_to_B_DEP[this_PKG]= this_PKG_DEP;
 
+	if (this_PKG_DEP == "")
+		return;
+
 	print "PTX_MAP_" dep_type "_DEP_" this_PKG "=" this_PKG_DEP	> MAP_DEPS;
 	print "PTX_MAP_" dep_type "_dep_" this_PKG "=" this_PKG_dep	> MAP_DEPS;
 	print "PTX_MAP_" dep_type "_dep_" this_PKG "=" this_PKG_dep	> MAP_ALL_MAKE;
+}
+
+function pkg_all_deps(this_PKG, dep_type, n, this_PKG_dep, this_DEP_array) {
+	if (this_PKG in PKG_to_dep_all)
+		return PKG_to_dep_all[this_PKG];
+
+	this_PKG_dep = ""
+	n = split(pkg_dep(this_PKG, dep_type), this_DEP_array, " ");
+	for (i = 1; i <= n; i++)
+		this_PKG_dep = this_PKG_dep " " PKG_to_pkg[this_DEP_array[i]] " " pkg_all_deps(this_DEP_array[i], dep_type)
+	n = split(this_PKG_dep, this_DEP_array, " ");
+	asort(this_DEP_array, this_DEP_array);
+	this_PKG_dep = ""
+	last = ""
+	for (i = 1; i <= n; i++) {
+		if (last == this_DEP_array[i])
+			continue
+		this_PKG_dep = this_PKG_dep " " this_DEP_array[i];
+		last = this_DEP_array[i]
+	}
+	PKG_to_dep_all[this_PKG] = this_PKG_dep;
+	return this_PKG_dep;
+}
+
+function write_all_deps(dep_type, PKG_to_dep_all) {
+	for (this_PKG in PKG_to_pkg) {
+		this_PKG_dep = pkg_all_deps(this_PKG, dep_type);
+		if (this_PKG_dep == "")
+			continue;
+		print "PTX_MAP_" dep_type "_dep_all_" this_PKG "=" this_PKG_dep	> MAP_DEPS;
+		print "PTX_MAP_" dep_type "_dep_all_" this_PKG "=" this_PKG_dep	> MAP_ALL_MAKE;
+	}
 }
 
 function write_vars_pkg_all(this_PKG, this_pkg, prefix) {
@@ -280,6 +365,7 @@ function write_vars_pkg_all(this_PKG, this_pkg, prefix) {
 	# define default ${PKG}, ${PKG}_SOURCE, ${PKG}_DIR
 	if ((prefix != "") && (target_PKG in PKG_to_pkg)) {
 		print this_PKG " = $(" target_PKG ")"			> DGEN_DEPS_PRE;
+		print this_PKG "_VERSION = $(" target_PKG "_VERSION)"	> DGEN_DEPS_PRE;
 		print this_PKG "_MD5 = $(" target_PKG "_MD5)"		> DGEN_DEPS_PRE;
 		print this_PKG "_SOURCE = $(" target_PKG "_SOURCE)"	> DGEN_DEPS_PRE;
 		print this_PKG "_URL = $(" target_PKG "_URL)"		> DGEN_DEPS_PRE;
@@ -305,16 +391,79 @@ function write_deps_pkg_all(this_PKG, this_pkg) {
 	print "endif" > DGEN_DEPS_POST;
 }
 
+function write_deps_pkg_active_cfghash(this_PKG, this_pkg) {
+	if (this_PKG in PKG_to_infile)
+		print "RULES: " this_PKG " " PKG_to_infile[this_PKG]						> PTXDIST_HASHLIST;
+	if (this_PKG in PKG_to_makefile)
+		print "RULES: " this_PKG " " PKG_to_makefile[this_PKG]						> PTXDIST_HASHLIST;
+
+	print "ifneq ($(" this_PKG "),)"									> DGEN_DEPS_POST;
+	print "ifneq ($(" this_PKG "_PATCHES),)"								> DGEN_DEPS_POST;
+	print this_PKG "_PATCH_DIR := $(call ptx/in-path,PTXDIST_PATH_PATCHES,$(" this_PKG "_PATCHES))"		> DGEN_DEPS_POST;
+	print "else"												> DGEN_DEPS_POST;
+	print this_PKG "_PATCH_DIR := $(call ptx/in-path,PTXDIST_PATH_PATCHES,$(" this_PKG "))"			> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "ifeq ($(" this_PKG "_PATCH_DIR),)"								> DGEN_DEPS_POST;
+	print "undefine " this_PKG "_PATCH_DIR"									> DGEN_DEPS_POST;
+	print "else"												> DGEN_DEPS_POST;
+	print "ifdef PTXDIST_SETUP_ONCE"									> DGEN_DEPS_POST;
+	print "PTXDIST_HASHLIST_DATA += PATCHES: " this_PKG " $(" this_PKG "_PATCH_DIR)\\n"			> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "ifneq ($(" this_PKG "_SOURCE),)"									> DGEN_DEPS_POST;
+	print "ifdef PTXDIST_SETUP_ONCE"									> DGEN_DEPS_POST;
+	print "_tmp := $(" this_PKG "_MD5) $(notdir $(" this_PKG "_SOURCE))"					> DGEN_DEPS_POST;
+	print "$(file >>" PTXDIST_TEMPDIR "/pkghash-" this_PKG ",$(_tmp))"					> DGEN_DEPS_POST;
+	print "$(file >>" PTXDIST_TEMPDIR "/pkghash-" this_PKG "_EXTRACT,$(_tmp))"				> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "ifdef PTXDIST_SETUP_ONCE"									> DGEN_DEPS_POST;
+	print this_PKG "_CONFIG := $(" this_PKG "_CONFIG)"							> DGEN_DEPS_POST;
+	print "ifeq ($(" this_PKG "_CONFIG),)"									> DGEN_DEPS_POST;
+	print "undefine " this_PKG "_CONFIG"									> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "ifneq ($(filter /%,$(" this_PKG "_CONFIG)),)"							> DGEN_DEPS_POST;
+	print "ifneq ($(wildcard $(" this_PKG "_CONFIG)),)"							> DGEN_DEPS_POST;
+	print "PTXDIST_HASHLIST_DATA += CONFIG: " this_PKG " $(" this_PKG "_CONFIG)\\n"				> DGEN_DEPS_POST;
+	print "else"												> DGEN_DEPS_POST;
+	if (this_pkg_prefix != "image-")
+		print "$(STATEDIR)/" this_pkg ".prepare: "            "$(" this_PKG "_CONFIG)"			> DGEN_DEPS_POST;
+	else
+		print "$(" this_PKG "_IMAGE): "                       "$(" this_PKG "_CONFIG)"			> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+}
+
 function write_deps_pkg_active(this_PKG, this_pkg, prefix) {
 	#
 	# default deps
 	#
+	target_PKG = gensub(/^HOST_|^CROSS_/, "", 1, this_PKG);
+	if (prefix != "" && target_PKG in active_PKG_to_pkg)
+		print "ifneq ($(" this_PKG "_SOURCE),$(" target_PKG "_SOURCE))"					> DGEN_DEPS_POST;
 	print "$(if $(" this_PKG "_SOURCE),$(eval $(" this_PKG "_SOURCE) := " this_PKG "))"			> DGEN_DEPS_POST;
+	if (prefix != "" && target_PKG in active_PKG_to_pkg)
+		print "endif"											> DGEN_DEPS_POST;
 	print "$(foreach src,$(" this_PKG "_SOURCES)," \
 		"$(eval $(STATEDIR)/" this_pkg ".get:"      "$(STATEDIR)/" this_pkg ".$(notdir $(src)).stamp))"	> DGEN_DEPS_POST;
+	if (DIRTY != "true") {
+		print "ifeq ($(" this_PKG "_EXTRACT_CFGHASH),)"							> DGEN_DEPS_POST;
+		print this_PKG "_EXTRACT_CFGHASH := 00000000000000000000000000000000"				> DGEN_DEPS_POST;
+		print "endif"											> DGEN_DEPS_POST;
+		print "$(STATEDIR)/" this_pkg ".extract: " \
+					"$(STATEDIR)/" this_pkg ".$(" this_PKG "_EXTRACT_CFGHASH).srchash"	> DGEN_DEPS_POST;
+	}
 	print "$(STATEDIR)/" this_pkg ".extract: "                    "$(STATEDIR)/" this_pkg ".get"		> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".extract.post: "               "$(STATEDIR)/" this_pkg ".extract"	> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".prepare: "                    "$(STATEDIR)/" this_pkg ".extract.post"	> DGEN_DEPS_POST;
+	if (DIRTY != "true") {
+		print "$(STATEDIR)/" this_pkg ".prepare: " \
+						"$(STATEDIR)/" this_pkg ".$(" this_PKG "_CFGHASH).cfghash"	> DGEN_DEPS_POST;
+		print "$(STATEDIR)/" this_pkg ".report: " \
+						"$(STATEDIR)/" this_pkg ".$(" this_PKG "_CFGHASH).cfghash"	> DGEN_DEPS_POST;
+	}
 	print "$(STATEDIR)/" this_pkg ".tags: "                       "$(STATEDIR)/" this_pkg ".prepare"	> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".compile: "                    "$(STATEDIR)/" this_pkg ".prepare"	> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".install: "                    "$(STATEDIR)/" this_pkg ".compile"	> DGEN_DEPS_POST;
@@ -322,6 +471,9 @@ function write_deps_pkg_active(this_PKG, this_pkg, prefix) {
 	print "ifeq ($(strip $(wildcard $(PTXDIST_DEVPKG_PLATFORMDIR)/$(" this_PKG "_DEVPKG))),)"		> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".install.post: "               "$(STATEDIR)/" this_pkg ".install.pack"	> DGEN_DEPS_POST;
 	print "else"												> DGEN_DEPS_POST;
+	if (DIRTY != "true")
+		print "$(STATEDIR)/" this_pkg ".install.unpack: " \
+						"$(STATEDIR)/" this_pkg ".$(" this_PKG "_CFGHASH).cfghash"	> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".install.post: "               "$(STATEDIR)/" this_pkg ".install.unpack"	> DGEN_DEPS_POST;
 	print "endif"												> DGEN_DEPS_POST;
 	if (prefix == "") {
@@ -343,7 +495,7 @@ function write_deps_pkg_active(this_PKG, this_pkg, prefix) {
 	print "ifneq ($(" this_PKG "),)"						> DGEN_DEPS_POST;
 	# on autogen script
 	print "ifneq ($(call autogen_dep,$(" this_PKG ")),)"				> DGEN_DEPS_POST;
-	print "$(STATEDIR)/" this_pkg ".extract.post: $(STATEDIR)/autogen-tools"	> DGEN_DEPS_POST;
+	print "$(STATEDIR)/" this_pkg ".extract.post:" DEP " $(STATEDIR)/autogen-tools"	> DGEN_DEPS_POST;
 	print "endif"									> DGEN_DEPS_POST;
 	# on lndir
 	print "ifneq ($(findstring lndir://,$(" this_PKG "_URL)),)"			> DGEN_DEPS_POST;
@@ -359,10 +511,10 @@ function write_deps_pkg_active(this_PKG, this_pkg, prefix) {
 	for (i = 1; i <= n; i++) {
 		this_dep = PKG_to_pkg[this_DEP_array[i]]
 
-		if (PARALLEL != "-j1")
+		if (PARALLEL != "-j1" && OPTIMIZE_IO == "true")
 			print "$(STATEDIR)/" this_pkg	".extract:| " "$(STATEDIR)/" this_dep ".install.post"	> DGEN_DEPS_POST;
-		print "$(STATEDIR)/" this_pkg	".extract.post: "     "$(STATEDIR)/" this_dep ".install.post"	> DGEN_DEPS_POST;
-		print "$(STATEDIR)/" this_pkg	".install.unpack: "   "$(STATEDIR)/" this_dep ".install.post"	> DGEN_DEPS_POST;
+		print "$(STATEDIR)/" this_pkg	".extract.post:" DEP   " $(STATEDIR)/" this_dep ".install.post"	> DGEN_DEPS_POST;
+		print "$(STATEDIR)/" this_pkg	".install.unpack:" DEP " $(STATEDIR)/" this_dep ".install.post"	> DGEN_DEPS_POST;
 
 	}
 	this_PKG_DEPS = PKG_to_R_DEP[this_PKG];
@@ -376,7 +528,7 @@ function write_deps_pkg_active(this_PKG, this_pkg, prefix) {
 		if (this_dep ~ /^host-|^cross-/)
 			continue;
 
-		print "$(STATEDIR)/" this_pkg ".targetinstall: "      "$(STATEDIR)/" this_dep ".targetinstall"	> DGEN_DEPS_POST;
+		print "$(STATEDIR)/" this_pkg ".targetinstall:" DEP " $(STATEDIR)/" this_dep ".targetinstall"	> DGEN_DEPS_POST;
 	}
 }
 
@@ -390,6 +542,8 @@ function write_deps_pkg_active_virtual(this_PKG, this_pkg, prefix) {
 		return;
 	if (this_pkg ~ /^host-chrpath$/)
 		return;
+	if (this_pkg ~ /^host-system-/)
+		return;
 
 	if (prefix != "")
 		virtual = "virtual-host-tools";
@@ -399,15 +553,23 @@ function write_deps_pkg_active_virtual(this_PKG, this_pkg, prefix) {
 		else
 			virtual = "base";
 	}
-	if (PARALLEL != "-j1")
+	if (PARALLEL != "-j1" && OPTIMIZE_IO == "true")
 		print "$(STATEDIR)/" this_pkg ".extract:| "           "$(STATEDIR)/" virtual  ".install"	> DGEN_DEPS_POST;
-	print "$(STATEDIR)/" this_pkg ".extract.post: "               "$(STATEDIR)/" virtual  ".install"	> DGEN_DEPS_POST;
-	print "$(STATEDIR)/" this_pkg ".install.unpack: "             "$(STATEDIR)/" virtual  ".install"	> DGEN_DEPS_POST;
+	print "$(STATEDIR)/" this_pkg ".extract.post:" DEP           " $(STATEDIR)/" virtual  ".install"	> DGEN_DEPS_POST;
+	print "$(STATEDIR)/" this_pkg ".install.unpack:" DEP         " $(STATEDIR)/" virtual  ".install"	> DGEN_DEPS_POST;
 }
 
 function write_deps_pkg_active_image(this_PKG, this_pkg, prefix) {
+	print "ifdef PTXCONF_IMAGE_INSTALL_FROM_IPKG_REPOSITORY"						> DGEN_DEPS_POST;
+	print "ifneq ($(" this_PKG "_PKGS),)"									> DGEN_DEPS_POST;
+	print "$(" this_PKG "_IMAGE): $(STATEDIR)/ipkg-push"							> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+	print "$(" this_PKG "_IMAGE): "                               "$(STATEDIR)/host-fakeroot.install.post"	> DGEN_DEPS_POST;
 	print "$(" this_PKG "_IMAGE): " \
 		"$(addprefix $(STATEDIR)/,$(addsuffix .targetinstall.post,$(" this_PKG "_PKGS)))"		> DGEN_DEPS_POST;
+	print "$(" this_PKG "_IMAGE): " \
+		"$(STATEDIR)/" this_pkg ".$(" this_PKG "_CFGHASH).cfghash"					> DGEN_DEPS_POST;
 	print "$(" this_PKG "_IMAGE): "                               "$(" this_PKG "_FILES)"			> DGEN_DEPS_POST;
 	print "$(STATEDIR)/" this_pkg ".install.post: "               "$(" this_PKG "_IMAGE)"			> DGEN_DEPS_POST;
 	print "images: "                                              "$(" this_PKG "_IMAGE)"			> DGEN_DEPS_POST;
@@ -427,7 +589,7 @@ function write_deps_pkg_active_image(this_PKG, this_pkg, prefix) {
 	#
 	# images don't depend on world, so this is needed to extract the packages
 	#
-	print "ifneq ($(strip $(" this_PKG "_PKGS)),)"									> DGEN_DEPS_POST
+	print "ifneq ($(strip $(" this_PKG "_PKGS)),)"								> DGEN_DEPS_POST
 	print "$(" this_PKG "_IMAGE):" " \
 		$(STATEDIR)/host-opkg.install.post"								> DGEN_DEPS_POST
 	print "ifeq ($(strip $(" this_PKG "_NFSROOT)),YES)"							> DGEN_DEPS_POST
@@ -438,19 +600,42 @@ function write_deps_pkg_active_image(this_PKG, this_pkg, prefix) {
 }
 
 END {
+	# writing maps first as this affect the pkghash via virtual packages
+	for (this_PKG in PKG_to_pkg) {
+		this_pkg = PKG_to_pkg[this_PKG];
+		write_maps(this_PKG, "R")
+		write_maps(this_PKG, "B")
+	}
+	# extend pkghash files fist
+	for (this_PKG in active_PKG_to_pkg)
+		write_deps_pkg_active_cfghash(this_PKG, this_pkg)
+
+	print "ifdef PTXDIST_SETUP_ONCE"									> DGEN_DEPS_POST;
+	print "$(call ptx/force-shell, echo -e '$(PTXDIST_HASHLIST_DATA)' >> " PTXDIST_HASHLIST ")"		> DGEN_DEPS_POST;
+	print "$(call ptx/force-sh, $(PTXDIST_LIB_DIR)/ptxd_make_pkghash.awk " PTXDIST_HASHLIST ")"		> DGEN_DEPS_POST;
+	print "endif"												> DGEN_DEPS_POST;
+
+	print "$(call ptx/force-sh, md5sum " PTXDIST_TEMPDIR "/pkghash-* | " \
+		"sed 's;^\\([a-z0-9]*\\).*pkghash-\\(.*\\)$$;\\2_CFGHASH := \\1;' > " \
+			PTXDIST_TEMPDIR "/pkghash.make)"							> DGEN_DEPS_POST;
+	print "include " PTXDIST_TEMPDIR "/pkghash.make"							> DGEN_DEPS_POST;
+
 	# for all pkgs
+	all_pkg = ""
 	for (this_PKG in PKG_to_pkg) {
 		this_pkg = PKG_to_pkg[this_PKG];
 		this_pkg_prefix = gensub(/^(host-|cross-|image-|).*/, "\\1", 1, this_pkg)
 
-		write_include(this_PKG)
-		write_maps(this_PKG, "R")
-		write_maps(this_PKG, "B")
+		write_vars_all(this_PKG)
 		if (this_pkg_prefix != "image-") {
 			write_deps_pkg_all(this_PKG, this_pkg)
 			write_vars_pkg_all(this_PKG, this_pkg, this_pkg_prefix)
 		}
+		all_pkg = all_pkg " " this_pkg
 	}
+	write_all_deps("R")
+	write_all_deps("B")
+	print "PTX_PACKAGES_ALL := " all_pkg									> DGEN_DEPS_PRE;
 
 	# for active pkgs
 	for (this_PKG in active_PKG_to_pkg) {
@@ -466,13 +651,6 @@ END {
 	}
 
 	close(PKG_HASHFILE);
-	MD5SUM_CMD = "md5sum " PTXDIST_TEMPDIR "/pkghash-*";
-	while (MD5SUM_CMD | getline) {
-		split($0, line, "[ -]")
-		print line[length(line)] "_CFGHASH = " line[1]			> DGEN_DEPS_PRE;
-	}
-
-	close(MD5SUM_CMD)
 	close(MAP_ALL);
 	close(MAP_ALL_MAKE);
 	close(MAP_DEPS);

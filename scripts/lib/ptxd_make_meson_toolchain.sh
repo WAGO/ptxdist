@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,7 +15,14 @@ export PTXDIST_MESON_CROSS_FILE
 # $1:	meson cross file
 #
 ptxd_make_meson_cross_file() {
+    local ptxd_reply
+    case "${PTXCONF_ARCH_STRING}" in
+	i386) PTXCONF_ARCH_STRING=x86 ;;
+	arm64) PTXCONF_ARCH_STRING=aarch64 ;;
+	riscv) PTXCONF_ARCH_STRING=riscv64 ;;
+    esac
+    ptxd_get_alternative config meson/cross-file.meson.in &&
     CPU="$(ptxd_cross_cc_v | sed -n -e "s/.*'-march=\([^']*\).*/\1/p" -e "/-march=/q")" \
-	ptxd_replace_magic "${PTXDIST_TOPDIR}/config/meson/cross-file.meson.in" > "${1}"
+	ptxd_replace_magic "${ptxd_reply}" > "${1}"
 }
 export -f ptxd_make_meson_cross_file

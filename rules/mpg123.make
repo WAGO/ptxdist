@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Juergen Kilb
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_MPG123) += mpg123
 #
 # Paths and names
 #
-MPG123_VERSION	:= 1.25.6
-MPG123_MD5	:= 43336bef78f67c2e66c4f6c288ca1eb3
+MPG123_VERSION	:= 1.25.10
+MPG123_MD5	:= ea32caa61d41d8be797f0b04a1b43ad9
 MPG123		:= mpg123-$(MPG123_VERSION)
 MPG123_SUFFIX	:= tar.bz2
 MPG123_URL	:= http://www.mpg123.org/download/$(MPG123).$(MPG123_SUFFIX)
 MPG123_SOURCE	:= $(SRCDIR)/$(MPG123).$(MPG123_SUFFIX)
 MPG123_DIR	:= $(BUILDDIR)/$(MPG123)
-MPG123_LICENSE	:= LGPL-2.1
+MPG123_LICENSE	:= LGPL-2.1-only
 MPG123_LICENSE_FILES := \
 	file://COPYING;md5=1e86753638d3cf2512528b99079bc4f3
 

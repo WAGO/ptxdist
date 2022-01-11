@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Juergen Beisert <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,10 +18,13 @@ PYSERIAL_VERSION	:= 2.7
 PYSERIAL_MD5		:= 794506184df83ef2290de0d18803dd11
 PYSERIAL		:= pyserial-$(PYSERIAL_VERSION)
 PYSERIAL_SUFFIX		:= tar.gz
-PYSERIAL_URL		:= http://pypi.python.org/packages/source/p/pyserial/$(PYSERIAL).$(PYSERIAL_SUFFIX)
+PYSERIAL_URL		:= https://pypi.python.org/packages/source/p/pyserial/$(PYSERIAL).$(PYSERIAL_SUFFIX)
 PYSERIAL_SOURCE		:= $(SRCDIR)/$(PYSERIAL).$(PYSERIAL_SUFFIX)
 PYSERIAL_DIR		:= $(BUILDDIR)/$(PYSERIAL)
 PYSERIAL_LICENSE	:= BSD
+ifdef PTXCONF_PYSERIAL_EXAMPLES
+PYSERIAL_DEVPKG		:= NO
+endif
 
 # ----------------------------------------------------------------------------
 # Prepare

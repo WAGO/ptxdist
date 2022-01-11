@@ -3,8 +3,6 @@
 # Copyright (C) 2013 by Christoph Fritz <chf.fritz@googlemail.com>
 #
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,17 @@ PACKAGES-$(PTXCONF_STRONGSWAN) += strongswan
 #
 # Paths and names
 #
-STRONGSWAN_VERSION	:= 5.3.5
-STRONGSWAN_MD5		:= a2f9ea185f27e7f8413d4cd2ee61efe4
+STRONGSWAN_VERSION	:= 5.8.4
+STRONGSWAN_MD5		:= 0634e7f40591bd3f6770e583c3f27d29
 STRONGSWAN		:= strongswan-$(STRONGSWAN_VERSION)
 STRONGSWAN_SUFFIX	:= tar.bz2
 STRONGSWAN_URL		:= https://download.strongswan.org/$(STRONGSWAN).$(STRONGSWAN_SUFFIX)
 STRONGSWAN_SOURCE	:= $(SRCDIR)/$(STRONGSWAN).$(STRONGSWAN_SUFFIX)
 STRONGSWAN_DIR		:= $(BUILDDIR)/$(STRONGSWAN)
 STRONGSWAN_LICENSE	:= GPL
+STRONGSWAN_LICENSE_FILES	:= \
+	file://LICENSE;md5=7744b64eaadabebdfd17e8a5ae6c9855 \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -33,25 +34,32 @@ STRONGSWAN_LICENSE	:= GPL
 STRONGSWAN_CONF_TOOL	:= autoconf
 STRONGSWAN_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-static \
 	--enable-aes \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_AFALG)-af-alg \
 	--disable-bliss \
 	--disable-blowfish \
+	--disable-botan \
 	--disable-ccm \
 	--disable-chapoly \
 	--enable-cmac \
 	--disable-ctr \
 	--disable-des \
+	--disable-drbg \
 	--enable-fips-prf \
 	--enable-gcm \
 	--disable-gcrypt \
 	--enable-gmp \
+	--disable-curve25519 \
 	--enable-hmac \
 	--disable-md4 \
 	--disable-md5 \
+	--disable-mgf1 \
+	--disable-newhope \
 	--enable-nonce \
 	--disable-ntru \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_OPENSSL)-openssl \
+	--disable-wolfssl \
 	--disable-padlock \
 	--enable-random \
 	--disable-rc2 \
@@ -89,6 +97,7 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-eap-sim-file \
 	--disable-eap-sim-pcsc \
 	--disable-eap-aka \
+	--disable-eap-aka-3gpp \
 	--disable-eap-aka-3gpp2 \
 	--disable-eap-simaka-sql \
 	--disable-eap-simaka-pseudonym \
@@ -107,6 +116,7 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-ipseckey \
 	--disable-keychain \
 	--disable-pkcs11 \
+	--disable-tpm \
 	--enable-revocation \
 	--disable-whitelist \
 	--enable-xauth-generic \
@@ -122,16 +132,17 @@ STRONGSWAN_CONF_OPT	:= \
 	--enable-socket-default \
 	--disable-socket-dynamic \
 	--disable-socket-win \
-	--enable-stroke \
+	--$(call ptx/disen, PTXCONF_STRONGSWAN_SWANCTL)-stroke \
 	--disable-smp \
 	--disable-sql \
 	--disable-uci \
-	--disable-vici \
+	--$(call ptx/endis, PTXCONF_STRONGSWAN_SWANCTL)-vici \
 	--disable-android-dns \
 	--enable-attr \
 	--disable-attr-sql \
 	--disable-dhcp \
 	--disable-osx-attr \
+	--disable-p-cscf \
 	--enable-resolve \
 	--disable-unity \
 	--disable-imc-test \
@@ -142,8 +153,8 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-imv-os \
 	--disable-imc-attestation \
 	--disable-imv-attestation \
-	--disable-imc-swid \
-	--disable-imv-swid \
+	--disable-imc-swima \
+	--disable-imv-swima \
 	--disable-imc-hcd \
 	--disable-imv-hcd \
 	--disable-tnc-ifmap \
@@ -154,8 +165,10 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-tnccs-20 \
 	--disable-tnccs-dynamic \
 	--disable-android-log \
+	--disable-bypass-lan \
 	--disable-certexpire \
 	--disable-connmark \
+	--disable-counters \
 	--disable-forecast \
 	--disable-duplicheck \
 	--disable-error-notify \
@@ -164,28 +177,27 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-led \
 	--disable-load-tester \
 	--disable-lookip \
-	--disable-maemo \
 	--disable-radattr \
+	--disable-save-keys \
 	--disable-systime-fix \
 	--disable-test-vectors \
 	--enable-updown \
 	--disable-aikgen \
-	--enable-charon \
+	--$(call ptx/disen, PTXCONF_STRONGSWAN_SYSTEMD_UNIT)-charon \
 	--disable-cmd \
 	--disable-conftest \
-	--disable-dumm \
 	--disable-fast \
+	--disable-fuzzing \
 	--disable-libipsec \
 	--disable-manager \
 	--disable-medcli \
 	--disable-medsrv \
 	--disable-nm \
 	--enable-pki \
-	--enable-scepclient \
+	--$(call ptx/disen, PTXCONF_STRONGSWAN_SWANCTL)-scepclient \
 	--enable-scripts \
 	--disable-svc \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_SYSTEMD_UNIT)-systemd \
-	--disable-swanctl \
 	--disable-tkm \
 	--disable-bfd-backtraces \
 	--disable-dbghelp-backtraces \
@@ -199,18 +211,23 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-ruby-gems-install \
 	--disable-python-eggs \
 	--disable-python-eggs-install \
+	--disable-perl-cpan \
+	--disable-perl-cpan-install \
+	--disable-tss-trousers \
+	--disable-tss-tss2 \
 	--disable-coverage \
 	--disable-leak-detective \
 	--disable-lock-profiler \
+	--disable-log-thread-ids \
 	--disable-monolithic \
 	--disable-defaults \
 	--enable-dependency-tracking \
 	--enable-shared \
-	--disable-static \
-	--enable-fast-install \
-	--enable-libtool-lock \
+	--$(call ptx/endis, PTXCONF_STRONGSWAN_SWANCTL)-swanctl \
 	--with-ipseclibdir=/usr/lib \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system
+
+STRONGSWAN_LDFLAGS	:= -Wl,-rpath,/usr/lib/plugins
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -240,11 +257,16 @@ STRONGSWAN_PLUGINS := \
 	libstrongswan-sha1.so \
 	libstrongswan-sha2.so \
 	libstrongswan-socket-default.so \
-	libstrongswan-stroke.so \
 	libstrongswan-updown.so \
 	libstrongswan-x509.so \
 	libstrongswan-xauth-generic.so \
 	libstrongswan-xcbc.so
+
+ifdef PTXCONF_STRONGSWAN_SWANCTL
+	STRONGSWAN_PLUGINS += libstrongswan-vici.so
+else
+	STRONGSWAN_PLUGINS += libstrongswan-stroke.so
+endif
 
 ifdef PTXCONF_STRONGSWAN_LIBCURL
 	STRONGSWAN_PLUGINS += libstrongswan-curl.so
@@ -267,12 +289,11 @@ $(STATEDIR)/strongswan.targetinstall:
 
 	@$(call install_alternative, strongswan, 0, 0, 0644, /etc/strongswan.conf)
 
-	@$(call install_copy, strongswan, 0, 0, 0755, -, /usr/sbin/ipsec)
-
-	@$(call install_tree, strongswan, 0, 0, -, /usr/libexec/ipsec)
+	@$(call install_tree, strongswan, 0, 0, -, /usr/bin)
+	@$(call install_tree, strongswan, 0, 0, -, /usr/libexec)
+	@$(call install_tree, strongswan, 0, 0, -, /usr/sbin)
 
 	@$(call install_lib, strongswan, 0, 0, 0644, libcharon)
-	@$(call install_lib, strongswan, 0, 0, 0644, libhydra)
 	@$(call install_lib, strongswan, 0, 0, 0644, libstrongswan)
 
 	@$(foreach plugin, $(STRONGSWAN_PLUGINS), \
@@ -284,6 +305,25 @@ ifdef PTXCONF_STRONGSWAN_SYSTEMD_UNIT
 		/usr/lib/systemd/system/strongswan.service)
 	@$(call install_link, strongswan, ../strongswan.service, \
 		/usr/lib/systemd/system/multi-user.target.wants/strongswan.service)
+endif
+
+ifdef PTXCONF_STRONGSWAN_SWANCTL
+	@$(call install_lib, strongswan, 0, 0, 0644, libvici)
+	@$(call install_tree, strongswan, 0, 0, -, /etc/strongswan.d)
+	@$(call install_alternative, strongswan, 0, 0, 0644, /etc/swanctl/swanctl.conf)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/bliss)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/ecdsa)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/pkcs12)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/pkcs8)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/private)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/pubkey)
+	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/rsa)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509aa)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ac)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ca)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509crl)
+	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ocsp)
 endif
 
 	@$(call install_copy, strongswan, 0, 0, 0644, /etc/ipsec.d/aacerts)

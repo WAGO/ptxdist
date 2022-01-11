@@ -3,8 +3,6 @@
 # Copyright (C) 2012 by Bernhard Sessler <bernhard.sessler@corscience.de>
 #                       Corscience GmbH & Co. KG <info@corscience.de>, Germany
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_LOG4CPLUS) += log4cplus
 #
 # Paths and names
 #
-LOG4CPLUS_VERSION	:= 1.1.2
-LOG4CPLUS_MD5		:= c798e13a0f3d4af0e7a777d16974f092
+LOG4CPLUS_VERSION	:= 1.2.2
+LOG4CPLUS_MD5		:= cfe73421b5fe8e7ec06f084a163c8995
 LOG4CPLUS		:= log4cplus-$(LOG4CPLUS_VERSION)
 LOG4CPLUS_SUFFIX	:= tar.xz
 LOG4CPLUS_URL		:= $(call ptx/mirror, SF, log4cplus/$(LOG4CPLUS).$(LOG4CPLUS_SUFFIX))

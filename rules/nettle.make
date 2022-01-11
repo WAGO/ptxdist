@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,13 @@ PACKAGES-$(PTXCONF_NETTLE) += nettle
 #
 # Paths and names
 #
-NETTLE_VERSION	:= 3.3
-NETTLE_MD5	:= 10f969f78a463704ae73529978148dbe
+NETTLE_VERSION	:= 3.6
+NETTLE_MD5	:= c45ee24ed7361dcda152a035d396fe8a
 NETTLE		:= nettle-$(NETTLE_VERSION)
 NETTLE_SUFFIX	:= tar.gz
 NETTLE_SOURCE	:= $(SRCDIR)/$(NETTLE).$(NETTLE_SUFFIX)
 NETTLE_DIR	:= $(BUILDDIR)/$(NETTLE)
-NETTLE_LICENSE	:= GPL-2.0+
-NETTLE_MAKE_PAR := NO
+NETTLE_LICENSE	:= GPL-2.0-or-later
 
 NETTLE_URL	:= \
 	http://www.lysator.liu.se/~nisse/archive/$(NETTLE).$(NETTLE_SUFFIX) \
@@ -49,7 +46,7 @@ NETTLE_CONF_OPT		:= \
 	--disable-fat \
 	--$(call ptx/endis,PTXCONF_ARCH_ARM_NEON)-arm-neon \
 	--disable-x86-aesni \
-	--enable-mini-gmp
+	--$(call ptx/disen,PTXCONF_NETTLE_GMP)-mini-gmp
 
 # ----------------------------------------------------------------------------
 # Target-Install

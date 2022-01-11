@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -43,12 +41,22 @@ IMAGE_HDIMG_BOOTLOADER_ENV := \
 endif
 ifdef PTXCONF_IMAGE_HDIMG_VFAT
 IMAGE_HDIMG_BOOTLOADER_ENV := \
-	VFAT_PARTITION_TYPE=$(call ptx/ifdef, PTXCONF_IMAGE_BOOT_VFAT_EFI_BAREBOX,0xef,0x0c) \
 	BOOTLOADER_IMAGES='' \
 	BOOTLOADER_PARTITIONS='include("vfat_partitions.config")'
+
+ifdef PTXCONF_IMAGE_HDIMG_GPT
+IMAGE_HDIMG_BOOTLOADER_ENV += \
+	VFAT_PARTITION_TYPE=$(call ptx/ifdef, PTXCONF_IMAGE_BOOT_VFAT_EFI_BAREBOX,U,F)
+else
+IMAGE_HDIMG_BOOTLOADER_ENV += \
+	VFAT_PARTITION_TYPE=$(call ptx/ifdef, PTXCONF_IMAGE_BOOT_VFAT_EFI_BAREBOX,0xef,0x0c)
+endif
 endif
 
 IMAGE_HDIMG_ENV = \
+	GPT=$(call ptx/ifdef, PTXCONF_IMAGE_HDIMG_GPT,true,false) \
+	PARTITION_TYPE_SUFFIX=$(call ptx/ifdef, PTXCONF_IMAGE_HDIMG_GPT,-uuid) \
+	ROOT_PARTITION_TYPE=$(call ptx/ifdef, PTXCONF_IMAGE_HDIMG_GPT,L,0x83) \
 	$(IMAGE_HDIMG_BOOTLOADER_ENV)
 
 $(IMAGE_HDIMG_IMAGE):

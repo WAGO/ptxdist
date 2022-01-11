@@ -3,7 +3,7 @@
 menuconfig MENU_XORG_FONTS
 	bool
 	prompt "fonts                         "
-	select XORG_LIB_XFONT_PCF_FONTS if XORG_SERVER
+	select XORG_LIB_XFONT2_PCF_FONTS if XORG_SERVER
 	default y if XORG_SERVER
 	help
 	  These fonts can be used with an x-server, standalone directfb or
@@ -20,12 +20,6 @@ config XORG_FONTS
 	select HOST_XORG_APP_MKFONTSCALE
 	select HOST_XORG_APP_BDFTOPCF
 	select HOST_XORG_FONT_UTIL
-	select RC_ONCE			if XORG_FONTS_FC_CACHE && RUNTIME
-
-config XORG_FONTS_FC_CACHE
-	default FONTCONFIG
-	select FONTCONFIG_UTILS
-	bool
 
 config XORG_FONTS_QT4_LINKS
 	depends on QT4_PLATFORM_EMBEDDED
@@ -38,6 +32,10 @@ config XORG_FONTS_QT4_LINKS
 
 source "generated/multimedia_xorg_font.in"
 endif
+
+menu "libs                          "
+source "generated/multimedia_libs.in"
+endmenu
 
 source "generated/multimedia_fltk.in"
 
@@ -72,14 +70,16 @@ menu "sound                         "
 source "generated/multimedia_sound.in"
 endmenu
 
-source "generated/multimedia_tk.in"
-
 menu "tools                         "
 source "generated/multimedia_tools.in"
 endmenu
 
-menu "libs                          "
-source "generated/multimedia_libs.in"
+menu "vaapi                         "
+source "generated/multimedia_vaapi.in"
+endmenu
+
+menu "wayland                       "
+source "generated/multimedia_wayland.in"
 endmenu
 
 menuconfig XORG
@@ -91,7 +91,3 @@ menuconfig XORG
 if XORG
 source "generated/multimedia_xorg.in"
 endif
-
-menu "wayland                       "
-source "generated/multimedia_wayland.in"
-endmenu

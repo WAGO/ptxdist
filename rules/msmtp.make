@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ MSMTP_SUFFIX	:= tar.bz2
 MSMTP_URL	:= $(call ptx/mirror, SF, msmtp/$(MSMTP).$(MSMTP_SUFFIX))
 MSMTP_SOURCE	:= $(SRCDIR)/$(MSMTP).$(MSMTP_SUFFIX)
 MSMTP_DIR	:= $(BUILDDIR)/$(MSMTP)
-MSMTP_LICENSE	:= GPL-3.0
+MSMTP_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

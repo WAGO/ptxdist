@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014, 2015 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,15 +14,18 @@ PACKAGES-$(PTXCONF_ECRYPTFS_UTILS) += ecryptfs-utils
 #
 # Paths and names
 #
-ECRYPTFS_UTILS_VERSION	:= 108
-ECRYPTFS_UTILS_MD5	:= 80f2a73e14030239fa01a2f1e5606a0e
+ECRYPTFS_UTILS_VERSION	:= 111
+ECRYPTFS_UTILS_MD5	:= 83513228984f671930752c3518cac6fd
 ECRYPTFS_UTILS		:= ecryptfs-utils_$(ECRYPTFS_UTILS_VERSION)
 ECRYPTFS_UTILS_SUFFIX	:= tar.gz
 ECRYPTFS_UTILS_TARBALL	:= $(ECRYPTFS_UTILS).orig.$(ECRYPTFS_UTILS_SUFFIX)
 ECRYPTFS_UTILS_URL	:= https://launchpad.net/ecryptfs/trunk/$(ECRYPTFS_UTILS_VERSION)/+download/$(ECRYPTFS_UTILS_TARBALL)
 ECRYPTFS_UTILS_SOURCE	:= $(SRCDIR)/$(ECRYPTFS_UTILS).$(ECRYPTFS_UTILS_SUFFIX)
 ECRYPTFS_UTILS_DIR	:= $(BUILDDIR)/$(ECRYPTFS_UTILS)
-ECRYPTFS_UTILS_LICENSE	:= GPL-2.0
+ECRYPTFS_UTILS_LICENSE	:= GPL-2.0-only
+ifdef PTXCONF_ECRYPTFS_UTILS_TESTS
+ECRYPTFS_UTILS_DEVPKG	:= NO
+endif
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,7 +37,7 @@ ECRYPTFS_UTILS_LICENSE	:= GPL-2.0
 ECRYPTFS_UTILS_CONF_TOOL := autoconf
 ECRYPTFS_UTILS_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-nss \
+	--enable-nss \
 	--disable-pywrap \
 	--disable-openssl \
 	--disable-pkcs11-helper \

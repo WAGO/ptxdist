@@ -4,8 +4,6 @@
 #               2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2010 Tim Sander <tim.sander@hbm.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,18 +16,23 @@ PACKAGES-$(PTXCONF_DBUS) += dbus
 #
 # Paths and names
 #
-DBUS_VERSION	:= 1.10.24
-DBUS_MD5	:= d548ae16f9a3268fe4650ccc86a3f06f
+DBUS_VERSION	:= 1.12.20
+DBUS_MD5	:= dfe8a71f412e0b53be26ed4fbfdc91c4
 DBUS		:= dbus-$(DBUS_VERSION)
 DBUS_SUFFIX	:= tar.gz
 DBUS_URL	:= http://dbus.freedesktop.org/releases/dbus/$(DBUS).$(DBUS_SUFFIX)
 DBUS_SOURCE	:= $(SRCDIR)/$(DBUS).$(DBUS_SUFFIX)
 DBUS_DIR	:= $(BUILDDIR)/$(DBUS)
-DBUS_LICENSE	:= AFL-2.1, GPL-2.0+
+DBUS_LICENSE	:= AFL-2.1 AND GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+
+DBUS_CONF_ENV	:= \
+	$(CROSS_ENV) \
+	ac_cv_lib_ICE_IceConnectionNumber=no
 
 #
 # autoconf
@@ -37,12 +40,12 @@ DBUS_LICENSE	:= AFL-2.1, GPL-2.0+
 DBUS_CONF_TOOL	:= autoconf
 DBUS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--runstatedir=/run \
 	--enable-silent-rules \
+	--disable-developer \
+	--disable-debug \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-static \
-	--disable-compiler-coverage \
-	--enable-compiler-optimisations \
-	--disable-developer \
 	--disable-ansi \
 	--disable-verbose-mode \
 	--disable-asserts \
@@ -50,7 +53,6 @@ DBUS_CONF_OPT	:= \
 	--disable-xml-docs \
 	--disable-doxygen-docs \
 	--disable-ducktype-docs \
-	--enable-abstract-sockets=yes \
 	--$(call ptx/endis, PTXCONF_DBUS_SELINUX)-selinux \
 	--disable-apparmor \
 	--disable-libaudit \
@@ -63,11 +65,15 @@ DBUS_CONF_OPT	:= \
 	--disable-modular-tests \
 	--disable-tests \
 	--disable-installed-tests \
+	--disable-code-coverage \
 	--enable-epoll \
 	--$(call ptx/endis, PTXCONF_DBUS_X)-x11-autolaunch \
+	--disable-compile-warnings \
 	--disable-Werror \
+	--disable-relocation \
 	--disable-stats \
 	--$(call ptx/endis, PTXCONF_DBUS_SYSTEMD)-user-session \
+	--with-system-socket=/run/dbus/system_bus_socket \
 	--with-dbus-user=messagebus \
 	--without-valgrind \
 	--$(call ptx/wwo, PTXCONF_DBUS_X)-x$(call ptx/ifdef,PTXCONF_DBUS_X,=$(SYSROOT)/usr,) \
@@ -140,6 +146,15 @@ ifdef PTXCONF_DBUS_SYSTEMD_UNIT
 	@$(call install_link, dbus, ../dbus.service, \
 		/usr/lib/systemd/system/multi-user.target.wants/dbus.service)
 endif
+ifdef PTXCONF_DBUS_SYSTEMD_USER_UNIT
+	@$(call install_copy, dbus, 0, 0, 0644, -, \
+		/usr/lib/systemd/user/dbus.socket)
+	@$(call install_link, dbus, ../dbus.socket, \
+		/usr/lib/systemd/user/sockets.target.wants/dbus.socket)
+	@$(call install_copy, dbus, 0, 0, 0644, -, \
+		/usr/lib/systemd/user/dbus.service)
+endif
+
 	@$(call install_finish, dbus)
 
 	@$(call touch)

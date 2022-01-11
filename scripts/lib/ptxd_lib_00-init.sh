@@ -3,60 +3,34 @@
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
 
 
 #
-# figure out if we use a production or base BSP
-#
-# out:
-# sysroot_base_platform
-#
-ptxd_init_get_sysroot_base_platform() {
-    local prefix
-
-    if prefix="$(ptxd_get_ptxconf PTXCONF_PROJECT_USE_PRODUCTION_PREFIX)"; then
-	local platform
-	if platform="$(ptxd_get_ptxconf PTXCONF_PLATFORM)"; then
-	    local platform_version="$(ptxd_get_ptxconf PTXCONF_PLATFORM_VERSION)"
-	    prefix="${prefix}/platform-${platform}${platform_version}"
-	else
-	    : # nothing to do for non-platform BSPs
-	fi
-    elif prefix="$(ptxd_get_ptxconf PTXCONF_PROJECT_USE_LOCAL_PLATFORM_NAME)"; then
-	prefix="${PTXDIST_WORKSPACE}/${prefix}"
-    else
-	return
-    fi
-
-    # FIXME: HACK we hardcode "sysroot-target" here
-    sysroot_base_platform="${prefix}/sysroot-target"
-
-    if [ ! -d "${sysroot_base_platform}" ]; then
-	ptxd_bailout "$(ptxd_print_path "${prefix}") is not a valid platform."
-    fi
-
-    PTXDIST_BASE_PLATFORMDIR="${prefix}"
-    export PTXDIST_BASE_PLATFORMDIR
-}
-
-
-#
 #
 #
 ptxd_init_ptxdist_path() {
-    if [ "${PTXDIST_WORKSPACE}" != "${PTXDIST_PLATFORMCONFIGDIR}" ]; then
-	PTXDIST_PATH="${PTXDIST_WORKSPACE}:${PTXDIST_PLATFORMCONFIGDIR}:${PTXDIST_TOPDIR}:"
-    elif [ ! "${PTXDIST_WORKSPACE}" -ef "${PTXDIST_TOPDIR}" ]; then
-	PTXDIST_PATH="${PTXDIST_WORKSPACE}:${PTXDIST_TOPDIR}:"
-    else
-	PTXDIST_PATH="${PTXDIST_WORKSPACE}:"
-    fi
+    local orig_IFS="${IFS}"
+    IFS=:
+    local -a paths
+    PTXDIST_PATH_LAYERS="${PTXDIST_LAYERS[*]}:"
+    IFS="${orig_IFS}"
+    export PTXDIST_PATH_LAYERS
+
+    PTXDIST_PATH=
+    PTXDIST_PATH_PLATFORMCONFIGDIR=
+    for layer in "${PTXDIST_LAYERS[@]}"; do
+	PTXDIST_PATH="${PTXDIST_PATH}${layer}:"
+	local tmp="${layer}/${PTXDIST_PLATFORMCONFIG_SUBDIR}"
+	if [ -n "${PTXDIST_PLATFORMCONFIG_SUBDIR}" -a -d "${tmp}" ]; then
+	    PTXDIST_PATH="${PTXDIST_PATH}${tmp}:"
+	    PTXDIST_PATH_PLATFORMCONFIGDIR="${PTXDIST_PATH_PLATFORMCONFIGDIR}${tmp}:"
+	fi
+    done
     export PTXDIST_PATH
+    export PTXDIST_PATH_PLATFORMCONFIGDIR
 
     PTXDIST_PATH_PATCHES="${PTXDIST_PATH//://patches:}"
     export PTXDIST_PATH_PATCHES
@@ -78,9 +52,6 @@ ptxd_init_ptxdist_path() {
 
     PTXDIST_PATH_SCRIPTS="${PTXDIST_PATH//://scripts:}"
     export PTXDIST_PATH_SCRIPTS
-
-    PTXDIST_PATH_PLATFORMS_XLBSP="${PTXDIST_PATH_PLATFORMS//://xlbsp:}"
-    export PTXDIST_PATH_PLATFORMS_XLBSP
 }
 
 

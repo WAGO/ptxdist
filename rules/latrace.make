@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Juergen Borleis <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LATRACE_SUFFIX	:= tar.bz2
 LATRACE_URL	:= http://people.redhat.com/jolsa/latrace/dl/$(LATRACE).$(LATRACE_SUFFIX)
 LATRACE_SOURCE	:= $(SRCDIR)/$(LATRACE).$(LATRACE_SUFFIX)
 LATRACE_DIR	:= $(BUILDDIR)/$(LATRACE)
-LATRACE_LICENSE	:= GPL-3.0
+LATRACE_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

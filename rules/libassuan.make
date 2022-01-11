@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Alexander Stein <alexander.stein@systec-electronic.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,16 +14,15 @@ PACKAGES-$(PTXCONF_LIBASSUAN) += libassuan
 #
 # Paths and names
 #
-LIBASSUAN_VERSION	:= 2.4.3
-LIBASSUAN_MD5		:= 8e01a7c72d3e5d154481230668e6eb5a
+LIBASSUAN_VERSION	:= 2.5.1
+LIBASSUAN_MD5		:= 4354b7ae296894f232ada226a062d7d7
 LIBASSUAN		:= libassuan-$(LIBASSUAN_VERSION)
 LIBASSUAN_SUFFIX	:= tar.bz2
-LIBASSUAN_URL		:= ftp://ftp.gnupg.org/gcrypt/libassuan/$(LIBASSUAN).$(LIBASSUAN_SUFFIX)
+LIBASSUAN_URL		:= https://www.gnupg.org/ftp/gcrypt/libassuan/$(LIBASSUAN).$(LIBASSUAN_SUFFIX)
 LIBASSUAN_SOURCE	:= $(SRCDIR)/$(LIBASSUAN).$(LIBASSUAN_SUFFIX)
 LIBASSUAN_DIR		:= $(BUILDDIR)/$(LIBASSUAN)
-LIBASSUAN_LICENSE	:= GPL-3.0, LGPL-2.1
+LIBASSUAN_LICENSE	:= LGPL-2.1-or-later
 LIBASSUAN_LICENSE_FILES	:= \
-	file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
 	file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1
 
 # ----------------------------------------------------------------------------
@@ -37,7 +34,8 @@ LIBASSUAN_LICENSE_FILES	:= \
 #
 LIBASSUAN_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
-	--enable-build-timestamp="$(PTXDIST_VERSION_YEAR)-$(PTXDIST_VERSION_MONTH)-01T00:00+0000"
+	--enable-build-timestamp="$(PTXDIST_BUILD_TIMESTAMP)" \
+	--disable-doc
 
 # ----------------------------------------------------------------------------
 # Target-Install

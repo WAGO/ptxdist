@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Robert Schwebel
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,10 @@ LIBEZV24_SUFFIX		:= tar.bz2
 LIBEZV24_URL		:= http://www.pengutronix.de/software/misc/download/$(LIBEZV24).$(LIBEZV24_SUFFIX)
 LIBEZV24_SOURCE		:= $(SRCDIR)/$(LIBEZV24).$(LIBEZV24_SUFFIX)
 LIBEZV24_DIR		:= $(BUILDDIR)/$(LIBEZV24)
+LIBEZV24_LICENSE	:= LGPL-2.1-or-later
+LIBEZV24_LICENSE_FILES	:= \
+	file://COPYRIGHT;md5=14aa8b8ed31fe828e58ea239e7e6b8c0 \
+	file://COPYING;md5=dcf3c825659e82539645da41a7908589
 
 # ----------------------------------------------------------------------------
 # Prepare

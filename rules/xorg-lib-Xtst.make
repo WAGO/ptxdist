@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_LIB_XTST) += xorg-lib-xtst
 #
 # Paths and names
 #
-XORG_LIB_XTST_VERSION	:= 1.2.2
-XORG_LIB_XTST_MD5	:= 25c6b366ac3dc7a12c5d79816ce96a59
+XORG_LIB_XTST_VERSION	:= 1.2.3
+XORG_LIB_XTST_MD5	:= ef8c2c1d16a00bd95b9fdcef63b8a2ca
 XORG_LIB_XTST		:= libXtst-$(XORG_LIB_XTST_VERSION)
 XORG_LIB_XTST_SUFFIX	:= tar.bz2
 XORG_LIB_XTST_URL	:= $(call ptx/mirror, XORG, individual/lib/$(XORG_LIB_XTST).$(XORG_LIB_XTST_SUFFIX))

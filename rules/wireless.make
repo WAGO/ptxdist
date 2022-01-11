@@ -3,8 +3,6 @@
 # Copyright (C) 2003 by Pengutronix e.K., Hildesheim, Germany
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -22,10 +20,10 @@ WIRELESS_MD5		:= ca91ba7c7eff9bfff6926b1a34a4697d
 WIRELESS_VERSION_PRE	:= pre9
 WIRELESS		:= wireless_tools.$(WIRELESS_VERSION).$(WIRELESS_VERSION_PRE)
 WIRELESS_SUFFIX		:= tar.gz
-WIRELESS_URL		:= http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/$(WIRELESS).$(WIRELESS_SUFFIX)
+WIRELESS_URL		:= https://hewlettpackard.github.io/wireless-tools/$(WIRELESS).$(WIRELESS_SUFFIX)
 WIRELESS_SOURCE		:= $(SRCDIR)/$(WIRELESS).$(WIRELESS_SUFFIX)
 WIRELESS_DIR 		:= $(BUILDDIR)/wireless_tools.$(WIRELESS_VERSION)
-WIRELESS_LICENSE	:= GPL-2.0
+WIRELESS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

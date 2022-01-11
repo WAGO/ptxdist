@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by BSP
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_SUDO) += sudo
 #
 # Paths and names
 #
-SUDO_VERSION	:= 1.8.21p2
-SUDO_MD5	:= cd3993d910c713ae72e94beebd230b22
+SUDO_VERSION	:= 1.8.28
+SUDO_MD5	:= 5afa5acd0c55b40916e4ad864607edfe
 SUDO		:= sudo-$(SUDO_VERSION)
 SUDO_SUFFIX	:= tar.gz
 SUDO_URL	:= \
@@ -26,7 +24,8 @@ SUDO_URL	:= \
 	http://www.sudo.ws/sudo/dist/OLD/$(SUDO).$(SUDO_SUFFIX)
 SUDO_SOURCE	:= $(SRCDIR)/$(SUDO).$(SUDO_SUFFIX)
 SUDO_DIR	:= $(BUILDDIR)/$(SUDO)
-SUDO_LICENSE	:= BSD, ISC
+SUDO_LICENSE	:= ISC AND BSD-3-Clause AND BSD-2-Clause-NetBSD AND Zlib
+SUDO_LICENSE_FILES := file://doc/LICENSE;md5=6c76b73603ac7763ab0516ebfbe67b42
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -45,22 +44,43 @@ SUDO_ENV 	:= \
 #
 SUDO_AUTOCONF = \
 	$(CROSS_AUTOCONF_USR) \
+	--enable-authentication \
+	--disable-root-mailer \
+	--enable-setreuid \
+	--enable-setresuid \
 	--enable-shadow \
 	--enable-root-sudo \
 	--disable-log-host \
 	--enable-noargs-shell \
+	--disable-shell-sets-home \
 	--disable-path-info \
+	--disable-env-debug \
+	--enable-zlib \
+	--disable-env-reset \
 	--enable-warnings \
 	--disable-werror \
+	--disable-openssl \
+	--disable-gcrypt \
 	--enable-hardening \
 	--enable-pie \
+	--disable-asan \
+	--enable-poll \
+	--disable-admin-flag \
 	--disable-nls \
 	--disable-rpath \
 	--enable-static-sudoers \
 	--disable-shared-libutil \
+	--disable-tmpfiles.d \
+	--disable-devsearch \
+	--disable-sasl \
+	--disable-offensive-insults \
+	--disable-package-build \
+	--disable-gss-krb5-ccache-name \
+	--disable-pvs-studio \
 	--disable-sia \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-pam-session \
+	--disable-kerb5-instance \
 	--without-AFS \
 	--without-DCE \
 	--without-logincap \

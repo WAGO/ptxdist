@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Jan Luebbe <jlu@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -41,7 +39,7 @@ KRB5_CONF_ENV	:= \
 	ac_cv_printf_positional=yes \
 	ac_cv_file__etc_environment=yes \
 	ac_cv_file__etc_TIMEZONE=no \
-	ac_cv_header_keyutils_h=$(call ptx/ifdef, PTXCONF_KRB5_CLIENT_TOOLS, yes, no)
+	ac_cv_header_keyutils_h=$(call ptx/yesno, PTXCONF_KRB5_CLIENT_TOOLS)
 
 #
 # autoconf
@@ -60,7 +58,7 @@ KRB5_CONF_OPT	:= \
 	--enable-pkinit \
 	--without-size-optimizations \
 	--with-system-et \
-	--with-system-ss \
+	--$(call ptx/wwo,PTXCONF_KRB5_ADMIN_TOOLS)-system-ss \
 	--without-system-db \
 	--without-netlib \
 	--without-hesiod \
@@ -71,7 +69,7 @@ KRB5_CONF_OPT	:= \
 	--with-prng-alg=fortuna \
 	--with-pkinit-crypto-impl=openssl \
 	--with-tls-impl=openssl \
-	--with-libedit \
+	--without-libedit \
 	--without-readline \
 	--without-system-verto
 

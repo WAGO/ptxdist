@@ -3,8 +3,6 @@
 # Copyright (C) 2005 by Robert Schwebel
 # 		2008 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,8 @@ LIBLIST_SUFFIX	:= tar.gz
 LIBLIST_URL	:= http://www.pengutronix.de/software/liblist/download/$(LIBLIST).$(LIBLIST_SUFFIX)
 LIBLIST_SOURCE	:= $(SRCDIR)/$(LIBLIST).$(LIBLIST_SUFFIX)
 LIBLIST_DIR	:= $(BUILDDIR)/$(LIBLIST)
+LIBLIST_LICENSE	:= GPL-2.0-or-later
+LIBLIST_LICENSE_FILES	:= file://src/list.c;startline=10;endline=22;md5=5ace59915d77ffe5be6f93a68f12a9c4
 
 # ----------------------------------------------------------------------------
 # Prepare

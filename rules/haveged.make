@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,16 +14,18 @@ PACKAGES-$(PTXCONF_HAVEGED) += haveged
 #
 # Paths and names
 #
-HAVEGED_VERSION	:= 1.9.1
-HAVEGED_MD5	:= 015ff58cd10607db0e0de60aeca2f5f8
+HAVEGED_VERSION	:= 1.9.13
+HAVEGED_MD5	:= 5391978794208b6cca6f53d7a6211c04
 HAVEGED		:= haveged-$(HAVEGED_VERSION)
 HAVEGED_SUFFIX	:= tar.gz
 HAVEGED_URL	:= \
-	http://www.issihosts.com/haveged/$(HAVEGED).$(HAVEGED_SUFFIX) \
-	http://www.issihosts.com/haveged/archive/$(HAVEGED).$(HAVEGED_SUFFIX)
+	https://github.com/jirka-h/haveged/archive/v$(HAVEGED_VERSION).tar.gz
 HAVEGED_SOURCE	:= $(SRCDIR)/$(HAVEGED).$(HAVEGED_SUFFIX)
 HAVEGED_DIR	:= $(BUILDDIR)/$(HAVEGED)
-HAVEGED_LICENSE	:= GPL-3.0
+HAVEGED_LICENSE	:= GPL-3.0-or-later
+HAVEGED_LICENSE_FILES   := \
+	file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
+	file://src/haveged.c;startline=1;endline=20;md5=0b45b25b79d4a3b7d800cc2c951429b2
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -44,7 +44,7 @@ HAVEGED_CONF_OPT	:= \
 	--enable-initdir=/usr/lib/systemd/system \
 	--disable-nistest \
 	--disable-olt \
-	--disable-threads \
+	--enable-threads \
 	--enable-tune
 
 # ----------------------------------------------------------------------------
@@ -75,10 +75,10 @@ endif
 endif
 
 ifdef PTXCONF_HAVEGED_SYSTEMD_UNIT
-	@$(call install_copy, haveged, 0, 0, 0644, -, \
+	@$(call install_alternative, haveged, 0, 0, 0644, \
 		/usr/lib/systemd/system/haveged.service)
 	@$(call install_link, haveged, ../haveged.service, \
-		/usr/lib/systemd/system/multi-user.target.wants/haveged.service)
+		/usr/lib/systemd/system/sysinit.target.wants/haveged.service)
 endif
 
 	@$(call install_finish, haveged)

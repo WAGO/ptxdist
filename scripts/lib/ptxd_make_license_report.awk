@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,8 +18,8 @@ $1 == "DEP" {
 }
 
 $1 == "LICENSE" {
-	# add newline after each second license
-	gsub("[^,]*,[^,]*,", "&\\\\ ", $4);
+	# add newline after each third word
+	gsub("[^ ]* [^ ]* [^ ]* ", "&\\\\ ", $4);
 	gsub("_", "\\_", $4);
 	licenses[$2] = $4
 	raw_names[$2] = $3

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Bernhard Walle <bernhard@bwalle.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,10 @@ TREE_SUFFIX	:= tgz
 TREE_URL	:= http://mama.indstate.edu/users/ice/tree/src/$(TREE).$(TREE_SUFFIX)
 TREE_SOURCE	:= $(SRCDIR)/$(TREE).$(TREE_SUFFIX)
 TREE_DIR	:= $(BUILDDIR)/$(TREE)
-TREE_LICENSE	:= GPL
+TREE_LICENSE	:= GPL-2.0-or-later AND LGPL-2.1-or-later
+TREE_LICENSE_FILES := \
+	file://LICENSE;md5=393a5ca445f6965873eca0259a17f833 \
+	file://strverscmp.c;startline=1;endline=19;md5=f50ab9ef044f00fb22691ec5051c922d
 
 # ----------------------------------------------------------------------------
 # Compile

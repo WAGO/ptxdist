@@ -3,22 +3,9 @@
 # Copyright (C) 2005-2008 by Robert Schwebel
 #               2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
-
-#
-# We provide this package
-#
-PACKAGES-$(PTXCONF_UDEV) += udev
-
-ifdef PTXCONF_INITMETHOD_SYSTEMD
-UDEV_LICENSE = $(SYSTEMD_LICENSE)
-else
-UDEV_LICENSE = $(UDEV_LEGACY_LICENSE)
-endif
 
 #
 # We provide this package
@@ -35,7 +22,7 @@ UDEV_LEGACY_SUFFIX	:= tar.bz2
 UDEV_LEGACY_URL		:= $(call ptx/mirror, KERNEL, utils/kernel/hotplug/$(UDEV_LEGACY).$(UDEV_LEGACY_SUFFIX))
 UDEV_LEGACY_SOURCE	:= $(SRCDIR)/$(UDEV_LEGACY).$(UDEV_LEGACY_SUFFIX)
 UDEV_LEGACY_DIR		:= $(BUILDDIR)/$(UDEV_LEGACY)
-UDEV_LEGACY_LICENSE	:= GPL-2.0
+UDEV_LEGACY_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -46,7 +33,7 @@ UDEV_LEGACY_LICENSE	:= GPL-2.0
 #
 UDEV_LEGACY_CONF_ENV := \
 	$(CROSS_ENV) \
-	CPPFLAGS="-I$(KERNEL_HEADERS_INCLUDE_DIR) $(CROSS_CPPFLAGS)"
+	CPPFLAGS="-isystem $(KERNEL_HEADERS_INCLUDE_DIR) $(CROSS_CPPFLAGS)"
 
 UDEV_LEGACY_CONF_TOOL	:= autoconf
 UDEV_LEGACY_CONF_OPT	:= \
@@ -86,7 +73,6 @@ UDEV_LEGACY_RULES-y := \
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_PERSISTENT_CDROM)	+= 60-cdrom_id.rules
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_PERSISTENT_V4L)		+= 60-persistent-v4l.rules
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_ACCELEROMETER)		+= 61-accelerometer.rules
-UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_PERSISTENT_EDD)		+= 61-persistent-storage-edd.rules
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_PERSISTENT_GENERATOR)	+= 75-cd-aliases-generator.rules
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_PERSISTENT_GENERATOR)	+= 75-persistent-net-generator.rules
 UDEV_LEGACY_RULES-$(PTXCONF_UDEV_LEGACY_MTD_PROBE)		+= 75-probe_mtd.rules
@@ -98,7 +84,6 @@ UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_ACCELEROMETER)		+= accelerometer
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_PERSISTENT_ATA)	+= ata_id
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_PERSISTENT_CDROM)	+= cdrom_id
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_COLLECT)		+= collect
-UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_PERSISTENT_EDD)	+= edd_id
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_KEYMAPS)		+= findkeyboards
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_KEYMAPS)		+= keyboard-force-release.sh
 UDEV_LEGACY_HELPER-$(PTXCONF_UDEV_LEGACY_KEYMAPS)		+= keymap

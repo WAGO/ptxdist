@@ -2,6 +2,7 @@
 
 config ORC
 	tristate
+	select HOST_MESON
 	select LIBC_M
 	select LIBC_RT
 	select GCCLIBS_GCC_S
@@ -13,3 +14,9 @@ config ORC
 	  the features available in SIMD architectures, including saturated
 	  addition and subtraction, and many arithmetic operations.
 
+if ORC
+
+config ORC_TEST
+	bool
+
+endif

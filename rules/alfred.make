@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Markus Pargmann <mpa@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ ALFRED_SUFFIX	:= tar.gz
 ALFRED_URL	:= http://downloads.open-mesh.org/batman/stable/sources/alfred/$(ALFRED).$(ALFRED_SUFFIX)
 ALFRED_SOURCE	:= $(SRCDIR)/$(ALFRED).$(ALFRED_SUFFIX)
 ALFRED_DIR	:= $(BUILDDIR)/$(ALFRED)
-ALFRED_LICENSE	:= GPL-2.0
+ALFRED_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -41,6 +39,7 @@ ALFRED_MAKE_OPT		:= \
 
 ALFRED_INSTALL_OPT	:= \
 	$(ALFRED_MAKE_OPT) \
+	PREFIX=/usr \
 	install
 
 # ----------------------------------------------------------------------------
@@ -56,8 +55,8 @@ $(STATEDIR)/alfred.targetinstall:
 	@$(call install_fixup, alfred,AUTHOR,"Markus Pargmann <mpa@pengutronix.de>")
 	@$(call install_fixup, alfred,DESCRIPTION,missing)
 
-	@$(call install_copy, alfred, 0, 0, 0755, $(ALFRED_DIR)/alfred, /usr/bin/alfred)
-	@$(call install_copy, alfred, 0, 0, 0755, $(ALFRED_DIR)/vis/batadv-vis, /usr/bin/batadv-vis)
+	@$(call install_copy, alfred, 0, 0, 0755, -, /usr/sbin/alfred)
+	@$(call install_copy, alfred, 0, 0, 0755, -, /usr/sbin/batadv-vis)
 
 ifdef PTXCONF_ALFRED_SYSTEMD_SERVICE
 	@$(call install_alternative, alfred, 0, 0, 0644, /usr/lib/systemd/system/alfred@.service)

@@ -4,8 +4,6 @@
 #               2002-2008 by Pengutronix e.K., Hildesheim, Germany
 #               2009, 2012 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -15,13 +13,14 @@
 #
 PACKAGES-$(PTXCONF_GDBSERVER) += gdbserver
 
-GDBSERVER_VERSION	:= $(call remove_quotes,$(PTXCONF_GDB_VERSION))
-GDBSERVER_MD5		:= $(call remove_quotes,$(PTXCONF_GDB_MD5))
+GDBSERVER_VERSION	 = $(SHARED_GDB_VERSION)
+GDBSERVER_MD5		 = $(SHARED_GDB_MD5)
 GDBSERVER		:= gdb-$(GDBSERVER_VERSION)
-GDBSERVER_SUFFIX	:= tar.gz
+GDBSERVER_SUFFIX	:= tar.xz
 GDBSERVER_SOURCE	:= $(SRCDIR)/$(GDBSERVER).$(GDBSERVER_SUFFIX)
 GDBSERVER_DIR		:= $(BUILDDIR)/gdbserver-$(GDBSERVER_VERSION)
-GDBSERVER_LICENSE	:= GPL-2.0, GPL-3.0+
+GDBSERVER_PKGDIR	:= $(PKGDIR)/gdbserver-$(GDBSERVER_VERSION)
+GDBSERVER_LICENSE	:= GPL-2.0-only AND GPL-3.0-or-later
 GDBSERVER_LICENSE_FILES	:= \
 	file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 	file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \

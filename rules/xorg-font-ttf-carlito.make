@@ -1,8 +1,7 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
-#
-# See CREDITS for details about who has contributed to this project.
+#           (C) 2018 by Florian Bäuerle <florian.baeuerle@allegion.com>
 #
 # For further information about the PTXdist project and license conditions
 # see the README file.
@@ -25,15 +24,8 @@ XORG_FONT_TTF_CARLITO_SOURCE	:= $(SRCDIR)/$(XORG_FONT_TTF_CARLITO).$(XORG_FONT_T
 XORG_FONT_TTF_CARLITO_DIR	:= $(BUILDDIR)/$(XORG_FONT_TTF_CARLITO)
 XORG_FONT_TTF_CARLITO_LICENSE	:= OFL-1.1
 
-ifdef PTXCONF_XORG_FONT_TTF_CARLITO
-$(STATEDIR)/xorg-fonts.targetinstall.post: $(STATEDIR)/xorg-font-ttf-carlito.targetinstall
-endif
-
-# ----------------------------------------------------------------------------
-# Prepare
-# ----------------------------------------------------------------------------
-
 XORG_FONT_TTF_CARLITO_CONF_TOOL	:= NO
+XORG_FONT_TTF_CARLITO_FONTDIR	:= $(XORG_FONTDIR)/truetype/carlito
 
 # ----------------------------------------------------------------------------
 # Compile
@@ -49,6 +41,7 @@ $(STATEDIR)/xorg-font-ttf-carlito.compile:
 
 $(STATEDIR)/xorg-font-ttf-carlito.install:
 	@$(call targetinfo)
+	@$(call world/install-fonts,XORG_FONT_TTF_CARLITO,*.ttf)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -57,16 +50,6 @@ $(STATEDIR)/xorg-font-ttf-carlito.install:
 
 $(STATEDIR)/xorg-font-ttf-carlito.targetinstall:
 	@$(call targetinfo)
-
-	@mkdir -p $(XORG_FONTS_DIR_INSTALL)/truetype
-
-	@find $(XORG_FONT_TTF_CARLITO_DIR) \
-		-name "*.ttf" \
-		| \
-		while read file; do \
-		install -m 644 $${file} $(XORG_FONTS_DIR_INSTALL)/truetype; \
-	done
-
 	@$(call install_init,  xorg-font-ttf-carlito)
 	@$(call install_fixup, xorg-font-ttf-carlito,PRIORITY,optional)
 	@$(call install_fixup, xorg-font-ttf-carlito,SECTION,base)
@@ -78,8 +61,9 @@ $(STATEDIR)/xorg-font-ttf-carlito.targetinstall:
 	@$(call install_alternative, xorg-font-ttf-carlito, 0, 0, 644, \
 		/etc/fonts/conf.d/62-google-crosextra-carlito-fontconfig.conf)
 
-	@$(call install_finish, xorg-font-ttf-carlito)
+	@$(call install_tree, xorg-font-ttf-carlito, 0, 0, -, /usr)
 
+	@$(call install_finish, xorg-font-ttf-carlito)
 	@$(call touch)
 
 # vim: syntax=make

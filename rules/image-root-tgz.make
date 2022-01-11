@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,6 +18,7 @@ IMAGE_ROOT_TGZ		:= image-root-tgz
 IMAGE_ROOT_TGZ_DIR	:= $(BUILDDIR)/$(IMAGE_ROOT_TGZ)
 IMAGE_ROOT_TGZ_IMAGE	:= $(IMAGEDIR)/root.tgz
 IMAGE_ROOT_TGZ_PKGS	= $(PTX_PACKAGES_INSTALL)
+IMAGE_ROOT_TGZ_LABEL	:= $(call remove_quotes, $(PTXCONF_IMAGE_ROOT_TGZ_LABEL))
 
 # ----------------------------------------------------------------------------
 # Image

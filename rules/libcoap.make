@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBCOAP_SUFFIX	:= tar.gz
 LIBCOAP_URL	:= $(call ptx/mirror, SF, libcoap/$(LIBCOAP).$(LIBCOAP_SUFFIX))
 LIBCOAP_SOURCE	:= $(SRCDIR)/$(LIBCOAP).$(LIBCOAP_SUFFIX)
 LIBCOAP_DIR	:= $(BUILDDIR)/$(LIBCOAP)
-LIBCOAP_LICENSE	:= BSD, GPL-2.0
+LIBCOAP_LICENSE	:= BSD AND GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

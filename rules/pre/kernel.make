@@ -3,8 +3,6 @@
 # Copyright (C) 2003, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #           (C) 2008 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -32,19 +30,31 @@ ifdef PTXCONF_ARCH_PPC
 GENERIC_KERNEL_ARCH := "powerpc"
 endif
 
+#
+# Starting with 4.12-rc1, Linus no longer provides signed tarballs for
+# pre-release ("-rc") kernels. Download the version automatically generated
+# by cgit.
+#
+ifneq ($(findstring -rc,$(KERNEL_VERSION)),)
+KERNEL_NEEDS_GIT_URL := $(call ptx/force-sh, test $(KERNEL_VERSION_MAJOR) -ge 5 -o \( $(KERNEL_VERSION_MAJOR) -eq 4 -a $(KERNEL_VERSION_MINOR) -ge 12 \) && echo y)
+endif
+ifneq ($(findstring -rc,$(KERNEL_HEADER_VERSION)),)
+KERNEL_HEADER_NEEDS_GIT_URL := $(call ptx/force-sh, test $(KERNEL_HEADER_VERSION_MAJOR) -ge 5 -o \( $(KERNEL_HEADER_VERSION_MAJOR) -eq 4 -a $(KERNEL_HEADER_VERSION_MINOR) -ge 12 \) && echo y)
+endif
+
 KERNEL_HEADERS_DIR	:= $(PTXDIST_SYSROOT_TARGET)/kernel-headers
 KERNEL_HEADERS_INCLUDE_DIR := $(KERNEL_HEADERS_DIR)/include
 
 kernel/url = \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/testing/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/testing/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/longterm/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/$($(1)).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/testing/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/testing/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).x/longterm/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
 	\
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/testing/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/testing/v$(call kernel-major,$(1)).$(call kernel-minor,$(1)).$(call kernel-micro,$(1))/$($(1)).$($(1)_SUFFIX)) \
-	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/longterm/v$(call kernel-major,$(1)).$(call kernel-minor,$(1)).$(call kernel-micro,$(1))/$($(1)).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/testing/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/testing/v$(call kernel-major,$(1)).$(call kernel-minor,$(1)).$(call kernel-micro,$(1))/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
+	$(call ptx/mirror, KERNEL, kernel/v$(call kernel-major,$(1)).$(call kernel-minor,$(1))/longterm/v$(call kernel-major,$(1)).$(call kernel-minor,$(1)).$(call kernel-micro,$(1))/linux-$($(1)_VERSION).$($(1)_SUFFIX)) \
 
 kernel-url = \
 	$(call kernel/url,$(strip $(1)))
@@ -55,13 +65,27 @@ kernel/opts = \
 	HOSTCC=$(HOSTCC) \
 	ARCH=$(GENERIC_KERNEL_ARCH) \
 	CROSS_COMPILE=$(COMPILER_PREFIX) \
-	DEPMOD=$(PTXCONF_SYSROOT_HOST)/sbin/depmod \
+	DEPMOD=$(PTXDIST_SYSROOT_HOST)/sbin/depmod \
 	\
 	INSTALL_MOD_PATH=$($(1)_PKGDIR) \
 	PTX_KERNEL_DIR=$($(1)_DIR)
 
 kernel-opts = \
 	$(call kernel/opts,$(strip $(1)))
+
+#
+# Blacklist for all low-level code, e.g. kernel and bootloaders
+#
+PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST := \
+	TARGET_HARDEN_STACK \
+	TARGET_HARDEN_STACKCLASH \
+	TARGET_HARDEN_FORTIFY \
+	TARGET_HARDEN_RELRO \
+	TARGET_HARDEN_BINDNOW \
+	TARGET_HARDEN_PIE \
+	TARGET_HARDEN_GLIBCXX_ASSERTIONS \
+	TARGET_DEBUG \
+	TARGET_BUILD_ID
 
 #
 # handle special compiler

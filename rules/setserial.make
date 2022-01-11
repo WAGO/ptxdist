@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2005 by BSP
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -28,13 +26,14 @@ SETSERIAL_DIR		:= $(BUILDDIR)/$(SETSERIAL)
 # Prepare
 # ----------------------------------------------------------------------------
 
-SETSERIAL_PATH	:= PATH=$(CROSS_PATH)
-SETSERIAL_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SETSERIAL_AUTOCONF := $(CROSS_AUTOCONF_USR)
+SETSERIAL_CONF_TOOL	:= autoconf
+SETSERIAL_CONF_OPT	:= \
+	$(CROSS_AUTOCONF_USR)
+
+SETSERIAL_MAKE_OPT	:= setserial
 
 # ----------------------------------------------------------------------------
 # Target-Install

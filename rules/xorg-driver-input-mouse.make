@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,8 +15,8 @@ PACKAGES-$(PTXCONF_XORG_DRIVER_INPUT_MOUSE) += xorg-driver-input-mouse
 #
 # Paths and names
 #
-XORG_DRIVER_INPUT_MOUSE_VERSION	:= 1.9.0
-XORG_DRIVER_INPUT_MOUSE_MD5	:= 36b5b92000c4644f648b58a535e4ee73
+XORG_DRIVER_INPUT_MOUSE_VERSION	:= 1.9.3
+XORG_DRIVER_INPUT_MOUSE_MD5	:= a2104693bbcfe1413397f7905eecd3dc
 XORG_DRIVER_INPUT_MOUSE		:= xf86-input-mouse-$(XORG_DRIVER_INPUT_MOUSE_VERSION)
 XORG_DRIVER_INPUT_MOUSE_SUFFIX	:= tar.bz2
 XORG_DRIVER_INPUT_MOUSE_URL	:= $(call ptx/mirror, XORG, individual/driver/$(XORG_DRIVER_INPUT_MOUSE).$(XORG_DRIVER_INPUT_MOUSE_SUFFIX))

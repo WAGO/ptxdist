@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Marc Kleine-Budde <mkl@pengutronix.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -78,9 +76,6 @@ $(STATEDIR)/xorg-fonts.targetinstall.post:
 			$(XORG_FONTS_DIR_INSTALL)/$$file, \
 			$(XORG_FONTDIR)/$$file, n); \
 	done
-ifdef PTXCONF_XORG_FONTS_FC_CACHE
-	@$(call install_alternative, xorg-fonts, 0, 0, 0755, /etc/rc.once.d/fc-cache)
-endif
 ifdef PTXCONF_XORG_FONTS_QT4_LINKS
 	@cd $(XORG_FONTS_DIR_INSTALL) && \
 	find . -type f | while read file; do \

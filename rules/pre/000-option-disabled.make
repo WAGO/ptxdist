@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -89,6 +87,18 @@ endef
 
 
 #
+# $(call ptx/wow, PTXCONF_SYMBOL) returns "with" or "without"
+# depending on the symbol is defined or not
+#
+# $(call ptx/wow, PTXCONF_SYMBOL)
+#                     $1
+#
+define ptx/wow
+$(call ptx/ifdef, $(1), without, with)
+endef
+
+
+#
 # $(call ptx/onoff, PTXCONF_SYMBOL) returns "ON" or "OFF"
 # depending on the symbol is defined or not
 #
@@ -121,6 +131,18 @@ endef
 #
 define ptx/falsetrue
 $(call ptx/ifdef, $(1), false, true)
+endef
+
+
+#
+# $(call ptx/yesno, PTXCONF_SYMBOL) returns "yes" or "no"
+# depending on the symbol is defined or not
+#
+# $(call ptx/yesno, PTXCONF_SYMBOL)
+#                     $1
+#
+define ptx/yesno
+$(call ptx/ifdef, $(1), yes, no)
 endef
 
 # vim: syntax=make

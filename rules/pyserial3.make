@@ -3,8 +3,6 @@
 # Copyright (C) 2011 by Juergen Beisert <jbe@pengutronix.de>
 # Copyright (C) 2015 by Bernhard Walle <bernhard@bwalle.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,11 +15,11 @@ PACKAGES-$(PTXCONF_PYSERIAL3) += pyserial3
 #
 # Paths and names
 #
-PYSERIAL3_VERSION	:= 2.7
-PYSERIAL3_MD5		:= 794506184df83ef2290de0d18803dd11
-PYSERIAL3		:= pyserial3-$(PYSERIAL3_VERSION)
+PYSERIAL3_VERSION	:= 3.4
+PYSERIAL3_MD5		:= fc00727ed9cf3a31b7a296a4d42f6afc
+PYSERIAL3		:= v$(PYSERIAL3_VERSION)
 PYSERIAL3_SUFFIX	:= tar.gz
-PYSERIAL3_URL		:= http://pypi.python.org/packages/source/p/pyserial/pyserial-$(PYSERIAL3_VERSION).$(PYSERIAL3_SUFFIX)
+PYSERIAL3_URL		:= https://github.com/pyserial/pyserial/archive/v$(PYSERIAL3_VERSION).$(PYSERIAL3_SUFFIX)
 PYSERIAL3_SOURCE	:= $(SRCDIR)/$(PYSERIAL3).$(PYSERIAL3_SUFFIX)
 PYSERIAL3_DIR		:= $(BUILDDIR)/$(PYSERIAL3)
 PYSERIAL3_LICENSE	:= BSD

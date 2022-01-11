@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ RTMPDUMP_SUFFIX		:= tar.xz
 RTMPDUMP_URL		:= git://git.ffmpeg.org/rtmpdump.git;tag=$(RTMPDUMP_VERSION)
 RTMPDUMP_SOURCE		:= $(SRCDIR)/$(RTMPDUMP).$(RTMPDUMP_SUFFIX)
 RTMPDUMP_DIR		:= $(BUILDDIR)/$(RTMPDUMP)
-RTMPDUMP_LICENSE	:= LGPL-2.1+,GPL-2.0+
+RTMPDUMP_LICENSE	:= LGPL-2.1-or-later AND GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -44,6 +42,7 @@ RTMPDUMP_MAKE_ENV	:= \
 	XLDFLAGS="$(CROSS_LDFLAGS)"
 
 RTMPDUMP_MAKE_OPT	:= \
+	CRYPTO=GNUTLS \
 	prefix=/usr
 
 # ----------------------------------------------------------------------------

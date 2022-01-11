@@ -3,8 +3,6 @@
 # Copyright (C) 2015 by Steffen Trumtrar <s.trumtrar@pengutronix.de>
 #           (C) 2016 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,14 @@ PACKAGES-$(PTXCONF_LINUXPTP) += linuxptp
 #
 # Paths and names
 #
-LINUXPTP_VERSION	:= 1.6
-LINUXPTP_MD5		:= 6aa15d83f5a35f1fd076ba9adc4e7285
+LINUXPTP_VERSION	:= 2.0
+LINUXPTP_MD5		:= d8bb7374943bb747db7786ac26f17f11
 LINUXPTP		:= linuxptp-$(LINUXPTP_VERSION)
 LINUXPTP_SUFFIX		:= tgz
 LINUXPTP_URL		:= $(call ptx/mirror, SF, linuxptp/$(LINUXPTP).$(LINUXPTP_SUFFIX))
 LINUXPTP_SOURCE		:= $(SRCDIR)/$(LINUXPTP).$(LINUXPTP_SUFFIX)
 LINUXPTP_DIR		:= $(BUILDDIR)/$(LINUXPTP)
-LINUXPTP_LICENSE	:= GPL-2.0+
+LINUXPTP_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,7 +32,8 @@ LINUXPTP_CONF_TOOL	:= NO
 
 LINUXPTP_MAKE_ENV	:= \
 	$(CROSS_ENV) \
-	CROSS_COMPILE=$(COMPILER_PREFIX)
+	CROSS_COMPILE=$(COMPILER_PREFIX) \
+	KBUILD_OUTPUT=$(PTXDIST_SYSROOT_TOOLCHAIN)
 
 LINUXPTP_MAKE_OPT	:= \
 	prefix=/usr
@@ -64,7 +63,22 @@ $(STATEDIR)/linuxptp.targetinstall:
 	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/phc2sys)
 	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/pmc)
 	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/hwstamp_ctl)
-	@$(call install_alternative, linuxptp, 0, 0, 0644, /etc/gPTP.conf)
+	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/phc_ctl)
+	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/nsm)
+	@$(call install_copy, linuxptp, 0, 0, 0755, -, /usr/sbin/timemaster)
+
+ifdef PTXCONF_LINUXPTP_SYSTEMD_SERVICE
+	@$(call install_alternative, linuxptp, 0, 0, 0644, /usr/lib/systemd/system/ptp4l.service)
+	@$(call install_alternative, linuxptp, 0, 0, 0644, /usr/lib/systemd/system/phc2sys.service)
+
+	@$(call install_link, linuxptp, ../ptp4l.service, \
+		/usr/lib/systemd/system/multi-user.target.wants/ptp4l.service)
+
+ifdef PTXCONF_LINUXPTP_PHC2SYS_SYSTEMD_SERVICE
+	@$(call install_link, linuxptp, ../phc2sys.service, \
+		/usr/lib/systemd/system/multi-user.target.wants/phc2sys.service)
+endif
+endif
 
 	@$(call install_finish, linuxptp)
 

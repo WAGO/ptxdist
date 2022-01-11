@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Roland Hieber <r.hieber@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ STRESS_SUFFIX	:= tar.gz
 STRESS_URL	:= https://people.seas.harvard.edu/~apw/stress/$(STRESS).$(STRESS_SUFFIX)
 STRESS_SOURCE	:= $(SRCDIR)/$(STRESS).$(STRESS_SUFFIX)
 STRESS_DIR	:= $(BUILDDIR)/$(STRESS)
-STRESS_LICENSE	:= GPL-2.0+
+STRESS_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

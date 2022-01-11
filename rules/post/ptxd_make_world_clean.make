@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,7 +17,7 @@ $(STATEDIR)/%.clean: FORCE
 # clean
 #
 world/clean = \
-	$(call world/env, $(1)) \
+	$(call world/image/env, $(1)) \
 	ptxd_make_world_clean
 
 #

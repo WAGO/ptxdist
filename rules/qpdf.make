@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Roland Hieber <r.hieber@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,15 @@ PACKAGES-$(PTXCONF_QPDF) += qpdf
 #
 # Paths and names
 #
-QPDF_VERSION	:= 7.0.0
-QPDF_MD5	:= c3ff408f69b3a6b2b3b4c8b373b2600c
+QPDF_VERSION	:= 8.4.2
+QPDF_MD5	:= 41160fbd4450d4988f0705d394069ad4
 QPDF		:= qpdf-$(QPDF_VERSION)
 QPDF_SUFFIX	:= tar.gz
 QPDF_URL	:= $(call ptx/mirror, SF, /qpdf/qpdf/$(QPDF_VERSION)/$(QPDF).$(QPDF_SUFFIX))
 QPDF_SOURCE	:= $(SRCDIR)/$(QPDF).$(QPDF_SUFFIX)
 QPDF_DIR	:= $(BUILDDIR)/$(QPDF)
-QPDF_LICENSE	:= Artistic-2.0
+QPDF_LICENSE	:= Apache-2.0
+QPDF_LICENSE_FILES	:= file://LICENSE.txt;md5=3b83ef96387f14655fc854ddc3c6bd57
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -43,6 +42,7 @@ QPDF_CONF_ENV	:= \
 QPDF_CONF_TOOL	:= autoconf
 QPDF_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-check-autofiles \
 	--disable-static \
 	--enable-libtool-lock \
 	--disable-insecure-random \

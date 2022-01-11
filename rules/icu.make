@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,17 +14,17 @@ PACKAGES-$(PTXCONF_ICU) += icu
 #
 # Paths and names
 #
-ICU_VERSION	:= 52.1
-ICU_MD5		:= 9e96ed4c1d99c0d14ac03c140f9f346c
+ICU_VERSION	:= 60.3
+ICU_MD5		:= 4f558e73b7bd1fa93caf3d10479de41b
 ICU		:= icu4c-$(subst .,_,$(ICU_VERSION))-src
 ICU_SUFFIX	:= tgz
-ICU_URL		:= http://download.icu-project.org/files/icu4c/$(ICU_VERSION)/$(ICU).$(ICU_SUFFIX)
+ICU_URL		:= https://github.com/unicode-org/icu/releases/download/release-$(subst .,-,$(ICU_VERSION))/$(ICU).$(ICU_SUFFIX)
 ICU_SOURCE	:= $(SRCDIR)/$(ICU).$(ICU_SUFFIX)
 ICU_DIR		:= $(BUILDDIR)/$(ICU)
 ICU_SUBDIR	:= source
-ICU_LICENSE	:= MIT, Unicode-TOU, public_domain
+ICU_LICENSE	:= MIT AND Unicode-TOU AND public_domain
 ICU_LICENSE_FILES := \
-	file://license.html;md5=3a0605ebb7852070592fbd57e8967f3f
+	file://LICENSE;md5=675f2d069434d8a1e4e6b0dcf4379226
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -52,7 +50,7 @@ ICU_CONF_OPT	:= \
 	--disable-weak-threads \
 	--disable-extras \
 	--enable-icuio \
-	--enable-layout \
+	--disable-layout \
 	--enable-tools \
 	--disable-tests \
 	--disable-samples \
@@ -75,8 +73,6 @@ $(STATEDIR)/icu.targetinstall:
 	@$(call install_lib, icu, 0, 0, 0644, libicudata)
 	@$(call install_lib, icu, 0, 0, 0644, libicui18n)
 	@$(call install_lib, icu, 0, 0, 0644, libicuio)
-	@$(call install_lib, icu, 0, 0, 0644, libicule)
-	@$(call install_lib, icu, 0, 0, 0644, libiculx)
 	@$(call install_lib, icu, 0, 0, 0644, libicutu)
 	@$(call install_lib, icu, 0, 0, 0644, libicuuc)
 

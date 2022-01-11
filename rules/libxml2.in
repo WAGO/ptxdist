@@ -103,7 +103,7 @@ config LIBXML2_LEGACY
 	default y
 	prompt "Support for deprecated APIs"
 	help
-	  Add support for deprecated APIs (compatiblity)
+	  Add support for deprecated APIs (compatibility)
 
 config LIBXML2_MEM_DEBUG
 	bool
@@ -148,10 +148,10 @@ config LIBXML2_PYTHON
 config LIBXML2_READER
 	bool
 	default y
-	# FIXME: this is http://bugzilla.gnome.org/show_bug.cgi?id=545579
-	select LIBXML2_SCHEMAS
 	# hard dependencies from configure.in
 	select LIBXML2_PUSH
+	# needed for xmlValidatePopElement
+	select LIBXML2_DTD
 	prompt "xmlReader Parsing Interface"
 	help
 	  Add the xmlReader parsing interface.

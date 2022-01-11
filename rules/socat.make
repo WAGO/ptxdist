@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Michael Grzeschik <mgr@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -14,14 +12,14 @@ PACKAGES-$(PTXCONF_SOCAT) += socat
 # Paths and names
 #
 
-SOCAT_VERSION	:= 1.7.3.0
-SOCAT_MD5	:= de46e3f726f783271226eb94d5109bf8
+SOCAT_VERSION	:= 1.7.3.2
+SOCAT_MD5	:= aec3154f7854580cfab0c2d81e910519
 SOCAT		:= socat-$(SOCAT_VERSION)
 SOCAT_SUFFIX	:= tar.gz
 SOCAT_URL	:= http://www.dest-unreach.org/socat/download/$(SOCAT).$(SOCAT_SUFFIX)
 SOCAT_SOURCE	:= $(SRCDIR)/$(SOCAT).$(SOCAT_SUFFIX)
 SOCAT_DIR	:= $(BUILDDIR)/$(SOCAT)
-SOCAT_LICENSE	:= GPL-2.0
+SOCAT_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

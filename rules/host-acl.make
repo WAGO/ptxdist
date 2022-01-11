@@ -3,8 +3,6 @@
 # Copyright (C) 2009 by Carsten Schlote <c.schlote@konzeptpark.de>
 #               2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,22 +16,14 @@ HOST_PACKAGES-$(PTXCONF_HOST_ACL) += host-acl
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_ACL_ENV := \
-	$(HOST_ENV) \
-	ac_cv_path_MSGFMT=: \
-	ac_cv_path_MSGMERGE=: \
-	ac_cv_path_XGETTEXT=:
-
-# don't use := here
-HOST_ACL_INSTALL_OPT = \
-	DIST_ROOT=$(HOST_ACL_PKGDIR) \
-	install \
-	install-lib \
-	install-dev
-
-HOST_ACL_AUTOCONF := \
+#
+# autoconf
+#
+HOST_ACL_CONF_TOOL	:= autoconf
+HOST_ACL_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
-	--libexecdir=/lib \
-	--enable-shared
+	--disable-nls \
+	--disable-rpath \
+	--disable-debug
 
 # vim: syntax=make

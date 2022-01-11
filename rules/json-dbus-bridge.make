@@ -3,8 +3,6 @@
 # Copyright (C) 2010 by Tim Sander <tim.sander@hbm.com>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ JSON_DBUS_BRIDGE_SUFFIX		:= tar.bz2
 JSON_DBUS_BRIDGE_URL		:= http://www.pengutronix.de/software/json-dbus-bridge/download/$(JSON_DBUS_BRIDGE).$(JSON_DBUS_BRIDGE_SUFFIX)
 JSON_DBUS_BRIDGE_SOURCE		:= $(SRCDIR)/$(JSON_DBUS_BRIDGE).$(JSON_DBUS_BRIDGE_SUFFIX)
 JSON_DBUS_BRIDGE_DIR		:= $(BUILDDIR)/$(JSON_DBUS_BRIDGE)
-JSON_DBUS_BRIDGE_LICENSE	:= LGPL-2.1+
+JSON_DBUS_BRIDGE_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

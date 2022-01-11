@@ -6,6 +6,7 @@ menuconfig CUPS_FILTERS
 
 	select LIBC_DL
 	select HOST_CUPS
+	select HOST_GLIB
 	select CUPS
 	select GLIB
 	select ZLIB
@@ -20,6 +21,7 @@ menuconfig CUPS_FILTERS
 	select POPPLER_CPP		if CUPS_FILTERS_POPPLER
 	select POPPLER_CMS		if CUPS_FILTERS_POPPLER
 	select POPPLER_SPLASH		if CUPS_FILTERS_POPPLER
+	select POPPLER_SPLASH_DOUBLE	if CUPS_FILTERS_POPPLER
 	select POPPLER_XPDF		if CUPS_FILTERS_POPPLER
 
 	select LIBJPEG			if CUPS_FILTERS_JPEG
@@ -40,9 +42,6 @@ config CUPS_FILTERS_POPPLER
 	bool "build with poppler support"
 	help
 	  Build with poppler support, needed for pdfto* filters and banners.
-
-comment "poppler support will not build with POPPLER_SPLASH_FIXED!"
-	depends on (POPPLER_SPLASH_FIXED && CUPS_FILTERS_POPPLER)
 
 config CUPS_FILTERS_IMAGEFILTERS
 	bool "build image filters"

@@ -3,8 +3,6 @@
 # Copyright (C) 2015 by Marc Kleine-Budde <mkl@pengutronix.de>
 # Copyright (C) 2016 by Clemens Gruber <clemens.gruber@pqgruber.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,15 @@ PACKAGES-$(PTXCONF_NGINX) += nginx
 #
 # Paths and names
 #
-NGINX_VERSION	:= 1.12.2
-NGINX_MD5	:= 4d2fc76211435f029271f1cf6d7eeae3
+NGINX_VERSION	:= 1.16.1
+NGINX_MD5	:= 45a80f75336c980d240987badc3dcf60
 NGINX		:= nginx-$(NGINX_VERSION)
 NGINX_SUFFIX	:= tar.gz
 NGINX_URL	:= https://nginx.org/download/$(NGINX).$(NGINX_SUFFIX)
 NGINX_SOURCE	:= $(SRCDIR)/$(NGINX).$(NGINX_SUFFIX)
 NGINX_DIR	:= $(BUILDDIR)/$(NGINX)
 NGINX_LICENSE	:= BSD-2-Clause
+NGINX_LICENSE_FILES	:= file://LICENSE;md5=52e384aaac868b755b93ad5535e2d075
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -45,7 +44,7 @@ NGINX_CONF_ENV := \
 	ngx_force_have_map_devzero=yes \
 	ngx_force_have_sysvshm=yes \
 	ngx_force_have_posix_sem=yes \
-	ngx_force_ipv6=$(call ptx/ifdef, PTXCONF_GLOBAL_IPV6, yes, no)
+	ngx_force_ipv6=$(call ptx/yesno, PTXCONF_GLOBAL_IPV6)
 
 ifdef PTXCONF_ENDIAN_LITTLE
 NGINX_CONF_ENV += ngx_force_have_little_endian=yes
@@ -80,6 +79,7 @@ NGINX_CONF_OPT := \
 	--without-http_limit_req_module \
 	--without-http_map_module \
 	--without-http_memcached_module \
+	--without-http_mirror_module \
 	--without-http_referer_module \
 	--without-http_split_clients_module \
 	--without-http_ssi_module \
@@ -93,7 +93,11 @@ NGINX_CONF_OPT := \
 	--without-mail_pop3_module \
 	--without-mail_smtp_module \
 	--without-stream_access_module \
+	--without-stream_geo_module \
 	--without-stream_limit_conn_module \
+	--without-stream_map_module \
+	--without-stream_return_module \
+	--without-stream_split_clients_module \
 	--without-stream_upstream_hash_module \
 	--without-stream_upstream_least_conn_module \
 	--without-stream_upstream_zone_module
@@ -114,6 +118,7 @@ NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_ACCESS_MODULE)		:= http_access_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_AUTH_BASIC_MODULE)	+= http_auth_basic_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_AUTOINDEX_MODULE)	+= http_autoindex_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_FASTCGI_MODULE)		+= http_fastcgi_module
+NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_GRPC_MODULE)		+= http_grpc_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_GZIP_MODULE)		+= http_gzip_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_PROXY_MODULE)		+= http_proxy_module
 NGINX_CONF_OPTOUT-$(PTXCONF_NGINX_HTTP_REWRITE_MODULE)		+= http_rewrite_module

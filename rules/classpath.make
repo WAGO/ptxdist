@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -36,6 +34,7 @@ CLASSPATH_ENV 	:= \
 	JAVAC=$(PTXCONF_SETUP_JAVA_SDK)/bin/javac \
 	JAVA=jamvm \
 	CLASSPATH=$(PTXCONF_SETUP_JAVA_SDK)/jre/lib \
+	ac_cv_lib_magic_magic_open=no \
 	ac_cv_prog_java_works=yes \
 	ac_cv_prog_javac_is_gcj=no
 
@@ -148,6 +147,14 @@ $(STATEDIR)/classpath.targetinstall:
 	@$(call install_lib, classpath, 0, 0, 0644, classpath/libjavanet)
 	@$(call install_lib, classpath, 0, 0, 0644, classpath/libjavalangreflect)
 	@$(call install_lib, classpath, 0, 0, 0644, classpath/libjavanio)
+
+	@$(call install_link, classpath, libjavautil.so.0.0.0, /usr/lib/classpath/libjavautil.so)
+	@$(call install_link, classpath, libjavalangmanagement.so.0.0.0, /usr/lib/classpath/libjavalangmanagement.so)
+	@$(call install_link, classpath, libjavaio.so.0.0.0, /usr/lib/classpath/libjavaio.so)
+	@$(call install_link, classpath, libjavalang.so.0.0.0, /usr/lib/classpath/libjavalang.so)
+	@$(call install_link, classpath, libjavanet.so.0.0.0, /usr/lib/classpath/libjavanet.so)
+	@$(call install_link, classpath, libjavalangreflect.so.0.0.0, /usr/lib/classpath/libjavalangreflect.so)
+	@$(call install_link, classpath, libjavanio.so.0.0.0, /usr/lib/classpath/libjavanio.so)
 
 	@$(call install_copy, classpath, 0, 0, 0644, -, /usr/lib/security/classpath.security)
 	@$(call install_copy, classpath, 0, 0, 0644, -, /usr/lib/logging.properties)

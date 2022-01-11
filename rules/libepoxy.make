@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBEPOXY) += libepoxy
 #
 # Paths and names
 #
-LIBEPOXY_VERSION	:= 1.2
-LIBEPOXY_MD5		:= 7f109968e610eff9c8b035a32e29f49c
+LIBEPOXY_VERSION	:= 1.5.3
+LIBEPOXY_MD5		:= e2845de8d2782b2d31c01ae8d7cd4cbb
 LIBEPOXY		:= libepoxy-$(LIBEPOXY_VERSION)
-LIBEPOXY_SUFFIX		:= tar.bz2
-LIBEPOXY_URL		:= https://github.com/anholt/libepoxy.git;tag=v$(LIBEPOXY_VERSION)
+LIBEPOXY_SUFFIX		:= tar.xz
+LIBEPOXY_URL		:= https://github.com/anholt/libepoxy/releases/download/$(LIBEPOXY_VERSION)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_SOURCE		:= $(SRCDIR)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_DIR		:= $(BUILDDIR)/$(LIBEPOXY)
 LIBEPOXY_LICENSE	:= MIT
@@ -29,17 +27,17 @@ LIBEPOXY_LICENSE	:= MIT
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBEPOXY_CONF_ENV	:= \
-	$(CROSS_ENV) \
-	ac_cv_prog_PYTHON=python
 #
 # autoconf
 #
-LIBEPOXY_CONF_TOOL	:= autoconf
+LIBEPOXY_CONF_TOOL	:= meson
 LIBEPOXY_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-strict-compilation \
-	$(GLOBAL_LARGE_FILE_OPTION)
+	$(CROSS_MESON_USR) \
+	-Ddocs=false \
+	-Degl=$(call ptx/yesno,PTXCONF_LIBEPOXY_EGL) \
+	-Dglx=$(call ptx/yesno,PTXCONF_LIBEPOXY_GLX) \
+	-Dtests=false \
+	-Dx11=$(call ptx/truefalse,PTXCONF_LIBEPOXY_GLX)
 
 # ----------------------------------------------------------------------------
 # Target-Install

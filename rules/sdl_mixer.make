@@ -3,8 +3,6 @@
 # Copyright (C) 2008 by Marek Moeckel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ SDL_MIXER_SUFFIX	:= tar.gz
 SDL_MIXER_URL		:= http://www.libsdl.org/projects/SDL_mixer/release/$(SDL_MIXER).$(SDL_MIXER_SUFFIX)
 SDL_MIXER_SOURCE	:= $(SRCDIR)/$(SDL_MIXER).$(SDL_MIXER_SUFFIX)
 SDL_MIXER_DIR		:= $(BUILDDIR)/$(SDL_MIXER)
-SDL_MIXER_LICENSE	:= LGPL-2.1
+SDL_MIXER_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

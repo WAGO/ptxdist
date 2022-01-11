@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Luotao Fu <lfu@pengutronix.de>
 #           (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -19,6 +17,7 @@ PACKAGES-$(PTXCONF_LOCALES) += locales
 #
 LOCALES			:= locales
 LOCALES_VERSION		:= 1.0
+LOCALES_LICENSE		:= ignore
 
 # ----------------------------------------------------------------------------
 # Install

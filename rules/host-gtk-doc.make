@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ HOST_GTK_DOC_SUFFIX	:= tar.bz2
 HOST_GTK_DOC_URL	:= http://ftp.gnome.org/pub/GNOME/sources/gtk-doc/$(HOST_GTK_DOC_VERSION)/$(HOST_GTK_DOC).$(HOST_GTK_DOC_SUFFIX)
 HOST_GTK_DOC_SOURCE	:= $(SRCDIR)/$(HOST_GTK_DOC).$(HOST_GTK_DOC_SUFFIX)
 HOST_GTK_DOC_DIR	:= $(HOST_BUILDDIR)/$(HOST_GTK_DOC)
-HOST_GTK_DOC_LICENSE	:= GPL-3.0, GFDL-1.1
+HOST_GTK_DOC_LICENSE	:= GPL-3.0-only AND GFDL-1.1-only
 HOST_GTK_DOC_LICENSE_FILES := \
 	file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 	file://COPYING-DOCS;md5=18ba770020b624031bc7c8a7b055d776
@@ -51,7 +49,10 @@ $(STATEDIR)/host-gtk-doc.compile:
 
 $(STATEDIR)/host-gtk-doc.install:
 	@$(call targetinfo)
-	install -D "$(HOST_GTK_DOC_DIR)/gtk-doc.m4" "$(PTXDIST_SYSROOT_HOST)/share/aclocal"
+	@install -vD -m644 "$(HOST_GTK_DOC_DIR)/gtk-doc.m4" \
+		"$(PTXDIST_SYSROOT_HOST)/share/aclocal/gtk-doc.m4"
+	@install -vD -m644 "$(HOST_GTK_DOC_DIR)/gtk-doc.make" \
+		"$(PTXDIST_SYSROOT_HOST)/share/gtk-doc/data/gtk-doc.make"
 	@$(call touch)
 
 # ----------------------------------------------------------------------------

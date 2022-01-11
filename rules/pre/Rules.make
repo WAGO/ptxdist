@@ -9,8 +9,8 @@
 
 # FIXME: cleanup
 
-GNU_BUILD	:= $(shell $(SCRIPTSDIR)/autoconf/config.guess)
-GNU_HOST	:= $(shell echo $(GNU_BUILD) | sed s/-[a-zA-Z0-9_]*-/-host-/)
+GNU_BUILD	:= $(call ptx/force-sh, $(SCRIPTSDIR)/autoconf/config.guess)
+GNU_HOST	:= $(call ptx/force-sh, echo $(GNU_BUILD) | sed s/-[a-zA-Z0-9_]*-/-host-/)
 
 INSTALL		:= install
 
@@ -29,7 +29,7 @@ CHECK_PIPE_STATUS := \
 #
 # prepare the search path when cross compiling
 #
-CROSS_PATH := $(PTXDIST_SYSROOT_CROSS)/bin:$(PTXDIST_SYSROOT_CROSS)/sbin:$$PATH
+CROSS_PATH := $(PTXDIST_SYSROOT_CROSS)/bin:$(PTXDIST_SYSROOT_CROSS)/sbin:$(PATH)
 
 
 # ----------------------------------------------------------------------------
@@ -64,6 +64,7 @@ CROSS_GNATMAKE		:= $(PTXCONF_COMPILER_PREFIX)gnatmake
 CROSS_GNATNAME		:= $(PTXCONF_COMPILER_PREFIX)gnatname
 CROSS_GNATPREP		:= $(PTXCONF_COMPILER_PREFIX)gnatprep
 CROSS_GNATXREF		:= $(PTXCONF_COMPILER_PREFIX)gnatxref
+CROSS_PKG_CONFIG	:= $(PTXCONF_COMPILER_PREFIX)pkg-config
 
 CROSS_ENV_AR		:= AR=$(CROSS_AR)
 CROSS_ENV_AS		:= AS=$(CROSS_AS)
@@ -93,6 +94,7 @@ CROSS_ENV_GNATXREF	:= GNATXREF=$(CROSS_GNATXREF)
 CROSS_ENV_CC_FOR_BUILD	:= CC_FOR_BUILD=$(HOSTCC)
 CROSS_ENV_CPP_FOR_BUILD	:= CPP_FOR_BUILD="$(HOSTCC) -E"
 CROSS_ENV_LINK_FOR_BUILD:= LINK_FOR_BUILD=$(HOSTCC)
+CROSS_ENV_PKG_CONFIG	:= PKG_CONFIG=$(CROSS_PKG_CONFIG)
 
 
 
@@ -131,21 +133,11 @@ CROSS_ENV_PROGS := \
 	$(CROSS_ENV_GNATXREF) \
 	$(CROSS_ENV_CC_FOR_BUILD) \
 	$(CROSS_ENV_CPP_FOR_BUILD) \
-	$(CROSS_ENV_LINK_FOR_BUILD)
+	$(CROSS_ENV_LINK_FOR_BUILD) \
+	$(CROSS_ENV_PKG_CONFIG)
 
 CROSS_LIB_DIR   := $(shell ptxd_get_lib_dir)
 
-#
-# prepare to use pkg-config with wrapper which takes care of
-# $(PTXDIST_SYSROOT_TARGET). The wrapper's magic doesn't work when
-# pkg-config strips out /usr/lib and other system libs/cflags, so we
-# leave them in; the wrapper replaces them by proper
-# $(PTXDIST_SYSROOT_TARGET) correspondees.
-#
-CROSS_ENV_PKG_CONFIG := \
-	SYSROOT="$(PTXDIST_SYSROOT_TARGET)" \
-	$(PTXDIST_CROSS_ENV_PKG_CONFIG) \
-	PKG_CONFIG="$(PTXDIST_SYSROOT_CROSS)/bin/$(COMPILER_PREFIX)pkg-config"
 
 #
 # The ac_cv_* variables are needed to tell configure scripts not to
@@ -213,7 +205,6 @@ endif
 #
 CROSS_ENV := \
 	$(CROSS_ENV_PROGS) \
-	$(CROSS_ENV_PKG_CONFIG) \
 	$(CROSS_ENV_AC)
 
 
@@ -255,14 +246,18 @@ CROSS_QMAKE_OPT := \
 	$(if $(filter 0,$(PTXDIST_VERBOSE)),CONFIG+=silent)
 
 CROSS_PYTHON_INSTALL := install --prefix=/usr
-HOST_PYTHON_INSTALL := install --prefix=
+HOST_PYTHON_INSTALL := install --prefix=/.
 
 CROSS_MESON_USR := \
-	--prefix /usr \
-	--libdir $(CROSS_LIB_DIR) \
-	--backend ninja \
-	--buildtype debugoptimized \
-	--cross-file '${PTXDIST_MESON_CROSS_FILE}'
+	--cross-file '${PTXDIST_MESON_CROSS_FILE}' \
+	--wrap-mode nodownload \
+	-Dbackend=ninja \
+	-Dbuildtype=debugoptimized \
+	-Dlibdir=$(CROSS_LIB_DIR) \
+	-Dprefix=/usr
+
+CROSS_MESON_ENV = \
+	$(HOST_ENV_PROGS)
 
 ifdef PTXCONF_GLOBAL_IPV6
 GLOBAL_IPV6_OPTION := --enable-ipv6
@@ -276,6 +271,12 @@ else
 GLOBAL_LARGE_FILE_OPTION := --disable-largefile
 endif
 
+ifdef PTXCONF_GLOBAL_PAM
+GLOBAL_PAM_OPTION := --enable-pam
+else
+GLOBAL_PAM_OPTION := --disable-pam
+endif
+
 ifdef PTXCONF_GLOBAL_SELINUX
 GLOBAL_SELINUX_OPTION := --enable-selinux
 else
@@ -286,24 +287,24 @@ endif
 # HOST stuff
 # ----------------------------------------------------------------------------
 
-HOST_PATH	:= $$PATH
+HOST_PATH	:= $(PATH)
+
+HOST_ENV_AC := \
+	enable_option_checking=fatal \
+	enable_maintainer_mode=no \
+	enable_static=no
 
 HOST_ENV_CC		:= CC="$(HOSTCC)"
 HOST_ENV_CXX		:= CXX="$(HOSTCXX)"
-HOST_ENV_PKG_CONFIG	:= $(PTXDIST_HOST_ENV_PKG_CONFIG)
 
-HOST_ENV_PYTHONPATH	:= \
-	PYTHONPATH="$(shell python -c 'import distutils.sysconfig as sysconfig; \
-		print "%s" % sysconfig.get_python_lib(prefix="'"$(PTXDIST_SYSROOT_HOST)"'")')"
+HOST_ENV_PROGS := \
+	$(HOST_ENV_CC) \
+	$(HOST_ENV_CXX)
 
 HOST_ENV	:= \
-	enable_option_checking=fatal \
-	enable_maintainer_mode=no \
-	enable_static=no \
-	$(HOST_ENV_CC) \
-	$(HOST_ENV_CXX) \
-	$(HOST_ENV_PKG_CONFIG) \
-	$(HOST_ENV_PYTHONPATH)
+	$(HOST_ENV_AC) \
+	$(HOST_ENV_PROGS) \
+	$(HOST_ENV_PKG_CONFIG)
 
 
 HOST_AUTOCONF  := --prefix=
@@ -318,6 +319,13 @@ HOST_CMAKE_OPT_SYSROOT := \
 	-DCMAKE_INSTALL_PREFIX=$(PTXDIST_SYSROOT_HOST) \
 	-DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
 	-DCMAKE_TOOLCHAIN_FILE='${PTXDIST_CMAKE_TOOLCHAIN_HOST}'
+
+HOST_MESON_OPT := \
+	--wrap-mode nodownload \
+	-Dbackend=ninja \
+	-Dbuildtype=debugoptimized \
+	-Dlibdir=lib \
+	-Dprefix=/
 
 # ----------------------------------------------------------------------------
 # HOST_CROSS stuff
@@ -390,16 +398,6 @@ add_zoneinfo =							\
 	-n "$$ZONEINFO_NAME"					\
 	-p "$$PREF"						\
 	-s "$$SYSROOT"
-
-
-#
-# clean
-#
-# Cleanup the given directory or file.
-#
-clean =								\
-	DIR="$(strip $(1))";					\
-	rm -rf $$DIR
 
 
 #

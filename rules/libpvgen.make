@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Markus Messmer <m.messmer@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -41,11 +39,11 @@ LIBPVGEN_AUTOCONF := \
 
 $(STATEDIR)/libpvgen.install:
 	@$(call targetinfo)
-	@mkdir -p $(PTXCONF_SYSROOT_HOST)/usr/share/libpvgen
+	@mkdir -p $(PTXDIST_SYSROOT_HOST)/usr/share/libpvgen
 	@for file in confignode genpv_cfile libpvgen wago; do \
 		ln -sf \
-			$(PTXCONF_SYSROOT_TARGET)/usr/share/libpvgen/"$${file}.py" \
-			$(PTXCONF_SYSROOT_HOST)/usr/share/libpvgen/"$${file}.py"; \
+			$(PTXDIST_SYSROOT_TARGET)/usr/share/libpvgen/"$${file}.py" \
+			$(PTXDIST_SYSROOT_HOST)/usr/share/libpvgen/"$${file}.py"; \
 	done
 	@$(call touch)
 

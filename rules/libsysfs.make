@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBSYSFS_SUFFIX		:= tar.gz
 LIBSYSFS_URL		:= $(call ptx/mirror, SF, linux-diag/$(LIBSYSFS).$(LIBSYSFS_SUFFIX))
 LIBSYSFS_SOURCE		:= $(SRCDIR)/$(LIBSYSFS).$(LIBSYSFS_SUFFIX)
 LIBSYSFS_DIR		:= $(BUILDDIR)/$(LIBSYSFS)
-LIBSYSFS_LICENSE	:= GPL-2.0, LGPL-2.0
+LIBSYSFS_LICENSE	:= GPL-2.0-only AND LGPL-2.0-only
 LIBSYSFS_LICENSE_FILES	:= \
 	file://cmd/GPL;md5=d41d4e2e1e108554e0388ea4aecd8d27 \
 	file://lib/LGPL;md5=b75d069791103ffe1c0d6435deeff72e

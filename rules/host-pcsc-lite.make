@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Steffen Trumtrar <s.trumtrar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,6 +22,7 @@ HOST_PCSC_LITE_CONF_TOOL := autoconf
 HOST_PCSC_LITE_CONF_OPT := \
 	$(HOST_AUTOCONF) \
 	--disable-libusb \
-	--disable-libudev
+	--disable-libudev \
+	--disable-libsystemd
 
 # vim: syntax=make

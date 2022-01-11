@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2010 by Jon Ringle
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ WATCHDOG_SUFFIX		:= tar.gz
 WATCHDOG_URL		:= $(call ptx/mirror, SF, watchdog/$(WATCHDOG).$(WATCHDOG_SUFFIX))
 WATCHDOG_SOURCE		:= $(SRCDIR)/$(WATCHDOG).$(WATCHDOG_SUFFIX)
 WATCHDOG_DIR		:= $(BUILDDIR)/$(WATCHDOG)
-WATCHDOG_LICENSE	:= GPL-2.0
+WATCHDOG_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

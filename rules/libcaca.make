@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -31,8 +29,7 @@ LIBCACA_DIR	:= $(BUILDDIR)/$(LIBCACA)
 LIBCACA_PATH	:= PATH=$(CROSS_PATH)
 LIBCACA_ENV 	:= \
 	$(CROSS_ENV) \
-	CONFIG_SHELL=bash \
-	$(call ptx/ncurses, PTXCONF_LIBCACA_NCURSES)
+	CONFIG_SHELL=bash
 
 #
 # autoconf

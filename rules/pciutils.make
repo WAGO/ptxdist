@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 # Copyright (C) 2009 by Wolfram Sang, Pengutronix
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,31 +15,33 @@ PACKAGES-$(PTXCONF_PCIUTILS) += pciutils
 #
 # Paths and names
 #
-PCIUTILS_VERSION	:= 3.3.0
-PCIUTILS_MD5		:= 3c19adf32a8457983b71ff376ef7dafe
+PCIUTILS_VERSION	:= 3.7.0
+PCIUTILS_MD5		:= e6e20482b4f25c5186e6a753c5edc361
 PCIUTILS		:= pciutils-$(PCIUTILS_VERSION)
 PCIUTILS_SUFFIX		:= tar.xz
 PCIUTILS_URL		:= $(call ptx/mirror, KERNEL, ../software/utils/pciutils/$(PCIUTILS).$(PCIUTILS_SUFFIX))
 PCIUTILS_SOURCE		:= $(SRCDIR)/$(PCIUTILS).$(PCIUTILS_SUFFIX)
 PCIUTILS_DIR		:= $(BUILDDIR)/$(PCIUTILS)
-PCIUTILS_LICENSE	:= GPL-2.0
+PCIUTILS_LICENSE	:= GPL-2.0-or-later
+PCIUTILS_LICENSE_FILES	:= \
+	file://README;startline=4;endline=8;md5=2ae7724797a960932b288272eed49a30
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 PCIUTILS_CONF_TOOL	:= NO
-PCIUTILS_COMPILE_ENV	:= $(CROSS_ENV)
+PCIUTILS_MAKE_ENV	:= $(CROSS_ENV)
 
 PCIUTILS_MAKE_OPT := \
 	CROSS_COMPILE=$(COMPILER_PREFIX) \
 	PREFIX=/usr \
-	SBINDIR='\$$(PREFIX)/bin' \
+	SBINDIR=/usr/bin \
 	HOST=$(PTXCONF_ARCH_STRING)-linux \
 	RELEASE=$(KERNEL_HEADER_VERSION) \
-	ZLIB=$(call ptx/ifdef,PTXCONF_PCIUTILS_COMPRESS,yes,no) \
-	LIBKMOD=$(call ptx/ifdef,PTXCONF_PCIUTILS_LIBKMOD,yes,no) \
-	SHARED=$(call ptx/ifdef,PTXCONF_PCIUTILS_LIBPCI,yes,no) \
+	ZLIB=$(call ptx/yesno, PTXCONF_PCIUTILS_COMPRESS) \
+	LIBKMOD=$(call ptx/yesno, PTXCONF_PCIUTILS_LIBKMOD) \
+	SHARED=$(call ptx/yesno, PTXCONF_PCIUTILS_LIBPCI) \
 	STRIP= \
 	DNS=no \
 	HWDB=no

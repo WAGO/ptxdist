@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Ladislav Michl
 #               2010 Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,21 +22,25 @@ IFPLUGD_SUFFIX	:= tar.gz
 IFPLUGD_URL	:= http://0pointer.de/lennart/projects/ifplugd/$(IFPLUGD).$(IFPLUGD_SUFFIX)
 IFPLUGD_SOURCE	:= $(SRCDIR)/$(IFPLUGD).$(IFPLUGD_SUFFIX)
 IFPLUGD_DIR	:= $(BUILDDIR)/$(IFPLUGD)
+IFPLUGD_LICENSE	:= GPL-2.0-or-later
+IFPLUGD_LICENSE_FILES	:= \
+	file://README;md5=591f54e7283317e5d562c55f10ba90b3;startline=16;endline=30 \
+	file://LICENSE;md5=94d55d512a9ba36caa9b7df079bae19f
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-IFPLUGD_PATH	:= PATH=$(CROSS_PATH)
-IFPLUGD_ENV 	:= \
-	$(CROSS_ENV)
-
 #
 # autoconf
 #
-IFPLUGD_AUTOCONF := \
+IFPLUGD_CONF_TOOL	:= autoconf
+IFPLUGD_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-lynx
+	--disable-lynx \
+	--disable-xmltoman \
+	--disable-subversion \
+	--with-initdir=/etc/init.d
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_IPUTILS) += iputils
 #
 # Paths and names
 #
-IPUTILS_VERSION	:= s20161105
-IPUTILS_MD5	:= 06f0be2dabe10dc80fdb328073230e69
+IPUTILS_VERSION	:= s20180629
+IPUTILS_MD5	:= 866547f2ffb17b67049472c770703c83
 IPUTILS		:= iputils-$(IPUTILS_VERSION)
 IPUTILS_SUFFIX	:= tar.gz
 IPUTILS_URL	:= http://codeload.github.com/iputils/iputils/$(IPUTILS_SUFFIX)/$(IPUTILS_VERSION)
 IPUTILS_SOURCE	:= $(SRCDIR)/$(IPUTILS).$(IPUTILS_SUFFIX)
 IPUTILS_DIR	:= $(BUILDDIR)/$(IPUTILS)
-IPUTILS_LICENSE	:= GPL-2.0
+IPUTILS_LICENSE	:= GPL-2.0-only
 IPUTILS_LICENSE_FILES := file://ninfod/COPYING;md5=5e9a325527978995c41e6d9a83f6e6bd
 
 # ----------------------------------------------------------------------------
@@ -44,8 +42,8 @@ IPUTILS_CONF_TOOL	:= NO
 IPUTILS_MAKEVARS	:= \
 	$(CROSS_ENV) \
 	USE_IDN=no \
-	USE_GCRYPT=$(call ptx/ifdef, PTXCONF_IPUTILS_GCRYPT, yes, no) \
-	USE_NETTLE=$(call ptx/ifdef, PTXCONF_IPUTILS_NETTLE, yes, no) \
+	USE_GCRYPT=$(call ptx/yesno, PTXCONF_IPUTILS_GCRYPT) \
+	USE_NETTLE=$(call ptx/yesno, PTXCONF_IPUTILS_NETTLE) \
 	USE_CRYPTO=$(call ptx/ifdef, PTXCONF_IPUTILS_OPENSSL, shared, no) \
 	TARGETS="$(IPUTILS_TOOLS-y)"
 

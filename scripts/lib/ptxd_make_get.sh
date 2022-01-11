@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008, 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -61,9 +59,9 @@ ptxd_make_get_http() {
 	# remove any pending or half downloaded files
 	rm -f -- "${path}."*
 
-	temp_file="$(mktemp "${path}.XXXXXXXXXX")" || ptxd_bailout "failed to create tempfile"
 	ptxd_make_serialize_take
 	if [ "${ptxd_make_get_dryrun}" != "y" ]; then
+	    temp_file="$(mktemp "${path}.XXXXXXXXXX")" || ptxd_bailout "failed to create tempfile"
 	    wget \
 		--passive-ftp \
 		--progress=bar:force \
@@ -89,7 +87,6 @@ ptxd_make_get_http() {
 		--connect-timeout 30 \
 		--retry 5 \
 		--user-agent "PTXdist ${PTXDIST_VERSION_FULL}" \
-		${PTXDIST_QUIET:+--silent} \
 		"${curl_opts[@]}" \
 		-o /dev/null \
 		--dump-header "${temp_header}" \
@@ -97,8 +94,9 @@ ptxd_make_get_http() {
 		--location \
 		--head \
 		--request GET \
+		--write-out '\n%{url_effective}\n' \
 		"${url}" &&
-		if grep -q "content-type:text/html" "${temp_header}"; then
+		if grep -i "content-type:" "${temp_header}" | tail -n 1 | grep -q "text/html"; then
 		    ptxd_bailout "Got HTML file"
 		fi
 		ptxd_make_serialize_put
@@ -326,10 +324,13 @@ ptxd_make_get() {
 	orig_argv=( "${@}" )
 
 	if [ -z "${1}" ]; then
-		echo
-		echo "${PROMPT}error: empty parameter to '${FUNCNAME}'"
-		echo
-		exit 1
+		if [ "${ptxd_make_get_dryrun}" != "y" ]; then
+		    ptxd_bailout "URL missing for '${path}'!"
+		else
+		    echo "URL missing for '${path}', skipping."
+		    echo
+		    return
+		fi
 	fi
 
 	ptxmirror_url="${path/#\/*\//${ptxd_make_get_mirror}/}"
@@ -395,6 +396,10 @@ ptxd_make_get() {
 		shift
 
 		case "${url}" in
+		git+file://*)
+			echo "local git repository, removing git+file:// prefix from URL"
+			url=${url#git+file://}
+			;&
 		git://*|http://*.git|https://*.git|ssh://*.git)
 			ptxd_make_get_download_permitted &&
 			ptxd_make_get_git && return
@@ -411,7 +416,7 @@ ptxd_make_get() {
 			local thing="${url/file:\/\///}"
 
 			if [ -f "$thing" ]; then
-				echo "local archive, skiping get"
+				echo "local archive, skipping get"
 				return
 			elif [ -d "${thing}" ]; then
 				echo "local directory instead of tar file, skipping get"

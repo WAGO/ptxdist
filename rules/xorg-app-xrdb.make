@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2006 by Luotao Fu <lfu@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_XORG_APP_XRDB) += xorg-app-xrdb
 #
 # Paths and names
 #
-XORG_APP_XRDB_VERSION	:= 1.0.9
-XORG_APP_XRDB_MD5	:= ed2e48cf33584455d74615ad4bbe4246
+XORG_APP_XRDB_VERSION	:= 1.2.0
+XORG_APP_XRDB_MD5	:= 34ae801ef994d192c70fcce2bdb2a1b2
 XORG_APP_XRDB		:= xrdb-$(XORG_APP_XRDB_VERSION)
 XORG_APP_XRDB_SUFFIX	:= tar.bz2
 XORG_APP_XRDB_URL	:= $(call ptx/mirror, XORG, individual/app/$(XORG_APP_XRDB).$(XORG_APP_XRDB_SUFFIX))

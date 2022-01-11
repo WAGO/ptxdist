@@ -1,0 +1,41 @@
+## SECTION=multimedia_wayland
+
+menuconfig WLROOTS
+	tristate
+	select HOST_MESON
+	select WAYLAND
+	select WAYLAND_PROTOCOLS
+	select LIBDRM
+	select MESALIB
+	select MESALIB_EGL
+	select MESALIB_GBM
+	select MESALIB_GLES2
+	select LIBINPUT
+	select LIBXKBCOMMON
+	select UDEV
+	select UDEV_LIBUDEV
+	select PIXMAN
+	select LIBCAP			if WLROOTS_LIBCAP
+	select SYSTEMD			if WLROOTS_SYSTEMD
+	select SYSTEMD_LOGIND		if WLROOTS_SYSTEMD_LOGIND
+	prompt "wlroots                       "
+	help
+	  wlroots provides pluggable, composable, unopinionated modules for
+	  building a Wayland compositor.
+
+if WLROOTS
+
+config WLROOTS_LIBCAP
+	bool
+	prompt "support rootless session via libcap"
+
+config WLROOTS_SYSTEMD
+	bool
+	default INITMETHOD_SYSTEMD
+
+config WLROOTS_SYSTEMD_LOGIND
+	bool
+	depends on WESTON_SYSTEMD
+	prompt "support rootless session via logind"
+
+endif

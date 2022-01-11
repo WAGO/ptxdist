@@ -2,12 +2,9 @@
 
 config HOST_XORG_LIB_X11
 	tristate
-	default ALLYES
-	select HOST_XORG_PROTO_X
+	default y if ALLYES
 
 	select HOST_LIBXCB
-	select HOST_XORG_PROTO_XEXT
-	select HOST_XORG_PROTO_KB
-	select HOST_XORG_PROTO_INPUT
+	select HOST_XORGPROTO
 	select HOST_XORG_LIB_XTRANS
 

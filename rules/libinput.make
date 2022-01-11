@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBINPUT) += libinput
 #
 # Paths and names
 #
-LIBINPUT_VERSION	:= 1.7.0
-LIBINPUT_MD5		:= b6689bfacc1239082afd453216fc3d0e
+LIBINPUT_VERSION	:= 1.16.0
+LIBINPUT_MD5		:= b518dae7f603040872739216971ee97b
 LIBINPUT		:= libinput-$(LIBINPUT_VERSION)
 LIBINPUT_SUFFIX		:= tar.xz
 LIBINPUT_URL		:= http://www.freedesktop.org/software/libinput/$(LIBINPUT).$(LIBINPUT_SUFFIX)
@@ -29,23 +27,18 @@ LIBINPUT_LICENSE	:= MIT
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBINPUT_CONF_ENV	:= \
-	$(CROSS_ENV) \
-	ac_cv_path_DOXYGEN=
-#
-# autoconf
-#
-LIBINPUT_CONF_TOOL	:= autoconf
+LIBINPUT_CONF_TOOL	:= meson
 LIBINPUT_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-documentation \
-	--disable-event-gui \
-	--disable-gcov \
-	--disable-test-run \
-	--disable-tests \
-	--disable-libwacom \
-	--without-libunwind \
-	--with-udev-dir=/usr/lib/udev
+	$(CROSS_MESON_USR) \
+	-Dcoverity=false \
+	-Ddebug-gui=false \
+	-Ddocumentation=false \
+	-Depoll-dir= \
+	-Dinstall-tests=false \
+	-Dlibwacom=false \
+	-Dtests=false \
+	-Dudev-dir=/usr/lib/udev \
+	-Dzshcompletiondir=no
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -61,6 +54,18 @@ $(STATEDIR)/libinput.targetinstall:
 	@$(call install_fixup, libinput,DESCRIPTION,missing)
 
 	@$(call install_lib, libinput, 0, 0, 0644, libinput)
+
+ifdef PTXCONF_LIBINPUT_QUIRKS
+	@$(call install_tree, libinput, 0, 0, -, /usr/share/libinput)
+else
+	@$(call install_alternative, libinput, 0, 0, 0644, \
+		/usr/share/libinput/99-ptxdist-dummy.quirks)
+endif
+
+ifdef PTXCONF_LIBINPUT_TOOL
+	@$(call install_copy, libinput, 0, 0, 0755, -, /usr/bin/libinput)
+	@$(call install_tree, libinput, 0, 0, -, /usr/libexec/libinput)
+endif
 
 	@$(call install_finish, libinput)
 

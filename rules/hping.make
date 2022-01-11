@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Juergen Beisert
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ HPING_SUFFIX	:= tar.gz
 HPING_URL	:= http://www.hping.org/$(HPING).$(HPING_SUFFIX)
 HPING_SOURCE	:= $(SRCDIR)/$(HPING).$(HPING_SUFFIX)
 HPING_DIR	:= $(BUILDDIR)/$(HPING)
-HPING_LICENSE	:= GPL-2.0
+HPING_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

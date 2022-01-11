@@ -1,9 +1,12 @@
-## SECTION=multimedia_gtk
+## SECTION=staging
+### old section:
+### SECTION=multimedia_gtk
 
 menuconfig LIBCROCO
 	tristate
 	prompt "libcroco                      "
 	select LIBXML2
+	select LIBXML2_SAX1
 	select GLIB
 	help
 	  a generic Cascading Style Sheet (CSS) parsing and
@@ -12,7 +15,7 @@ menuconfig LIBCROCO
 	  Services provided by Libcroco:
 
 	  * A parser module that provides o A SAC like api. SAC stands
-            for Simple Api for CSS. SAC is an event driven api wich
+            for Simple Api for CSS. SAC is an event driven api which
             resembles SAX in the xml world.
 
 	  * A CSSOM like api. CSSOM stands for Cascading Style Sheet
@@ -30,6 +33,11 @@ menuconfig LIBCROCO
 
 	  Note that the xml manipulation toolkit used by the libcroco
 	    selection engine at the moment is libxml2.
+
+	  STAGING: remove in PTXdist 2021.05.0
+
+	  Old version that needs to be updated, and license is unclear
+	  (headers say LGPL-2.1-or-later, COPYING contains LGPL-2.0)
 
 if LIBCROCO
 

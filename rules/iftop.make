@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Alexander Dahl <post@lespocky.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ IFTOP_SUFFIX	:= tar.gz
 IFTOP_URL	:= http://www.ex-parrot.com/pdw/iftop/download/$(IFTOP).$(IFTOP_SUFFIX)
 IFTOP_SOURCE	:= $(SRCDIR)/$(IFTOP).$(IFTOP_SUFFIX)
 IFTOP_DIR	:= $(BUILDDIR)/$(IFTOP)
-IFTOP_LICENSE	:= GPL-2.0+
+IFTOP_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

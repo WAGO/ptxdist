@@ -4,8 +4,6 @@
 #               2006 by Randall Loomis
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,7 +23,7 @@ HOST_GENEXT2FS_SUFFIX	:= tar.gz
 HOST_GENEXT2FS_URL	:= $(call ptx/mirror, SF, genext2fs/$(HOST_GENEXT2FS).$(HOST_GENEXT2FS_SUFFIX))
 HOST_GENEXT2FS_SOURCE	:= $(SRCDIR)/$(HOST_GENEXT2FS).$(HOST_GENEXT2FS_SUFFIX)
 HOST_GENEXT2FS_DIR	:= $(HOST_BUILDDIR)/$(HOST_GENEXT2FS)
-HOST_GENEXT2FS_LICENSE	:= GPL-2.0
+HOST_GENEXT2FS_LICENSE	:= GPL-2.0-only
 HOST_GENEXT2FS_LICENSE_FILES := \
 	file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f
 

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Bernhard Seßler <bernhard.sessler@corscience.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,10 +18,12 @@ CXXTOOLS_VERSION	:= 2.2.1
 CXXTOOLS_MD5		:= aab00068ae5237435b37ac86f2ac7576
 CXXTOOLS			:= cxxtools-$(CXXTOOLS_VERSION)
 CXXTOOLS_SUFFIX		:= tar.gz
-CXXTOOLS_URL		:= http://www.tntnet.org/download/$(CXXTOOLS).$(CXXTOOLS_SUFFIX)
+CXXTOOLS_URL		:= \
+	http://www.tntnet.org/download/$(CXXTOOLS).$(CXXTOOLS_SUFFIX) \
+	https://ftp.uni-erlangen.de/gentoo/distfiles/$(CXXTOOLS).$(CXXTOOLS_SUFFIX)
 CXXTOOLS_SOURCE		:= $(SRCDIR)/$(CXXTOOLS).$(CXXTOOLS_SUFFIX)
 CXXTOOLS_DIR		:= $(BUILDDIR)/$(CXXTOOLS)
-CXXTOOLS_LICENSE	:= LGPL-2.1
+CXXTOOLS_LICENSE	:= LGPL-2.1-only
 
 # ----------------------------------------------------------------------------
 # Prepare

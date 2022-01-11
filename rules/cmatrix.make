@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,10 +18,10 @@ CMATRIX_VERSION	:= 1.2a
 CMATRIX_MD5	:= ebfb5733104a258173a9ccf2669968a1
 CMATRIX		:= cmatrix-$(CMATRIX_VERSION)
 CMATRIX_SUFFIX	:= tar.gz
-CMATRIX_URL	:= http://www.asty.org/cmatrix/dist/$(CMATRIX).$(CMATRIX_SUFFIX)
+CMATRIX_URL	:= $(call ptx/mirror, SF, cmatrix/cmatrix/1.2a/$(CMATRIX).$(CMATRIX_SUFFIX))
 CMATRIX_SOURCE	:= $(SRCDIR)/$(CMATRIX).$(CMATRIX_SUFFIX)
 CMATRIX_DIR	:= $(BUILDDIR)/$(CMATRIX)
-CMATRIX_LICENSE	:= GPL-2.0
+CMATRIX_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

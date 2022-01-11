@@ -3,8 +3,6 @@
 # Copyright (C) 2003 by Ixia Corporation (www.ixiacom.com)
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,6 +21,7 @@ INETUTILS		:= inetutils-$(INETUTILS_VERSION)
 INETUTILS_SUFFIX	:= tar.gz
 INETUTILS_URL		:= $(call ptx/mirror, GNU, inetutils/$(INETUTILS).$(INETUTILS_SUFFIX))
 INETUTILS_SOURCE	:= $(SRCDIR)/$(INETUTILS).$(INETUTILS_SUFFIX)
+INETUTILS_LICENSE	:= GPL-3.0-or-later
 INETUTILS_DIR		:= $(BUILDDIR)/$(INETUTILS)
 
 # ----------------------------------------------------------------------------

@@ -7,11 +7,9 @@ menuconfig LINKS
 	select LIBC_M
 	select LIBC_DL
 	select OPENSSL		if LINKS_SSL
-	select GPM		if LINKS_GPM
 	select LIBPNG		if LINKS_PNG
 	select LIBJPEG		if LINKS_JPEG
 	select XORG_LIB_XEXT	if LINKS_X
-	select DIRECTFB		if LINKS_DIRECTFB
 	select SDL		if LINKS_SDL
 	select ZLIB		if LINKS_ZLIB
 	select BZIP2		if LINKS_BZIP2
@@ -23,15 +21,11 @@ if LINKS
 
 config LINKS_SSL
 	bool
+	# 2.7 fails to build with OpenSSL 1.1.x
+	depends on BROKEN
 	prompt "support for SSL"
 	help
 	  Include support for Secure Socket Layer (SSL) transfers
-
-config LINKS_GPM
-	bool
-	prompt "support for GPM"
-	help
-	  Activate support for General Purpose Mouse (GPM) service
 
 config LINKS_PNG
 	bool
@@ -46,15 +40,6 @@ config LINKS_JPEG
 	  Activate support for Joint Photographic Experts Group (JPEG)
 	  image format
 
-config LINKS_FBCON
-	bool
-	select LINKS_PNG
-	select LINKS_JPEG
-	select LINKS_GPM
-	prompt "support for fbcon"
-	help
-	  Activate support for Framebuffer Console mode
-
 config LINKS_TIFF
 	bool
 	depends on BROKEN # no libtiff in ptxdist yet
@@ -64,12 +49,6 @@ config LINKS_X
 	bool
 	select LINKS_PNG
 	prompt "support for X"
-
-config LINKS_DIRECTFB
-	bool
-	depends on STAGING
-	select LINKS_PNG
-	prompt "support for DirectFB"
 
 config LINKS_SDL
 	bool

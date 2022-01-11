@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2014 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,7 +18,7 @@ UNIXBENCH_VERSION	:= 5.1.2
 UNIXBENCH_MD5		:= 10edef9af6ad29770437d0b39828218d
 UNIXBENCH		:= unixbench-$(UNIXBENCH_VERSION)
 UNIXBENCH_SUFFIX	:= tar.gz
-UNIXBENCH_URL		:= https://byte-unixbench.googlecode.com/files/$(UNIXBENCH).$(UNIXBENCH_SUFFIX)
+UNIXBENCH_URL		:= https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/byte-unixbench/$(UNIXBENCH).$(UNIXBENCH_SUFFIX)
 UNIXBENCH_SOURCE	:= $(SRCDIR)/$(UNIXBENCH).$(UNIXBENCH_SUFFIX)
 UNIXBENCH_DIR		:= $(BUILDDIR)/$(UNIXBENCH)
 UNIXBENCH_LICENSE	:= unknown

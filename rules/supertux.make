@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2008 by SuperTux Team
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,7 +18,7 @@ SUPERTUX_VERSION	:= 0.1.3
 SUPERTUX_MD5		:= f2fc288459f33d5cd8f645fbca737a63
 SUPERTUX		:= supertux-$(SUPERTUX_VERSION)
 SUPERTUX_SUFFIX		:= tar.bz2
-SUPERTUX_URL		:= http://download.berlios.de/supertux/$(SUPERTUX).$(SUPERTUX_SUFFIX)
+SUPERTUX_URL		:= https://github.com/SuperTux/supertux/releases/download/v$(SUPERTUX_VERSION)/$(SUPERTUX).$(SUPERTUX_SUFFIX)
 SUPERTUX_SOURCE		:= $(SRCDIR)/$(SUPERTUX).$(SUPERTUX_SUFFIX)
 SUPERTUX_DIR		:= $(BUILDDIR)/$(SUPERTUX)
 
@@ -38,6 +36,8 @@ SUPERTUX_AUTOCONF := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-opengl \
 	--with-sdl-prefix=$(SYSROOT)/usr
+
+SUPERTUX_CXXFLAGS := -std=c++98
 
 # ----------------------------------------------------------------------------
 # Target-Install

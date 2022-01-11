@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -14,7 +12,7 @@
 PACKAGES-$(PTXCONF_RTPS) += rtps
 
 RTPS_VERSION	:= 1.0
-RTPS_LICENSE	:= GPL-2.0
+RTPS_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Alexander Aring <aar@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,15 +14,22 @@ PACKAGES-$(PTXCONF_LIBNL3) += libnl3
 #
 # Paths and names
 #
-LIBNL3_VERSION	:= 3.4.0
-LIBNL3_MD5	:= 8f71910c03db363b41e2ea62057a4311
+LIBNL3_VERSION	:= 3.5.0
+LIBNL3_MD5	:= 74ba57b1b1d6f9f92268aa8141d8e8e4
 LIBNL3		:= libnl-$(LIBNL3_VERSION)
 LIBNL3_RELEASE	:= libnl$(subst .,_,$(LIBNL3_VERSION))
 LIBNL3_SUFFIX	:= tar.gz
 LIBNL3_URL	:= https://github.com/thom311/libnl/releases/download/$(LIBNL3_RELEASE)/$(LIBNL3).$(LIBNL3_SUFFIX)
 LIBNL3_SOURCE	:= $(SRCDIR)/$(LIBNL3).$(LIBNL3_SUFFIX)
 LIBNL3_DIR	:= $(BUILDDIR)/$(LIBNL3)
-LIBNL3_LICENSE	:= GPL-2.0
+LIBNL3_LICENSE	:= LGPL-2.1-only AND BSD-3-Clause
+LIBNL3_LICENSE_FILES := \
+	file://COPYING;md5=4fbd65380cdd255951079008b364516c \
+	file://lib/xfrm/ae.c;startline=3;endline=32;md5=6813917a92b539b07534e1a79f5a6aca
+
+ifdef PTXCONF_LIBNL3_ENABLE_CLI
+LIBNL3_LICENSE	+= AND GPL-2.0-only
+endif
 
 #
 # autoconf

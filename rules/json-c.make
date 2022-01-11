@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,30 +14,30 @@ PACKAGES-$(PTXCONF_JSON_C) += json-c
 #
 # Paths and names
 #
-JSON_C_VERSION		:= 0.12.1-20160607
-JSON_C_MD5		:= 0a2a49a1e89044fdac414f984f3f81a6
+JSON_C_VERSION		:= 0.14
+JSON_C_MD5		:= 72cbb065b43376d825cd521d115ae1f6
 JSON_C			:= json-c-$(JSON_C_VERSION)
 JSON_C_SUFFIX		:= tar.gz
-JSON_C_URL		:= https://github.com/json-c/json-c/archive/$(JSON_C).$(JSON_C_SUFFIX)
+JSON_C_URL		:= https://s3.amazonaws.com/json-c_releases/releases/$(JSON_C).$(JSON_C_SUFFIX)
 JSON_C_SOURCE		:= $(SRCDIR)/$(JSON_C).$(JSON_C_SUFFIX)
 JSON_C_DIR		:= $(BUILDDIR)/$(JSON_C)
 JSON_C_LICENSE		:= MIT
+JSON_C_LICENSE_FILES	:= file://COPYING;md5=de54b60fbbc35123ba193fea8ee216f2
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-JSON_C_CONF_ENV		:= \
-	$(CROSS_ENV) \
-	CFLAGS="-O2 -g -Wno-error"
-
-#
-# autoconf
-#
-JSON_C_CONF_TOOL	:= autoconf
+JSON_C_CONF_TOOL	:= cmake
 JSON_C_CONF_OPT		:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-static
+	$(CROSS_CMAKE_USR) \
+	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	-DBUILD_SHARED_LIBS:BOOL=ON \
+	-DBUILD_TESTING:BOOL=OFF \
+	-DDISABLE_BSYMBOLIC:BOOL=ON \
+	-DDISABLE_WERROR:BOOL=ON \
+	-DENABLE_RDRAND:BOOL=OFF \
+	-DENABLE_THREADING:BOOL=OFF
 
 # ----------------------------------------------------------------------------
 # Install

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Robert Schwebel
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ DBUS_GLIB_SUFFIX	:= tar.gz
 DBUS_GLIB_URL		:= http://dbus.freedesktop.org/releases/dbus-glib/$(DBUS_GLIB).$(DBUS_GLIB_SUFFIX)
 DBUS_GLIB_SOURCE	:= $(SRCDIR)/$(DBUS_GLIB).$(DBUS_GLIB_SUFFIX)
 DBUS_GLIB_DIR		:= $(BUILDDIR)/$(DBUS_GLIB)
-DBUS_GLIB_LICENSE	:= AFL-2.1, GPL-2.0+
+DBUS_GLIB_LICENSE	:= AFL-2.1 AND GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -43,8 +41,8 @@ DBUS_GLIB_CONF_OPT	:= \
 	--disable-asserts \
 	--enable-checks \
 	--disable-gtk-doc \
-	--with-dbus-binding-tool=$(PTXCONF_SYSROOT_HOST)/bin/dbus-binding-tool \
-	--with-introspect-xml=$(PTXCONF_SYSROOT_HOST)/share/dbus-glib/dbus-bus-introspect.xml
+	--with-dbus-binding-tool=$(PTXDIST_SYSROOT_HOST)/bin/dbus-binding-tool \
+	--with-introspect-xml=$(PTXDIST_SYSROOT_HOST)/share/dbus-glib/dbus-bus-introspect.xml
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -3,8 +3,6 @@
 # Copyright (C) 2007 by Carsten Schlote <c.schlote@konzeptpark.de>
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBLZO_SUFFIX	:= tar.gz
 LIBLZO_URL	:= http://www.oberhumer.com/opensource/lzo/download/$(LIBLZO).$(LIBLZO_SUFFIX)
 LIBLZO_SOURCE	:= $(SRCDIR)/$(LIBLZO).$(LIBLZO_SUFFIX)
 LIBLZO_DIR	:= $(BUILDDIR)/$(LIBLZO)
-LIBLZO_LICENSE	:= GPL-2.0+
+LIBLZO_LICENSE	:= GPL-2.0-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

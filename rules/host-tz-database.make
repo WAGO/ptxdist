@@ -3,8 +3,6 @@
 # Copyright (C) 2010 by Bart vdr. Meulen <bartvdrmeulen@gmail.com>
 #               2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -20,8 +18,8 @@ HOST_PACKAGES-$(PTXCONF_HOST_TZ_DATABASE) += host-tz-database
 HOST_TZ_DATABASE	:= tz-database
 HOST_TZ_DATABASE_DIR	:= $(HOST_BUILDDIR)/$(HOST_TZ_DATABASE)
 
-TZCODE_VERSION		:= 2017c
-TZCODE_MD5		:= 2fe6986231db5182c61d565021a0cd7b
+TZCODE_VERSION		:= 2020a
+TZCODE_MD5		:= f87c3477e85a5c4b00df0def6c6a0055
 TZCODE			:= tzcode$(TZCODE_VERSION)
 TZCODE_SUFFIX		:= tar.gz
 TZCODE_URL		:= \
@@ -31,8 +29,8 @@ $(TZCODE_SOURCE)	:= TZCODE
 TZCODE_DIR		:= $(HOST_TZ_DATABASE_DIR)
 TZCODE_STRIP_LEVEL	:= 0
 
-TZDATA_VERSION		:= 2017c
-TZDATA_MD5		:= 1e751e7e08f8b68530674f04619d894d
+TZDATA_VERSION		:= 2020a
+TZDATA_MD5		:= 96a985bb8eeab535fb8aa2132296763a
 TZDATA			:= tzdata$(TZDATA_VERSION)
 TZDATA_SUFFIX		:= tar.gz
 TZDATA_URL		:= \
@@ -43,7 +41,7 @@ TZDATA_DIR		:= $(HOST_TZ_DATABASE_DIR)
 TZDATA_STRIP_LEVEL	:= 0
 
 HOST_TZ_DATABASE_SOURCES := $(TZCODE_SOURCE) $(TZDATA_SOURCE)
-HOST_TZ_DATABASE_LICENSE := public_domain, BSD-3-clause
+HOST_TZ_DATABASE_LICENSE := public_domain AND BSD-3-Clause
 HOST_TZ_DATABASE_LICENSE_FILES := \
 	file://LICENSE;md5=c679c9d6b02bc2757b3eaf8f53c43fba \
 	file://date.c;startline=3;endline=28;md5=0b516100709f6de9dc65257bf91e6dd0

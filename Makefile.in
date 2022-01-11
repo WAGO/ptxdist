@@ -36,6 +36,7 @@ kconfig:
 	$(MAKE) -C "$(abs_srcdir)/scripts/kconfig" \
 		CONF_LIBS="@CONF_LIBS@" \
 		MCONF_LIBS="@MCONF_LIBS@" \
+		NCONF_LIBS="@NCONF_LIBS@" \
 		CURSES_LOC="@CURSES_LOC@" \
 		conf mconf $(NCONF)
 	@echo "done."
@@ -64,7 +65,6 @@ environment:
 	@ln -sf @GNU_dirname@ "$(abs_srcdir)/bin/dirname"
 	@ln -sf @GNU_readlink@ "$(abs_srcdir)/bin/readlink"
 	@ln -sf @GNU_sort@ "$(abs_srcdir)/bin/sort"
-	@ln -sf @PYTHON@ "$(abs_srcdir)/bin/python"
 	@ln -sf @SED@ "$(abs_srcdir)/bin/sed"
 	@ln -sf @GNU_xargs@ "$(abs_srcdir)/bin/xargs"
 	@ln -sf @BASH@  "$(abs_srcdir)/bin/bash"
@@ -76,13 +76,13 @@ environment:
 	@echo " done"
 
 man: man/ptxdist.1.gz
-man/ptxdist.1: doc/ptxdist.man doc/ref_parameter.inc
+man/ptxdist.1: doc/ptxdist.man doc/ref_parameter.rst
 	@mkdir -pv man
 	$(RST2MAN) $< $@
 
 .INTERMEDIATE: man/ptxdist.1
 man/ptxdist.1.gz: man/ptxdist.1
-	gzip $<
+	gzip -f $<
 
 clean:
 	@rm -f .done
@@ -100,7 +100,9 @@ install: all dirty-check
 	@mkdir -p "$(DESTDIR)$(instdir)"
 	@tar -C "$(abs_srcdir)" -cf - \
 		--exclude *~ \
+		--exclude .*.sw* \
 		--exclude .git \
+		--exclude .gitignore \
 		--exclude .pc \
 		--exclude .svn \
 		--exclude autom4te.cache \

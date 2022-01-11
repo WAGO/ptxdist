@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBSEMANAGE_SUFFIX	:= tar.gz
 LIBSEMANAGE_URL		:= https://raw.githubusercontent.com/wiki/SELinuxProject/selinux/files/releases/20120924/$(LIBSEMANAGE).$(LIBSEMANAGE_SUFFIX)
 LIBSEMANAGE_SOURCE	:= $(SRCDIR)/$(LIBSEMANAGE).$(LIBSEMANAGE_SUFFIX)
 LIBSEMANAGE_DIR		:= $(BUILDDIR)/$(LIBSEMANAGE)
-LIBSEMANAGE_LICENSE	:= LGPL-2.1+
+LIBSEMANAGE_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

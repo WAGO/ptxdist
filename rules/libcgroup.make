@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2012 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ LIBCGROUP_SUFFIX	:= tar.bz2
 LIBCGROUP_URL		:= $(call ptx/mirror, SF, libcg/$(LIBCGROUP).$(LIBCGROUP_SUFFIX))
 LIBCGROUP_SOURCE	:= $(SRCDIR)/$(LIBCGROUP).$(LIBCGROUP_SUFFIX)
 LIBCGROUP_DIR		:= $(BUILDDIR)/$(LIBCGROUP)
-LIBCGROUP_LICENSE	:= LGPL-2.1
+LIBCGROUP_LICENSE	:= LGPL-2.1-only
 
 #
 # autoconf

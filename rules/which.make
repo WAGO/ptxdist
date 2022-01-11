@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ WHICH_SUFFIX	:= tar.gz
 WHICH_URL	:= $(call ptx/mirror, GNU, which/$(WHICH).$(WHICH_SUFFIX))
 WHICH_SOURCE	:= $(SRCDIR)/$(WHICH).$(WHICH_SUFFIX)
 WHICH_DIR	:= $(BUILDDIR)/$(WHICH)
-WHICH_LICENSE	:= GPL-3.0
+WHICH_LICENSE	:= GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

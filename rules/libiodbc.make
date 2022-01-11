@@ -3,8 +3,6 @@
 # Copyright (C) 2009 by Robert Schwebel <r.schwebel@pengutronix.de>
 # Copyright (C) 2009 by Juergen Beisert <j.beisert@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ LIBIODBC_SUFFIX		:= tar.gz
 LIBIODBC_URL		:= $(call ptx/mirror, SF, iodbc/$(LIBIODBC).$(LIBIODBC_SUFFIX))
 LIBIODBC_SOURCE		:= $(SRCDIR)/$(LIBIODBC).$(LIBIODBC_SUFFIX)
 LIBIODBC_DIR		:= $(BUILDDIR)/$(LIBIODBC)
-LIBIODBC_LICENSE	:= LGPL-2.0, BSD
+LIBIODBC_LICENSE	:= LGPL-2.0-only AND BSD
 
 # ----------------------------------------------------------------------------
 # Prepare

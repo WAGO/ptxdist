@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2016 by Juergen Borleis <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -25,7 +23,7 @@ MYSQL_SUFFIX	:= tar.gz
 MYSQL_URL	:= https://dev.mysql.com/get/Downloads/MySQL-5.7/$(MYSQL).tar.gz
 MYSQL_SOURCE	:= $(SRCDIR)/$(MYSQL).$(MYSQL_SUFFIX)
 MYSQL_DIR	:= $(BUILDDIR)/$(MYSQL)
-MYSQL_LICENSE	:= GPL-2.0
+MYSQL_LICENSE	:= GPL-2.0-only
 
 # mySQL has a hard dependency to boost_1_59_0. Deal with it
 
@@ -63,10 +61,10 @@ $(STATEDIR)/mysql.extract:
 MYSQL_CONF_TOOL	:= cmake
 MYSQL_CONF_OPT	:= \
 	$(CROSS_CMAKE_USR) \
+	-DINSTALL_LAYOUT=TARGZ \
 	-DBUILD_CONFIG=mysql_release \
 	-DSTACK_DIRECTION=1 \
 	-DHAVE_LLVM_LIBCPP_EXITCODE=no \
-	-DCMAKE_INSTALL_PREFIX:PATH=/usr \
 	-DWITH_ZLIB=system \
 	-DWITH_LZ4=bundled \
 	-DWITH_SSL=bundled \
@@ -86,25 +84,21 @@ MYSQL_CONF_OPT	:= \
 	-DDEFAULT_CHARSET=latin1 \
 	-DENABLE_DTRACE=OFF
 
+MYSQL_CXXFLAGS := -std=c++98
+
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
 
 $(STATEDIR)/mysql.compile:
 	@$(call targetinfo)
-	# we must copy it twice: once for the buildsystem, once for runtime
-	cp $(HOST_MYSQL_DIR)-build/sql/gen_lex_hash $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/sql/gen_lex_hash $(MYSQL_DIR)/sql
-	cp $(HOST_MYSQL_DIR)-build/sql/gen_lex_token $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/sql/gen_lex_token $(MYSQL_DIR)/sql
-	cp $(HOST_MYSQL_DIR)-build/extra/lz4_decompress $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/extra/lz4_decompress $(MYSQL_DIR)/extra
-	cp $(HOST_MYSQL_DIR)-build/extra/zlib_decompress $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/extra/zlib_decompress $(MYSQL_DIR)/extra
-	cp $(HOST_MYSQL_DIR)-build/extra/comp_err $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/extra/comp_err $(MYSQL_DIR)/extra
-	cp $(HOST_MYSQL_DIR)-build/scripts/comp_sql $(PTXDIST_SYSROOT_HOST)/bin
-	cp $(HOST_MYSQL_DIR)-build/scripts/comp_sql $(MYSQL_DIR)/scripts
+
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/gen_lex_hash $(MYSQL_DIR)/sql/
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/gen_lex_token $(MYSQL_DIR)/sql/
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/lz4_decompress $(MYSQL_DIR)/extra/
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/zlib_decompress $(MYSQL_DIR)/extra/
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/comp_err $(MYSQL_DIR)/extra/
+	@install -v -m755  $(PTXDIST_SYSROOT_HOST)/bin/comp_sql $(MYSQL_DIR)/scripts/
 
 	@$(call world/compile, MYSQL)
 	@$(call touch)

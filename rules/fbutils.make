@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2004 by Sascha Hauer
 #          
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ FBUTILS_SUFFIX	:= tar.gz
 FBUTILS_URL	:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(FBUTILS).$(FBUTILS_SUFFIX)
 FBUTILS_SOURCE	:= $(SRCDIR)/$(FBUTILS).$(FBUTILS_SUFFIX)
 FBUTILS_DIR	:= $(BUILDDIR)/$(FBUTILS)
-FBUTILS_LICENSE := GPL-3.0
+FBUTILS_LICENSE := GPL-3.0-only
 
 # ----------------------------------------------------------------------------
 # Compile

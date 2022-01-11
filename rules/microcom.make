@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,29 +14,24 @@ PACKAGES-$(PTXCONF_MICROCOM) += microcom
 #
 # Paths and names
 #
-MICROCOM_VERSION	:= 2009.06
-MICROCOM_MD5		:= 68a63c2d56196a28be89d1b4e5d13af1
+MICROCOM_VERSION	:= 2019.01.0
+MICROCOM_MD5		:= 8e8c58b4d95d4466097dec3c7ed03ccd
 MICROCOM		:= microcom-$(MICROCOM_VERSION)
-MICROCOM_SUFFIX		:= tar.gz
-MICROCOM_URL		:= http://www.pengutronix.de/software/microcom/download/$(MICROCOM).$(MICROCOM_SUFFIX)
+MICROCOM_SUFFIX		:= tar.xz
+MICROCOM_URL		:= https://github.com/pengutronix/microcom/releases/download/v$(MICROCOM_VERSION)/microcom-$(MICROCOM_VERSION).$(MICROCOM_SUFFIX)
 MICROCOM_SOURCE		:= $(SRCDIR)/$(MICROCOM).$(MICROCOM_SUFFIX)
 MICROCOM_DIR		:= $(BUILDDIR)/$(MICROCOM)
-MICROCOM_LICENSE	:= GPL-2.0
+MICROCOM_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-MICROCOM_PATH := PATH=$(CROSS_PATH)
-MICROCOM_COMPILE_ENV := $(CROSS_ENV)
-
-# ----------------------------------------------------------------------------
-# Install
-# ----------------------------------------------------------------------------
-
-$(STATEDIR)/microcom.install:
-	@$(call targetinfo)
-	@$(call touch)
+MICROCOM_CONF_TOOL := autoconf
+MICROCOM_CONF_OPT := \
+	$(CROSS_AUTOCONF_USR) \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--enable-can \
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -53,10 +46,9 @@ $(STATEDIR)/microcom.targetinstall:
 	@$(call install_fixup, microcom,AUTHOR,"Marc Kleine-Budde <mkl@pengutronix.de>")
 	@$(call install_fixup, microcom,DESCRIPTION,missing)
 
-	@$(call install_copy, microcom, 0, 0, 0755, $(MICROCOM_DIR)/microcom, /usr/bin/microcom)
+	@$(call install_copy, microcom, 0, 0, 0755, -, /usr/bin/microcom)
 
 	@$(call install_finish, microcom)
-
 	@$(call touch)
 
 # vim: syntax=make

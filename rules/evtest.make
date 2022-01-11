@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Juergen Beisert <jbe@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_EVTEST) += evtest
 #
 # Paths and names
 #
-EVTEST_VERSION	:= 1.31
-EVTEST_MD5	:= 2f4814fd011eb21770040b27d5e68d46
+EVTEST_VERSION	:= 1.33
+EVTEST_MD5	:= c29f43c5e96a07a7c09fa3a977401dd1
 EVTEST		:= evtest-$(EVTEST_VERSION)
 EVTEST_SUFFIX	:= tar.bz2
-EVTEST_URL	:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(EVTEST).$(EVTEST_SUFFIX)
+EVTEST_URL	:= https://gitlab.freedesktop.org/libevdev/evtest/-/archive/evtest-$(EVTEST_VERSION)/evtest-$(EVTEST).$(EVTEST_SUFFIX)
 EVTEST_SOURCE	:= $(SRCDIR)/$(EVTEST).$(EVTEST_SUFFIX)
 EVTEST_DIR	:= $(BUILDDIR)/$(EVTEST)
-EVTEST_LICENSE	:= GPL-2.0
+EVTEST_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare

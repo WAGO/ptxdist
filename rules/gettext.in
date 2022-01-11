@@ -1,7 +1,7 @@
 ## SECTION=system_libraries
-config GETTEXT
+menuconfig GETTEXT
 	tristate
-	prompt "gettext (gnu)"
+	prompt "gettext (gnu)                 "
 	select LIBC_M
 	select LIBC_DL
 	select GCCLIBS_CXX
@@ -10,3 +10,27 @@ config GETTEXT
 	  The gettext program translates a natural language
 	  message into the user's language, by looking up
 	  the translation in a message catalog.
+
+
+if GETTEXT
+
+config GETTEXT_ENVSUBST
+	bool
+	prompt "envsubst"
+	help
+	  Substitutes environment variables in shell format strings
+
+config GETTEXT_TOOLS
+	bool
+	prompt "gettext/xgettext cli"
+	select GETTEXT_LIBS
+	help
+	  Command line tools for translations.
+
+config GETTEXT_LIBS
+	bool
+	prompt "gettext libs"
+	help
+	  System libraries for translations.
+
+endif

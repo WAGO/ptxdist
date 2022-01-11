@@ -3,8 +3,6 @@
 # Copyright (C) 2004 by Sascha Hauer
 #               2009 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ FBTEST_SUFFIX	:= tar.gz
 FBTEST_URL	:= https://git.kernel.org/pub/scm/linux/kernel/git/geert/fbtest.git;tag=$(FBTEST_VERSION)
 FBTEST_SOURCE	:= $(SRCDIR)/$(FBTEST).$(FBTEST_SUFFIX)
 FBTEST_DIR	:= $(BUILDDIR)/$(FBTEST)
-FBTEST_LICENSE	:= GPL-2.0
+FBTEST_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Compile

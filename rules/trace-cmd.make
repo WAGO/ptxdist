@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Michael Olbrich <m.olbrich@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,14 @@ PACKAGES-$(PTXCONF_TRACE_CMD) += trace-cmd
 #
 # Paths and names
 #
-TRACE_CMD_VERSION	:= 2.6.1
-TRACE_CMD_MD5		:= d677c8895af84d6cdb9f6a65006cc507
-TRACE_CMD		:= trace-cmd-$(TRACE_CMD_VERSION)
-TRACE_CMD_SUFFIX	:= tar.bz2
-TRACE_CMD_URL		:= http://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git;tag=trace-cmd-v$(TRACE_CMD_VERSION)
+TRACE_CMD_VERSION	:= 2.8.3
+TRACE_CMD_MD5		:= f0e0b7df8e38c1b4842e8037c2292066
+TRACE_CMD		:= trace-cmd-v$(TRACE_CMD_VERSION)
+TRACE_CMD_SUFFIX	:= tar.gz
+TRACE_CMD_URL		:= https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/$(TRACE_CMD).$(TRACE_CMD_SUFFIX)
 TRACE_CMD_SOURCE	:= $(SRCDIR)/$(TRACE_CMD).$(TRACE_CMD_SUFFIX)
 TRACE_CMD_DIR		:= $(BUILDDIR)/$(TRACE_CMD)
-TRACE_CMD_LICENSE	:= GPL-2.0
+TRACE_CMD_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -44,6 +42,7 @@ TRACE_CMD_MAKE_ENV	:= \
 TRACE_CMD_PLUGINS	:= \
 	blk \
 	cfg80211 \
+	futex \
 	function \
 	hrtimer \
 	jbd2 \
@@ -52,6 +51,7 @@ TRACE_CMD_PLUGINS	:= \
 	mac80211 \
 	sched_switch \
 	scsi \
+	tlb \
 	xen
 
 

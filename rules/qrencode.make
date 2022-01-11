@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2017 by Roland Hieber <r.hieber@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -23,7 +21,7 @@ QRENCODE_SUFFIX		:= tar.gz
 QRENCODE_URL		:= https://fukuchi.org/works/qrencode/$(QRENCODE).$(QRENCODE_SUFFIX)
 QRENCODE_SOURCE		:= $(SRCDIR)/$(QRENCODE).$(QRENCODE_SUFFIX)
 QRENCODE_DIR		:= $(BUILDDIR)/$(QRENCODE)
-QRENCODE_LICENSE	:= LGPL-2.1+
+QRENCODE_LICENSE	:= LGPL-2.1-or-later
 
 # ----------------------------------------------------------------------------
 # Prepare

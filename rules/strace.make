@@ -4,8 +4,6 @@
 #               2003-2008 by Pengutronix e.K., Hildesheim, Germany
 #               2009, 2010, 2012 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -18,11 +16,11 @@ PACKAGES-$(PTXCONF_STRACE) += strace
 #
 # Paths and names
 #
-STRACE_VERSION	:= 4.18
-STRACE_MD5	:= 3579b3266bb096cebaefbe2cdb1a3a78
+STRACE_VERSION	:= 5.7
+STRACE_MD5	:= 8c35b8ebf187b2ec18209bd7bbd16e7a
 STRACE		:= strace-$(STRACE_VERSION)
 STRACE_SUFFIX	:= tar.xz
-STRACE_URL	:= $(call ptx/mirror, SF, strace/$(STRACE).$(STRACE_SUFFIX))
+STRACE_URL	:= https://strace.io/files/$(STRACE_VERSION)/$(STRACE).$(STRACE_SUFFIX)
 STRACE_SOURCE	:= $(SRCDIR)/$(STRACE).$(STRACE_SUFFIX)
 STRACE_DIR	:= $(BUILDDIR)/$(STRACE)
 STRACE_LICENSE	:= BSD-3-Clause
@@ -37,13 +35,17 @@ STRACE_CONF_OPT		:= \
 	--disable-gcc-Werror \
 	--disable-code-coverage \
 	--disable-arm-oabi \
+	--disable-stacktrace \
+	--disable-mpers \
 	--disable-valgrind \
 	--disable-valgrind-memcheck \
 	--disable-valgrind-helgrind \
 	--disable-valgrind-drd \
 	--disable-valgrind-sgcheck \
 	--without-gcov \
-	--without-libunwind
+	--without-libdw \
+	--without-libunwind \
+	--without-libiberty
 
 
 # ----------------------------------------------------------------------------

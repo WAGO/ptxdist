@@ -3,8 +3,6 @@
 # Copyright (C) 2011 by Sascha Hauer <s.hauer@pengutronix.de>
 # Copyright (C) 2011 by Wolfram Sang <w.sang@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -24,7 +22,7 @@ FBSET_SUFFIX	:= tar.gz
 FBSET_URL	:= http://users.telenet.be/geertu/Linux/fbdev/$(FBSET).$(FBSET_SUFFIX)
 FBSET_SOURCE	:= $(SRCDIR)/$(FBSET).$(FBSET_SUFFIX)
 FBSET_DIR	:= $(BUILDDIR)/$(FBSET)
-FBSET_LICENSE	:= GPL-2.0
+FBSET_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Compile
@@ -47,7 +45,9 @@ $(STATEDIR)/fbset.targetinstall:
 	@$(call install_fixup, fbset,DESCRIPTION,missing)
 
 	@$(call install_copy, fbset, 0, 0, 0755, -, /usr/sbin/fbset)
-
+ifdef PTXCONF_FBSET_FBMODES
+	@$(call install_alternative, fbset, 0, 0, 0644, /etc/fb.modes)
+endif
 	@$(call install_finish, fbset)
 
 	@$(call touch)

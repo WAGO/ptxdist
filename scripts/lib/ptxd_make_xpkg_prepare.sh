@@ -4,8 +4,6 @@
 #               2008, 2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
 #               2011 by George McCollister <george.mccollister@gmail.com>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -100,7 +98,8 @@ install_init:	@DEPENDS@ -> ${dep}"
     for script in preinst postinst prerm postrm; do
 	echo -n "install_init:	${script} "
 
-	if ptxd_in_path PTXDIST_PATH_RULES "${pkg_xpkg}.${script}"; then
+	if ptxd_in_path PTXDIST_PATH_RULES "${pkg_xpkg}.${script}" && \
+	    [ ! -h "${ptxd_reply}" -o "$(readlink "${ptxd_reply}")" != /dev/null ]; then
 	    install -m 0755 \
 		-D "${ptxd_reply}" \
 		"${pkg_xpkg_control_dir}/${script}" || return
@@ -110,5 +109,6 @@ install_init:	@DEPENDS@ -> ${dep}"
 	    echo "not available"
 	fi
     done
+    touch ${PTXDIST_TEMPDIR}/${pkg_stamp}.${pkg_xpkg}
 }
 export -f ptxd_make_xpkg_prepare

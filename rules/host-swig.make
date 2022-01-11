@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2013 by Marc Kleine-Budde <mkl@pengutronix.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,8 +14,8 @@ HOST_PACKAGES-$(PTXCONF_HOST_SWIG) += host-swig
 #
 # Paths and names
 #
-HOST_SWIG_VERSION	:= 2.0.9
-HOST_SWIG_MD5		:= 54d534b14a70badc226129159412ea85
+HOST_SWIG_VERSION	:= 4.0.1
+HOST_SWIG_MD5		:= 54cc40b3804816f7d38ab510b6f13b04
 HOST_SWIG		:= swig-$(HOST_SWIG_VERSION)
 HOST_SWIG_SUFFIX	:= tar.gz
 HOST_SWIG_URL		:= $(call ptx/mirror, SF, swig/$(HOST_SWIG).$(HOST_SWIG_SUFFIX))
@@ -40,11 +38,11 @@ HOST_SWIG_CONF_OPT = \
 	--without-boost \
 	--without-x \
 	--without-tcl \
-	--with-python=$(CROSS_PYTHON) \
-	--without-python3 \
+	$(call ptx/ifdef, PTXCONF_HOST_SWIG_PYTHON_SUPPORT, --with-python=$(CROSS_PYTHON), --without-python) \
+	$(call ptx/ifdef, PTXCONF_HOST_SWIG_PYTHON3_SUPPORT, --with-python=$(CROSS_PYTHON3), --without-python3) \
 	--without-perl5 \
 	--without-octave \
-	--without-java \
+	$(call ptx/ifdef, PTXCONF_HOST_SWIG_JAVA_SUPPORT, --with-java=$(PTXCONF_SETUP_JAVA_SDK), --without-java) \
 	--without-gcj \
 	--without-android \
 	--without-guile \

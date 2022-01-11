@@ -2,8 +2,6 @@
 #
 # Copyright (C) 2011 by Alexander Dahl <post@lespocky.de>
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -16,14 +14,17 @@ PACKAGES-$(PTXCONF_FILE) += file
 #
 # Paths and names
 #
-FILE_VERSION	:= 5.30
-FILE_MD5	:= f35eaf05489ae566eafc4d26bb1dcd90
+FILE_VERSION	:= 5.36
+FILE_MD5	:= 9af0eb3f5db4ae00fffc37f7b861575c
 FILE		:= file-$(FILE_VERSION)
 FILE_SUFFIX	:= tar.gz
-FILE_URL	:= ftp://ftp.astron.com/pub/file/$(FILE).$(FILE_SUFFIX)
+FILE_URL	:= http://ftp.astron.com/pub/file/$(FILE).$(FILE_SUFFIX)
 FILE_SOURCE	:= $(SRCDIR)/$(FILE).$(FILE_SUFFIX)
 FILE_DIR	:= $(BUILDDIR)/$(FILE)
-FILE_LICENSE	:= BSD, 2-term BSD
+FILE_LICENSE	:= BSD-2-Clause
+FILE_LICENSE_FILES	:= \
+	file://COPYING;md5=8bafafc441e2e0b9660848c98760b5f3 \
+	file://src/file.c;startline=1;endline=27;md5=c23a8098a761ce3193087925877307b9
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,8 +38,10 @@ FILE_CONF_OPT	:= \
 	--enable-elf \
 	--enable-elf-core \
 	--enable-zlib \
+	--$(call ptx/endis, PTXCONF_FILE_SECCOMP)-libseccomp \
 	--disable-fsect-man5 \
-	$(GLOBAL_LARGE_FILE_OPTION)
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-warnings
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -3,8 +3,6 @@
 # Copyright (C) 2006 by Erwin Rol
 # Copyright (C) 2009 by Robert Schwebel/Juergen Beisert
 #
-# See CREDITS for details about who has contributed to this project.
-#
 # For further information about the PTXdist project and license conditions
 # see the README file.
 #
@@ -17,14 +15,14 @@ PACKAGES-$(PTXCONF_IPROUTE2) += iproute2
 #
 # Paths and names
 #
-IPROUTE2_VERSION	:= 4.13.0
-IPROUTE2_MD5		:= 69dc9e3ece3296890278f0de478330c8
+IPROUTE2_VERSION	:= 5.7.0
+IPROUTE2_MD5		:= da22ab8562eda56ae232872fa72e4870
 IPROUTE2		:= iproute2-$(IPROUTE2_VERSION)
 IPROUTE2_SUFFIX		:= tar.xz
 IPROUTE2_URL		:= $(call ptx/mirror, KERNEL, utils/net/iproute2/$(IPROUTE2).$(IPROUTE2_SUFFIX))
 IPROUTE2_SOURCE		:= $(SRCDIR)/$(IPROUTE2).$(IPROUTE2_SUFFIX)
 IPROUTE2_DIR		:= $(BUILDDIR)/$(IPROUTE2)
-IPROUTE2_LICENSE	:= GPL-2.0
+IPROUTE2_LICENSE	:= GPL-2.0-only
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,24 +35,16 @@ $(STATEDIR)/iproute2.prepare:
 	@$(call targetinfo)
 	@$(call world/prepare, IPROUTE2)
 # overwrite options we don't want, or may be misdetected
-	@echo 'TC_CONFIG_ATM:=n'	>> $(IPROUTE2_DIR)/Config
-	@echo 'TC_CONFIG_NO_XT:=y'	>> $(IPROUTE2_DIR)/Config
-	@echo 'HAVE_ELF:=n'		>> $(IPROUTE2_DIR)/Config
-ifndef PTXCONF_GLOBAL_SELINUX
-	@echo 'HAVE_SELINUX:=n'		>> $(IPROUTE2_DIR)/Config
-endif
-	@echo 'HAVE_MNL:=n'		>> $(IPROUTE2_DIR)/Config
+	@echo 'TC_CONFIG_ATM:=n'	>> $(IPROUTE2_DIR)/config.mk
 ifndef PTXCONF_IPROUTE2_ARPD
-	@echo 'HAVE_BERKELEY_DB:=n'	>> $(IPROUTE2_DIR)/Config
+	@echo 'HAVE_BERKELEY_DB:=n'	>> $(IPROUTE2_DIR)/config.mk
 endif
 	@$(call touch)
 
 IPROUTE2_MAKE_OPT := \
 	SBINDIR=/usr/sbin \
 	DBM_INCLUDE=$(SYSROOT)/usr/include \
-	LDFLAGS='-rdynamic' \
-	WFLAGS="-Wall" \
-	KERNEL_INCLUDE="$(KERNEL_HEADERS_INCLUDE_DIR)"
+	LDFLAGS='-rdynamic'
 
 IPROUTE2_INSTALL_OPT := \
 	$(IPROUTE2_MAKE_OPT) \
@@ -68,6 +58,7 @@ IPROUTE2_INSTALL_FILES-y =
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_ARPD) +=	arpd
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_BRIDGE) +=	bridge
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_CTSTAT) +=	ctstat
+IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_DEVLINK) +=	devlink
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_GENL) +=	genl
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_IP) +=	ip
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_IFCFG) +=	ifcfg

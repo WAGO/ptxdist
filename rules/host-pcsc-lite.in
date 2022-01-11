@@ -1,8 +1,8 @@
 ## SECTION=hosttools_noprompt
-## SECTION=hosttools_platform
 
 config HOST_PCSC_LITE
 	tristate
+	default y if ALLYES
 	help
 	  Middleware to access a smart card using PC/SC (library)
 

@@ -1,8 +1,7 @@
 # -*-makefile-*-
 #
 # Copyright (C) 2015 by Michael Olbrich <m.olbrich@pengutronix.de>
-#
-# See CREDITS for details about who has contributed to this project.
+#           (C) 2018 by Florian Bäuerle <florian.baeuerle@allegion.com>
 #
 # For further information about the PTXdist project and license conditions
 # see the README file.
@@ -20,22 +19,15 @@ XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_VERSION	:= 2.5.3
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_MD5		:= 8042f874e86a87623adaea4780f03b29
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL		:= lohit-tamil-classical-ttf-$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_VERSION)
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_SUFFIX	:= tar.gz
-XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_URL		:= https://fedorahosted.org/releases/l/o/lohit/$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL).$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_SUFFIX)
+XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_URL		:= https://releases.pagure.org/lohit/$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL).$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_SUFFIX)
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_SOURCE	:= $(SRCDIR)/$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL).$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_SUFFIX)
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_DIR		:= $(BUILDDIR)/$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL)
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_LICENSE	:= OFL-1.1
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_LICENSE_FILES := \
 	file://OFL.txt;md5=e56537d157e0ee370c0d8468da33e245
 
-ifdef PTXCONF_XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL
-$(STATEDIR)/xorg-fonts.targetinstall.post: $(STATEDIR)/xorg-font-ttf-lohit-tamil-classical.targetinstall
-endif
-
-# ----------------------------------------------------------------------------
-# Prepare
-# ----------------------------------------------------------------------------
-
 XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_CONF_TOOL	:= NO
+XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_FONTDIR	:= $(XORG_FONTDIR)/truetype/lohit-tamil-classical
 
 # ----------------------------------------------------------------------------
 # Compile
@@ -51,6 +43,10 @@ $(STATEDIR)/xorg-font-ttf-lohit-tamil-classical.compile:
 
 $(STATEDIR)/xorg-font-ttf-lohit-tamil-classical.install:
 	@$(call targetinfo)
+	@$(call world/install-fonts,XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL,*.ttf)
+	@mkdir -p $(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_PKGDIR)/etc/fonts/conf.d
+	@install -m 644 $(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_DIR)/66-lohit-tamil-classical.conf \
+		$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_PKGDIR)/etc/fonts/conf.d
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
@@ -59,25 +55,14 @@ $(STATEDIR)/xorg-font-ttf-lohit-tamil-classical.install:
 
 $(STATEDIR)/xorg-font-ttf-lohit-tamil-classical.targetinstall:
 	@$(call targetinfo)
-
-	@mkdir -p $(XORG_FONTS_DIR_INSTALL)/truetype
-
-	@find $(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_DIR) \
-		-name "*.ttf" \
-		| \
-		while read file; do \
-		install -m 644 $${file} $(XORG_FONTS_DIR_INSTALL)/truetype; \
-	done
-
 	@$(call install_init,  xorg-font-ttf-lohit-tamil-classical)
 	@$(call install_fixup, xorg-font-ttf-lohit-tamil-classical,PRIORITY,optional)
 	@$(call install_fixup, xorg-font-ttf-lohit-tamil-classical,SECTION,base)
 	@$(call install_fixup, xorg-font-ttf-lohit-tamil-classical,AUTHOR,"Michael Olbrich <m.olbrich@pengutronix.de>")
 	@$(call install_fixup, xorg-font-ttf-lohit-tamil-classical,DESCRIPTION,missing)
 
-	@$(call install_copy, xorg-font-ttf-lohit-tamil-classical, 0, 0, 644, \
-		$(XORG_FONT_TTF_LOHIT_TAMIL_CLASSICAL_DIR)/66-lohit-tamil-classical.conf, \
-		/etc/fonts/conf.d/66-lohit-tamil-classical.conf)
+	@$(call install_tree, xorg-font-ttf-lohit-tamil-classical, 0, 0, -, /etc)
+	@$(call install_tree, xorg-font-ttf-lohit-tamil-classical, 0, 0, -, /usr)
 
 	@$(call install_finish, xorg-font-ttf-lohit-tamil-classical)
 	@$(call touch)
