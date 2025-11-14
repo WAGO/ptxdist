@@ -1,13 +1,21 @@
 ## SECTION=shell_and_console
 
-menuconfig SYSTEMD
+menuconfig SYSTEMD_HELPER
+	tristate
+	prompt "systemd                       "
+
+if SYSTEMD_HELPER
+
+config SYSTEMD
 	tristate
 	depends on INITMETHOD_SYSTEMD
+	default SYSTEMD_HELPER
 	select HOST_SYSTEM_PYTHON3
+	select HOST_SYSTEM_PYTHON3_JINJA2
 	select HOST_MESON
-	select HOST_GETTEXT
 	select HOST_GPERF
 	select ROOTFS_RUN
+	select LIBC_CRYPT
 	select LIBC_PTHREAD
 	select LIBC_RT
 	select LIBC_DL		if SYSTEMD_NETWORK
@@ -16,25 +24,27 @@ menuconfig SYSTEMD
 	select LIBCAP
 	select LIBKMOD
 	select LIBKMOD_TOOLS
-	select UTIL_LINUX_NG
-	select UTIL_LINUX_NG_LIBMOUNT
+	select UTIL_LINUX
+	select UTIL_LINUX_LIBMOUNT
+	select UTIL_LINUX_LIBFDISK	if SYSTEMD_REPART
 	select MACHINE_ID	if RUNTIME
 	select XZ		if SYSTEMD_XZ
 	select LZ4		if SYSTEMD_LZ4
 	select ZSTD		if SYSTEMD_ZSTD
+	select PCRE2		if SYSTEMD_PCRE2
 	select LIBMICROHTTPD	if SYSTEMD_MICROHTTPD
 	select LIBSECCOMP	if SYSTEMD_SECCOMP
-	select LIBSELINUX	if GLOBAL_SELINUX
 	select IPTABLES		if SYSTEMD_IPMASQUERADE
 	select LIBELF		if SYSTEMD_COREDUMP
 	select LIBELF_LIBDW	if SYSTEMD_COREDUMP
+	select OPENSSL		if SYSTEMD_OPENSSL
+	select LIBCURL		if SYSTEMD_LIBCURL
 	# for udev:
 	select ROOTFS_DEV
 	select LIBBLKID
-	select HOST_SYSTEMD	if SYSTEMD_UDEV_HWDB
 	select ROOTFS_VAR_LIB	if RUNTIME
 	select ROOTFS_VAR_CACHE	if RUNTIME
-	prompt "systemd                       "
+	select ROOTFS_VAR_SPOOL if RUNTIME
 	help
 	  systemd is a system and session manager for Linux, compatible with SysV
 	  and LSB init scripts. systemd provides aggressive parallelization
@@ -50,19 +60,24 @@ menuconfig SYSTEMD
 	  Note: on a read-only root filesystem this package still requires a
 	  writable '/var/lib' and '/var/cache' for its run-time information.
 
-if SYSTEMD
-
 comment "D-Bus is needed for the enabled features"
 	depends on SYSTEMD_DBUS && !DBUS
 
 config SYSTEMD_DBUS
 	bool
 
+config SYSTEMD_DBUS_SERVICES
+	bool
+
 config SYSTEMD_MICROHTTPD
+	bool
+
+config SYSTEMD_LIBCURL
 	bool
 
 config SYSTEMD_LOCALES
 	bool
+	select SYSTEMD_DBUS_SERVICES
 	default LOCALES
 
 config SYSTEMD_VCONSOLE
@@ -79,9 +94,19 @@ config SYSTEMD_DISABLE_RANDOM_SEED
 	  the random seed is not possible.
 	  Warning: enabling this option may be insecure.
 
+config SYSTEMD_HOSTNAMED
+	bool
+	default y
+	select SYSTEMD_DBUS_SERVICES
+	prompt "hostname daemon"
+	help
+	  A tiny daemon that can be used to control the hostname and related
+	  machine meta data from user programs.
+
 config SYSTEMD_LOGIND
 	bool
 	select SYSTEMD_DBUS
+	select SYSTEMD_DBUS_SERVICES
 	prompt "login daemon"
 
 config SYSTEMD_UNITS_USER
@@ -91,7 +116,14 @@ config SYSTEMD_UNITS_USER
 
 config SYSTEMD_NETWORK
 	bool
+	select SYSTEMD_DBUS_SERVICES
 	prompt "network configuration with systemd"
+
+config SYSTEMD_OPENSSL
+	bool
+	prompt "openssl support"
+	help
+	  OpenSSL is needed for DNSSEC support in systemd-resolved
 
 config SYSTEMD_IPMASQUERADE
 	bool
@@ -104,9 +136,21 @@ config SYSTEMD_TIMEDATE
 	bool
 	default y
 	select SYSTEMD_DBUS
+	select SYSTEMD_DBUS_SERVICES
 	prompt "date/time handling"
 	help
 	  NTP client for time synchronization and local timezone handling.
+
+config SYSTEMD_TIMEDATE_VOLATILE
+	bool
+	prompt "volatile systemd-timesyncd"
+	help
+	  If this option is enabled then ptxdist assumes that
+	  /var/lib/systemd/timesync is not writeable at runtime and
+	  systemd-timesyncd cannot save the synchronized time.
+	  PTXdist will prevent systemd from trying to create this directory.
+	  This helps with nfsroot where incorrect permissions of the directory
+	  prevent systemd-timesyncd from starting.
 
 config SYSTEMD_COREDUMP
 	bool
@@ -122,7 +166,34 @@ config SYSTEMD_SECCOMP
 
 config SYSTEMD_POLKIT
 	bool
-	default POLKIT
+	default POLKIT_POLKITD
+
+config SYSTEMD_QUOTACHECK
+	bool
+	default y
+	prompt "disk quota support"
+	help
+	  File system quota checker logic
+
+config SYSTEMD_NSPAWN
+	bool
+	prompt "install systemd-nspawn"
+
+config SYSTEMD_REPART
+	bool
+	prompt "install systemd-repart"
+	help
+	  systemd-repart repartitions the disk on system boot if configuration
+	  files are present. You should install these files in a separate
+	  PTXdist package, or call systemd-repart explicitly.
+
+config SYSTEMD_DEFAULT_NET_NAMING_SCHEME
+	string
+	prompt "default net.naming-scheme= value"
+	default "latest"
+	help
+	  Preserve the naming scheme for network interfaces of the given
+	  systemd version.
 
 menu "journald                    "
 
@@ -138,9 +209,14 @@ config SYSTEMD_ZSTD
 	bool
 	prompt "ZSTD compressed journal support"
 
+config SYSTEMD_PCRE2
+	bool
+	prompt "regexp matching support using pcre2"
+
 config SYSTEMD_JOURNAL_REMOTE
 	bool
 	select SYSTEMD_MICROHTTPD
+	select SYSTEMD_LIBCURL
 	prompt "install systemd-journal-remote"
 	help
 	  systemd-journal-remote is a command to receive serialized
@@ -153,19 +229,9 @@ menu "udev                        "
 
 menu "install options               "
 
-config SYSTEMD_UDEV_DRIVERS_RULES
-	bool
-	default y
-	prompt "install udev driver rules"
-	help
-	  This will install the generic udev drivers rules files from the udev package
-	  under '/usr/lib/udev/rules.d/',
-	  These rules are required to automatically load kernel modules on
-	  udev start.
-	  If unsure say Y.
-
 config SYSTEMD_UDEV_HWDB
 	bool
+	select SYSTEMD_HWDB
 	prompt "install hardware database"
 
 config SYSTEMD_UDEV_CUST_RULES
@@ -186,6 +252,10 @@ config SYSTEMD_UDEV_PERSISTENT_ATA
 config SYSTEMD_UDEV_PERSISTENT_CDROM
 	bool
 	prompt "cdrom"
+
+config SYSTEMD_UDEV_PERSISTENT_FIDO
+	bool
+	prompt "fido"
 
 config SYSTEMD_UDEV_PERSISTENT_SCSI
 	bool

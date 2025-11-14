@@ -14,10 +14,10 @@ PACKAGES-$(PTXCONF_V4L_UTILS) += v4l-utils
 #
 # Paths and names
 #
-V4L_UTILS_VERSION	:= 1.20.0
-V4L_UTILS_MD5		:= 46f9e2c0b2fdccd009da2f7e1aa87894
+V4L_UTILS_VERSION	:= 1.28.1
+V4L_UTILS_MD5		:= 6716de513a1fd2e1edb404a46a455855
 V4L_UTILS		:= v4l-utils-$(V4L_UTILS_VERSION)
-V4L_UTILS_SUFFIX	:= tar.bz2
+V4L_UTILS_SUFFIX	:= tar.xz
 V4L_UTILS_URL		:= http://linuxtv.org/downloads/v4l-utils/$(V4L_UTILS).$(V4L_UTILS_SUFFIX)
 V4L_UTILS_SOURCE	:= $(SRCDIR)/$(V4L_UTILS).$(V4L_UTILS_SUFFIX)
 V4L_UTILS_DIR		:= $(BUILDDIR)/$(V4L_UTILS)
@@ -31,36 +31,34 @@ V4L_UTILS_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-V4L_UTILS_CONF_TOOL	:= autoconf
+V4L_UTILS_CONF_TOOL	:= meson
 V4L_UTILS_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-doxygen-doc \
-	--disable-doxygen-dot \
-	--disable-doxygen-man \
-	--disable-doxygen-rtf \
-	--disable-doxygen-xml \
-	--disable-doxygen-chm \
-	--disable-doxygen-chi \
-	--disable-doxygen-html \
-	--disable-doxygen-ps \
-	--disable-doxygen-pdf \
-	--disable-nls \
-	--disable-rpath \
-	--disable-libdvbv5 \
-	--enable-dyn-libv4l \
-	--enable-v4l-utils \
-	--enable-v4l2-compliance-libv4l \
-	--disable-v4l2-compliance-32 \
-	--enable-v4l2-ctl-libv4l \
-	--enable-v4l2-ctl-stream-to \
-	--disable-v4l2-ctl-32 \
-	--disable-qv4l2 \
-	--disable-qvidcap \
-	--disable-gconv \
-	--$(call ptx/endis, PTXCONF_V4L_UTILS_IRKEYTABLE)-bpf \
-	--$(call ptx/wwo, PTXCONF_V4L_UTILS_LIBV4LCONVERT)-jpeg \
-	--with-udevdir=/usr/lib/udev \
-	--with-systemdsystemunitdir=/usr/lib/systemd/system
+	$(CROSS_MESON_USR) \
+	-Dbpf=disabled \
+	-Ddocdir= \
+	-Ddoxygen-doc=disabled \
+	-Ddoxygen-html=false \
+	-Ddoxygen-man=false \
+	-Dgconv=disabled \
+	-Dgconvsysdir= \
+	-Djpeg=$(call ptx/endis, PTXCONF_V4L_UTILS_LIBV4LCONVERT)d \
+	-Dlibdvbv5=disabled \
+	-Dlibv4l1subdir=libv4l \
+	-Dlibv4l2subdir=libv4l \
+	-Dlibv4lconvertsubdir=libv4l \
+	-Dqv4l2=disabled \
+	-Dqvidcap=disabled \
+	-Dsystemdsystemunitdir=/usr/lib/systemd/system \
+	-Dudevdir=/usr/lib/udev \
+	-Dv4l-plugins=true \
+	-Dv4l-utils=true \
+	-Dv4l-wrappers=$(call ptx/truefalse, PTXCONF_V4L_UTILS_V4L2CONVERT) \
+	-Dv4l2-compliance-32=false \
+	-Dv4l2-compliance-libv4l=true \
+	-Dv4l2-ctl-32=false \
+	-Dv4l2-ctl-libv4l=true \
+	-Dv4l2-ctl-stream-to=true \
+	-Dv4l2-tracer=$(call ptx/endis, PTXCONF_V4L_UTILS_TRACER)d
 
 ifdef PTXCONF_KERNEL_HEADER
 V4L_UTILS_CPPFLAGS	:= \
@@ -86,7 +84,9 @@ ifdef PTXCONF_V4L_UTILS_LIBV4L1
 endif
 ifdef PTXCONF_V4L_UTILS_LIBV4L2
 	@$(call install_lib, v4l-utils, 0, 0, 0644, libv4l2)
+ifdef PTXCONF_V4L_UTILS_V4L2CONVERT
 	@$(call install_lib, v4l-utils, 0, 0, 0644, libv4l/v4l2convert)
+endif
 endif
 ifdef PTXCONF_V4L_UTILS_LIBV4LCONVERT
 	@$(call install_lib, v4l-utils, 0, 0, 0644, libv4lconvert)
@@ -133,6 +133,9 @@ ifdef PTXCONF_V4L_UTILS_V4L2CTL
 endif
 ifdef PTXCONF_V4L_UTILS_V4L2SYSFSPATH
 	@$(call install_copy, v4l-utils, 0, 0, 0755, -, /usr/bin/v4l2-sysfs-path)
+endif
+ifdef PTXCONF_V4L_UTILS_TRACER
+	@$(call install_copy, v4l-utils, 0, 0, 0755, -, /usr/bin/v4l2-tracer)
 endif
 	@$(call install_finish, v4l-utils)
 

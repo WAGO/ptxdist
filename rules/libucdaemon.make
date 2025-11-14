@@ -26,13 +26,11 @@ LIBUCDAEMON_DIR		:= $(BUILDDIR)/$(LIBUCDAEMON)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBUCDAEMON_PATH	:= PATH=$(CROSS_PATH)
-LIBUCDAEMON_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBUCDAEMON_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBUCDAEMON_CONF_TOOL	:= autoconf
+LIBUCDAEMON_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

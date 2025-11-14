@@ -18,7 +18,7 @@ LIBMAD_VERSION	:= 0.15.1b
 LIBMAD_MD5	:= 1be543bc30c56fb6bea1d7bf6a64e66c
 LIBMAD		:= libmad-$(LIBMAD_VERSION)
 LIBMAD_SUFFIX	:= tar.gz
-LIBMAD_URL	:= ftp://ftp.mars.org/pub/mpeg/$(LIBMAD).$(LIBMAD_SUFFIX)
+LIBMAD_URL	:=  $(call ptx/mirror, SF, mad/libmad/$(LIBMAD_VERSION)/$(LIBMAD).$(LIBMAD_SUFFIX))
 LIBMAD_SOURCE	:= $(SRCDIR)/$(LIBMAD).$(LIBMAD_SUFFIX)
 LIBMAD_DIR	:= $(BUILDDIR)/$(LIBMAD)
 LIBMAD_LICENSE	:= GPL-2.0-or-later
@@ -27,23 +27,21 @@ LIBMAD_LICENSE	:= GPL-2.0-or-later
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBMAD_PATH	:= PATH=$(CROSS_PATH)
-LIBMAD_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBMAD_AUTOCONF := \
+LIBMAD_CONF_TOOL := autoconf
+LIBMAD_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-debugging \
 	--disable-profiling \
 	--disable-experimental
 
 ifdef PTXCONF_LIBMAD__OPT_SPEED
-LIBMAD_AUTOCONF += --enable-speed
+LIBMAD_CONF_OPT += --enable-speed
 endif
 ifdef PTXCONF_LIBMAD__OPT_ACCURACY
-LIBMAD_AUTOCONF += --enable-accuracy
+LIBMAD_CONF_OPT += --enable-accuracy
 endif
 
 # ----------------------------------------------------------------------------

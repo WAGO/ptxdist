@@ -16,18 +16,19 @@ PACKAGES-$(PTXCONF_OPENSSL) += openssl
 #
 # Paths and names
 #
-OPENSSL_BASE	:= 1.1.1
-OPENSSL_BUGFIX	:= g
-OPENSSL_VERSION	:= $(OPENSSL_BASE)$(OPENSSL_BUGFIX)
-OPENSSL_MD5	:= 76766e98997660138cdaf13a187bd234
-OPENSSL		:= openssl-$(OPENSSL_VERSION)
-OPENSSL_SUFFIX	:= tar.gz
-OPENSSL_URL	:= \
-	http://www.openssl.org/source/$(OPENSSL).$(OPENSSL_SUFFIX) \
-	http://www.openssl.org/source/old/$(OPENSSL_BASE)/$(OPENSSL).$(OPENSSL_SUFFIX)
-OPENSSL_SOURCE	:= $(SRCDIR)/$(OPENSSL).$(OPENSSL_SUFFIX)
-OPENSSL_DIR	:= $(BUILDDIR)/$(OPENSSL)
-OPENSSL_LICENSE	:= OpenSSL
+OPENSSL_VERSION		:= 3.4.0
+OPENSSL_MD5		:= 34733f7be2d60ecd8bd9ddb796e182af
+OPENSSL			:= openssl-$(OPENSSL_VERSION)
+OPENSSL_SUFFIX		:= tar.gz
+OPENSSL_URL		:= \
+	https://github.com/openssl/openssl/releases/download/$(OPENSSL)/$(OPENSSL).$(OPENSSL_SUFFIX) \
+	https://www.openssl.org/source/$(OPENSSL).$(OPENSSL_SUFFIX) \
+	https://www.openssl.org/source/old/$(basename $(OPENSSL_VERSION))/$(OPENSSL).$(OPENSSL_SUFFIX)
+OPENSSL_SOURCE		:= $(SRCDIR)/$(OPENSSL).$(OPENSSL_SUFFIX)
+OPENSSL_DIR		:= $(BUILDDIR)/$(OPENSSL)
+OPENSSL_LICENSE		:= Apache-2.0
+OPENSSL_LICENSE_FILES	:= \
+	file://LICENSE.txt;md5=c75985e733726beaba57bc5253e96d04
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -55,7 +56,7 @@ endif
 
 ifdef PTXCONF_OPENSSL
 ifndef OPENSSL_ARCH-y
-$(error *** Sorry unsupported ARCH in openssl.make)
+$(call ptx/error, Sorry unsupported ARCH in openssl.make)
 endif
 endif
 
@@ -69,6 +70,7 @@ OPENSSL_CONF_OPT := \
 	--openssldir=/usr/lib/ssl \
 	shared \
 	$(call ptx/ifdef, PTXCONF_OPENSSL_CRYPTODEV, enable-devcryptoeng, no-devcryptoeng) \
+	$(call ptx/ifdef, PTXCONF_OPENSSL_KTLS, enable-ktls, no-ktls) \
 	no-idea \
 	no-mdc2 \
 	no-rc5 \

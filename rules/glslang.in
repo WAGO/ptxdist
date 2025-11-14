@@ -2,8 +2,10 @@
 
 menuconfig GLSLANG
 	tristate
-	prompt "glslang"
+	prompt "glslang                       "
 	select HOST_CMAKE
+	select HOST_SYSTEM_PYTHON3
+	select SPIRV_TOOLS
 	help
 	  Khronos-reference SPIR-V generator
 
@@ -12,6 +14,7 @@ if GLSLANG
 config GLSLANG_TOOLS
 	bool
 	prompt "install tools"
+	select GLSLANG_LIBS
 	help
 	  Install glslangValidator and spirv-remap tools.
 

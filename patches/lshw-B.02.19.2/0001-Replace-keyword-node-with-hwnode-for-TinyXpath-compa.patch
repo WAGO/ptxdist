@@ -1,0 +1,35 @@
+From: "Bart vdr. Meulen" <bartvdrmeulen@gmail.com>
+Date: Sun, 20 Jun 2010 22:48:09 +0200
+Subject: [PATCH] Replace keyword node with hwnode for TinyXpath compatibility
+
+It turns out that within TinyXpath 'node' is a reserved key-word.
+Replace it with 'hwnode' when printing to xml.
+
+Signed-off-by: Bart vdr. Meulen <bartvdrmeulen@gmail.com>
+Signed-off-by: Remy Bohmer <linux@bohmer.net>
+---
+ src/core/hw.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/hw.cc b/src/core/hw.cc
+index 4522c1af0fc3..13c22ac8f44d 100644
+--- a/src/core/hw.cc
++++ b/src/core/hw.cc
+@@ -1715,7 +1715,7 @@ string hwNode::asXML(unsigned level)
+   if(visible(getClassName()))
+   {
+     out << spaces(2*level);
+-    out << "<node id=\"" << getId() << "\"";
++    out << "<hwnode id=\"" << getId() << "\"";
+     if (disabled())
+       out << " disabled=\"true\"";
+     if (claimed())
+@@ -2014,7 +2014,7 @@ string hwNode::asXML(unsigned level)
+   if(visible(getClassName()))
+   {
+     out << spaces(2*level);
+-    out << "</node>" << endl;
++    out << "</hwnode>" << endl;
+   }
+ 
+   if((level==0) && ::enabled("output:list"))

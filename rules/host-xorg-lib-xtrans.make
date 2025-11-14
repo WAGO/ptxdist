@@ -21,12 +21,9 @@ HOST_XORG_LIB_XTRANS_DIR	= $(HOST_BUILDDIR)/$(XORG_LIB_XTRANS)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_XORG_LIB_XTRANS_PATH	:= PATH=$(HOST_PATH)
-HOST_XORG_LIB_XTRANS_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_XORG_LIB_XTRANS_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_XORG_LIB_XTRANS_CONF_TOOL	:= autoconf
 
 # vim: syntax=make

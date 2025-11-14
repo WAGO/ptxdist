@@ -15,37 +15,40 @@ PACKAGES-$(PTXCONF_LIBXSLT) += libxslt
 #
 # Paths and names
 #
-LIBXSLT_VERSION	:= 1.1.29
-LIBXSLT_MD5	:= a129d3c44c022de3b9dcf6d6f288d72e
+LIBXSLT_VERSION	:= 1.1.42
+LIBXSLT_MD5	:= 56bc5d89aa39d62002961c150fec08a0
 LIBXSLT		:= libxslt-$(LIBXSLT_VERSION)
-LIBXSLT_SUFFIX	:= tar.gz
+LIBXSLT_SUFFIX	:= tar.xz
 LIBXSLT_SOURCE	:= $(SRCDIR)/$(LIBXSLT).$(LIBXSLT_SUFFIX)
 LIBXSLT_DIR	:= $(BUILDDIR)/$(LIBXSLT)
 LIBXSLT_LICENSE	:= MIT
+LIBXSLT_LICENSE_FILES := \
+	file://Copyright;md5=0cd9a07afbeb24026c9b03aecfeba458
 
 LIBXSLT_URL	:= \
-	ftp://xmlsoft.org/libxslt/$(LIBXSLT).$(LIBXSLT_SUFFIX) \
-	ftp://xmlsoft.org/libxslt/old/$(LIBXSLT).$(LIBXSLT_SUFFIX)
+	https://download.gnome.org/sources/libxslt/$(basename $(LIBXSLT_VERSION))/$(LIBXSLT).$(LIBXSLT_SUFFIX)
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBXSLT_ENV	:= \
+LIBXSLT_CONF_ENV := \
 	$(CROSS_ENV) \
 	ac_cv_path_XML_CONFIG=xml2-config
 
 #
 # autoconf
 #
-LIBXSLT_AUTOCONF := \
+LIBXSLT_CONF_TOOL := autoconf
+LIBXSLT_CONF_OPT := \
 	 $(CROSS_AUTOCONF_USR) \
 	--disable-static \
 	--without-python \
 	--$(call ptx/wwo, PTXCONF_LIBXSLT_CRYPTO)-crypto \
-	--$(call ptx/wwo, PTXCONF_LIBXSLT_PLUGINS)-plugins \
 	--$(call ptx/wwo, PTXCONF_LIBXSLT_DEBUG)-debug \
-	--$(call ptx/wwo, PTXCONF_LIBXSLT_DEBUG)-debugger
+	--$(call ptx/wwo, PTXCONF_LIBXSLT_DEBUG)-debugger \
+	--$(call ptx/wwo, PTXCONF_LIBXSLT_PROFILER)-profiler \
+	--$(call ptx/wwo, PTXCONF_LIBXSLT_PLUGINS)-plugins
 
 # ----------------------------------------------------------------------------
 # Target-Install

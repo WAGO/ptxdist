@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_READLINE) += readline
 #
 # Paths and names
 #
-READLINE_VERSION	:= 8.0
-READLINE_MD5		:= 7e6c1f16aee3244a69aba6e438295ca3
+READLINE_VERSION	:= 8.2
+READLINE_MD5		:= 4aa1b31be779e6b84f9a96cb66bc50f6
 READLINE		:= readline-$(READLINE_VERSION)
 READLINE_SUFFIX		:= tar.gz
 READLINE_URL		:= $(call ptx/mirror, GNU, readline/$(READLINE).$(READLINE_SUFFIX))
@@ -29,12 +29,14 @@ READLINE_LICENSE_FILES	:= file://COPYING;md5=d32239bcb673463ab874e80d47fae504
 # Prepare
 # ----------------------------------------------------------------------------
 
-READLINE_AUTOCONF := \
+READLINE_CONF_TOOL	:= autoconf
+READLINE_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-multibyte \
 	--enable-shared \
 	--disable-static\
 	--disable-install-examples \
+	--enable-bracketed-paste-default \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--$(call ptx/wwo,PTXCONF_READLINE_NCURSES)-curses
 

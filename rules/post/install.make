@@ -179,8 +179,9 @@ install_archive =		\
 	GRP=$(strip $(3));	\
 	DIR=$(strip $(4));	\
 	DST=$(strip $(5));	\
+	STRIP=$(strip $(6));	\
 	$(call install_check, install_archive);	\
-	echo "ptxd_install_archive '$$DIR' '$$DST' '$$OWN' '$$GRP'" >> "$(STATEDIR)/$$XPKG.cmds"
+	echo "ptxd_install_archive '$$DIR' '$$DST' '$$OWN' '$$GRP' '$$STRIP'" >> "$(STATEDIR)/$$XPKG.cmds"
 
 #
 # install_glob
@@ -232,9 +233,9 @@ install_spec =			\
 #
 # install_package
 #
-# Installs usefull files and directories in an archive with user/group ownership and
+# Installs useful files and directories in an archive with user/group ownership and
 # permissions via fakeroot.
-# Usefull means binaries, libs + links, etc.
+# Useful means binaries, libs + links, etc.
 #
 #
 # $1: xpkg label

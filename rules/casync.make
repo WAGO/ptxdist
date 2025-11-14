@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_CASYNC) += casync
 #
 # Paths and names
 #
-CASYNC_VERSION	:= a8f6c841ccfe59ca8c68aad64df170b64042dce8
-CASYNC_MD5	:= 38cf3c9e1be9ac60243031538024aa01
+CASYNC_VERSION	:= 0efa7abffe5fffbde8c457d3c8fafbdde0bb6e4f
+CASYNC_MD5	:= 9b28d76355acfb56ba6ddfcb95951c13
 CASYNC		:= casync-$(CASYNC_VERSION)
 CASYNC_SUFFIX	:= tar.gz
 CASYNC_URL	:= https://github.com/systemd/casync/archive/$(CASYNC_VERSION).$(CASYNC_SUFFIX)
@@ -33,16 +33,15 @@ CASYNC_CONF_TOOL	:= meson
 CASYNC_CONF_OPT		:= \
 	$(CROSS_MESON_USR) \
 	-Dfuse=$(call ptx/truefalse,PTXCONF_CASYNC_FUSE) \
-	-Dselinux=$(call ptx/truefalse,PTXCONF_GLOBAL_SELINUX) \
-	-Dudev=$(call ptx/truefalse,PTXCONF_CASYNC_UDEV) \
-	-Dudevrulesdir=/usr/lib/udev/rules.d \
-	-Dman=false \
-	-Dlibzstd=disabled \
 	-Dliblzma=$(call ptx/endis,PTXCONF_CASYNC_LZMA)d \
 	-Dlibz=$(call ptx/endis,PTXCONF_CASYNC_ZLIB)d \
-	-Doss-fuzz=false \
+	-Dlibzstd=disabled \
 	-Dllvm-fuzz=false \
-	-Dbashcompletiondir=no
+	-Dman=false \
+	-Doss-fuzz=false \
+	-Dselinux=$(call ptx/truefalse,PTXCONF_GLOBAL_SELINUX) \
+	-Dudev=$(call ptx/truefalse,PTXCONF_CASYNC_UDEV) \
+	-Dudevrulesdir=/usr/lib/udev/rules.d
 
 # ----------------------------------------------------------------------------
 # Target-Install

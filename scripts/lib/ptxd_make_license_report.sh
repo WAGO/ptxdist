@@ -18,9 +18,8 @@ ptxd_make_license_report_header() {
 	\usepackage{tikz}
 	\usepackage{adjustbox}
 	\usepackage{spverbatim}
+	\usepackage{pdfpages}
 	\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
-	\usepackage{tocstyle}
-	\usetocstyle{KOMAlike}
 
 	%% Something like this may be needed depending on the package list
 	%\usepackage[CJK]{ucharclasses}
@@ -138,7 +137,7 @@ ptxd_make_license_report() {
     ptxd_make_world_init || return
 
     # regenerate license info and sort out unused packages
-    for pkg in $(cat "${ptx_report_dir}/package.list"); do
+    for pkg in $(<"${ptx_report_dir}/package.list"); do
 	ptxd_package_license_association[$(basename ${pkg})]=$(dirname ${pkg})
     done
 
@@ -186,7 +185,7 @@ ptxd_make_license_report() {
 	ptxd_make_license_report_header
 	for pkg in ${@}; do
 		pkg_lic="${ptxd_package_license_association[${pkg}]}"
-		if [ -z ${pkg_lic} ]; then
+		if [ -z ${pkg_lic} -o "${pkg_lic}" = "ignore" ]; then
 			continue
 		fi
 		pkg_lic="${pkg_lic}/${pkg}"
@@ -211,9 +210,8 @@ ptxd_make_license_compliance_header() {
 	\usepackage{tikz}
 	\usepackage{adjustbox}
 	\usepackage{spverbatim}
+	\usepackage{pdfpages}
 	\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
-	\usepackage{tocstyle}
-	\usetocstyle{KOMAlike}
 
 	%% Something like this may be needed depending on the package list
 	%\usepackage[CJK]{ucharclasses}
@@ -265,12 +263,11 @@ ptxd_make_license_compliance_footer() {
 export -f ptxd_make_license_compliance_footer
 
 ptxd_make_license_compliance_pdf() {
-    local -a ptxd_reply
     local ptx_license_target_tex pkg_lic pkg
     local -A ptxd_package_license_association
 
     # regenerate license info and sort out unused packages
-    for pkg in $(cat "${ptx_report_dir}/package.list"); do
+    for pkg in $(<"${ptx_report_dir}/package.list"); do
 	ptxd_package_license_association[$(basename ${pkg})]=$(dirname ${pkg})
     done
 
@@ -282,7 +279,7 @@ ptxd_make_license_compliance_pdf() {
 	ptxd_make_license_compliance_header
 	for pkg in ${@}; do
 		pkg_lic="${ptxd_package_license_association[${pkg}]}"
-		if [ -z "${pkg_lic}" -o "${pkg_lic}" = "proprietary" ]; then
+		if [ -z "${pkg_lic}" -o "${pkg_lic}" = "proprietary" -o "${pkg_lic}" = "ignore" ]; then
 			continue
 		fi
 		pkg_lic="${pkg_lic}/${pkg}"
@@ -297,12 +294,11 @@ ptxd_make_license_compliance_pdf() {
 export -f ptxd_make_license_compliance_pdf
 
 ptxd_make_license_compliance_yaml() {
-    local -a ptxd_reply
-    local ptx_license_target_tex pkg_lic pkg
+    local pkg_lic pkg
     local -A ptxd_package_license_association
 
     # regenerate license info and sort out unused packages
-    for pkg in $(cat "${ptx_report_dir}/package.list"); do
+    for pkg in $(<"${ptx_report_dir}/package.list"); do
 	ptxd_package_license_association[$(basename ${pkg})]=$(dirname ${pkg})
     done
 

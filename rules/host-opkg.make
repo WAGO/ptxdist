@@ -22,8 +22,6 @@ HOST_OPKG_DIR	= $(HOST_BUILDDIR)/$(HOST_OPKG)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_OPKG_ENV	:= $(HOST_ENV)
-
 #
 # autoconf
 #
@@ -32,15 +30,15 @@ HOST_OPKG_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--disable-libopkg-api \
 	--disable-static \
-	--disable-pathfinder \
 	--disable-xz \
 	--disable-bzip2 \
+	--disable-lz4 \
+	--disable-zstd \
 	--disable-curl \
 	--disable-sha256 \
-	--disable-openssl \
 	--disable-ssl-curl \
 	--disable-gpg \
-	--without-libsolv \
-	--without-static-libopkg
+	--without-static-libopkg \
+	--without-libsolv
 
 # vim: syntax=make

@@ -27,7 +27,8 @@ EGGDBUS_LICENSE	:= LGPL-2.0-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-EGGDBUS_AUTOCONF := \
+EGGDBUS_CONF_TOOL := autoconf
+EGGDBUS_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-static \
@@ -35,7 +36,7 @@ EGGDBUS_AUTOCONF := \
 	--disable-verbose-mode \
 	--disable-man-pages \
 	--disable-gtk-doc \
-	--with-eggdbus-tools=$(PTXDIST_SYSROOT_HOST)/bin
+	--with-eggdbus-tools=$(PTXDIST_SYSROOT_HOST)/usr/bin
 
 # ----------------------------------------------------------------------------
 # Target-Install

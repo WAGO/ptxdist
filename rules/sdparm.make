@@ -26,13 +26,11 @@ SDPARM_DIR	:= $(BUILDDIR)/$(SDPARM)
 # Prepare
 # ----------------------------------------------------------------------------
 
-SDPARM_PATH	:= PATH=$(CROSS_PATH)
-SDPARM_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SDPARM_AUTOCONF := $(CROSS_AUTOCONF_USR)
+SDPARM_CONF_TOOL := autoconf
+SDPARM_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

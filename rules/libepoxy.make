@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_LIBEPOXY) += libepoxy
 #
 # Paths and names
 #
-LIBEPOXY_VERSION	:= 1.5.3
-LIBEPOXY_MD5		:= e2845de8d2782b2d31c01ae8d7cd4cbb
+LIBEPOXY_VERSION	:= 1.5.10
+LIBEPOXY_MD5		:= f0730aad115c952e77591fcc805b1dc1
 LIBEPOXY		:= libepoxy-$(LIBEPOXY_VERSION)
-LIBEPOXY_SUFFIX		:= tar.xz
-LIBEPOXY_URL		:= https://github.com/anholt/libepoxy/releases/download/$(LIBEPOXY_VERSION)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
+LIBEPOXY_SUFFIX		:= tar.gz
+LIBEPOXY_URL		:= https://github.com/anholt/libepoxy/archive/refs/tags/$(LIBEPOXY_VERSION).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_SOURCE		:= $(SRCDIR)/$(LIBEPOXY).$(LIBEPOXY_SUFFIX)
 LIBEPOXY_DIR		:= $(BUILDDIR)/$(LIBEPOXY)
 LIBEPOXY_LICENSE	:= MIT
+LIBEPOXY_LICENSE_FILES	:= \
+	file://COPYING;md5=58ef4c80d401e07bd9ee8b6b58cf464b
 
 # ----------------------------------------------------------------------------
 # Prepare

@@ -15,14 +15,15 @@ PACKAGES-$(PTXCONF_LIBCURL) += libcurl
 #
 # Paths and names
 #
-LIBCURL_VERSION	:= 7.66.0
-LIBCURL_MD5	:= c238aa394e3aa47ca4fcb0491774149f
+LIBCURL_VERSION	:= 8.11.0
+LIBCURL_MD5	:= 49dd886ac84ed3de693464f78f1ee926
 LIBCURL		:= curl-$(LIBCURL_VERSION)
-LIBCURL_SUFFIX	:= tar.bz2
-LIBCURL_URL	:= https://curl.haxx.se/download/$(LIBCURL).$(LIBCURL_SUFFIX)
+LIBCURL_SUFFIX	:= tar.xz
+LIBCURL_URL	:= https://curl.se/download/$(LIBCURL).$(LIBCURL_SUFFIX)
 LIBCURL_SOURCE	:= $(SRCDIR)/$(LIBCURL).$(LIBCURL_SUFFIX)
 LIBCURL_DIR	:= $(BUILDDIR)/$(LIBCURL)
-LIBCURL_LICENSE	:= MIT
+LIBCURL_LICENSE	:= curl
+LIBCURL_LICENSE_FILES := file://COPYING;md5=eed2e5088e1ac619c9a1c747da291d75
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,17 +41,21 @@ LIBCURL_CONF_OPT	:= \
 	--disable-werror \
 	--disable-curldebug \
 	--enable-symbol-hiding \
-	--enable-hidden-symbols \
 	--$(call ptx/endis, PTXCONF_LIBCURL_C_ARES)-ares \
 	--enable-rt \
+	--disable-httpsrr \
+	--disable-ech \
 	--disable-code-coverage \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-unity \
+	--disable-test-bundles \
 	--$(call ptx/endis, PTXCONF_LIBCURL_HTTP)-http \
 	--$(call ptx/endis, PTXCONF_LIBCURL_FTP)-ftp \
 	--$(call ptx/endis, PTXCONF_LIBCURL_FILE)-file \
+	--disable-ipfs \
 	--disable-ldap \
 	--disable-ldaps \
-	--disable-rtsp \
+	--$(call ptx/endis, PTXCONF_LIBCURL_RTSP)-rtsp \
 	--enable-proxy \
 	--disable-dict \
 	--disable-telnet \
@@ -60,57 +65,79 @@ LIBCURL_CONF_OPT	:= \
 	--disable-smb \
 	--$(call ptx/endis, PTXCONF_LIBCURL_SMTP)-smtp \
 	--disable-gopher \
+	--disable-mqtt \
 	--disable-manual \
+	--disable-docs \
 	--enable-libcurl-option \
 	--disable-libgcc \
 	$(GLOBAL_IPV6_OPTION) \
 	--enable-openssl-auto-load-config \
 	--disable-versioned-symbols \
+	--disable-windows-unicode \
 	--$(call ptx/disen, PTXCONF_LIBCURL_C_ARES)-threaded-resolver \
 	--enable-pthreads \
 	--$(call ptx/endis, PTXCONF_LIBCURL_VERBOSE)-verbose \
 	--disable-sspi \
-	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-crypto-auth \
-	--disable-ntlm-wb \
+	--enable-basic-auth \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-bearer-auth \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-digest-auth \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-kerberos-auth \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-negotiate-auth \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-aws \
+	--$(call ptx/endis, PTXCONF_LIBCURL_CRYPTO_AUTH)-ntlm \
 	--enable-tls-srp \
 	--enable-unix-sockets \
 	--$(call ptx/endis, PTXCONF_LIBCURL_COOKIES)-cookies \
+	--enable-socketpair \
 	--$(call ptx/endis, PTXCONF_LIBCURL_HTTP)-http-auth \
 	--disable-doh \
-	--disable-mime \
+	--$(call ptx/endis, PTXCONF_LIBCURL_MIME)-mime \
+	--enable-bindlocal \
+	--$(call ptx/endis, PTXCONF_LIBCURL_MIME)-form-api \
 	--enable-dateparse \
 	--enable-netrc \
 	--enable-progress-meter \
+	--enable-sha512-256 \
 	--disable-dnsshuffle \
+	--enable-get-easy-options \
 	--disable-alt-svc \
-	--with-zlib=$(SYSROOT) \
-	--without-brotli \
-	--without-gssapi \
-	--with-default-ssl-backend=$(call ptx/ifdef, PTXCONF_LIBCURL_SSL,openssl,no) \
-	--without-winssl \
+	--disable-headers-api \
+	--enable-hsts \
+	--disable-websockets \
 	--without-schannel \
-	--without-darwinssl \
 	--without-secure-transport \
 	--without-amissl \
-	--with-ssl=$(call ptx/ifdef, PTXCONF_LIBCURL_SSL,$(SYSROOT)/usr,no) \
-	--with-random=/dev/urandom \
-	--without-gnutls \
+	--$(call ptx/wwo,PTXCONF_LIBCURL_SSL)-ssl \
+	--with-openssl=$(call ptx/ifdef, PTXCONF_LIBCURL_SSL_OPENSSL,$(SYSROOT)/usr,no) \
+	--with-gnutls=$(call ptx/ifdef, PTXCONF_LIBCURL_SSL_GNUTLS,$(SYSROOT)/usr,no) \
 	--without-mbedtls \
-	--without-cyassl \
 	--without-wolfssl \
-	--without-mesalink \
-	--without-nss \
+	--without-bearssl \
+	--without-rustls \
+	--without-hyper \
+	--with-zlib=$(SYSROOT) \
+	--without-brotli \
+	--without-zstd \
+	--without-gssapi \
+	--with-default-ssl-backend=$(PTXCONF_LIBCURL_SSL_DEFAULT_BACKEND) \
 	--with-ca-bundle=$(PTXCONF_LIBCURL_SSL_CABUNDLE_PATH) \
 	--with-ca-path=$(PTXCONF_LIBCURL_SSL_CAPATH_PATH) \
 	--without-ca-fallback \
 	--without-libpsl \
-	--without-libmetalink \
+	--without-libgsasl \
 	--$(call ptx/wwo, PTXCONF_LIBCURL_LIBSSH2)-libssh2 \
 	--without-libssh \
+	--without-wolfssh \
 	--without-librtmp \
 	--without-winidn \
+	--without-apple-idn \
 	--without-libidn2 \
 	--without-nghttp2 \
+	--without-ngtcp2 \
+	--without-openssl-quic \
+	--without-nghttp3 \
+	--without-quiche \
+	--without-msh3 \
 	--without-zsh-functions-dir \
 	--without-fish-functions-dir
 

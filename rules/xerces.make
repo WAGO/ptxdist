@@ -27,13 +27,11 @@ XERCES_DIR	:= $(BUILDDIR)/$(XERCES)
 # Prepare
 # ----------------------------------------------------------------------------
 
-XERCES_PATH	:= PATH=$(CROSS_PATH)
-XERCES_CONF_ENV	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XERCES_AUTOCONF	:= $(CROSS_AUTOCONF_USR)
+XERCES_CONF_TOOL := autoconf
+XERCES_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
 XERCES_SUBDIR	:= src/xercesc
 

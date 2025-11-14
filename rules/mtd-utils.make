@@ -15,11 +15,11 @@ PACKAGES-$(PTXCONF_MTD_UTILS) += mtd-utils
 #
 # Paths and names
 #
-MTD_UTILS_VERSION	:= 2.1.1
-MTD_UTILS_MD5		:= 94bbd31b217a5169ae26ab8c0442f691
+MTD_UTILS_VERSION	:= 2.2.1
+MTD_UTILS_MD5		:= 08b97c0df7e70916a7b42460b5030fff
 MTD_UTILS		:= mtd-utils-$(MTD_UTILS_VERSION)
 MTD_UTILS_SUFFIX	:= tar.bz2
-MTD_UTILS_URL		:= ftp://ftp.infradead.org/pub/mtd-utils/$(MTD_UTILS).$(MTD_UTILS_SUFFIX)
+MTD_UTILS_URL		:= https://infraroot.at/pub/mtd/$(MTD_UTILS).$(MTD_UTILS_SUFFIX)
 MTD_UTILS_SOURCE	:= $(SRCDIR)/$(MTD_UTILS).$(MTD_UTILS_SUFFIX)
 MTD_UTILS_DIR		:= $(BUILDDIR)/$(MTD_UTILS)
 MTD_UTILS_LICENSE	:= GPL-2.0-or-later
@@ -34,9 +34,10 @@ MTD_UTILS_CONF_TOOL	:= autoconf
 MTD_UTILS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-unit-tests \
-	--disable-tests \
-	--disable-install-tests \
-	--$(call ptx/endis, PTXCONF_MTD_UTILS_LSMTD)-lsmtd \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--$(call ptx/wwo,PTXCONF_MTD_UTILS_TESTS)-tests \
+	--$(call ptx/endis,PTXCONF_MTD_UTILS_UBIHEALTHD)-ubihealthd \
+	--$(call ptx/wwo, PTXCONF_MTD_UTILS_LSMTD)-lsmtd \
 	--$(call ptx/wwo, PTXCONF_MTD_UTILS_JFFS)-jffs \
 	--$(call ptx/wwo, PTXCONF_MTD_UTILS_UBIFS)-ubifs \
 	--without-xattr \
@@ -118,10 +119,21 @@ ifdef PTXCONF_MTD_UTILS_JFFS2_DUMP
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/jffs2dump)
 endif
+ifdef PTXCONF_MTD_UTILS_JFFS2READER
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/sbin/jffs2reader)
+endif
+
 ifdef PTXCONF_MTD_UTILS_MTDDEBUG
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/mtd_debug)
 endif
+
+ifdef PTXCONF_MTD_UTILS_MTDPART
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/sbin/mtdpart)
+endif
+
 ifdef PTXCONF_MTD_UTILS_NANDDUMP
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/nanddump)
@@ -186,6 +198,28 @@ ifdef PTXCONF_MTD_UTILS_UBICRC32
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/ubicrc32)
 endif
+ifdef PTXCONF_MTD_UTILS_UBIFS_MOUNTHELPER
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/sbin/mount.ubifs)
+endif
+ifdef PTXCONF_MTD_UTILS_UBIHEALTHD
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/sbin/ubihealthd)
+ifdef PTXCONF_MTD_UTILS_UBIHEALTHD_STARTSCRIPT
+	@$(call install_alternative, mtd-utils, 0, 0, 0755, \
+		/etc/init.d/ubihealthd)
+ifneq ($(call remove_quotes,$(PTXCONF_MTD_UTILS_UBIHEALTHD_BBINIT_LINK)),)
+	@$(call install_link, mtd-utils, ../init.d/ubihealthd, \
+		/etc/rc.d/$(PTXCONF_MTD_UTILS_UBIHEALTHD_BBINIT_LINK))
+endif
+endif
+ifdef PTXCONF_MTD_UTILS_UBIHEALTHD_SYSTEMD_UNIT
+	@$(call install_alternative, mtd-utils, 0, 0, 0644, \
+		/usr/lib/systemd/system/ubihealthd@.service)
+	@$(call install_link, mtd-utils, ../ubihealthd@.service, \
+		/usr/lib/systemd/system/multi-user.target.wants/ubihealthd@ubi0.service)
+endif
+endif
 ifdef PTXCONF_MTD_UTILS_UBIMKVOL
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/ubimkvol)
@@ -201,6 +235,10 @@ endif
 ifdef PTXCONF_MTD_UTILS_UBIRMVOL
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/ubirmvol)
+endif
+ifdef PTXCONF_MTD_UTILS_UBISCAN
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/sbin/ubiscan)
 endif
 ifdef PTXCONF_MTD_UTILS_UBIUPDATEVOL
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
@@ -225,6 +263,22 @@ endif
 ifdef PTXCONF_MTD_UTILS_MTDINFO
 	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
 		/usr/sbin/mtdinfo)
+endif
+ifdef PTXCONF_MTD_UTILS_TESTS
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/nandbiterrs)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/flash_speed)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/flash_stress)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/flash_readtest)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/nandpagetest)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/nandsubpagetest)
+	@$(call install_copy, mtd-utils, 0, 0, 0755, -, \
+		/usr/libexec/mtd-utils/flash_torture)
 endif
 
 	@$(call install_finish, mtd-utils)

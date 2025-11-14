@@ -19,9 +19,21 @@ HOST_PACKAGES-$(PTXCONF_HOST_LIBUSB) += host-libusb
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBUSB_AUTOCONF := \
+#
+# autoconf
+#
+HOST_LIBUSB_CONF_TOOL := autoconf
+HOST_LIBUSB_CONF_OPT := \
 	$(HOST_AUTOCONF) \
+	--enable-shared \
 	--disable-static \
-	--disable-udev
+	--disable-udev \
+	--enable-eventfd \
+	--enable-timerfd \
+	--enable-log \
+	--disable-debug-log \
+	--disable-system-log \
+	--disable-examples-build \
+	--disable-tests-build
 
 # vim: syntax=make

@@ -22,6 +22,7 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 @PACKAGE@_SOURCE	:= $(SRCDIR)/$(@PACKAGE@).$(@PACKAGE@_SUFFIX)
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
 @PACKAGE@_LICENSE	:= unknown
+@PACKAGE@_LICENSE_FILES	:=
 
 # ----------------------------------------------------------------------------
 # Get
@@ -40,7 +41,7 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 #
 # @conf_tool@
 #
-@PACKAGE@_CONF_TOOL	:= @conf_tool@
+@PACKAGE_PATH@@PACKAGE@_CONF_TOOL	:= @conf_tool@
 #@PACKAGE@_CONF_OPT	:= @CONF_OPT@
 
 #$(STATEDIR)/@package@.prepare:

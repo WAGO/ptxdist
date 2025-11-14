@@ -1,0 +1,6 @@
+## SECTION=hosttools_noprompt
+
+config @PREFIX@_@PACKAGE@
+	tristate
+	default y if ALLYES
+	select @PREFIX@

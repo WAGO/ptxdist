@@ -3,19 +3,21 @@
 menuconfig IPUTILS
 	tristate
 	prompt "iputils                       "
+	select HOST_MESON
 	select LIBC_RESOLV	if IPUTILS_PING
-	select LIBCAP		if IPUTILS_ARPING || IPUTILS_PING || IPUTILS_TRACEROUTE6 || IPUTILS_CLOCKDIFF
-	select LIBGCRYPT	if IPUTILS_GCRYPT
-	select NETTLE		if IPUTILS_NETTLE
-	select OPENSSL		if IPUTILS_OPENSSL
+	select LIBCAP		if IPUTILS_LIBCAP
 	help
 	  The iputils package is set of small useful utilities for Linux
 	  networking.
 
 if IPUTILS
 
+config IPUTILS_LIBCAP
+	bool
+
 config IPUTILS_ARPING
 	bool
+	select IPUTILS_LIBCAP
 	depends on !BUSYBOX_ARPING || ALLYES
 	prompt "arping"
 	help
@@ -23,10 +25,11 @@ config IPUTILS_ARPING
 	  address source.
 
 comment "BusyBox' arping is selected!"
-        depends on BUSYBOX_ARPING
+	depends on BUSYBOX_ARPING
 
 config IPUTILS_CLOCKDIFF
 	bool
+	select IPUTILS_LIBCAP
 	prompt "clockdiff"
 	help
 	  Measures clock difference between us and destination with 1 msec
@@ -34,6 +37,7 @@ config IPUTILS_CLOCKDIFF
 
 config IPUTILS_PING
 	bool
+	select IPUTILS_LIBCAP
 	depends on (!BUSYBOX_PING && !INETUTILS_PING) || ALLYES
 	prompt "ping"
 	help
@@ -43,43 +47,10 @@ config IPUTILS_PING
 	  be enforced by specifying -4 or -6.
 
 comment "inetutils' ping is selected!"
-        depends on INETUTILS_PING
+	depends on INETUTILS_PING
 
 comment "BusyBox' ping is selected!"
-        depends on BUSYBOX_PING
-
-if GLOBAL_IPV6
-
-choice
-	prompt "crypto library to be used for ping -N"
-	default IPUTILS_NOCRYPTO
-	depends on IPUTILS_PING
-	help
-	  Selecting a crypto library is necessary for ping to support
-	  sending IPv6 Node Information Queries (RFC 4620).
-
-	config IPUTILS_NOCRYPTO
-		bool
-		prompt "none"
-		help
-		  No crypto library is used. This means that ping -N
-		  won't work.
-
-	config IPUTILS_GCRYPT
-		bool
-		prompt "libgcrypt"
-
-	config IPUTILS_NETTLE
-		bool
-		prompt "nettle"
-
-	config IPUTILS_OPENSSL
-		bool
-		prompt "openssl"
-
-endchoice
-
-endif
+	depends on BUSYBOX_PING
 
 config IPUTILS_RARPD
 	bool
@@ -105,10 +76,10 @@ config IPUTILS_TFTPD
 	prompt "tftpd"
 
 comment "inetutils' tftpd is selected!"
-        depends on INETUTILS_PING
+	depends on INETUTILS_PING
 
 comment "BusyBox' tftpd is selected!"
-        depends on BUSYBOX_TFTPD
+	depends on BUSYBOX_TFTPD
 
 config IPUTILS_TRACEPATH
 	bool
@@ -120,6 +91,7 @@ config IPUTILS_TRACEPATH
 
 config IPUTILS_TRACEROUTE6
 	bool
+	select IPUTILS_LIBCAP
 	depends on !BUSYBOX_TRACEROUTE6 || ALLYES
 	prompt "traceroute6"
 	depends on GLOBAL_IPV6
@@ -129,6 +101,6 @@ config IPUTILS_TRACEROUTE6
 	  for IPv6 only.
 
 comment "BusyBox' traceroute6 is selected!"
-        depends on BUSYBOX_TRACEROUTE6
+	depends on BUSYBOX_TRACEROUTE6
 
 endif

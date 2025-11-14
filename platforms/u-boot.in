@@ -1,7 +1,16 @@
 ## SECTION=bootloader
 
+config U_BOOT_DEPENDENCIES
+	tristate
+	select VIRTUAL
+
 menuconfig U_BOOT
+	select U_BOOT_DEPENDENCIES
 	select BOOTLOADER
+	select HOST_SYSTEM_PYTHON3
+	select HOST_OPENSSL		if U_BOOT_NEEDS_HOST_OPENSSL
+	select HOST_GNUTLS		if U_BOOT_NEEDS_HOST_GNUTLS
+	select HOST_LIBUUID		if U_BOOT_NEEDS_HOST_LIBUUID
 	prompt "U-Boot                        "
 	bool
 
@@ -19,6 +28,16 @@ config U_BOOT_MD5
 	string
 	prompt "U-Boot source md5"
 
+config U_BOOT_BUILD_OOT
+	prompt "Out of tree build"
+	default y
+	bool
+	help
+	  U-Boot is usually built out of tree.
+	  But for some builds, f.ex. with firmware blobs, out of tree builds
+	  can break because of vendors using source paths to files.
+	  Disable OOT build if you need a workaround for those type of builds.
+
 choice
 	prompt "config system"
 	default U_BOOT_CONFIGSYSTEM_LEGACY
@@ -30,7 +49,7 @@ config U_BOOT_CONFIGSYSTEM_KCONFIG
 	  U-Boot from version 2014.10 uses Kconfig for configuring a target.
 	  Use this if you want to configure U-Boot inside the BSP, e.g.
 	  with menuconfig.
-	  
+
 	  NOTE: if you just want to use a defconfig, you can still use the
 	  legacy config system by using the name of a defconfig file from
 	  the "configs" folder as config target.
@@ -70,6 +89,23 @@ config U_BOOT_CONFIG
 	  "configs".
 
 endif
+
+menuconfig U_BOOT_FIRMWARE
+	bool
+	prompt "integrate firmware blobs      "
+
+if U_BOOT_FIRMWARE
+source "generated/u_boot_firmware.in"
+endif
+
+config U_BOOT_CUSTOM_MAKE_ENV
+	prompt "Custom (additional) make environment"
+	string
+	help
+	  List of additional env variables set for make at build time.
+	  Can be used for example to set BINMAN_INDIRS= to a path
+	  containing firmware files (preferably somewhere in
+	  sysroot-target).
 
 config U_BOOT_CUSTOM_MAKE_OPTS
 	prompt "Custom make options"
@@ -159,6 +195,13 @@ endif
 
 comment "target install"
 
+config U_BOOT_INSTALL_U_BOOT_BIN
+	prompt "install u-boot.bin"
+	bool
+	default y
+	help
+	  Installing the U-Boot default binary target.
+
 config U_BOOT_INSTALL_SREC
 	prompt "install u-boot.srec"
 	bool
@@ -170,6 +213,18 @@ config U_BOOT_INSTALL_ELF
 	bool
 	help
 	  Installing the U-Boot ELF binary into platform image directory.
+
+config U_BOOT_INSTALL_EFI_APPLICATION
+	prompt "install u-boot-app.efi"
+	bool
+	help
+	  Installing the U-Boot EFI application into platform image directory.
+
+config U_BOOT_INSTALL_EFI_PAYLOAD
+	prompt "install u-boot-payload.efi"
+	bool
+	help
+	  Installing the U-Boot EFI payload into platform image directory.
 
 config U_BOOT_INSTALL_SPL
 	prompt "install SPL"
@@ -201,17 +256,17 @@ config U_BOOT_INSTALL_U_BOOT_IMX
 	prompt "install u-boot.imx"
 	bool
 	help
-	  Installing the U-Boot image with imx header (u-boot.imx) into platform 
+	  Installing the U-Boot image with imx header (u-boot.imx) into platform
 	  image directory. Say yes if you are building for freescale i.MX SOCs
 	  and are not using SPL.
 
 config U_BOOT_INSTALL_U_BOOT_DTB_IMX
-        prompt "install u-boot-dtb.imx"
-        bool
-        help
-          Installing the U-Boot image with device tree support and imx header (u-boot-dtb.imx)
-          into platform image directory. Say yes if you are building for freescale i.MX SOCs
-          and are not using SPL.
+	prompt "install u-boot-dtb.imx"
+	bool
+	help
+	  Installing the U-Boot image with device tree support and imx header (u-boot-dtb.imx)
+	  into platform image directory. Say yes if you are building for freescale i.MX SOCs
+	  and are not using SPL.
 
 config U_BOOT_INSTALL_U_BOOT_DTB
 	prompt "install u-boot-dtb.bin"
@@ -235,5 +290,43 @@ config U_BOOT_INSTALL_U_BOOT_STM32
 	  platform image directory. Say yes if you are building for STM32MP1
 	  SOCs.
 
-endif
+config U_BOOT_INSTALL_U_BOOT_FLASH_BIN
+	prompt "install flash.bin"
+	bool
+	help
+	  Installing the U-Boot image to Gateworks.
 
+comment "build dependencies"
+
+config U_BOOT_NEEDS_HOST_OPENSSL
+	prompt "needs host OpenSSL"
+	bool
+	help
+	  Newer host U-Boot tools can sign images and use OpenSSL for that.
+	  It is most probably needed if your board config does not disable
+	  CONFIG_TOOLS_LIBCRYPTO.
+
+	  Select this if you're unsure, as it won't hurt.
+	  It might just increase the build time, if no other package has
+	  host openssl selected.
+
+config U_BOOT_NEEDS_HOST_GNUTLS
+	prompt "needs host GnuTLS"
+	bool
+	help
+	  U-Boot from version 2022.04 includes host tools using GnuTLS for
+	  image signing.
+
+	  Select this if your board config enables such tools, e.g. with
+	  CONFIG_TOOLS_MKEFICAPSULE.
+
+config U_BOOT_NEEDS_HOST_LIBUUID
+	prompt "needs host libuuid"
+	bool
+	help
+	  U-Boot from version 2022.04 includes host tools using libuuid.
+
+	  Select this if your board config enables such tools, e.g. with
+	  CONFIG_TOOLS_MKEFICAPSULE or CONFIG_TOOLS_MKFWUMDATA.
+
+endif

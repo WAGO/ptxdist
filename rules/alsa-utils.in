@@ -5,16 +5,18 @@ menuconfig ALSA_UTILS
 	prompt "alsa utils                    "
 	select ALSA_LIB
 	select ALSA_LIB_UCM	if ALSA_UTILS_USE_CASE_MANAGER
-	select ALSA_LIB_RAWMIDI if ALSA_UTILS_RAW_MIDI
+	select ALSA_LIB_RAWMIDI if ALSA_UTILS_RAW_MIDI || ALSA_UTILS_MIDI
 	select ALSA_LIB_MIXER	if ALSA_UTILS_AMIXER || ALSA_UTILS_ALSAMIXER
 	select ALSA_LIB_PCM	if ALSA_UTILS_APLAYRECORD || ALSA_UTILS_IECSET || ALSA_UTILS_MIDI || ALSA_UTILS_ALSALOOP
 	select ALSA_LIB_SEQ	if ALSA_UTILS_SEQTOOLS || ALSA_UTILS_ACONNECT || ALSA_UTILS_MIDI
 	select LIBC_M		if ALSA_UTILS_ALSALOOP
 	select LIBC_PTHREAD
 	select NCURSES		if ALSA_UTILS_ALSAMIXER
+	select NCURSES_FORM	if ALSA_UTILS_ALSAMIXER
+	select NCURSES_MENU	if ALSA_UTILS_ALSAMIXER
+	select NCURSES_PANEL	if ALSA_UTILS_ALSAMIXER
+	# needed for minimum systemd version check
 	select SYSTEMD		if ALSA_UTILS_SYSTEMD_UNIT
-	# to detect where to install its udev rules
-	select UDEV
 	help
 	  Some utils to handle the Advanced Linux Sound Architecture.
 	  With these utils you can control your sound device, for
@@ -25,6 +27,7 @@ if ALSA_UTILS
 config ALSA_UTILS_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/alsa-utils"
 
 config ALSA_UTILS_SYSTEMD_UNIT
@@ -42,9 +45,6 @@ config ALSA_UTILS_ASOUND_STATE
 config ALSA_UTILS_ALSAMIXER
 	bool
 	prompt "alsamixer"
-	select NCURSES_FORM
-	select NCURSES_MENU
-	select NCURSES_PANEL
 	help
 	  Build the console and ncurses based 'alsamixer' tool.
 

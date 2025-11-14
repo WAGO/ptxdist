@@ -18,7 +18,7 @@ FLUP6_VERSION	:= 1.1
 FLUP6_MD5	:= 67c20571a6e637b1f457031767fe8ae7
 FLUP6		:= flup6-$(FLUP6_VERSION)
 FLUP6_SUFFIX	:= tar.gz
-FLUP6_URL	:= https://pypi.python.org/packages/source/f/flup6/$(FLUP6).$(FLUP6_SUFFIX)
+FLUP6_URL	:= $(call ptx/mirror-pypi, flup6, $(FLUP6).$(FLUP6_SUFFIX))
 FLUP6_SOURCE	:= $(SRCDIR)/$(FLUP6).$(FLUP6_SUFFIX)
 FLUP6_DIR	:= $(BUILDDIR)/$(FLUP6)
 FLUP6_LICENSE	:= BSD AND MIT
@@ -48,7 +48,7 @@ $(STATEDIR)/flup6.targetinstall:
 	@$(call install_copy, flup6, 0, 0, 0755, $(PYTHON_SITEPACKAGES)/flup6/server)
 
 	@$(call install_glob, flup6, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/flup,, *.py)
+		$(PYTHON3_SITEPACKAGES)/flup,, *.py)
 
 	@$(call install_finish, flup6)
 

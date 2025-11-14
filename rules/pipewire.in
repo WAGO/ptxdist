@@ -1,0 +1,86 @@
+## SECTION=multimedia_pipewire
+
+menuconfig PIPEWIRE
+	tristate
+	select HOST_MESON
+	select DBUS
+	select ALSA_LIB
+	select ALSA_LIB_PCM
+	select ALSA_LIB_UCM
+	select ALSA_LIB_SEQ
+	select GLIB			if PIPEWIRE_GSTREAMER
+	select GSTREAMER1		if PIPEWIRE_GSTREAMER
+	select GST_PLUGINS_BASE1	if PIPEWIRE_GSTREAMER
+	select LIBCAMERA		if PIPEWIRE_LIBCAMERA
+	select LIBSNDFILE
+	select READLINE			if PIPEWIRE_PW_CTL
+	select NCURSES			if PIPEWIRE_PW_TOP
+	select NCURSES_WIDE_CHAR	if PIPEWIRE_PW_TOP
+	select OPENSSL			if PIPEWIRE_RAOP
+	select SYSTEMD			if PIPEWIRE_SYSTEMD
+	select BLUEZ			if PIPEWIRE_BLUETOOTH
+	select SBC			if PIPEWIRE_BLUETOOTH
+	select UDEV
+	select UDEV_LIBUDEV
+	select WEBRTC_AUDIO_PROCESSING1	if PIPEWIRE_ECHO_CANCEL
+	prompt "pipewire                      "
+	help
+	  PipeWire is a server and user space API to deal with multimedia
+	  pipelines. This includes:
+	   - Making available sources of video (such as from a capture devices or
+	     application provided streams) and multiplexing this with clients.
+	   - Accessing sources of video for consumption.
+	   - Generating graphs for audio and video processing.
+
+if PIPEWIRE
+
+config PIPEWIRE_BLUETOOTH
+	bool
+	prompt "enable bluetooth options"
+
+config PIPEWIRE_ECHO_CANCEL
+	bool
+	prompt "enable echo canceling"
+
+config PIPEWIRE_GSTREAMER
+	bool
+	prompt "build and install gstreamer plugins"
+
+config PIPEWIRE_PW_CTL
+	bool
+	prompt "build and install pw-cli, requires readline"
+
+config PIPEWIRE_PW_TOP
+	bool
+	prompt "build and install pw-top, requires ncurses"
+
+config PIPEWIRE_SYSTEMD
+	bool
+
+config PIPEWIRE_PULSEAUDIO
+	bool
+	prompt "install pulseaudio compatibility service"
+
+config PIPEWIRE_LIBCAMERA
+	bool
+	prompt "build and install libcamera plugin"
+
+config PIPEWIRE_RAOP
+	bool
+	prompt "enable Remote Audio Output Protocol module"
+
+config PIPEWIRE_SYSTEMD_UNIT
+	bool
+	default y
+	depends on INITMETHOD_SYSTEMD
+	select PIPEWIRE_SYSTEMD
+	prompt "install systemd system unit file for pipewire"
+
+config PIPEWIRE_SYSTEMD_UNIT_USER
+	bool
+	default y
+	depends on INITMETHOD_SYSTEMD
+	select PIPEWIRE_SYSTEMD
+	prompt "install systemd user unit file for pipewire"
+
+endif

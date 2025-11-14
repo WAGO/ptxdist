@@ -12,12 +12,12 @@ kernel-major = $(word 1,$(call kernel-version-split, $(1)))
 kernel-minor = $(word 2,$(call kernel-version-split, $(1)))
 kernel-micro = $(word 3,$(call kernel-version-split, $(1)))
 
-KERNEL_VERSION		:= $(call remove_quotes,$(PTXCONF_KERNEL_VERSION))
+KERNEL_VERSION		:= $(call ptx/config-version, PTXCONF_KERNEL)
 KERNEL_VERSION_MAJOR	:= $(call kernel-major,KERNEL)
 KERNEL_VERSION_MINOR	:= $(call kernel-minor,KERNEL)
 KERNEL_VERSION_MICRO	:= $(call kernel-micro,KERNEL)
 
-KERNEL_HEADER_VERSION		:= $(call remove_quotes,$(PTXCONF_KERNEL_HEADER_VERSION))
+KERNEL_HEADER_VERSION		:= $(call ptx/config-version, PTXCONF_KERNEL_HEADER)
 KERNEL_HEADER_VERSION_MAJOR	:= $(call kernel-major,KERNEL_HEADER)
 KERNEL_HEADER_VERSION_MINOR	:= $(call kernel-minor,KERNEL_HEADER)
 KERNEL_HEADER_VERSION_MICRO	:= $(call kernel-micro,KERNEL_HEADER)
@@ -60,18 +60,18 @@ kernel-url = \
 	$(call kernel/url,$(strip $(1)))
 
 kernel/opts = \
-	$(PARALLELMFLAGS) \
 	V=$(PTXDIST_VERBOSE) \
 	HOSTCC=$(HOSTCC) \
 	ARCH=$(GENERIC_KERNEL_ARCH) \
-	CROSS_COMPILE=$(COMPILER_PREFIX) \
+	CROSS_COMPILE=$(if $(2),$(2),$(COMPILER_PREFIX)) \
 	DEPMOD=$(PTXDIST_SYSROOT_HOST)/sbin/depmod \
 	\
+	INSTALL_MOD_STRIP=1 \
 	INSTALL_MOD_PATH=$($(1)_PKGDIR) \
 	PTX_KERNEL_DIR=$($(1)_DIR)
 
 kernel-opts = \
-	$(call kernel/opts,$(strip $(1)))
+	$(call kernel/opts,$(strip $(1)),$(strip $(2)))
 
 #
 # Blacklist for all low-level code, e.g. kernel and bootloaders
@@ -85,7 +85,9 @@ PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST := \
 	TARGET_HARDEN_PIE \
 	TARGET_HARDEN_GLIBCXX_ASSERTIONS \
 	TARGET_DEBUG \
-	TARGET_BUILD_ID
+	TARGET_BUILD_ID \
+	TARGET_COMPILER_RECORD_SWITCHES \
+	PTXDIST_Y2038
 
 #
 # handle special compiler
@@ -93,15 +95,18 @@ PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST := \
 ifdef PTXCONF_KERNEL
     ifneq ($(PTXCONF_COMPILER_PREFIX),$(PTXCONF_COMPILER_PREFIX_KERNEL))
         ifeq ($(wildcard selected_toolchain_kernel/$(PTXCONF_COMPILER_PREFIX_KERNEL)gcc),)
-            $(warning *** no 'selected_toolchain_kernel' link found. Please create a link)
-            $(warning *** 'selected_toolchain_kernel' to the bin directory of your)
-            $(warning '$(PTXCONF_COMPILER_PREFIX_KERNEL)' toolchain)
-            $(error )
+            $(call ptx/error, no 'selected_toolchain_kernel' link found. Please create a link)
+            $(call ptx/error, 'selected_toolchain_kernel' to the bin directory of your)
+            $(call ptx/error, '$(PTXCONF_COMPILER_PREFIX_KERNEL)' toolchain)
         endif
         KERNEL_TOOLCHAIN_LINK := $(PTXDIST_WORKSPACE)/selected_toolchain_kernel/
     endif
 endif
 
 KERNEL_CROSS_COMPILE := $(KERNEL_TOOLCHAIN_LINK)$(PTXCONF_COMPILER_PREFIX_KERNEL)
+
+define ptx/kconfig-targets
+$(addprefix $(strip $(1))_,menuconfig nconfig oldconfig allmodconfig allyesconfig allnoconfig alldefconfig randconfig)
+endef
 
 # vim: syntax=make

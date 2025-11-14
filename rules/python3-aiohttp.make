@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_PYTHON3_AIOHTTP) += python3-aiohttp
 #
 # Paths and names
 #
-PYTHON3_AIOHTTP_VERSION	:= 3.4.4
-PYTHON3_AIOHTTP_MD5	:= 80a6e0c6c452d511d1d37755d6f0995a
+PYTHON3_AIOHTTP_VERSION	:= 3.8.4
+PYTHON3_AIOHTTP_MD5	:= 8208bc4b519ac4520720577f93561855
 PYTHON3_AIOHTTP		:= aiohttp-$(PYTHON3_AIOHTTP_VERSION)
 PYTHON3_AIOHTTP_SUFFIX	:= tar.gz
-PYTHON3_AIOHTTP_URL	:= https://pypi.io/packages/source/a/aiohttp/$(PYTHON3_AIOHTTP).$(PYTHON3_AIOHTTP_SUFFIX)
+PYTHON3_AIOHTTP_URL	:= $(call ptx/mirror-pypi, aiohttp, $(PYTHON3_AIOHTTP).$(PYTHON3_AIOHTTP_SUFFIX))
 PYTHON3_AIOHTTP_SOURCE	:= $(SRCDIR)/$(PYTHON3_AIOHTTP).$(PYTHON3_AIOHTTP_SUFFIX)
 PYTHON3_AIOHTTP_DIR	:= $(BUILDDIR)/$(PYTHON3_AIOHTTP)
 PYTHON3_AIOHTTP_LICENSE	:= Apache-2.0
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-aiohttp.targetinstall:
 	@$(call install_fixup, python3-aiohttp,DESCRIPTION,missing)
 
 	@$(call install_glob, python3-aiohttp, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/aiohttp,, *.py)
+		$(PYTHON3_SITEPACKAGES)/aiohttp,, *.py)
 
 	@$(call install_finish, python3-aiohttp)
 

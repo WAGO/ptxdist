@@ -11,16 +11,17 @@ menuconfig PULSEAUDIO
 	select ALSA_LIB_MIXER
 	select ALSA_LIB_UCM
 	select LIBCAP
-	select LIBLTDL
 	select LIBSNDFILE
 	select ORC
+	select LIBLTDL			if PULSEAUDIO_DAEMON
 	select SYSTEMD			if PULSEAUDIO_SYSTEMD
 	select SBC			if PULSEAUDIO_BLUETOOTH
 	select DBUS			if PULSEAUDIO_BLUETOOTH
 	select BLUEZ			if PULSEAUDIO_BLUETOOTH
+	select BLUEZ_LIBBLUETOOTH	if PULSEAUDIO_BLUETOOTH
 	select SPEEXDSP			if PULSEAUDIO_SPEEX
 	select SPEEXDSP_FLOAT_API	if PULSEAUDIO_SPEEX
-	select WEBRTC_AUDIO_PROCESSING	if PULSEAUDIO_WEBRTC_AEC
+	select WEBRTC_AUDIO_PROCESSING1	if PULSEAUDIO_WEBRTC_AEC
 	select UDEV
 	select UDEV_LIBUDEV
 	prompt "pulseaudio                    "
@@ -36,14 +37,28 @@ config PULSEAUDIO_SYSTEMD
 	bool
 	default INITMETHOD_SYSTEMD
 
-config PULSEAUDIO_SYSTEMD_USER
+config PULSEAUDIO_DAEMON
 	bool
+	default y
+	prompt "install pulseaudio daemon"
+
+if PULSEAUDIO_DAEMON
+
+config PULSEAUDIO_SYSTEMD_UNIT
+	bool
+	default !SYSTEMD_UNITS_USER
 	depends on PULSEAUDIO_SYSTEMD
-	default y if SYSTEMD_UNITS_USER
+	prompt "install systemd system unit file"
+
+config PULSEAUDIO_SYSTEMD_UNIT_USER
+	bool
+	default y
+	depends on PULSEAUDIO_SYSTEMD && SYSTEMD_UNITS_USER
+	prompt "install systemd user unit file"
 
 config PULSEAUDIO_BLUETOOTH
-        bool
-        prompt "enable bluetooth support"
+	bool
+	prompt "enable bluetooth support"
 
 config PULSEAUDIO_SPEEX
 	bool
@@ -61,4 +76,5 @@ config PULSEAUDIO_WEBRTC_AEC
 	  Use the WebRTC audio processing library for echo cancellation. It
 	  provides better quality than the builtin 'Adrian' echo canceller.
 
+endif
 endif

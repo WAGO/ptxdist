@@ -28,14 +28,13 @@ LIBIODBC_LICENSE	:= LGPL-2.0-only AND BSD
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBIODBC_PATH		:= PATH=$(CROSS_PATH)
-LIBIODBC_ENV 		:= $(CROSS_ENV)
 LIBIODBC_MAKE_PAR	:= NO
 
 #
 # autoconf
 #
-LIBIODBC_AUTOCONF := \
+LIBIODBC_CONF_TOOL	:= autoconf
+LIBIODBC_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-libodbc \
 	--enable-pthreads \

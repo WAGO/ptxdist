@@ -18,7 +18,7 @@ PYTHON3_ZIPP_VERSION	:= 3.1.0
 PYTHON3_ZIPP_MD5	:= 199da7385f080ec45da6c1942e2b5996
 PYTHON3_ZIPP		:= zipp-$(PYTHON3_ZIPP_VERSION)
 PYTHON3_ZIPP_SUFFIX	:= tar.gz
-PYTHON3_ZIPP_URL	:= https://pypi.python.org/packages/source/z/zipp/$(PYTHON3_ZIPP).$(PYTHON3_ZIPP_SUFFIX)
+PYTHON3_ZIPP_URL	:= $(call ptx/mirror-pypi, zipp, $(PYTHON3_ZIPP).$(PYTHON3_ZIPP_SUFFIX))
 PYTHON3_ZIPP_SOURCE	:= $(SRCDIR)/$(PYTHON3_ZIPP).$(PYTHON3_ZIPP_SUFFIX)
 PYTHON3_ZIPP_DIR	:= $(BUILDDIR)/$(PYTHON3_ZIPP)
 PYTHON3_ZIPP_LICENSE	:= MIT
@@ -51,7 +51,7 @@ $(STATEDIR)/python3-zipp.targetinstall:
 	@$(call install_fixup, python3-zipp, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-zipp, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-zipp)
 

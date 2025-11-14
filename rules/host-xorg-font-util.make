@@ -21,12 +21,9 @@ HOST_XORG_FONT_UTIL_DIR	= $(HOST_BUILDDIR)/$(XORG_FONT_UTIL)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_XORG_FONT_UTIL_PATH	:= PATH=$(HOST_PATH)
-HOST_XORG_FONT_UTIL_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_XORG_FONT_UTIL_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_XORG_FONT_UTIL_CONF_TOOL := autoconf
 
 # vim: syntax=make

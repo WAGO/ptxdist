@@ -21,18 +21,18 @@ LIBMNG_SUFFIX	:= tar.bz2
 LIBMNG_URL	:= $(call ptx/mirror, SF, libmng/$(LIBMNG).$(LIBMNG_SUFFIX))
 LIBMNG_SOURCE	:= $(SRCDIR)/$(LIBMNG).$(LIBMNG_SUFFIX)
 LIBMNG_DIR	:= $(BUILDDIR)/$(LIBMNG)
+LIBMNG_LICENSE	:= custom
+LIBMNG_LICENSE_FILES	:= file://LICENSE;md5=32becdb8930f90eab219a8021130ec09
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBMNG_PATH	:= PATH=$(CROSS_PATH)
-LIBMNG_ENV	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBMNG_AUTOCONF := \
+LIBMNG_CONF_TOOL := autoconf
+LIBMNG_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--with-jpeg \
 	--$(call ptx/wwo, PTXCONF_LIBMNG_LCMS)-lcms

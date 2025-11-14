@@ -30,39 +30,53 @@ $1 == "RULES:" {
 	rules[pkg] = rules[pkg] " " rule
 }
 
-function dump_file(src, dst, tmp) {
+$1 == "DEPS:" {
+	pkg = $2
+	$1 = $2 = ""
+	deps[pkg] = $0
+}
+
+function read_file(src, data, pkg, tmp) {
 	if (!src)
 		return
 
 	old_RS = RS
 	RS = "^$"
 	getline tmp < src
-	printf "%s", tmp >> dst
 	RS = old_RS
 	close(src)
-	close(dst)
+	data[pkg] = data[pkg] tmp "\n"
 }
 
 END {
 	for (pkg in rules) {
 		f1 = PTXDIST_TEMPDIR "/pkghash-" pkg
+		f2 = PTXDIST_TEMPDIR "/pkghash-" pkg "_EXTRACT"
+		old_RS = RS
+		RS = "^$"
+		getline tmp < f1
+		data[pkg] = tmp
+		getline tmp < f2
+		extract_data[pkg] = tmp
+		RS = old_RS
+		close(f1)
+		close(f2)
+	}
+	for (pkg in rules) {
 		n = split(rules[pkg], cfgs)
-		for (rule = 1; rule <= n; rule++) {
-			dump_file(cfgs[rule], f1)
-			printf "\n" >> f1
-		}
+		for (rule = 1; rule <= n; rule++)
+			read_file(cfgs[rule], data, pkg)
 	}
 	for (pkg in configs) {
 		config = configs[pkg]
-		f1 = PTXDIST_TEMPDIR "/pkghash-" pkg
 		n = split(configs[pkg], cfgs)
 		for (config = 1; config <= n; config++)
-			dump_file(cfgs[config], f1)
+			read_file(cfgs[config], data, pkg)
 	}
 	if (dirs == "")
 		exit;
 	n = split(dirs, dir_array, " ");
-	asort(dir_array, dir_array);
+	asort(dir_array);
 	dirs = ""
 	last = ""
 	for (i = 1; i <= n; i++) {
@@ -77,16 +91,28 @@ END {
 	for (dir in pkgs) {
 		split(pkgs[dir], list, " ")
 		n = split(files[dir], file_list, " ")
-		asort(file_list, file_list)
-		for (pkg in list) {
-			pkg = list[pkg]
-			f1 = PTXDIST_TEMPDIR "/pkghash-" pkg
-			f2 = PTXDIST_TEMPDIR "/pkghash-" pkg "_EXTRACT"
+		asort(file_list)
+		for (j in list) {
+			pkg = list[j]
 			for (i = 1; i <= n; i++) {
 				file = dir "/" file_list[i]
-				dump_file(file, f1)
-				dump_file(file, f2)
+				read_file(file, extract_data, pkg)
 			}
 		}
+	}
+	for (pkg in rules) {
+		f1 = PTXDIST_TEMPDIR "/pkghash-" pkg
+		f2 = PTXDIST_TEMPDIR "/pkghash-" pkg "_EXTRACT"
+		print data[pkg] extract_data[pkg] > f1
+		print extract_data[pkg] > f2
+		m = split(deps[pkg], list, " ");
+		for (j in list) {
+			dep = list[j]
+			if (match(dep, /^HOST_SYSTEM_/))
+				continue
+			print data[dep] extract_data[dep] >> f1
+		}
+		close(f1)
+		close(f2)
 	}
 }

@@ -31,13 +31,11 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_FONT_MICRO_MISC_PATH	:= PATH=$(CROSS_PATH)
-XORG_FONT_MICRO_MISC_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_FONT_MICRO_MISC_AUTOCONF := \
+XORG_FONT_MICRO_MISC_CONF_TOOL	:= autoconf
+XORG_FONT_MICRO_MISC_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--with-fontdir=$(XORG_FONTDIR)/misc
 

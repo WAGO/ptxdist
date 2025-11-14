@@ -11,26 +11,27 @@
 # migrate a config file
 # look in PTX_MIGRATEDIR for a migration handler and call it
 #
-# $1	part identifier ("ptx", "platform", "collection", "board", "user")
+# $1	part identifier ("ptx", "platform", "collection", "board", "setup")
 #
 ptxd_kconfig_migrate() {
     local part="${1}"
-    local assistent="${PTX_MIGRATEDIR}/migrate_${part}"
+    local config="${2-.config}"
+    local assistant="${PTX_MIGRATEDIR}/migrate_${part}"
 
-    if [ \! -f "${assistent}" ]; then
+    if [ \! -f "${assistant}" ]; then
 	return 0
     fi
 
-    cp -- ".config" ".config.old" || return
-    sed -f "${assistent}" ".config.old" > ".config"
+    cp -- "${config}" "${config}.old" || return
+    sed -f "${assistant}" "${config}.old" > "${config}"
     retval=$?
 
     if [ $retval -ne 0 ]; then
-	ptxd_dialog_msgbox "error: error occured during migration"
+	ptxd_dialog_msgbox "error: error occurred during migration"
 	return ${retval}
     fi
 
-    if ! diff -u ".config.old" ".config" >/dev/null; then
+    if ! diff -u "${config}.old" "${config}" >/dev/null; then
 	ptxd_dialog_msgbox "info: successfully migrated '${file_dotconfig}'"
     fi
 
@@ -40,7 +41,7 @@ export -f ptxd_kconfig_migrate
 
 
 #
-# nomalize the path to a config file
+# normalize the path to a config file
 #
 # $file_dotconfig the absolute path to the config file
 #
@@ -50,13 +51,16 @@ export -f ptxd_kconfig_migrate
 #   ${PTXDIST_LAYERS[X]}/${relative_file_dotconfig}
 #
 ptxd_normalize_config() {
-    local normalized old
-    normalized="$(readlink -f "${file_dotconfig}")"
-    old="${normalized}"
+    local normalized relative old
+    old="$(readlink -f "${file_dotconfig}")"
+    relative="${old}"
     for layer in "${PTXDIST_LAYERS[@]}"; do
-	local tmp="${old/#$(readlink -f ${layer})\//${layer}/}"
-	if [ "${tmp}" != "${old}" ]; then
-	    normalized="${tmp}"
+	local tmp="${old/#$(readlink -f ${layer})\//}"
+	# check the string length to get the shortest relative path
+	# this is necessary when a base layer is the parent directory
+	if [ "${tmp}" != "${old}" -a ${#tmp} -lt ${#relative} ]; then
+	    relative="${tmp}"
+	    normalized="${layer}/${tmp}"
 	fi
     done
     if [ "$(readlink -f "${normalized}")" != "${old}" ]; then
@@ -71,14 +75,8 @@ ptxd_normalize_config() {
 	    "${file_dotconfig}" \
 	    "must be located inside the BSP!"
     fi
-    for layer in "${PTXDIST_LAYERS[@]}"; do
-	local relative="${normalized#${layer}/}"
-	if [ "${relative}" != "${normalized}" ]; then
-	    relative_file_dotconfig="${relative}"
-	fi
-    done
+    relative_file_dotconfig="${relative}"
     file_dotconfig="${normalized}"
-
 }
 export -f ptxd_normalize_config
 
@@ -253,9 +251,8 @@ ptxd_kconfig_validate_config_check() {
 export -f ptxd_kconfig_validate_config_check
 
 ptxd_kconfig_validate_config_next() {
-	local layer
-	for layer in "${@}"; do
-	    next="${layer}/${relative_config}"
+	local next
+	for next in "${@}"; do
 	    if ! ptxd_kconfig_validate_config_check "${next}"; then
 		continue
 	    fi
@@ -266,6 +263,15 @@ ptxd_kconfig_validate_config_next() {
 }
 export -f ptxd_kconfig_validate_config_next
 
+ptxd_kconfig_setup_layer_configs() {
+    if [ ${#kconfig_layer_configs[@]} -gt 0 ]; then
+	layer_configs=( "${kconfig_layer_configs[@]}" )
+    else
+	layer_configs=( "${PTXDIST_LAYERS[@]/%//${relative_config}}" )
+    fi
+}
+export -f ptxd_kconfig_setup_layer_configs
+
 ptxd_kconfig_validate_config() {
     local relative_config="${1}"
     local relative_ref_config="${2}"
@@ -274,16 +280,15 @@ ptxd_kconfig_validate_config() {
     local last next
     local -a layers
 
+    ptxd_kconfig_setup_layer_configs
+
     if [ "${mode}" = update ]; then
-	layers=( "${PTXDIST_LAYERS[@]:1}" )
-    else
-	layers=( "${PTXDIST_LAYERS[@]}" )
+	layer_configs=( "${layer_configs[@]:1}" )
     fi
 
-    set -- "${layers[@]}";
+    set -- "${layer_configss[@]}";
     while [ $# -gt 0 ]; do
-	layer="${1}"
-	last="${layer}/${relative_config}"
+	last="${1}"
 	shift
 	if ! ptxd_kconfig_validate_config_check "${last}"; then
 	    continue
@@ -296,7 +301,7 @@ ptxd_kconfig_validate_config() {
 	    relative_config="${relative_ref_config}"
 	    unset relative_ref_config
 	    ignore_last_diff=y
-	    set -- "${layer}" "${@}"
+	    set -- "${last}" "${@}"
 	    ptxd_kconfig_validate_config_next "${@}"
 	fi
 	if [ ! -e "${next}" ]; then
@@ -333,14 +338,16 @@ ptxd_kconfig_find_config() {
     local mode="${1}"
     local relative_config="${2}"
     local relative_ref_config="${3}"
-    local -a layers
-    local tmp_config
+    local -a layer_configs
+    local tmp_config tmp
 
     if [ "${mode}" = run -o "${mode}" = "update" ]; then
 	ptxd_kconfig_validate_config "${relative_config}" "${relative_ref_config}" || return
     fi
 
-    last_config="${PTXDIST_LAYERS[0]}/${relative_config}"
+    ptxd_kconfig_setup_layer_configs
+
+    last_config="${layer_configs[0]}"
     if [ "$(readlink -f "${last_config}")" = /dev/null ]; then
 	# use the first existing config for 'run'
 	if [ "${mode}" = run ]; then
@@ -352,15 +359,12 @@ ptxd_kconfig_find_config() {
     fi
 
     if [ "${mode}" = update ]; then
-	layers=( "${PTXDIST_LAYERS[@]:1}" )
+	layer_configs=( "${layer_configs[@]:1}" )
     else
 	base_config="${last_config}"
-	layers=( "${PTXDIST_LAYERS[@]}" )
     fi
 
-    for layer in "${layers[@]}"; do
-	local tmp
-	tmp="${layer}/${relative_config}"
+    for tmp in "${layer_configs[@]}"; do
 	if [ "$(readlink -f "${tmp}")" = /dev/null ]; then
 	    continue
 	fi
@@ -443,7 +447,7 @@ ptxd_kconfig_update_config() {
     local config="${2}"
     local base_config="${3}"
     local stamp="$(stat -c '%y' "${target_config}")"
-    local old_stamp="$(cat "${target_config}.stamp")"
+    local old_stamp="$(<"${target_config}.stamp")"
 
     if [ "${stamp}" == "${old_stamp}" ]; then
 	rm  -f "${target_config}.stamp"
@@ -537,20 +541,43 @@ ptxd_kconfig_sync_config() {
 }
 export -f ptxd_kconfig_sync_config
 
+ptxd_kconfig_run_conf() {
+    (
+	(
+	    # swap stdout and stderr to filter out OPTION_DOES_NOT_EXIST warning
+	    "${conf}" "${@}" 3>&1 1>&2 2>&3 | grep -s -v 'OPTION_DOES_NOT_EXIST'
+	    # only fail if ${conf} failed
+	    exit ${PIPESTATUS[0]}
+	) 3>&1 1>&2 2>&3
+    )
+}
+export -f ptxd_kconfig_run_conf
 
 ptxd_kconfig_update() {
-    local mode
+    local mode file_kconfig
+    if [ ${#kconfig_layer_configs[@]} -eq 1 ]; then
+	#  Don't touch the last config. It's ptxdistrc.default
+	return
+    fi
     if [ "${PTXDIST_LAYERS[0]}" = "${PTXDIST_TOPDIR}" ]; then
 	# nothing to do for PTXdist itself
 	return
     fi
-    if [ "${config}" != dep -a "${part}" != user -a "${part}" != board ]; then
+    if [ "${config}" != dep -a "${part}" != board ]; then
 	(
-	# call ptxd_kconfig_update() recursively after removing the last layer
-	PTXDIST_LAYERS=( "${PTXDIST_LAYERS[@]:1}" )
-	PTX_KGEN_DIR="${PTX_KGEN_DIR}.base"
-	confdir="${confdir}.base"
-	ptxd_init_ptxdist_path &&
+	if [ ${#kconfig_layer_configs[@]} -eq 0 ]; then
+	    # call ptxd_kconfig_update() recursively after removing the last layer
+	    PTXDIST_LAYERS=( "${PTXDIST_LAYERS[@]:1}" )
+	    local orig_IFS="${IFS}"
+	    IFS=:
+	    PTXDIST_PATH_LAYERS="${PTXDIST_LAYERS[*]}:"
+	    IFS="${orig_IFS}"
+	    PTX_KGEN_DIR="${PTX_KGEN_DIR}.base"
+	    confdir="${confdir}.base"
+	    ptxd_init_ptxdist_path
+	else
+	    kconfig_layer_configs=( "${kconfig_layer_configs[@]:1}" )
+	fi
 	ptxd_kconfig_update
 	ret=$?
 	if [ "${ret}" -ne 42 ]; then
@@ -577,8 +604,17 @@ ptxd_kconfig_update() {
 	;;
     esac
     case "${part}" in
-    user|board)
-	mode=single
+    ptx)
+	if ptxd_in_path PTXDIST_PATH_LAYERS "Kconfig"; then
+	    ptxd_bailout "Legacy path '$(ptxd_print_path "${ptxd_reply}")' is no longer supported." \
+		    "It must be moved to '$(ptxd_print_path "${ptxd_reply%Kconfig}config/Kconfig")'."
+	fi
+	ptxd_in_path PTXDIST_PATH_LAYERS "config/Kconfig"
+	file_kconfig="${ptxd_reply}"
+	;;
+    platform)
+	ptxd_in_path PTXDIST_PATH_LAYERS "platforms/Kconfig"
+	file_kconfig="${ptxd_reply}"
 	;;
     collection)
 	ptxd_kconfig_find_config run ${ptx_relative_file_dotconfig} || return 0
@@ -596,6 +632,20 @@ ptxd_kconfig_update() {
 	# here.
 	#
 	PTXDIST_COLLECTIONCONFIG="" ptxd_colgen || ptxd_bailout "error in colgen"
+	file_kconfig="${PTXDIST_TOPDIR}/config/collection/Kconfig"
+	;;
+    board)
+	ptxd_in_path PTXDIST_PATH_LAYERS "config/boardsetup/Kconfig"
+	file_kconfig="${ptxd_reply}"
+	mode=single
+	;;
+    setup|localsetup)
+	file_kconfig="${PTXDIST_TOPDIR}/config/setup/Kconfig"
+	# only relevalnt for localsetup:  automatically update the lower
+	# 'layers', which means ~/.ptxdist/ptxdistrc-<version>, with defaults
+	if [ "${kconfig_layer_configs[0]}" != "${file_dotconfig}" ]; then
+	    config=defconfig
+	fi
 	;;
     esac
 
@@ -627,7 +677,7 @@ ptxd_kconfig_update() {
 	"${relative_file_dotconfig}" "${file_dotconfig}" &&
 
     if [ "${mode}" = check ]; then
-	if ! "${conf}" --oldconfig "${file_kconfig}" < /dev/null; then
+	if ! ptxd_kconfig_run_conf --oldconfig "${file_kconfig}" < /dev/null; then
 	    # error handling in ptxd_kconfig_sync_config()
 	    :> .config
 	fi
@@ -643,15 +693,23 @@ ptxd_kconfig_update() {
 	    if [ "${part}" = ptx -o "${part}" = platform ]; then
 		ptxd_kconfig_migrate "${part}" &&
 		# migrate touches the config, so update the timestamp
-		stat -c '%y' ".config" > ".config.stamp"
+		if cmp --quiet ".config" ".config.old"; then
+		    stat -c '%y' ".config" > ".config.stamp"
+		fi
 	    fi &&
-	    "${conf}" --oldconfig "${file_kconfig}"
+	    ptxd_kconfig_run_conf --oldconfig "${file_kconfig}"
+	    ;;
+	defconfig)
+	    ptxd_kconfig_run_conf --oldconfig "${file_kconfig}" < /dev/null > /dev/null
 	    ;;
 	all*config|randconfig)
-	    "${conf}" --${config} "${file_kconfig}"
+	    if [ "$(realpath "${KCONFIG_ALLCONFIG}")" = "$(realpath "${file_dotconfig}")" ]; then
+		ptxd_kconfig_migrate "${part}" "${file_dotconfig}"
+	    fi &&
+	    ptxd_kconfig_run_conf --${config} "${file_kconfig}"
 	    ;;
 	dep)
-	    KCONFIG_ALLCONFIG=".config" "${conf}" \
+	    KCONFIG_ALLCONFIG=".config" ptxd_kconfig_run_conf \
 		--writedepend --alldefconfig "${file_kconfig}" &&
 	    mv -- ".config" "${PTXDIST_DGEN_DIR}/${part}config"
 	    return
@@ -670,26 +728,24 @@ export -f ptxd_kconfig_update
 
 #
 # $1	what kind of config ("oldconfig", "menuconfig", "dep")
-# $2	part identifier ("ptx", "platform", "collection", "board", "user")
+# $2	part identifier ("ptx", "platform", "collection", "board", "setup")
 # $...	optional parameters
 #
 ptxd_kconfig() {
     local config="${1}"
     local part="${2}"
 
-    local file_kconfig file_dotconfig
+    local file_dotconfig kconfig_layer_configs
 
     case "${part}" in
     ptx)
 	if ! ptxd_in_path PTXDIST_PATH_LAYERS "Kconfig"; then
 	    ptxd_in_path PTXDIST_PATH_LAYERS "config/Kconfig"
 	fi
-	file_kconfig="${ptxd_reply}"
 	file_dotconfig="${PTXDIST_PTXCONFIG}"
 	;;
     platform)
 	ptxd_in_path PTXDIST_PATH_LAYERS "platforms/Kconfig"
-	file_kconfig="${ptxd_reply}"
 	file_dotconfig="${PTXDIST_PLATFORMCONFIG}"
 	;;
     collection)
@@ -699,17 +755,19 @@ ptxd_kconfig() {
 	file_dotconfig="${PTXDIST_PLATFORMCONFIG}"
 	ptxd_normalize_config
 	export platform_relative_file_dotconfig="${relative_file_dotconfig}"
-	file_kconfig="${PTXDIST_TOPDIR}/config/collection/Kconfig"
 	file_dotconfig="${3}"
 	;;
     board)
 	ptxd_in_path PTXDIST_PATH_LAYERS "config/boardsetup/Kconfig"
-	file_kconfig="${ptxd_reply}"
 	file_dotconfig="${PTXDIST_BOARDSETUP}"
 	;;
-    user)
-	file_kconfig="${PTXDIST_TOPDIR}/config/setup/Kconfig"
+    setup)
 	file_dotconfig="${PTXDIST_PTXRC}"
+	kconfig_layer_configs=( "${file_dotconfig}" ${PTXDIST_TOPDIR}/config/setup/ptxdistrc.default )
+	;;
+    localsetup)
+	file_dotconfig="${PTXDIST_LOCAL_PTXRC}"
+	kconfig_layer_configs=( "${file_dotconfig}" "${PTXDIST_PTXRC}" ${PTXDIST_TOPDIR}/config/setup/ptxdistrc.default )
 	;;
     *)
 	ptxd_bailout "invalid use of '${FUNCNAME} ${@}'"
@@ -730,7 +788,7 @@ ptxd_kconfig() {
     fi
 
     (
-	if [ "${part}" != user -a "${part}" != board ]; then
+	if [ "${part}" != setup -a "${part}" != board ]; then
 	    ptxd_normalize_config
 	fi &&
 	ptxd_kconfig_update

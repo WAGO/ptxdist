@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_RSYSLOG) += rsyslog
 #
 # Paths and names
 #
-RSYSLOG_VERSION	:= 8.26.0
-RSYSLOG_MD5	:= abe20d1621d1e73326c08b964a556ed7
+RSYSLOG_VERSION	:= 8.2406.0
+RSYSLOG_MD5	:= 9bb2673cf15181b16e3f7c7bb5ad23fd
 RSYSLOG		:= rsyslog-$(RSYSLOG_VERSION)
 RSYSLOG_SUFFIX	:= tar.gz
-RSYSLOG_URL	:= http://www.rsyslog.com/files/download/rsyslog/$(RSYSLOG).$(RSYSLOG_SUFFIX)
+RSYSLOG_URL	:= https://www.rsyslog.com/files/download/rsyslog/$(RSYSLOG).$(RSYSLOG_SUFFIX)
 RSYSLOG_SOURCE	:= $(SRCDIR)/$(RSYSLOG).$(RSYSLOG_SUFFIX)
 RSYSLOG_DIR	:= $(BUILDDIR)/$(RSYSLOG)
 RSYSLOG_LICENSE	:= GPL-3.0-or-later AND LGPL-3.0-or-later AND Apache-2.0
@@ -37,38 +37,53 @@ RSYSLOG_LICENSE_FILES := \
 RSYSLOG_CONF_TOOL	:= autoconf
 RSYSLOG_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-aix64bits \
+	--enable-atomic-operations \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_REGEXP)-regexp \
+	--disable-fmhash \
+	--disable-libcap-ng \
+	--disable-fmhash-xxhash \
+	--disable-ffaup \
+	--disable-fmunflatten \
 	--disable-gssapi-krb5 \
+	--disable-root-tests \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMKLOG)-klog \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMKMSG)-kmsg \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_SYSTEMD)-imjournal \
+	--$(call ptx/endis, PTXCONF_RSYSLOG_SYSTEMD)-libsystemd \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_INET)-inet \
 	--disable-jemalloc \
 	--disable-unlimited-select \
 	--disable-debug \
 	--disable-debug-symbols \
-	--disable-rtinst \
 	--disable-debugless \
 	--disable-valgrind \
-	--disable-memcheck \
 	--disable-diagtools \
 	--disable-usertools \
 	--disable-mysql \
 	--disable-pgsql \
 	--disable-libdbi \
 	--disable-snmp \
+	--disable-snmp-tests \
 	--disable-uuid \
 	--disable-elasticsearch \
+	--disable-clickhouse \
+	--disable-omhttp \
 	--disable-elasticsearch-tests \
+	--disable-clickhouse-tests \
+	--disable-openssl \
 	--disable-gnutls \
+	--disable-gnutls-tests \
 	--disable-libgcrypt \
+	--disable-libzstd \
 	--enable-rsyslogrt \
 	--enable-rsyslogd \
 	--disable-extended-tests \
 	--disable-mysql-tests \
 	--disable-pgsql-tests \
 	--disable-mail \
+	--disable-fmhttp \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMDIAG)-imdiag \
 	--disable-mmnormalize \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_MMJSONPARSE)-mmjsonparse \
@@ -80,27 +95,42 @@ RSYSLOG_CONF_OPT	:= \
 	--disable-mmcount \
 	--disable-mmsequence \
 	--disable-mmdblookup \
+	--disable-mmdarwin \
 	--disable-mmfields \
 	--disable-mmpstrucdata \
 	--disable-mmrfc5424addhmac \
+	--disable-omfile-hardened \
 	--disable-relp \
-	--disable-guardtime \
-	--disable-gt-ksi \
+	--disable-ksi-ls12 \
 	--disable-liblogging-stdlog \
 	--disable-rfc3195 \
 	--disable-testbench \
+	--disable-libfaketime \
+	--disable-default-tests \
+	--disable-helgrind \
+	--disable-imbatchreport \
+	--disable-pmdb2diag \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMFILE)-imfile \
+	--disable-imfile-tests \
+	--disable-imdocker \
+	--disable-imdocker-tests \
+	--disable-imtuxedoulog \
+	--disable-improg \
+	--disable-imhttp \
 	--disable-imsolaris \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMPTCP)-imptcp \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_IMPSTATS)-impstats \
+	--disable-impcap \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_OMPROG)-omprog \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_OMUDPSPOOF)-omudpspoof \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_OMSTDOUT)-omstdout \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_SYSTEMD)-omjournal \
+	--disable-journal-tests \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_PMLASTMSG)-pmlastmsg \
 	--disable-pmcisconames \
 	--$(call ptx/endis, PTXCONF_RSYSLOG_PMCISCOIOS)-pmciscoios \
 	--disable-pmnull \
+	--disable-pmnormalize \
 	--disable-pmaixforwardedfrom \
 	--disable-pmsnare \
 	--disable-pmpanngfw \
@@ -109,25 +139,29 @@ RSYSLOG_CONF_OPT	:= \
 	--disable-mmsnmptrapd \
 	--disable-omhdfs \
 	--disable-omkafka \
+	--disable-imkafka \
+	--disable-omazureeventhubs-tests \
 	--disable-kafka-tests \
+	--disable-kafka-static \
+	--disable-omazureeventhubs \
+	--disable-qpidproton_static \
 	--disable-ommongodb \
-	--disable-imzmq3 \
+	--disable-imdtls \
+	--disable-omdtls \
 	--disable-imczmq \
-	--disable-omzmq3 \
 	--disable-omczmq \
 	--disable-omrabbitmq \
+	--disable-imhiredis \
 	--disable-omhiredis \
+	--disable-redis-tests \
 	--disable-omhttpfs \
 	--disable-omamqp1 \
 	--disable-omtcl \
+	--disable-mmkubernetes \
+	--disable-mmtaghostname \
 	--disable-generate-man-pages \
+	--without-tcl \
 	--disable-distcheck-workaround
-
-ifdef PTXCONF_RSYSLOG_SYSTEMD_UNIT
-RSYSLOG_CONF_OPT += --with-systemdsystemunitdir=/usr/lib/systemd/system
-else
-RSYSLOG_CONF_OPT += --without-systemdsystemunitdir
-endif
 
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_IMDIAG)	+= imdiag
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_IMFILE)	+= imfile
@@ -144,7 +178,6 @@ RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmnet
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmnetstrms
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmnsd_ptcp
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_REGEXP)	+= lmregexp
-RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmstrmsrv
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmtcpclt
 RSYSLOG_PLUGINS-$(PTXCONF_RSYSLOG_INET)		+= lmtcpsrv
 RSYSLOG_PLUGINS-y				+= lmzlibw

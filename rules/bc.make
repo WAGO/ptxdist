@@ -31,13 +31,11 @@ BC_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-BC_PATH	:= PATH=$(CROSS_PATH)
-BC_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-BC_AUTOCONF := $(CROSS_AUTOCONF_USR)
+BC_CONF_TOOL	:= autoconf
+BC_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

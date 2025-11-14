@@ -8,29 +8,27 @@ menuconfig WESTON
 	select WAYLAND
 	select WAYLAND_PROTOCOLS
 	select LIBXKBCOMMON
+	select LIBDISPLAY_INFO
 	select LIBJPEG
 	select LIBPNG
 	select LIBINPUT
 	select CAIRO
 	select CAIRO_PNG
-	select LIBDRM			if WESTON_DRM_COMPOSITOR || BUILDTIME
-	select UDEV			if WESTON_DRM_COMPOSITOR || WESTON_FBDEV_COMPOSITOR
-	select UDEV_LIBUDEV		if WESTON_DRM_COMPOSITOR || WESTON_FBDEV_COMPOSITOR
-	select MESALIB			if WESTON_DRM_COMPOSITOR
-	select MESALIB_GBM		if WESTON_DRM_COMPOSITOR
+	select LIBDRM
+	select UDEV
+	select UDEV_LIBUDEV
+	select SEATD
+	select MESALIB			if WESTON_GL
+	select MESALIB_GBM		if WESTON_GL
 	select MESALIB_EGL		if WESTON_GL
 	select MESALIB_EGL_WAYLAND	if WESTON_GL
 	select MESALIB_GLES2		if WESTON_GL
-	select CAIRO_GLES2		if WESTON_GL
-	select CAIRO_EGL		if WESTON_GL
+	select XORG			if WESTON_XWAYLAND
 	select CAIRO_XCB		if WESTON_XWAYLAND
 	select LIBXCB			if WESTON_XWAYLAND
 	select XORG_LIB_XCURSOR		if WESTON_XWAYLAND
-	select XORG_SERVER		if WESTON_XWAYLAND && RUNTIME
-	select XORG_SERVER_XWAYLAND	if WESTON_XWAYLAND && RUNTIME
+	select XWAYLAND			if WESTON_XWAYLAND && RUNTIME
 	select SYSTEMD			if WESTON_SYSTEMD
-	select SYSTEMD_LOGIND		if WESTON_SYSTEMD_LOGIND
-	select DBUS			if WESTON_SYSTEMD_LOGIND
 	select GSTREAMER1		if WESTON_REMOTING
 	select GST_PLUGINS_BASE1	if WESTON_REMOTING
 	select GST_PLUGINS_BASE1_APP	if WESTON_REMOTING
@@ -39,6 +37,11 @@ menuconfig WESTON
 	select GST_PLUGINS_GOOD1_RTP	if WESTON_REMOTING && RUNTIME
 	select GST_PLUGINS_GOOD1_UDP	if WESTON_REMOTING && RUNTIME
 	select PANGO			if WESTON_IVISHELL_EXAMPLE
+	select PIPEWIRE 		if WESTON_PIPEWIRE
+	select PIPEWIRE 		if WESTON_BACKEND_PIPEWIRE
+	select NEATVNC			if WESTON_BACKEND_VNC
+	select PAM			if WESTON_BACKEND_VNC
+	select LCMS			if WESTON_COLOR_MANAGEMENT_LCMS
 	prompt "weston                        "
 	help
 	  Wayland compositor reference implementation
@@ -49,45 +52,31 @@ config WESTON_XWAYLAND
 	bool
 	prompt "Xwayland support"
 
-config WESTON_DRM_COMPOSITOR
-	bool
-	prompt "drm compositor"
-
 config WESTON_GL
 	bool
-	depends on WESTON_DRM_COMPOSITOR
 	prompt "OpenGL accelerated compositing"
 
 config WESTON_HEADLESS_COMPOSITOR
 	bool
 	prompt "headless compositor"
 
-config WESTON_FBDEV_COMPOSITOR
+config WESTON_BACKEND_PIPEWIRE
 	bool
-	prompt "fbdev compositor"
+	prompt "PipeWire backend"
 
-config WESTON_LAUNCH
+config WESTON_BACKEND_VNC
 	bool
-	prompt "weston-launch support"
-	# needs pam
-	depends on BROKEN
-	help
-	  weston-launch is a setuid-root program which does privileged
-	  operations on Weston's behalf
+	prompt "VNC backend"
 
 config WESTON_STARTSCRIPT
 	bool
-	default INITMETHOD_BBINIT
+	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/weston-init"
 
 config WESTON_SYSTEMD
 	bool
 	default INITMETHOD_SYSTEMD
-
-config WESTON_SYSTEMD_LOGIND
-	bool
-	depends on WESTON_SYSTEMD
-	prompt "logind support"
 
 config WESTON_WCAP_TOOLS
 	bool
@@ -115,14 +104,18 @@ config WESTON_IVISHELL_EXAMPLE
 	  application, a few demo clients and the weston.ini configuration for
 	  the IVI-Shell.
 
+config WESTON_SHELL_KIOSK
+	bool
+	prompt "kiosk shell"
+
 config WESTON_PIPEWIRE
 	bool
+	select WESTON_GL
 	prompt "pipewire plugin"
-	# needs pipewire
-	depends on BROKEN
 
 config WESTON_REMOTING
 	bool
+	select WESTON_GL
 	prompt "remoting plugin"
 
 config WESTON_SIMPLE_CLIENTS
@@ -137,5 +130,9 @@ config WESTON_TOUCH_CALIBRATOR
 	help
 	  Install weston-touch-calibrator tool, interface must be enabled in
 	  weston.ini.
+
+config WESTON_COLOR_MANAGEMENT_LCMS
+	bool
+	prompt "color management module"
 
 endif

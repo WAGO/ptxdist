@@ -3,7 +3,8 @@
 menuconfig SMARTMONTOOLS
 	tristate
 	prompt "smartmontools                 "
-	select BUSYBOX_START_STOP_DAEMON if SMARTMONTOOLS_SMARTD_INITD
+	select BUSYBOX_START_STOP_DAEMON	if SMARTMONTOOLS_SMARTD_INITD
+	select SYSTEMD				if SMARTMONTOOLS_SYSTEMD_UNIT
 	select LIBC_M
 	select GCCLIBS_CXX
 	select GCCLIBS_GCC_S
@@ -24,7 +25,6 @@ config SMARTMONTOOLS_SMARTCTL
 
 config SMARTMONTOOLS_SMARTD
 	bool
-	default n
 	prompt "install smartd"
 	help
 	  SMART Disk Monitoring Daemon
@@ -32,7 +32,6 @@ config SMARTMONTOOLS_SMARTD
 config SMARTMONTOOLS_SMARTD_CONFIG
 	bool
 	depends	on SMARTMONTOOLS_SMARTD
-	default n
 	prompt "install smartd.conf"
 	help
 	  SMART Disk Monitoring Daemon Configuration File
@@ -40,7 +39,6 @@ config SMARTMONTOOLS_SMARTD_CONFIG
 config SMARTMONTOOLS_SMARTD_INITD
 	bool
 	depends	on SMARTMONTOOLS_SMARTD
-	default n
 	prompt "install /etc/init.d/smartd"
 	help
 	  SMART Disk Monitoring Daemon Configuration File
@@ -48,7 +46,7 @@ config SMARTMONTOOLS_SMARTD_INITD
 config SMARTMONTOOLS_SYSTEMD_UNIT
 	bool
 	default y
-	depends on SMARTMONTOOLS_SMARTD && SYSTEMD
+	depends on SMARTMONTOOLS_SMARTD && INITMETHOD_SYSTEMD
 	prompt "install systemd unit file for smartd"
 
 endif

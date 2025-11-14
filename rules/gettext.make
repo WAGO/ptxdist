@@ -16,8 +16,8 @@ PACKAGES-$(PTXCONF_GETTEXT) += gettext
 #
 # Paths and names
 #
-GETTEXT_VERSION	:= 0.20.2
-GETTEXT_MD5	:= 0cf5f68338d5d941bbf9ac93b847310f
+GETTEXT_VERSION	:= 0.22.5
+GETTEXT_MD5	:= 3ae5580599d84be93e6213930facb2db
 GETTEXT		:= gettext-$(GETTEXT_VERSION)
 GETTEXT_SUFFIX	:= tar.xz
 GETTEXT_URL	:= $(call ptx/mirror, GNU, gettext/$(GETTEXT).$(GETTEXT_SUFFIX))
@@ -32,30 +32,37 @@ GETTEXT_LICENSE_FILES := \
 # Prepare
 # ----------------------------------------------------------------------------
 
-GETTEXT_PATH	:= PATH=$(CROSS_PATH)
-GETTEXT_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-GETTEXT_AUTOCONF := \
+GETTEXT_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-java \
-	--enable-namespacing \
 	--disable-csharp \
+	--enable-c++ \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-threads=posix \
+	--disable-more-warnings \
 	--enable-static \
 	--disable-nls \
 	--disable-rpath \
-	--enable-c++ \
 	--enable-cross-guesses=conservative \
 	--disable-relocatable \
 	--enable-libasprintf \
-	--disable-acl \
-	--disable-openmp \
+	--$(call ptx/endis, PTXDIST_Y2038)-year2038 \
 	--disable-curses \
+	--enable-namespacing \
+	--disable-openmp \
+	--disable-acl \
+	--disable-xattr \
+	--without-included-gettext \
+	--with-included-libunistring \
+	--without-included-libxml \
+	--with-included-regex \
 	--without-emacs \
+	--without-lispdir \
+	--without-git \
+	--without-cvs \
 	--without-bzip2 \
 	--without-xz
 

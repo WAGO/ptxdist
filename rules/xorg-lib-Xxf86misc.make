@@ -27,15 +27,13 @@ XORG_LIB_XXF86MISC_DIR		:= $(BUILDDIR)/$(XORG_LIB_XXF86MISC)
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_LIB_XXF86MISC_PATH	:= PATH=$(CROSS_PATH)
-XORG_LIB_XXF86MISC_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_LIB_XXF86MISC_AUTOCONF := $(CROSS_AUTOCONF_USR)
-
-XORG_LIB_XXF86MISC_AUTOCONF += --disable-malloc0returnsnull
+XORG_LIB_XXF86MISC_CONF_TOOL := autoconf
+XORG_LIB_XXF86MISC_CONF_OPT := \
+	$(CROSS_AUTOCONF_USR) \
+	--disable-malloc0returnsnull
 
 # ----------------------------------------------------------------------------
 # Target-Install

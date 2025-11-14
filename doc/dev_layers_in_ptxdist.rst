@@ -29,7 +29,7 @@ are used. Any layer specific handling is done implicitly by PTXdist.
 However, there are a few things that need special handling.
 
 The variables :ref:`PTXDIST_WORKSPACE<ptxdist_workspace>` and
-:ref:`PTXDIST_PLATFORMCONFIGDIR`<ptxdist_platformconfigdir>` always refer
+:ref:`PTXDIST_PLATFORMCONFIGDIR<ptxdist_platformconfigdir>` always refer
 to the directories in the top layer. These variables might be used in rules
 files like this:
 
@@ -89,7 +89,7 @@ must be updated before they can be used. This can be done by using the
 ``oldconfig`` command. In this special case, PTXdist will iterate from the
 bottom to the top layer and run ``oldconfig`` for each of them. It will
 use the delta config applied to the full config of the layer below at each
-step. This means that it's possible to enable or disable a option in the
+step. This means that it's possible to enable or disable an option in the
 bottom layer and ``oldconfig`` will propagate this change to all other
 layers.
 
@@ -98,7 +98,8 @@ Packages with kconfig Based Config Files
 
 For packages such as the Linux kernel that have kconfig based config files,
 a lot of the infrastructure to handle config files and deltas across
-multiple layers can be reused. Consistency validation is done implicitly
+multiple layers can be reused (see :ref:`kconfig-diffs`).
+Consistency validation is done implicitly
 and ``menuconfig`` and other kconfig commands will use config files and
 deltas as expected.
 

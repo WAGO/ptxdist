@@ -10,11 +10,12 @@
 # We provide this package
 #
 CROSS_PACKAGES-$(PTXCONF_CROSS_DUMMY_STRIP) += cross-dummy-strip
+CROSS_DUMMY_STRIP_VERSION := 1
 CROSS_DUMMY_STRIP_LICENSE := ignore
 
 $(STATEDIR)/cross-dummy-strip.install:
 	@$(call targetinfo)
-	install -D -m 755 $(PTXDIST_TOPDIR)/scripts/dummy-strip.sh $(PTXDIST_SYSROOT_CROSS)/bin/strip
+	install -D -m 755 $(PTXDIST_TOPDIR)/scripts/dummy-strip.sh $(PTXDIST_SYSROOT_CROSS)/usr/bin/strip
 	@$(call touch)
 
 # vim: syntax=make

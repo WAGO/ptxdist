@@ -31,13 +31,11 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_FONT_BITSTREAM_100DPI_PATH	:= PATH=$(CROSS_PATH)
-XORG_FONT_BITSTREAM_100DPI_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_FONT_BITSTREAM_100DPI_AUTOCONF := \
+XORG_FONT_BITSTREAM_100DPI_CONF_TOOL	:= autoconf
+XORG_FONT_BITSTREAM_100DPI_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--with-fontdir=$(XORG_FONTDIR)/100dpi
 

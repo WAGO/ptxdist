@@ -19,13 +19,11 @@ SPARSEHASH_DIR		:= $(BUILDDIR)/$(SPARSEHASH)
 # Prepare
 # ----------------------------------------------------------------------------
 
-SPARSEHASH_PATH	:= PATH=$(CROSS_PATH)
-SPARSEHASH_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SPARSEHASH_AUTOCONF := $(CROSS_AUTOCONF_USR)
+SPARSEHASH_CONF_TOOL	:= autoconf
+SPARSEHASH_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

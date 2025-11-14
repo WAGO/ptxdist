@@ -19,7 +19,7 @@ BLSPEC_ENTRY_VERSION	:= $(KERNEL_VERSION)
 
 BLSPEC_ENTRY_TITLE	:= PTXdist - $(call remove_quotes,$(PTXCONF_PROJECT_VENDOR)-$(PTXCONF_PROJECT))
 ifdef PTXCONF_BLSPEC_ENTRY_DEVICETREE
-BLSPEC_ENTRY_NAMES	= $(basename $(notdir $(DTC_DTB)))
+BLSPEC_ENTRY_NAMES	= $(basename $(notdir $(KERNEL_DTS)))
 blspec/title		= $(BLSPEC_ENTRY_TITLE) $(strip $(1))
 blspec/devicetree	= devicetree\t/boot/$(strip $(1)).dtb
 else
@@ -30,9 +30,15 @@ endif
 BLSPEC_ENTRY_LICENSE	= ignore
 
 ifdef PTXCONF_KERNEL_FIT
-BLSPEC_KERNEL_IMAGE	= /boot/linux.fit
+BLSPEC_KERNEL_IMAGE	= linux.fit
 else
 BLSPEC_KERNEL_IMAGE	= $(KERNEL_IMAGE)
+endif
+
+ifdef PTXCONF_BLSPEC_ENTRY_APPENDROOT
+BLSPEC_APPENDROOT	= linux-appendroot\ttrue
+else
+BLSPEC_APPENDROOT	=
 endif
 
 $(STATEDIR)/blspec-entry.targetinstall:
@@ -56,7 +62,9 @@ $(STATEDIR)/blspec-entry.targetinstall:
 		$(call install_replace, blspec-entry, /loader/entries/$(name).conf, \
 			@KERNEL@,'/boot/$(BLSPEC_KERNEL_IMAGE)')$(ptx/nl) \
 		$(call install_replace, blspec-entry, /loader/entries/$(name).conf, \
-			@DEVICETREE@,'$(call blspec/devicetree,$(name))')$(ptx/nl))
+			@DEVICETREE@,'$(call blspec/devicetree,$(name))')$(ptx/nl) \
+		$(call install_replace, blspec-entry, /loader/entries/$(name).conf, \
+			@LINUXAPPENDROOT@,'$(BLSPEC_APPENDROOT)')$(ptx/nl))
 
 	@$(call install_finish,blspec-entry)
 

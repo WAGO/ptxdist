@@ -34,7 +34,7 @@ $(STATEDIR)/gcclibs.targetinstall:
 	@$(call install_fixup, gcclibs,DESCRIPTION,missing)
 
 ifdef PTXCONF_GCCLIBS_GCC_S
-	@$(call install_copy_toolchain_lib, gcclibs, libgcc_s.so)
+	@$(call install_copy_toolchain_lib, gcclibs, libgcc_s.so.1)
 endif
 
 ifdef PTXCONF_GCCLIBS_CXX
@@ -47,6 +47,21 @@ endif
 
 ifdef PTXCONF_GCCLIBS_GCJ
 	@$(call install_copy_toolchain_lib, gcclibs, libgcj.so)
+endif
+
+ifdef PTXCONF_GCCLIBS_GFORTRAN
+	@$(call install_copy_toolchain_lib, gcclibs, libgfortran.so)
+endif
+
+ifdef PTXCONF_GCCLIBS_GOMP
+	@$(call install_copy_toolchain_lib, gcclibs, libgomp.so)
+endif
+
+ifdef PTXCONF_ARCH_X86
+# the libarary does not exist on other architectures
+ifdef PTXCONF_GCCLIBS_QUADMATH
+	@$(call install_copy_toolchain_lib, gcclibs, libquadmath.so)
+endif
 endif
 
 ifdef PTXCONF_GCCLIBS_LIBASAN

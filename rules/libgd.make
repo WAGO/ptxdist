@@ -21,18 +21,18 @@ LIBGD_SUFFIX	:= tar.gz
 LIBGD_URL	:= https://github.com/libgd/libgd/releases/download/$(LIBGD)/libgd-$(LIBGD_VERSION).$(LIBGD_SUFFIX)
 LIBGD_SOURCE	:= $(SRCDIR)/$(LIBGD).$(LIBGD_SUFFIX)
 LIBGD_DIR	:= $(BUILDDIR)/$(LIBGD)
+LIBGD_LICENSE	:= custom
+LIBGD_LICENSE_FILES	:= file://COPYING;md5=07384b3aa2e0d39afca0d6c40286f545
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBGD_PATH	:= PATH=$(CROSS_PATH)
-LIBGD_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBGD_AUTOCONF  := \
+LIBGD_CONF_TOOL	:= autoconf
+LIBGD_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-rpath \
 	--disable-werror \

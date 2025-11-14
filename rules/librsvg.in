@@ -3,11 +3,13 @@
 menuconfig LIBRSVG
 	tristate
 	prompt "librsvg                       "
-	select GTK
+	select CAIRO
+	select CAIRO_GOBJECT
+	select GDK_PIXBUF
 	select LIBXML2
 	select LIBXML2_PUSH
+	select PANGO
 	select LIBGSF	if LIBRSVG_SVGZ
-	select LIBCROCO	if LIBRSVG_CROCO
 	help
 	  AX-based renderer library for SVG files
 
@@ -24,6 +26,7 @@ config LIBRSVG_PIXBUF_LOADER
 
 config LIBRSVG_SVGZ
 	bool
+	depends on STAGING
 	prompt "svgz support"
 	help
 	  Adds support for the ompressed Scalable Vector Graphics
@@ -31,7 +34,7 @@ config LIBRSVG_SVGZ
 
 config LIBRSVG_CROCO
 	bool
-	depends on STAGING
+	depends on BROKEN
 	prompt "libcroco support"
 	help
 	  Libcroco is a general CSS parsing and manipulation library.

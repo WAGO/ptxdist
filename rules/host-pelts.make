@@ -29,12 +29,9 @@ HOST_PELTS_DIR		:= $(HOST_BUILDDIR)/$(HOST_PELTS)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_PELTS_PATH	:= PATH=$(HOST_PATH)
-HOST_PELTS_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_PELTS_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_PELTS_CONF_TOOL	:= autoconf
 
 # vim: syntax=make

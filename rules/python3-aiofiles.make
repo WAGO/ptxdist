@@ -14,14 +14,15 @@ PACKAGES-$(PTXCONF_PYTHON3_AIOFILES) += python3-aiofiles
 #
 # Paths and names
 #
-PYTHON3_AIOFILES_VERSION	:= 0.3.2
-PYTHON3_AIOFILES_MD5		:= 726de778d9e4b1c6d5e4d04994a03505
+PYTHON3_AIOFILES_VERSION	:= 23.1.0
+PYTHON3_AIOFILES_MD5		:= d648a31366030470c97401741747065f
 PYTHON3_AIOFILES		:= aiofiles-$(PYTHON3_AIOFILES_VERSION)
 PYTHON3_AIOFILES_SUFFIX		:= tar.gz
-PYTHON3_AIOFILES_URL		:= https://pypi.python.org/packages/a4/49/f983f0bc7572edad5bbbaf0f91087f1448aee8ba55046f15bb464fb8bb63/$(PYTHON3_AIOFILES).$(PYTHON3_AIOFILES_SUFFIX)
+PYTHON3_AIOFILES_URL		:= $(call ptx/mirror-pypi, aiofiles, $(PYTHON3_AIOFILES).$(PYTHON3_AIOFILES_SUFFIX))
 PYTHON3_AIOFILES_SOURCE		:= $(SRCDIR)/$(PYTHON3_AIOFILES).$(PYTHON3_AIOFILES_SUFFIX)
 PYTHON3_AIOFILES_DIR		:= $(BUILDDIR)/$(PYTHON3_AIOFILES)
 PYTHON3_AIOFILES_LICENSE	:= Apache-2.0
+PYTHON3_AIOFILES_LICENSE_FILES	:= file://LICENSE;md5=d2794c0df5b907fdace235a619d80314
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -43,7 +44,7 @@ $(STATEDIR)/python3-aiofiles.targetinstall:
 	@$(call install_fixup, python3-aiofiles, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-aiofiles, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/aiofiles,, *.py)
+		$(PYTHON3_SITEPACKAGES)/aiofiles,, *.py)
 
 	@$(call install_finish, python3-aiofiles)
 

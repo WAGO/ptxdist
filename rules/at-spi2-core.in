@@ -1,0 +1,24 @@
+## SECTION=multimedia_gtk
+
+config AT_SPI2_CORE
+	tristate
+	prompt "at-spi2-core"
+	select HOST_MESON
+	select DBUS
+	select GLIB
+	select GOBJECT_INTROSPECTION	if AT_SPI2_CORE_INTROSPECTION
+	help
+	  ATK is a toolkit providing accessibility interfaces
+	  for applications or other toolkits. By implementing
+	  these interfaces, those other toolkits or applications
+	  can be used with tools such as screen readers,
+	  magnifiers, and other alternative input devices.
+	  ATK is part of the GNOME project.
+
+if AT_SPI2_CORE
+
+config AT_SPI2_CORE_INTROSPECTION
+	bool
+	default GOBJECT_INTROSPECTION_HELPER
+
+endif

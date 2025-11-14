@@ -26,13 +26,11 @@ SDL_GFX_DIR	:= $(BUILDDIR)/$(SDL_GFX)
 # Prepare
 # ----------------------------------------------------------------------------
 
-SDL_GFX_PATH	:= PATH=$(CROSS_PATH)
-SDL_GFX_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SDL_GFX_AUTOCONF := \
+SDL_GFX_CONF_TOOL := autoconf
+SDL_GFX_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--with-sdl-prefix=$(SYSROOT)/usr \
 	--disable-mmx \

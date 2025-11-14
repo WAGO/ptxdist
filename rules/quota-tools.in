@@ -25,12 +25,6 @@ config QUOTA_TOOLS_REPQUOTA
 	help
 	  summarize quotas for a filesystem
 
-config QUOTA_TOOLS_QUOT
-	bool
-	prompt "install quot"
-	help
-	  summarizes file system ownership
-
 config QUOTA_TOOLS_EDQUOTA
 	bool
 	prompt "install edquota"

@@ -20,12 +20,9 @@ HOST_LIBPNG_DIR	= $(HOST_BUILDDIR)/$(LIBPNG)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBPNG_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBPNG_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_LIBPNG_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_LIBPNG_CONF_TOOL := autoconf
 
 # vim: syntax=make

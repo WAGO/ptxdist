@@ -14,52 +14,30 @@ PACKAGES-$(PTXCONF_LSOF) += lsof
 #
 # Paths and names
 #
-LSOF_VERSION	:= 4.81.dfsg.1
-LSOF_MD5	:= 138b628cb1b6a3b16b32b792f77abcce
+LSOF_VERSION	:= 4.99.3
+LSOF_MD5	:= 0fa5cfcaaca77a2fb3579c17de016353
 LSOF_SUFFIX	:= tar.gz
 LSOF		:= lsof-$(LSOF_VERSION)
-LSOF_TARBALL	:= lsof_$(LSOF_VERSION).orig.$(LSOF_SUFFIX)
-LSOF_URL	:= http://snapshot.debian.org/archive/debian/20090218T214238Z/pool/main/l/lsof/$(LSOF_TARBALL)
-LSOF_SOURCE	:= $(SRCDIR)/$(LSOF_TARBALL)
+LSOF_URL	:= https://github.com/lsof-org/lsof/releases/download/$(LSOF_VERSION)/$(LSOF).$(LSOF_SUFFIX)
+LSOF_SOURCE	:= $(SRCDIR)/$(LSOF).$(LSOF_SUFFIX)
 LSOF_DIR	:= $(BUILDDIR)/$(LSOF)
+LSOF_LICENSE	:= custom
+LSOF_LICENSE_FILES	:= file://00README;startline=633;endline=664;md5=3161a245910921b0f58644299e268d39
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LSOF_PATH	:= PATH=$(CROSS_PATH)
+LSOF_CONF_TOOL	:= autoconf
+LSOF_CONF_OPT	:= \
+	$(CROSS_AUTOCONF_USR) \
+	--disable-liblsof \
+	--enable-security \
+	--disable-no-sock-security \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--with-libtirpc  \
+	--without-selinux
 
-LSOF_ENV 	:= \
-	$(CROSS_ENV) \
-	LINUX_HASSELINUX=N \
-	LSOF_AR="$(CROSS_AR) cr"
-
-LSOF_MAKEVARS	:= \
-	$(CROSS_ENV_CC) \
-	LSOF_USER=none \
-	DEBUG=-O2 \
-	RANLIB="$(CROSS_RANLIB) liblsof.a"
-
-#
-# autoconf
-#
-LSOF_AUTOCONF := -n linux
-
-$(STATEDIR)/lsof.prepare:
-	@$(call targetinfo)
-	cd $(LSOF_DIR) && \
-		$(LSOF_PATH) $(LSOF_ENV) \
-		./Configure $(LSOF_AUTOCONF)
-	@$(call touch)
-
-# ----------------------------------------------------------------------------
-# Install
-# ----------------------------------------------------------------------------
-
-$(STATEDIR)/lsof.install:
-	@$(call targetinfo)
-	install -D -m 755 "$(LSOF_DIR)/lsof" "$(LSOF_PKGDIR)/usr/bin/lsof"
-	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install

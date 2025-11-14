@@ -1,3 +1,5 @@
+.. _kernel_local_src:
+
 Using an External Kernel Source Tree
 ------------------------------------
 
@@ -122,6 +124,78 @@ To rebuild the kernel:
          ``make clean`` or the clean command for the build system used by the
          package. A ``ptxdist clean kernel`` call will only delete the
          symlinks in the build directory, but not clean the kernel compiled files.
+
+Using the Code Signing Infrastructure with the Kernel Recipe
+------------------------------------------------------------
+
+The kernel recipe can make use of the :ref:`code signing infrastructure
+<code_signing>` to supply cryptographic key material for several kernel features.
+They can be enabled in the `Linux kernel` section of ``ptxdist platformconfig``.
+
+.. important::
+
+   When supplying the kernel with key material, you should also make sure that
+   all necessary crypto algorithms are enabled in the kernel.
+   For example, if your module signing key is signed with an SHA256 hash,
+   you must enable ``CONFIG_CRYPTO_SHA256`` so that the signature can be verified.
+   Otherwise, some older kernels throw a stack trace on boot, and will not load
+   the supplied key material.
+
+.. _kernel_trust_root:
+
+Trusted Root CAs
+~~~~~~~~~~~~~~~~
+
+In some setups additional trusted CAs can be necessary;
+for example, when using EVM, the EVM key must be issued by a certificate that
+is trusted by the kernel.
+
+When ``PTXCONF_KERNEL_CODE_SIGNING`` ("depend on code signing infrastructure")
+is enabled in the platformconfig, and if the code signing provider supplies CA
+certificates in the ``kernel-trusted`` role,
+PTXdist adds the option ``CONFIG_SYSTEM_TRUSTED_KEYS`` to the kernel config to
+add those certificates to the kernel trust root.
+(The code signing provider should use :ref:`cs_append_ca_from_der`,
+:ref:`cs_append_ca_from_pem`, or :ref:`cs_append_ca_from_uri` with the
+``kernel-trusted`` role to supply those certificates.)
+
+Note that the kernel also always adds the module signing key to the trust root
+(see :ref:`kernel_module_signing` below).
+If the EVM key is signed by the module signing key (or if the two keys are the
+same *and* it is self-signed), no additional trust CA is necessary.
+
+.. _kernel_module_signing:
+
+Kernel Module Signing
+~~~~~~~~~~~~~~~~~~~~~
+
+The kernel's build system can generate cryptographic signatures for all
+kernel modules during the build process.
+This can ensure that all modules loaded on the target at runtime have been
+built by a trustworthy source.
+
+If ``PTXCONF_KERNEL_MODULES_SIGN`` ("sign modules") is enabled in the
+platformconfig, PTXdist augments the kernel config with the following config
+options during the `kernel.compile` and `kernel.install` stages:
+
+* ``CONFIG_MODULE_SIG_KEY`` ("File name or PKCS#11 URI of module signing key"):
+  PTXdist supplies the URI from the ``kernel-modules`` role of the configured
+  code signing provider.
+  (The code signing provider should use :ref:`cs_set_uri` to set the URI.)
+
+However, additional settings must also be enabled in the kernel config:
+
+* ``CONFIG_MODULE_SIG=y`` ("Module signature verification"):
+  Enable this option for module signing, and to get access to its sub-options.
+* ``CONFIG_MODULE_SIG_ALL=y`` ("Automatically sign all modules"):
+  Enable this option so that the kernel's build system signs the modules during
+  PTXdist's `kernel.install` stage.
+* Additionally, ``CONFIG_MODULE_SIG_FORCE`` ("Require modules to be validly
+  signed") can be useful so that the kernel refuses loading modules with
+  invalid, untrusted, or no signature.
+
+For the full overview, refer to the `kernel's module signing documentation
+<https://www.kernel.org/doc/html/latest/admin-guide/module-signing.html>`_.
 
 Discovering Runtime Dependencies
 --------------------------------
@@ -575,6 +649,70 @@ development machine.
 
 .. _devpkgs:
 
+Building BSPs in a Container
+----------------------------
+
+While PTXdist tries to limit the influence of the build host, some aspects
+can inevitably leak into the build. Especially building old BSPs on new
+Linux distribution can be problematic. So building a BSP in a container
+with a defined distribution can be useful.
+
+PTXdist has support to run in a Docker or Podman container automatically,
+if configured to do so. This hooks into the
+:ref:`--auto-version<ptxdist_parameter_autoversion>` feature, so while the
+PTXdist version, that is initially started, needs support for containers,
+the PTXdist version that actually builds the BSP does not.
+
+The container manager and image are configured with ``ptxdist setup`` or
+``ptxdist localsetup``. Since the image is BSP specific, localsetup usually
+makes more sense.
+
+.. code-block:: text
+
+    $ ptxdist localsetup
+
+        [*] build in container  --->
+                 container manager (docker)  --->
+           (myimage) image name
+           ()    extra args
+           [ ]   developer mode
+
+With Docker, the image must have a USER that matches the local user.
+Otherwise, the BSP will not be writable in the container.
+Podman is started with ``--userns=keep-id`` which maps the local user into
+the container so no explicit user is needed in the image.
+
+The image must contain the toolchain needed to build the BSP and the
+required PTXdist version. There are two exceptions when PTXdist itself is
+explicitly mounted into the container:
+
+-  PTXdist is a non-release version from git.
+
+-  PTXdist is an explicit bottom layer in a layer BSP.
+
+All other necessary directories are mounted into the container, such as:
+
+-  The BSP with all its layers
+
+-  The source download directory
+
+-  The icecc socket if icecc is enabled
+
+-  The ccache cache directory if ccache is enabled
+
+If the "developer mode" option is enabled, then additional directories are
+mounted:
+
+-  ``~/.ptxdist`` for the global setup config. Note: without this, icecc or
+   ccache must be enabled in localsetup to work.
+
+-  All directories referenced by symlinks in ``local_src/`` (generated by
+   ``ptxdist local-src <pkg>``)
+
+With the "extra args" option, additional command-line arguments for the
+container manager can be added. They will be inserted at the end, right
+before the image name and the ptxdist command-line.
+
 Using Pre-Built Archives
 ------------------------
 
@@ -791,11 +929,11 @@ Sometimes it makes sense to get all required source archives at once.
 For example prior to a shipment we want to also include all source
 archives, to free the user from downloading it by him/herself.
 
-PTXdist supports this requirement by the ``export_src`` parameter. It
+PTXdist supports this requirement by the ``export-src`` parameter. It
 collects all required source archives into one given single directory.
 To do so, the current project must be set up correctly, e.g. the
 ``select`` and ``platform`` commands must be ran prior the
-``export_src`` step.
+``export-src`` step.
 
 If everything is set up correctly we can run the following commands to
 get the full list of required archives to build the project again
@@ -804,7 +942,7 @@ without an internet connection.
 .. code-block:: text
 
     $ mkdir my_archives
-    $ ptxdist export_src my_archives
+    $ ptxdist export-src my_archives
 
 PTXdist will now collect all source archives to the ``my_archives/``
 directory.
@@ -1366,11 +1504,19 @@ permissions related to file permission masks.
 PTXdist requires a ``umask`` of ``0022`` to be able to create files accessible
 by regular users. This is important at build-time, since it propagates to the
 generated target filesystem images as well. For example the ``install_tree``
-macro (refer :ref:`install_tree,reference`) uses the file permissions it finds
+macro (refer :ref:`install_tree`) uses the file permissions it finds
 in the build machine's filesystem also for the target filesystem image. With
 a different ``umask`` than ``0022`` at build-time this may fail badly at
 run-time with strange erroneous behaviour (for example some daemons with
 regular user permissions cannot access their own configuration files).
+
+If the current ``umask`` is more permissive than the required ``umask``,
+then ptxdist will change it as required. For example, a ``umask`` of
+``0002`` is quite common when the primary group of a user has the same name
+as the user.
+
+For security reasons, PTXdist will not set a more permissive ``umask``
+than the current one.
 
 Read Only Filesystem
 --------------------
@@ -1435,9 +1581,9 @@ A different approach to have a writable ``/var`` without persistency is to use
 a so called *overlay filesystem*. This *overlay filesystem* is a transparent
 writable layer on top of a read-only filesystem. After the system's start the
 *overlay filesystem layer* is empty and all reads will be satisfied by the
-underlaying read-only filesystem. Writes (new files, directories, changes of
+underlying read-only filesystem. Writes (new files, directories, changes of
 existing files) are stored in the *overlay filesystem layer* and on the
-next read satisfied by this layer, instead of the underlaying read-only
+next read satisfied by this layer, instead of the underlying read-only
 filesystem.
 
 PTXdist supports this use case, by enabling the *overlay* feature for the

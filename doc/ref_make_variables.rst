@@ -35,18 +35,18 @@ Global Variables
   project. All of the project’s packages built for the host to create data
   for the target are searching in this directory tree for their
   dependencies (executables, header and library files). Use
-  ``$(PTXDIST_SYSROOT_CROSS)/bin`` to install executables,
-  ``$(PTXDIST_SYSROOT_CROSS)/include`` for header files and
-  ``$(PTXDIST_SYSROOT_CROSS)/lib`` for libraries.
+  ``$(PTXDIST_SYSROOT_CROSS)/usr/bin`` to install executables,
+  ``$(PTXDIST_SYSROOT_CROSS)/usr/include`` for header files and
+  ``$(PTXDIST_SYSROOT_CROSS)/usr/lib`` for libraries.
 
 ``PTXDIST_SYSROOT_HOST``
   ``PTXDIST_SYSROOT_HOST`` points to a directory tree all host relevant
   executables, libraries and header files are installed to. All project’s
   packages built for the host are searching in this directory tree for
   their dependencies (executables, header and library files). Use
-  ``$(PTXDIST_SYSROOT_HOST)/bin`` to install executables,
-  ``$(PTXDIST_SYSROOT_HOST)/include`` for header files and
-  ``$(PTXDIST_SYSROOT_HOST)/lib`` for libraries.
+  ``$(PTXDIST_SYSROOT_HOST)/usr/bin`` to install executables,
+  ``$(PTXDIST_SYSROOT_HOST)/usr/include`` for header files and
+  ``$(PTXDIST_SYSROOT_HOST)/usr/lib`` for libraries.
 
 ``PTXDIST_SYSROOT_TARGET``
   ``PTXDIST_SYSROOT_TARGET`` points to a directory tree all target
@@ -61,7 +61,7 @@ Global Variables
 Other useful variables:
 
 ``CROSS_PATH``
-  Use to find cross tools. This path must be used to create anything that
+  Used to find cross tools. This path must be used to create anything that
   depends on the target’s architecture, but needs something running on the
   host to do the job. Examples:
 
@@ -126,6 +126,8 @@ Other useful variables:
   Similar to ``PACKAGES``, these variables contain the host and cross packages
   that are built and installed during the PTXdist build run.
   There are analogous ``-y`` and ``-m`` variants of those variables too.
+
+.. _package_specific_variables:
 
 Package Specific Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -194,8 +196,13 @@ Package Definition
   Git URLs must either start with 'git://' or end with '.git'. They have a
   mandatory ``tag=<tagname>`` option.
 
-  Svn URLs must start with 'svn://'. They have a mandatory
+  SVN URLs must start with 'svn://'. They have a mandatory
   ``rev=r<number>`` option.
+
+  SVN custom tunnel schemes (e.g. 'svn+ssh') are supported as
+  well. There is a special treatment for 'svn+https'. In this case
+  the URL is fixed and 'svn+' is removed from URL. This is useful to
+  work around firewalls that block 'svn' ports.
 
 ``<PKG>_SOURCE``
   The location of the downloaded source archive. There should be no reason
@@ -223,10 +230,19 @@ Package Definition
   'gdbserver' for an example.
 
 ``<PKG>_LICENSE``
-  The license of the package. The SPDX license identifiers should be used
-  here. Use ``proprietary`` for proprietary packages and ``ignore`` for
-  packages without their own license, e.g. meta packages or packages that
-  only install files from ``projectroot/``.
+  The license of the package in the form of an `SPDX license expression
+  <https://spdx.org/licenses/>`_.
+  The following values have special meaning for PTXdist:
+
+  - ``custom`` and ``custom-exception``: for licenses or license exceptions
+    that are considered free software, but do not match any license or license
+    exception known to SPDX.
+  - ``proprietary``: for proprietary (non-free) packages
+  - ``ignore`` for packages without their own license, e.g. meta packages or
+    packages that only install files from ``projectroot/``
+  - ``unknown``: no licensing information was extracted yet
+
+  See the section :ref:`licensing_in_packages` for more information.
 
 ``<PKG>_LICENSE_FILES``
   A space separated list of URLs of license text files. The URLs must be
@@ -238,6 +254,7 @@ Package Definition
   used in case the specified file contains more than just the license text,
   e.g. if the license is in the header of a source file. For non ASCII or
   UTF-8 files the encoding can be specified with ``encoding=<enc>``.
+  See the section :ref:`licensing_in_packages` for more information.
 
 For most packages the variables described above are undefined by default.
 However, for cross and host packages these variables default to the value
@@ -255,7 +272,7 @@ of the corresponding target package if it exists.
   When PTXdist extracts source archives, it will create ``<PKG>_DIR``
   first and then extracts the archive there. If ``<PKG>_STRIP_LEVEL`` is
   set to 1 (the default) then PTXdist removes the first directory level
-  defined inside the archive. For most packages that this is the same as
+  defined inside the archive. For most packages this is the same as
   just extracting the archive. However, this is useful for packages with
   badly named top-level directories or packages where the directory must be
   renamed to avoid collisions (e.g. gdbserver).
@@ -276,7 +293,7 @@ of the corresponding target package if it exists.
   keep the source tree free of build files.
 
   ``KEEP`` can be used instead of ``YES``. In this case the build tree is
-  not deleted at the beginning of the prepare stage. This make
+  not deleted at the beginning of the prepare stage. This makes
   reconfiguration faster. This should only be used for packages that can
   handle configuration changes correctly and rebuild everything as needed.
 
@@ -296,7 +313,7 @@ Build Environment for all Stages
   packages and ``PATH=$(HOST_CROSS_PATH)`` for cross packages. It must be
   set by packages that use the variable locally in the make file or if more
   directories are added, e.g. to
-  ``PATH=$(PTXDIST_SYSROOT_CROSS)/bin/qt5:$(CROSS_PATH)`` for packages that
+  ``PATH=$(PTXDIST_SYSROOT_CROSS)/usr/bin/qt5:$(CROSS_PATH)`` for packages that
   use qmake from Qt5.
 
 ``<PKG>_CFLAGS``, ``<PKG>_CPPFLAGS``, ``<PKG>_LDFLAGS``
@@ -308,6 +325,14 @@ Build Environment for all Stages
   flags. Adding them via environment variables or ``make`` arguments can
   have unexpected side effects, such as as overwriting existing defaults.
 
+``<PKG>_FLAGS_BLACKLIST``
+  A list of arbitrary flags. If any one of these flags is found as an
+  argument to the compiler, preprocessor or linker then the call will fail.
+  This is useful to prevent implicit dependencies: Many packages try to
+  link to libraries at configure time and use them if it works. Adding
+  '-l<lib>' to the blacklist makes it possible to prevent such a detection
+  and explicitly avoid the dependency.
+
 ``<PKG>_WRAPPER_BLACKLIST``
   PTXdist has several options in the platformconfig that inject options in
   the compiler command line. This is used, for example, to add hardening
@@ -317,8 +342,33 @@ Build Environment for all Stages
   individual options by setting it to a space separated list of the
   corresponding Kconfig symbols (without the ``PTXCONF_`` prefix).
 
+``<PKG>_WRAPPER_ACCEPT_PATHS``
+  By default, the toolchain wrapper scripts will drop any -I and -L paths
+  that point to directories outside the BSP for target packages. This
+  avoids problems with bad search paths due to broken package build
+  systems.
+
+  Sometimes search paths outside the BSP are needed. In this case
+  ``<PKG>_WRAPPER_ACCEPT_PATHS`` can be used. It accepts a space separated
+  list of directories. Those directories (with and without symlinks
+  resolved) will not be dropped when the wrapper filters the search paths.
+
+  For example, external kernel modules need the kernel source tree. If the
+  kernel is built :ref:`using an external source tree<kernel_local_src>`
+  then search paths to that source tree are needed. So external kernel
+  modules should set ``<PKG>_WRAPPER_ACCEPT_PATHS`` to ``$(KERNEL_DIR)``.
+
 Prepare Stage
 ^^^^^^^^^^^^^
+
+``<PKG>_CFGHASH``
+  This variable contains the config hash for the package.
+  If it changes, PTXdist rebuilds the prepare stage of the package (and
+  successively, all following stages).
+
+  You should not need to touch this variable directly.
+  To add content to the config hash, you can use the macros :ref:`ptx/cfghash
+  and ptx/cfghash-file <ptx/cfghash>`.
 
 ``<PKG>_CONF_ENV``
   The environment for the prepare stage. If undefined, PTXdist will use
@@ -428,7 +478,7 @@ different.
   package then this package should be selected in the menu file.
 
 ``<PKG>_PKGS``
-  This is another mechanism to add files to the image. It can be uses
+  This is another mechanism to add files to the image. It can be used
   instead of or in addition to ``<PKG>_FILES``. It must be set to a list of
   ptxdist packages (the lowercase name of the packages). PTXdist will add
   the necessary dependencies.
@@ -436,9 +486,9 @@ different.
   Note that this will not ensure that the packages are enabled or that all
   all package dependencies are satisfied. ``$(PTX_PACKAGES_INSTALL)`` can
   be used to specify all enabled packages. Or ``$(call ptx/collection,
-  $(PTXDIST_WORKSPACE)/configs/<collection-file-name>)`` can be uses to to
+  $(PTXDIST_WORKSPACE)/configs/<collection-file-name>)`` can be used to
   specify the packages enabled by this collection. In both cases ``=`` must
-  be uses instead of ``:=`` due to the makefile include order.
+  be used instead of ``:=`` due to the makefile include order.
 
 ``<PKG>_CONFIG``
   ``genimage`` packages use this to specify the ``genimage`` configuration

@@ -31,16 +31,13 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_FONT_BITSTREAM_75DPI_PATH	:= PATH=$(CROSS_PATH)
-XORG_FONT_BITSTREAM_75DPI_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_FONT_BITSTREAM_75DPI_AUTOCONF := \
+XORG_FONT_BITSTREAM_75DPI_CONF_TOOL	:= autoconf
+XORG_FONT_BITSTREAM_75DPI_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--with-fontdir=$(XORG_FONTDIR)/75dpi
-
 
 # ----------------------------------------------------------------------------
 # Install

@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_LIBPSL) += libpsl
 #
 # Paths and names
 #
-LIBPSL_VERSION	:= 0.21.0
-LIBPSL_MD5	:= 171e96d887709e36a57f4ee627bf82d2
+LIBPSL_VERSION	:= 0.21.2
+LIBPSL_MD5	:= 2864d3eb744b378d68f5c4da25603459
 LIBPSL		:= libpsl-$(LIBPSL_VERSION)
 LIBPSL_SUFFIX	:= tar.gz
-LIBPSL_URL	:= https://github.com/rockdaboot/libpsl/releases/download/$(LIBPSL)/$(LIBPSL).$(LIBPSL_SUFFIX)
+LIBPSL_URL	:= https://github.com/rockdaboot/libpsl/releases/download/$(LIBPSL_VERSION)/$(LIBPSL).$(LIBPSL_SUFFIX)
 LIBPSL_SOURCE	:= $(SRCDIR)/$(LIBPSL).$(LIBPSL_SUFFIX)
 LIBPSL_DIR	:= $(BUILDDIR)/$(LIBPSL)
 LIBPSL_LICENSE	:= MIT
+LIBPSL_LICENSE_FILES := \
+	file://COPYING;md5=6f40ab7fcf5ff18f3ff7f4b0860493fa
 
 # ----------------------------------------------------------------------------
 # Prepare

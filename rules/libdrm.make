@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_LIBDRM) += libdrm
 #
 # Paths and names
 #
-LIBDRM_VERSION	:= 2.4.102
-LIBDRM_MD5	:= 586f1e0c324dd372841922089a04417c
+LIBDRM_VERSION	:= 2.4.123
+LIBDRM_MD5	:= 322f5ffe2d3adc2f6ecaab52ae64ba4a
 LIBDRM		:= libdrm-$(LIBDRM_VERSION)
 LIBDRM_SUFFIX	:= tar.xz
 LIBDRM_URL	:= http://dri.freedesktop.org/libdrm/$(LIBDRM).$(LIBDRM_SUFFIX)
@@ -39,7 +39,6 @@ LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_RADEON) += radeon
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_AMDGPU) += amdgpu
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_NOUVEAU) += nouveau
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_FREEDRENO) += freedreno
-LIBDRM_BACKENDS- += freedreno-kgsl
 LIBDRM_BACKENDSC-$(PTXCONF_LIBDRM_VMWGFX) += vmwgfx
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_OMAP) += omap
 LIBDRM_BACKENDS-$(PTXCONF_LIBDRM_EXYNOS) += exynos
@@ -58,13 +57,14 @@ LIBDRM_BACKENDSL-y += $(LIBDRM_BACKENDS-y)
 LIBDRM_CONF_TOOL := meson
 LIBDRM_CONF_OPT := \
 	$(CROSS_MESON_USR) \
-	-Dlibkms=$(call ptx/truefalse, PTXCONF_LIBDRM_LIBKMS) \
-	$(patsubst %,-D%=true,$(LIBDRM_BACKENDSC-y)) \
-	$(patsubst %,-D%=false,$(LIBDRM_BACKENDSC-)) \
-	-Dcairo-tests=false \
-	-Dman-pages=false \
-	-Dvalgrind=false \
+	$(patsubst %,-D%=enabled,$(LIBDRM_BACKENDSC-y)) \
+	$(patsubst %,-D%=disabled,$(LIBDRM_BACKENDSC-)) \
+	-Dcairo-tests=disabled \
+	-Dfreedreno-kgsl=false \
+	-Dman-pages=disabled \
+	-Dvalgrind=disabled \
 	-Dinstall-test-programs=$(call ptx/truefalse, PTXCONF_LIBDRM_TESTS) \
+	-Dtests=true \
 	-Dudev=true
 
 
@@ -83,23 +83,21 @@ $(STATEDIR)/libdrm.targetinstall:
 
 	@$(call install_lib, libdrm, 0, 0, 0644, libdrm)
 
-ifdef PTXCONF_LIBDRM_LIBKMS
-	@$(call install_lib, libdrm, 0, 0, 0644, libkms)
-endif
 	@$(foreach backend,$(LIBDRM_BACKENDSL-y), \
-		$(call install_lib, libdrm, 0, 0, 0644, libdrm_$(backend));)
+		$(call install_lib, libdrm, 0, 0, 0644, \
+			libdrm_$(backend))$(ptx/nl))
 
 ifdef PTXCONF_LIBDRM_TESTS
-ifdef PTXCONF_LIBDRM_LIBKMS
-	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/kmstest)
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/modetest)
-endif
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/modeprint)
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/vbltest)
 ifdef PTXCONF_LIBDRM_ETNAVIV
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/etnaviv_2d_test)
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/etnaviv_cmd_stream_test)
 	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/etnaviv_bo_cache_test)
+endif
+ifdef PTXCONF_LIBDRM_AMDGPU
+	@$(call install_copy, libdrm, 0, 0, 0755, -, /usr/bin/amdgpu_stress)
 endif
 endif
 ifdef PTXCONF_LIBDRM_AMDGPU

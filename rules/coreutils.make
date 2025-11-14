@@ -14,42 +14,19 @@ PACKAGES-$(PTXCONF_COREUTILS) += coreutils
 #
 # Paths and names
 #
-COREUTILS_VERSION	:= 8.31
-COREUTILS_MD5		:= 0009a224d8e288e8ec406ef0161f9293
+COREUTILS_VERSION	:= 9.5
+COREUTILS_MD5		:= e99adfa059a63db3503cc71f3d151e31
 COREUTILS		:= coreutils-$(COREUTILS_VERSION)
 COREUTILS_SUFFIX	:= tar.xz
 COREUTILS_URL		:= $(call ptx/mirror, GNU, coreutils/$(COREUTILS).$(COREUTILS_SUFFIX))
 COREUTILS_SOURCE	:= $(SRCDIR)/$(COREUTILS).$(COREUTILS_SUFFIX)
 COREUTILS_DIR		:= $(BUILDDIR)/$(COREUTILS)
 COREUTILS_LICENSE	:= GPL-3.0-or-later
-COREUTILS_LICENSE_FILES	:= file://COPYING;md5=d32239bcb673463ab874e80d47fae504
+COREUTILS_LICENSE_FILES	:= file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
-
-#   --enable-install-program=PROG_LIST
-#                           install the programs in PROG_LIST (comma-separated,
-#                           default: none)
-#   --enable-no-install-program=PROG_LIST
-#                           do NOT install the programs in PROG_LIST
-#                           (comma-separated, default: arch,hostname,su)
-#   --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
-#   --without-libiconv-prefix     don't search for libiconv in includedir and libdir
-#   --with-libpth-prefix[=DIR]  search for libpth in DIR/include and DIR/lib
-#   --without-libpth-prefix     don't search for libpth in includedir and libdir
-#   --without-included-regex
-#                           don't compile regex; this is the default on systems
-#                           with recent-enough versions of the GNU C Library
-#                           (use with caution on other systems).
-#   --with-packager         String identifying the packager of this software
-#   --with-packager-version Packager-specific version information
-#   --with-packager-bug-reports
-#                           Packager info for bug reports (URL/e-mail/...)
-#   --without-gmp           do not use the GNU MP library for arbitrary
-#                           precision calculation (default: use it if available)
-#   --with-libintl-prefix[=DIR]  search for libintl in DIR/include and DIR/lib
-#   --without-libintl-prefix     don't search for libintl in includedir and libdir
 
 COREUTILS_INST- =
 COREUTILS_INST-y =
@@ -162,22 +139,30 @@ COREUTILS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-threads=posix \
+	--enable-cross-guesses=conservative \
 	--disable-acl \
 	--disable-assert \
 	--disable-rpath \
-	--disable-libsmack \
 	--disable-xattr \
+	--$(call ptx/endis, PTXCONF_INITMETHOD_SYSTEMD)-systemd \
+	--disable-libsmack \
 	--disable-libcap \
-	--disable-gcc-warnings \
 	--disable-single-binary \
 	--disable-single-binary-exceptions \
+	--disable-bold-man-page-references \
+	--disable-gcc-warnings \
 	--enable-no-install-program=$(subst $(space),$(comma),$(strip $(COREUTILS_INST-))) \
 	--disable-nls \
+	--$(call ptx/endis, PTXCONF_GLIBC_Y2038)-year2038 \
 	--without-linux-crypto \
 	--without-openssl \
+	--without-libgmp \
+	--without-included-regex \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_SELINUX)-selinux \
-	--with-tty-group=tty \
-	--without-gmp
+	--with-packager \
+	--with-packager-version \
+	--with-packager-bug-reports \
+	--with-tty-group=tty
 
 COREUTILS_MAKE_OPT	:= \
 	man1_MANS=

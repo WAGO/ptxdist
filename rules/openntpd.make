@@ -21,6 +21,8 @@ OPENNTPD_SUFFIX		:= tar.gz
 OPENNTPD_URL		:= http://ftp.eu.openbsd.org/pub/OpenBSD/OpenNTPD/$(OPENNTPD).$(OPENNTPD_SUFFIX)
 OPENNTPD_SOURCE		:= $(SRCDIR)/$(OPENNTPD).$(OPENNTPD_SUFFIX)
 OPENNTPD_DIR		:= $(BUILDDIR)/$(OPENNTPD)
+OPENNTPD_LICENSE	:= ISC AND custom AND BSD-2-Clause AND BSD-3-Clause
+OPENNTPD_LICENSE_FILES	:= file://LICENCE;md5=4b4f5158007cc97e6b0e2325bb99854a
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -61,10 +63,8 @@ $(STATEDIR)/openntpd.targetinstall:
 	# busybox init
 	#
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_OPENNTPD_STARTSCRIPT
 	@$(call install_alternative, openntpd, 0, 0, 0644, /etc/init.d/ntp-server, n)
-endif
 endif
 
 	@$(call install_finish, openntpd)

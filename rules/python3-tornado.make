@@ -11,14 +11,16 @@
 #
 PACKAGES-$(PTXCONF_PYTHON3_TORNADO) += python3-tornado
 
-PYTHON3_TORNADO_VERSION	:= 6.0.3
-PYTHON3_TORNADO_MD5	:= cab4b11480f6d032e46465586192d343
+PYTHON3_TORNADO_VERSION	:= 6.4
+PYTHON3_TORNADO_MD5	:= 460b467761e5ff74202b5bf8054c8116
 PYTHON3_TORNADO		:= tornado-$(PYTHON3_TORNADO_VERSION)
 PYTHON3_TORNADO_SUFFIX	:= tar.gz
-PYTHON3_TORNADO_URL	:= https://files.pythonhosted.org/packages/source/t/tornado/$(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX)
+PYTHON3_TORNADO_URL	:= $(call ptx/mirror-pypi, tornado, $(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX))
 PYTHON3_TORNADO_SOURCE	:= $(SRCDIR)/$(PYTHON3_TORNADO).$(PYTHON3_TORNADO_SUFFIX)
 PYTHON3_TORNADO_DIR	:= $(BUILDDIR)/$(PYTHON3_TORNADO)
 PYTHON3_TORNADO_LICENSE	:= Apache-2.0
+PYTHON3_TORNADO_LICENSE_FILES:= \
+	file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,7 +42,7 @@ $(STATEDIR)/python3-tornado.targetinstall:
 	@$(call install_fixup,python3-tornado,DESCRIPTION,missing)
 
 	@$(call install_glob, python3-tornado, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/tornado,, *.py)
+		$(PYTHON3_SITEPACKAGES)/tornado,, *.py)
 
 	@$(call install_finish,python3-tornado)
 

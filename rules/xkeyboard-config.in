@@ -3,6 +3,6 @@
 config XKEYBOARD_CONFIG
 	tristate
 	prompt "xkeyboard-config"
-	select HOST_INTLTOOL
+	select HOST_MESON
 	help
 	  FIXME

@@ -27,13 +27,11 @@ LIBRN_DIR	:= $(BUILDDIR)/$(LIBRN)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBRN_PATH	:= PATH=$(CROSS_PATH)
-LIBRN_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBRN_AUTOCONF := \
+LIBRN_CONF_TOOL	:= autoconf
+LIBRN_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-debug
 

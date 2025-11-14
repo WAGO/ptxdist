@@ -29,10 +29,13 @@ ETHERWAKE_LICENSE	:= GPL
 # Prepare
 # ----------------------------------------------------------------------------
 
-ETHERWAKE_PATH	:= PATH=$(CROSS_PATH)
-ETHERWAKE_ENV 	:= $(CROSS_ENV)
+ETHERWAKE_CONF_TOOL	:= NO
 
-ETHERWAKE_MAKEVARS := CC=$(CROSS_CC)
+# ----------------------------------------------------------------------------
+# Compile
+# ----------------------------------------------------------------------------
+
+ETHERWAKE_MAKE_OPT	:= CC=$(CROSS_CC)
 
 # ----------------------------------------------------------------------------
 # Target-Install

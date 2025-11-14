@@ -14,45 +14,47 @@ PACKAGES-$(PTXCONF_MODEMMANAGER) += modemmanager
 #
 # Paths and names
 #
-MODEMMANAGER_VERSION	:= 1.12.6
-MODEMMANAGER_MD5	:= 796bf7bfc156c4229cef1a9cb8c79f37
+MODEMMANAGER_VERSION	:= 1.22.0
+MODEMMANAGER_MD5	:= e967a452eb6f505a645df8c0582a17b7
 MODEMMANAGER		:= ModemManager-$(MODEMMANAGER_VERSION)
-MODEMMANAGER_SUFFIX	:= tar.xz
-MODEMMANAGER_URL	:= https://www.freedesktop.org/software/ModemManager/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
+MODEMMANAGER_SUFFIX	:= tar.bz2
+MODEMMANAGER_URL	:= https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/archive/$(MODEMMANAGER_VERSION)/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
 MODEMMANAGER_SOURCE	:= $(SRCDIR)/$(MODEMMANAGER).$(MODEMMANAGER_SUFFIX)
 MODEMMANAGER_DIR	:= $(BUILDDIR)/$(MODEMMANAGER)
-MODEMMANAGER_LICENSE	:= GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later
+MODEMMANAGER_LICENSE	:= GPL-2.0-or-later AND LGPL-2.1-or-later
+MODEMMANAGER_LICENSE_FILES := \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-#MODEMMANAGER_CONF_ENV	:= $(CROSS_ENV)
-
 #
-# autoconf
+# meson
 #
-MODEMMANAGER_CONF_TOOL	:= autoconf
+MODEMMANAGER_CONF_TOOL	:= meson
 MODEMMANAGER_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-gtk-doc \
-	--disable-gtk-doc-html \
-	--disable-gtk-doc-pdf \
-	--disable-nls \
-	--disable-rpath \
-	--disable-introspection \
-	--disable-vala \
-	--disable-more-warnings \
-	--with-gnu-ld \
-	--with-dbus-sys-dir=/usr/share/dbus-1/system.d \
-	--with-udev-base-dir=/usr/lib/udev \
-	--with-systemdsystemunitdir=/usr/lib/systemd/system \
-	--$(call ptx/wwo, PTXCONF_INITMETHOD_SYSTEMD)-systemd-suspend-resume \
-	--$(call ptx/wwo, PTXCONF_INITMETHOD_SYSTEMD)-systemd-journal \
-	--without-polkit \
-	--$(call ptx/wwo, PTXCONF_MODEMMANAGER_ALLOW_DBUS_AT_CMDS)-at-command-via-dbus \
-	--with-mbim \
-	--with-qmi
+	$(CROSS_MESON_USR) \
+	-Dudev=true \
+	-Dudevdir=/usr/lib/udev \
+	-Dtests=false \
+	-Ddbus_policy_dir=/usr/share/dbus-1/system.d \
+	-Dsystemdsystemunitdir=/usr/lib/systemd/system \
+	-Dsystemd_suspend_resume=$(call ptx/truefalse, PTXCONF_INITMETHOD_SYSTEMD) \
+	-Dpowerd_suspend_resume=false \
+	-Dsystemd_journal=$(call ptx/truefalse, PTXCONF_INITMETHOD_SYSTEMD) \
+	-Dpolkit=no \
+	-Dat_command_via_dbus=$(call ptx/truefalse, PTXCONF_MODEMMANAGER_ALLOW_DBUS_AT_CMDS) \
+	-Dmbim=true \
+	-Dqmi=true \
+	-Dqrtr=false \
+	-Dintrospection=false \
+	-Dvapi=false \
+	-Dgtk_doc=false \
+	-Dman=false \
+	-Dbash_completion=false \
+	-Dexamples=false
 
 # ----------------------------------------------------------------------------
 # Target-Install

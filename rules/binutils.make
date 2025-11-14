@@ -29,6 +29,7 @@ BINUTILS_DIR		:= $(BUILDDIR)/$(BINUTILS)
 
 BINUTILS_CONF_ENV := \
 	$(CROSS_ENV) \
+	enable_gprofng=no \
 	host_configargs='$(strip \
 		--enable-targets=$(PTXCONF_GNU_TARGET) \
 		--disable-nls \
@@ -38,13 +39,20 @@ BINUTILS_CONF_ENV := \
 #
 # autoconf
 #
-BINUTILS_AUTOCONF := \
+BINUTILS_CONF_TOOL := autoconf
+BINUTILS_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--target=$(PTXCONF_GNU_TARGET) \
+	--with-system-zlib \
 	--disable-werror
 
 BINUTILS_CFLAGS := \
 	-fPIC
+
+# overwrite install dir for libiberty when MULTIOSDIR evaluates to ../lib64
+BINUTILS_INSTALL_OPT := \
+	MAKE="make MULTIOSDIR=." \
+	install
 
 # ----------------------------------------------------------------------------
 # Target-Install

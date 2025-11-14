@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_KRB5) += krb5
 #
 # Paths and names
 #
-KRB5_VERSION	:= 1.15.2
-KRB5_MD5	:= b160f72161c730897dc7689f876b6e2a
+KRB5_VERSION	:= 1.20
+KRB5_MD5	:= e88657aca6e6b0528c11a78643498bd5
 KRB5		:= krb5-$(KRB5_VERSION)
 KRB5_SUFFIX	:= tar.gz
-KRB5_URL	:= https://web.mit.edu/kerberos/dist/krb5/1.15/$(KRB5).$(KRB5_SUFFIX)
+KRB5_URL	:= https://web.mit.edu/kerberos/dist/krb5/$(KRB5_VERSION)/$(KRB5).$(KRB5_SUFFIX)
 KRB5_SOURCE	:= $(SRCDIR)/$(KRB5).$(KRB5_SUFFIX)
 KRB5_DIR	:= $(BUILDDIR)/$(KRB5)
 KRB5_LICENSE	:= MIT
@@ -31,7 +31,6 @@ KRB5_SUBDIR	:= src
 
 # keyutils is only useful for the client case
 
-KRB5_PATH	:= PATH=$(CROSS_PATH)
 KRB5_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	krb5_cv_attr_constructor_destructor=yes,yes \
@@ -52,7 +51,9 @@ KRB5_CONF_OPT	:= \
 	--enable-thread-support \
 	--disable-rpath \
 	--disable-athena \
+	--disable-nls \
 	--disable-audit-plugin \
+	--$(call ptx/endis, PTXCONF_ARCH_X86_64)-aesni \
 	--enable-kdc-lookaside-cache \
 	--disable-asan \
 	--enable-pkinit \
@@ -63,12 +64,12 @@ KRB5_CONF_OPT	:= \
 	--without-netlib \
 	--without-hesiod \
 	--without-ldap \
-	--without-tcl \
 	--without-vague-errors \
 	--with-crypto-impl=openssl \
-	--with-prng-alg=fortuna \
-	--with-pkinit-crypto-impl=openssl \
 	--with-tls-impl=openssl \
+	--$(call ptx/wwo,PTXCONF_KRB5_CLIENT_TOOLS)-keyutils \
+	--with-spake-openssl \
+	--without-lmdb \
 	--without-libedit \
 	--without-readline \
 	--without-system-verto
@@ -87,15 +88,15 @@ $(STATEDIR)/krb5.targetinstall:
 	@$(call install_fixup, krb5,DESCRIPTION,missing)
 
 	@$(call install_lib, krb5, 0, 0, 0644, libgssapi_krb5)
-	@$(call install_lib, krb5, 0, 0, 0644, libgssrpc)
 	@$(call install_lib, krb5, 0, 0, 0644, libk5crypto)
-	@$(call install_lib, krb5, 0, 0, 0644, libkdb5)
 	@$(call install_lib, krb5, 0, 0, 0644, libkrb5)
 	@$(call install_lib, krb5, 0, 0, 0644, libkrb5support)
 
 ifdef PTXCONF_KRB5_ADMIN_LIBS
+	@$(call install_lib, krb5, 0, 0, 0644, libgssrpc)
 	@$(call install_lib, krb5, 0, 0, 0644, libkadm5clnt_mit)
 	@$(call install_lib, krb5, 0, 0, 0644, libkadm5srv_mit)
+	@$(call install_lib, krb5, 0, 0, 0644, libkdb5)
 endif
 
 ifdef PTXCONF_KRB5_CLIENT_TOOLS

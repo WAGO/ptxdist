@@ -20,7 +20,7 @@ CKERMIT_VERSION		:= 302
 CKERMIT_MD5		:= eac4dbf18b45775e4cdee5a7c74762b0
 CKERMIT			:= cku$(CKERMIT_VERSION)
 CKERMIT_SUFFIX		:= tar.gz
-CKERMIT_URL		:= ftp://ftp.kermitproject.org/kermit/archives/$(CKERMIT).$(CKERMIT_SUFFIX)
+CKERMIT_URL		:= https://www.kermitproject.org/ftp/kermit/archives/$(CKERMIT).$(CKERMIT_SUFFIX)
 CKERMIT_SOURCE		:= $(SRCDIR)/$(CKERMIT).$(CKERMIT_SUFFIX)
 CKERMIT_DIR		:= $(BUILDDIR)/$(CKERMIT)
 CKERMIT_STRIP_LEVEL	:= 0
@@ -35,16 +35,24 @@ CKERMIT_CONF_TOOL	:= NO
 # Compile
 # ----------------------------------------------------------------------------
 
-CKERMIT_MAKEVARS := \
+CKERMIT_MAKE_OPT := \
 	xermit \
 	KTARGET=linuxa  \
 	prefix=/usr \
 	CC=$(CROSS_CC) \
 	CC2=$(CROSS_CC) \
-	WART=$(PTXDIST_SYSROOT_HOST)/bin/wart \
-	CFLAGS='$(CROSS_CPPFLAGS) $(CROSS_CFLAGS) -O2 -g -DLINUX -DFNFLOAT -DCK_POSIX_SIG -DCK_NEWTERM -DTCPSOCKET -DLINUXFSSTND -DNOCOTFMC -DPOSIX -DUSE_STRERROR -DCK_NCURSES -DHAVE_PTMX' \
+	WART=$(PTXDIST_SYSROOT_HOST)/usr/bin/wart \
+	CFLAGS='$(CROSS_CPPFLAGS) $(CROSS_CFLAGS) -O2 -g -DLINUX -DFNFLOAT -DCK_POSIX_SIG -DCK_NEWTERM -DTCPSOCKET -DLINUXFSSTND -DNOCOTFMC -DPOSIX -DUSE_STRERROR -DCK_NCURSES -DHAVE_PTMX -DHAVE_OPENPTY -DMAINTYPE=int' \
 	LNKFLAGS='$(CROSS_LDFLAGS)' \
 	LIBS='-lncurses -lutil -lresolv -lcrypt -lm'
+
+# ----------------------------------------------------------------------------
+# Install
+# ----------------------------------------------------------------------------
+
+CKERMIT_INSTALL_OPT := \
+	prefix=/usr \
+	install
 
 # ----------------------------------------------------------------------------
 # Target-Install

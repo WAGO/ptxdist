@@ -14,18 +14,33 @@ PACKAGES-$(PTXCONF_GNUTLS) += gnutls
 #
 # Paths and names
 #
-GNUTLS_VERSION	:= 3.6.14
-GNUTLS_MD5	:= bf70632d420e421baff482247f01dbfe
-GNUTLS		:= gnutls-$(GNUTLS_VERSION)
-GNUTLS_SUFFIX	:= tar.xz
-GNUTLS_URL	:= https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/$(GNUTLS).$(GNUTLS_SUFFIX)
-GNUTLS_SOURCE	:= $(SRCDIR)/$(GNUTLS).$(GNUTLS_SUFFIX)
-GNUTLS_DIR	:= $(BUILDDIR)/$(GNUTLS)
-GNUTLS_LICENSE	:= LGPL-3.0-or-later
+GNUTLS_VERSION		:= 3.7.7
+GNUTLS_MD5		:= 39e5c71af7f444bdf175094a787843a2
+GNUTLS			:= gnutls-$(GNUTLS_VERSION)
+GNUTLS_SUFFIX		:= tar.xz
+GNUTLS_URL		:= https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7/$(GNUTLS).$(GNUTLS_SUFFIX)
+GNUTLS_SOURCE		:= $(SRCDIR)/$(GNUTLS).$(GNUTLS_SUFFIX)
+GNUTLS_DIR		:= $(BUILDDIR)/$(GNUTLS)
+GNUTLS_LICENSE		:= LGPL-3.0-or-later
+GNUTLS_LICENSE_FILES	:= \
+	file://doc/COPYING.LESSER;md5=a6f89e2100d9b6cdffcea4f398e37343 \
+	file://LICENSE;md5=71391c8e0c1cfe68077e7fce3b586283
+
+ifdef PTXCONF_GNUTLS_OPENSSL
+GNUTLS_LICENSE 		+= AND GPL-3.0-or-later
+GNUTLS_LICENSE_FILES	+= \
+	file://extra/gnutls_openssl.c;startline=1;endline=19;md5=b8b99cb92b0fbb522912f20e3359913c \
+	file://doc/COPYING;md5=c678957b0c8e964aa6c70fd77641a71e
+endif
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+ifdef PTXCONF_KERNEL_HEADER
+GNUTLS_CPPFLAGS	:= \
+	-isystem $(KERNEL_HEADERS_INCLUDE_DIR)
+endif
 
 #
 # autoconf
@@ -41,6 +56,7 @@ GNUTLS_CONF_OPT		:= \
 	--disable-manpages \
 	--disable-tools \
 	--enable-cxx \
+	--disable-dyn-ncrypt \
 	--enable-hardware-acceleration \
 	--enable-tls13-interop \
 	--enable-padlock \
@@ -58,6 +74,8 @@ GNUTLS_CONF_OPT		:= \
 	--enable-ecdhe \
 	--enable-gost \
 	--$(call ptx/endis, PTXCONF_GNUTLS_CRYPTODEV)-cryptodev \
+	--$(call ptx/endis, PTXCONF_GNUTLS_AFALG)-afalg \
+	--$(call ptx/endis, PTXCONF_GNUTLS_KTLS)-ktls \
 	--enable-ocsp \
 	--$(call ptx/endis, PTXCONF_GNUTLS_OPENSSL)-openssl-compatibility \
 	--disable-tests \
@@ -76,11 +94,9 @@ GNUTLS_CONF_OPT		:= \
 	--disable-static \
 	--enable-shared \
 	--disable-fips140-mode \
+	--disable-strict-x509 \
 	--enable-non-suiteb-curves \
 	--disable-libdane \
-	--enable-local-libopts \
-	--disable-libopts-install \
-	--enable-optional-args \
 	--disable-guile \
 	--with-nettle-mini \
 	--without-included-libtasn1 \
@@ -88,9 +104,12 @@ GNUTLS_CONF_OPT		:= \
 	--without-fips140-key \
 	--without-idn \
 	--without-p11-kit \
+	--without-tpm2 \
 	--without-tpm \
 	--without-trousers-lib \
-	--without-libregex \
+	--without-zlib \
+	--without-brotli \
+	--without-zstd \
 	--with-default-trust-store-file=/etc/ssl/certs/ca-certificates.crt
 
 # ----------------------------------------------------------------------------

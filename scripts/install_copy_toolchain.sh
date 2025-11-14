@@ -46,19 +46,22 @@ ptxd_split_lib_prefix_sysroot_eval() {
     lib_dir="${lib_path%/${lib}}"		# abs path to that lib
 
     # try to identify sysroot part of that path
-    for prefix in {/usr,}/lib{64,32,}{/tls,/gconv,} ""; do
+    for prefix in {/usr,}/lib{64,32,}{/lp64d,}{/tls,/gconv,} ""; do
 	tmp="${lib_dir%${prefix}}"
 	if test "${lib_dir}" != "${tmp}"; then
 	    break
 	fi
     done
     sysroot="${lib_dir%${prefix}}"
+    orig_prefix="${prefix}"
     tmp="${prefix#/usr}"
     if [ "${tmp}" == "${prefix}" ]; then
 	prefix="/usr${prefix}"
     fi
+    prefix="${prefix/lib64\/lp64d/lib}"
+    prefix="${prefix/lib64/lib}"
 
-    echo "${pre}sysroot=\"${sysroot}\" ${pre}prefix=\"${prefix}\""
+    echo "${pre}sysroot=\"${sysroot}\" ${pre}prefix=\"${prefix}\" ${pre}orig_prefix=\"${orig_prefix}\""
 }
 
 
@@ -80,7 +83,7 @@ ptxd_split_lib_prefix_sysroot_eval() {
 #   libs mentioned there
 #
 ptxd_install_toolchain_lib() {
-    local lib_path lib lib_dir sysroot prefix script_lib tmp dir v_full lib_v_major
+    local lib_path lib lib_dir sysroot prefix orig_prefix script_lib tmp dir v_full lib_v_major
     local packet dest strip lnk lnk_path lnk_prefix lnk_sysroot perm
 
     eval "${@}"
@@ -94,6 +97,11 @@ ptxd_install_toolchain_lib() {
 	# if the user has given us a $dest use it
 	prefix="${dest:-${prefix}}"
 
+	if [[ "${orig_prefix}" =~ ^/lib64 ]] && [ "${lib}" = "libc.so.6" ]; then
+	    local rel_lib="$(ptxd_abs2rel "$(dirname "${orig_prefix}")" /lib)"
+	    echo "ptxd_install_link \"${rel_lib}\" \"${orig_prefix}\"" >> "${STATEDIR}/${packet}.cmds"
+	    echo "ptxd_install_link \"${rel_lib}\" \"/usr${orig_prefix}\"" >> "${STATEDIR}/${packet}.cmds"
+	fi
 	# do sth. with that found lib, action depends on file type (link or regular)
 	if test -h "${lib_path}"; then		# link
 	    echo "link - ${lib_path}"
@@ -116,11 +124,16 @@ ptxd_install_toolchain_lib() {
 	    eval $(ptxd_split_lib_prefix_sysroot_eval "${lnk_path}" lnk)
 	    lnk_prefix="${dest:-${lnk_prefix}}"
 
-	    if test -n "${prefix}"; then
-		lnk_prefix="$(ptxd_abs2rel "${prefix}" "${lnk_prefix}")"
-		lnk_prefix="${lnk_prefix}${lnk_prefix:+/}"
-		# now remember that link for later
-		echo "ptxd_install_link \"${lnk_prefix}${lnk}\" \"${prefix}/${lib}\"" >> "${STATEDIR}/${packet}.cmds"
+	    # if the file name of the link target ist the same then skip creating
+	    # the link to avoid a cyclic symlink.
+	    # Happens with crosstool-ng with some libraries.
+	    if [ "${lib}" != "${lnk}" ]; then
+		if test -n "${prefix}"; then
+		    lnk_prefix="$(ptxd_abs2rel "${prefix}" "${lnk_prefix}")"
+		    lnk_prefix="${lnk_prefix}${lnk_prefix:+/}"
+		    # now remember that link for later
+		    echo "ptxd_install_link \"${lnk_prefix}${lnk}\" \"${prefix}/${lib}\"" >> "${STATEDIR}/${packet}.cmds"
+		fi
 	    fi
 
 	    lib_path="${lnk_path}"

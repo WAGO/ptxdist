@@ -19,7 +19,7 @@ GTK_ENGINES_VERSION	:= 2.91.1
 GTK_ENGINES_MD5		:= 290d2fdb66743066dab92db694dd7b99
 GTK_ENGINES		:= gtk-engines-$(GTK_ENGINES_VERSION)
 GTK_ENGINES_SUFFIX	:= tar.bz2
-GTK_ENGINES_URL		:= http://ftp.gnome.org/pub/GNOME/sources/gtk-engines/2.91/$(GTK_ENGINES).$(GTK_ENGINES_SUFFIX)
+GTK_ENGINES_URL		:= $(call ptx/mirror, GNOME, gtk-engines/$(basename $(GTK_ENGINES_VERSION))/$(GTK_ENGINES).$(GTK_ENGINES_SUFFIX))
 GTK_ENGINES_SOURCE	:= $(SRCDIR)/$(GTK_ENGINES).$(GTK_ENGINES_SUFFIX)
 GTK_ENGINES_DIR		:= $(BUILDDIR)/$(GTK_ENGINES)
 
@@ -31,7 +31,8 @@ GTK_ENGINES_DIR		:= $(BUILDDIR)/$(GTK_ENGINES)
 #
 # autoconf
 #
-GTK_ENGINES_AUTOCONF := \
+GTK_ENGINES_CONF_TOOL := autoconf
+GTK_ENGINES_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-schemas
 
@@ -60,7 +61,7 @@ $(STATEDIR)/gtk-engines.targetinstall:
 
 	@$(foreach engine,$(GTK_ENGINES_ENGINES), \
 		$(call install_lib, gtk-engines, 0, 0, 0644, \
-			gtk-3.0/3.0.0/engines/lib$(engine));)
+			gtk-3.0/3.0.0/engines/lib$(engine))$(ptx/nl))
 
 	@$(call install_tree, gtk-engines, 0, 0, -, \
 		/usr/share/themes)

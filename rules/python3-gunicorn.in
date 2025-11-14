@@ -1,0 +1,13 @@
+## SECTION=python3
+
+config PYTHON3_GUNICORN
+	bool
+	select PYTHON3
+	select HOST_PYTHON3_PYBUILD
+	select HOST_PYTHON3_WHEEL
+	prompt "gunicorn"
+	help
+	  Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX.
+	  It's a pre-fork worker model. The Gunicorn server is broadly
+	  compatible with various web frameworks, simply implemented,
+	  light on server resources, and fairly speedy.

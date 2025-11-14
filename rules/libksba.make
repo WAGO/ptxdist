@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBKSBA) += libksba
 #
 # Paths and names
 #
-LIBKSBA_VERSION	:= 1.3.5
-LIBKSBA_MD5	:= 8302a3e263a7c630aa7dea7d341f07a2
+LIBKSBA_VERSION	:= 1.6.7
+LIBKSBA_MD5	:= 7e736de467b67c7ea88de746c31ea12f
 LIBKSBA		:= libksba-$(LIBKSBA_VERSION)
 LIBKSBA_SUFFIX	:= tar.bz2
-LIBKSBA_URL	:= ftp://ftp.gnupg.org/gcrypt/libksba/$(LIBKSBA).$(LIBKSBA_SUFFIX)
+LIBKSBA_URL	:= https://www.gnupg.org/ftp/gcrypt/libksba/$(LIBKSBA).$(LIBKSBA_SUFFIX)
 LIBKSBA_SOURCE	:= $(SRCDIR)/$(LIBKSBA).$(LIBKSBA_SUFFIX)
 LIBKSBA_DIR	:= $(BUILDDIR)/$(LIBKSBA)
 LIBKSBA_LICENSE	:= GPL-2.0-only AND GPL-3.0-only AND LGPL-3.0-only
@@ -34,9 +34,11 @@ LIBKSBA_LICENSE_FILES := \
 #
 # autoconf
 #
-LIBKSBA_AUTOCONF := \
+LIBKSBA_CONF_TOOL := autoconf
+LIBKSBA_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-build-timestamp="$(PTXDIST_BUILD_TIMESTAMP)" \
+	--disable-doc \
 	--enable-optimization
 
 # ----------------------------------------------------------------------------

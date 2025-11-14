@@ -187,6 +187,7 @@ ptxd_make_log() {(
 	export PTXDIST_FD_STDOUT
 	export PTXDIST_FD_STDERR
 	export PTXDIST_FD_LOGFILE=9
+	export PTXDIST_LOGFILE_PATH="/proc/${BASHPID}/fd/${PTXDIST_FD_LOGFILE}"
 
 	if [ -z "${PTXDIST_QUIET}" ]; then
 		# stdout and logfile
@@ -315,6 +316,10 @@ ptxd_dumpstack() {
 ptxd_replace_link() {
 	test -e "${2}" -a ! -L "${2}" && ptxd_bailout "'${2}' is not a link"
 
+	if [ "${1}" -ef "${2}" ]; then
+	    return
+	fi
+
 	ln -sfT "${1}" "${2}.tmp"
 	mv -T "${2}.tmp" "${2}"
 }
@@ -395,13 +400,15 @@ export -f ptxd_get_alternative
 # array "ptxd_reply" containing the found files/dirs
 #
 ptxd_get_path() {
+    local file
     [ -n "${1}" ] || return
 
-    local orig_IFS="${IFS}"
-    IFS="
-"
-    ptxd_reply=( $(command ls -f -d "${@}" 2>/dev/null) )
-    IFS="${orig_IFS}"
+    ptxd_reply=()
+    for file in "${@}"; do
+	if [ -e "${file}" -o -h "${file}" ]; then
+	    ptxd_reply[${#ptxd_reply[*]}]="${file}"
+	fi
+    done
 
     [ ${#ptxd_reply[@]} -ne 0 ]
 }

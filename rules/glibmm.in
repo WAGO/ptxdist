@@ -2,10 +2,9 @@
 
 config GLIBMM
 	tristate
+	select HOST_MESON
 	select GLIB
 	select LIBSIGCPP
-	select GCCLIBS_CXX
 	prompt "glibmm"
 	help
-	  glibmm is the C++ interface to the glib library.
-
+	  C++ wrapper for glib

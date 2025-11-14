@@ -18,7 +18,7 @@ LIBID3TAG_VERSION	:= 0.15.1b
 LIBID3TAG_MD5		:= e5808ad997ba32c498803822078748c3
 LIBID3TAG		:= libid3tag-$(LIBID3TAG_VERSION)
 LIBID3TAG_SUFFIX	:= tar.gz
-LIBID3TAG_URL		:= ftp://ftp.mars.org/pub/mpeg/$(LIBID3TAG).$(LIBID3TAG_SUFFIX)
+LIBID3TAG_URL		:= $(call ptx/mirror, SF, mad/libid3tag/$(LIBID3TAG_VERSION)/$(LIBID3TAG).$(LIBID3TAG_SUFFIX))
 LIBID3TAG_SOURCE	:= $(SRCDIR)/$(LIBID3TAG).$(LIBID3TAG_SUFFIX)
 LIBID3TAG_DIR		:= $(BUILDDIR)/$(LIBID3TAG)
 LIBID3TAG_LICENSE	:= GPL-2.0-or-later
@@ -30,13 +30,11 @@ LIBID3TAG_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBID3TAG_PATH	:= PATH=$(CROSS_PATH)
-LIBID3TAG_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBID3TAG_AUTOCONF := \
+LIBID3TAG_CONF_TOOL	:= autoconf
+LIBID3TAG_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-debugging \
 	--disable-profiling

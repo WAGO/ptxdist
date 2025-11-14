@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_ARCH_X86)-$(PTXCONF_INTEL_GMMLIB) += intel-gmmlib
 #
 # Paths and names
 #
-INTEL_GMMLIB_VERSION	:= 20.2.2
-INTEL_GMMLIB_MD5	:= 74e88b8439d94efda983fbc2c8d6ac1c
+INTEL_GMMLIB_VERSION	:= 22.4.1
+INTEL_GMMLIB_MD5	:= 37684beaa140a0926967ebd56193cc13
 INTEL_GMMLIB		:= intel-gmmlib-$(INTEL_GMMLIB_VERSION)
 INTEL_GMMLIB_SUFFIX	:= tar.gz
 INTEL_GMMLIB_URL	:= https://github.com/intel/gmmlib/archive/$(INTEL_GMMLIB).$(INTEL_GMMLIB_SUFFIX)
 INTEL_GMMLIB_SOURCE	:= $(SRCDIR)/$(INTEL_GMMLIB).$(INTEL_GMMLIB_SUFFIX)
 INTEL_GMMLIB_DIR	:= $(BUILDDIR)/$(INTEL_GMMLIB)
-INTEL_GMMLIB_LICENSE	:= MIT
+INTEL_GMMLIB_LICENSE	:= MIT AND BSD-3-Clause
+INTEL_GMMLIB_LICENSE_FILES := \
+	file://LICENSE.md;md5=465fe90caea3edd6a2cecb3f0c28a654
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -48,7 +50,7 @@ $(STATEDIR)/intel-gmmlib.targetinstall:
 	@$(call install_fixup, intel-gmmlib,AUTHOR,"Michael Olbrich <m.olbrich@pengutronix.de>")
 	@$(call install_fixup, intel-gmmlib,DESCRIPTION,missing)
 
-	@$(call install_lib, intel-gmmlib, 0, 0, 644, libigdgmm)
+	@$(call install_lib, intel-gmmlib, 0, 0, 0644, libigdgmm)
 
 	@$(call install_finish, intel-gmmlib)
 

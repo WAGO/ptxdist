@@ -21,12 +21,9 @@ HOST_XORG_APP_MKFONTSCALE_DIR	= $(HOST_BUILDDIR)/$(XORG_APP_MKFONTSCALE)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_XORG_APP_MKFONTSCALE_PATH	:= PATH=$(HOST_PATH)
-HOST_XORG_APP_MKFONTSCALE_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_XORG_APP_MKFONTSCALE_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_XORG_APP_MKFONTSCALE_CONF_TOOL := autoconf
 
 # vim: syntax=make

@@ -24,8 +24,16 @@ KERNEL_@PACKAGE@_SOURCE		:= $(SRCDIR)/$(KERNEL_@PACKAGE@_PATCHES).$(KERNEL_@PACK
 KERNEL_@PACKAGE@_DIR		:= $(BUILDDIR)/$(KERNEL_@PACKAGE@)
 KERNEL_@PACKAGE@_BUILD_DIR	:= $(KERNEL_@PACKAGE@_DIR)-build
 KERNEL_@PACKAGE@_CONFIG		:= $(call ptx/in-platformconfigdir, kernelconfig-@package@)
+KERNEL_@PACKAGE@_DTS_PATH	:= ${PTXDIST_PLATFORMCONFIG_SUBDIR}/dts:${KERNEL_@PACKAGE@_DIR}/arch/${GENERIC_KERNEL_ARCH}/boot/dts
+KERNEL_@PACKAGE@_DTS		:= @dts@
+KERNEL_@PACKAGE@_DTB_FILES	:= $(addsuffix .dtb,$(basename $(notdir $(KERNEL_@PACKAGE@_DTS))))
 KERNEL_@PACKAGE@_LICENSE	:= GPL-2.0-only
+KERNEL_@PACKAGE@_LICENSE_FILES	:=
+KERNEL_@PACKAGE@_DEVPKG		:= NO
 KERNEL_@PACKAGE@_BUILD_OOT	:= KEEP
+
+# track changes to devices-trees in the BSP
+$(call world/dts-cfghash-file, KERNEL_@PACKAGE@)
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -39,13 +47,19 @@ KERNEL_@PACKAGE@_PATH		:= PATH=$(CROSS_PATH)
 KERNEL_@PACKAGE@_SHARED_OPT	:= \
 	-C $(KERNEL_@PACKAGE@_DIR) \
 	O=$(KERNEL_@PACKAGE@_BUILD_DIR) \
+	PAHOLE=false \
 	$(call kernel-opts, KERNEL_@PACKAGE@)
 
 # no gcc plugins; avoid config changes depending on the host compiler
 KERNEL_@PACKAGE@_SHARED_OPT	+= \
-	HOSTCXX="$(HOSTXX) -DGENERATOR_FILE" \
+	HOSTCXX="$(HOSTCXX) -DGENERATOR_FILE" \
 	HOSTCC="$(HOSTCC) -DGENERATOR_FILE"
+KERNEL_@PACKAGE@_CONF_ENV	:= \
+	PTXDIST_NO_GCC_PLUGINS=1
+KERNEL_@PACKAGE@_MAKE_ENV	:= \
+	PTXDIST_NO_GCC_PLUGINS=1
 
+KERNEL_@PACKAGE@_CONF_TOOL	:= kconfig
 KERNEL_@PACKAGE@_CONF_OPT	:= \
 	$(KERNEL_@PACKAGE@_SHARED_OPT)
 
@@ -71,7 +85,7 @@ endif
 # Compile
 # ----------------------------------------------------------------------------
 
-KERNEL_@PACKAGE@_MAKE_OPT := \
+KERNEL_@PACKAGE@_MAKE_OPT	:= \
 	$(KERNEL_@PACKAGE@_SHARED_OPT) \
 	@image@ modules
 
@@ -79,20 +93,36 @@ KERNEL_@PACKAGE@_MAKE_OPT := \
 # Install
 # ----------------------------------------------------------------------------
 
-KERNEL_@PACKAGE@_INSTALL_OPT := \
+KERNEL_@PACKAGE@_INSTALL_OPT	:= \
 	$(call kernel-opts, KERNEL_@PACKAGE@) \
 	modules_install
+
+$(STATEDIR)/kernel-@package@.install:
+	@$(call targetinfo)
+	@$(call world/install, KERNEL_@PACKAGE@)
+	@$(call world/dtb, KERNEL_@PACKAGE@)
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install
 # ----------------------------------------------------------------------------
 
+ifneq ($(KERNEL_@PACKAGE@_DTB_FILES),)
+$(addprefix $(IMAGEDIR)/,$(KERNEL_@PACKAGE@_DTB_FILES)): $(STATEDIR)/kernel-@package@.targetinstall
+endif
+
 $(STATEDIR)/kernel-@package@.targetinstall:
 	@$(call targetinfo)
 
 	@$(foreach image, $(KERNEL_@PACKAGE@_IMAGES), \
-		install -v -m 644 $(image) \
-			$(IMAGEDIR)/$(notdir $(image))-@package@$(ptx/nl))
+		$(call ptx/image-install, KERNEL_@PACKAGE@, \
+			$(image), \
+			$(notdir $(image))-@package@$(ptx/nl)))
+
+	@$(foreach dtb, $(KERNEL_@PACKAGE@_DTB_FILES), \
+		$(call ptx/image-install, KERNEL_@PACKAGE@, \
+			$(KERNEL_@PACKAGE@_PKGDIR)/boot/$(dtb), \
+			$(dtb)$(ptx/nl)))
 
 	@$(call install_init,  kernel-@package@)
 	@$(call install_fixup, kernel-@package@, PRIORITY,optional)
@@ -103,7 +133,11 @@ $(STATEDIR)/kernel-@package@.targetinstall:
 	@$(call install_copy, kernel-@package@, 0, 0, 0644, \
 		$(IMAGEDIR)/@image@-@package@, /boot/@image@-@package@, n)
 
-	@$(call install_glob, kernel-@package@, 0, 0, -, /lib/modules, *.ko,, k)
+	@$(foreach dtb, $(KERNEL_@PACKAGE@_DTB_FILES), \
+		$(call install_copy, kernel-@package@, 0, 0, 0644, -, \
+			/boot/$(dtb), n)$(ptx/nl))
+
+	@$(call install_glob, kernel-@package@, 0, 0, -, /lib/modules, *.ko,, n)
 	@$(call install_glob, kernel-@package@, 0, 0, -, /lib/modules,, *.ko */build */source, n)
 
 	@$(call install_finish, kernel-@package@)
@@ -114,7 +148,7 @@ $(STATEDIR)/kernel-@package@.targetinstall:
 # oldconfig / menuconfig
 # ----------------------------------------------------------------------------
 
-kernel-@package@_oldconfig kernel-@package@_menuconfig kernel-@package@_nconfig: $(STATEDIR)/kernel-@package@.extract
+$(call ptx/kconfig-targets, kernel-@package@): $(STATEDIR)/kernel-@package@.extract
 	@$(call world/kconfig, KERNEL_@PACKAGE@, $(subst kernel-@package@_,,$@))
 
 # vim: syntax=make

@@ -13,8 +13,8 @@
 #
 PACKAGES-$(PTXCONF_GDBSERVER) += gdbserver
 
-GDBSERVER_VERSION	 = $(SHARED_GDB_VERSION)
-GDBSERVER_MD5		 = $(SHARED_GDB_MD5)
+GDBSERVER_VERSION	 = $(call ptx/config-version,PTXCONF_GDBSERVER,SHARED_GDB)
+GDBSERVER_MD5		 = $(call ptx/config-md5,PTXCONF_GDBSERVER,SHARED_GDB)
 GDBSERVER		:= gdb-$(GDBSERVER_VERSION)
 GDBSERVER_SUFFIX	:= tar.xz
 GDBSERVER_SOURCE	:= $(SRCDIR)/$(GDBSERVER).$(GDBSERVER_SUFFIX)
@@ -29,7 +29,7 @@ GDBSERVER_LICENSE_FILES	:= \
 
 GDBSERVER_URL := \
 	$(call ptx/mirror, GNU, gdb/$(GDBSERVER).$(GDBSERVER_SUFFIX)) \
-	ftp://sourceware.org/pub/gdb/snapshots/current/$(GDBSERVER).$(GDBSERVER_SUFFIX)
+	https://sourceware.org/pub/gdb/snapshots/current/$(GDBSERVER).$(GDBSERVER_SUFFIX)
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,10 +40,12 @@ GDBSERVER_WRAPPER_BLACKLIST := \
 	TARGET_HARDEN_PIE
 endif
 
-GDBSERVER_ENV := $(GDB_ENV)
+GDBSERVER_CONF_ENV := \
+	$(GDB_ENV) \
+	enable_gdb=no
 
 ifndef PTXCONF_GDBSERVER_SHARED
-GDBSERVER_ENV +=  LDFLAGS=-static
+GDBSERVER_CONF_ENV +=  LDFLAGS=-static
 endif
 
 GDBSERVER_CONF_TOOL := autoconf
@@ -52,7 +54,14 @@ GDBSERVER_CONF_OPT  := \
 	--disable-werror
 
 GDBSERVER_BUILD_OOT := YES
+
+ifeq ($(filter 1%,$(GDBSERVER_VERSION)),)
+# version < 10
 GDBSERVER_SUBDIR := gdb/gdbserver
+else
+GDBSERVER_MAKE_OPT := all-gdbserver
+GDBSERVER_INSTALL_OPT := install-gdbserver
+endif
 
 # ----------------------------------------------------------------------------
 # Target-Install

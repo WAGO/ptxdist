@@ -6,7 +6,6 @@ menuconfig COREUTILS
 	select LIBC_M if COREUTILS_SORT
 	select LIBC_RT
 	select GCCLIBS_GCC_S
-	select LIBSELINUX if GLOBAL_SELINUX
 	help
 	  This package contains the essential basic system utilities.
 
@@ -303,6 +302,10 @@ comment "busybox' mknod is selected!"
 config COREUTILS_TSORT
 	bool
 	prompt "tsort"
+	depends on !BUSYBOX_TSORT || ALLYES
+
+comment "busybox' tsort is selected!"
+	depends on BUSYBOX_TSORT
 
 config COREUTILS_MKTEMP
 	bool

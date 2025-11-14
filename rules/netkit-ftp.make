@@ -19,9 +19,7 @@ NETKIT_FTP_VERSION	:= 0.17
 NETKIT_FTP_MD5		:= 94441610c9b86ef45c4c6ec609444060
 NETKIT_FTP		:= netkit-ftp-$(NETKIT_FTP_VERSION)
 NETKIT_FTP_SUFFIX	:= tar.gz
-NETKIT_FTP_URL		:= \
-	ftp://ftp.uk.linux.org/pub/linux/Networking/netkit/$(NETKIT_FTP).$(NETKIT_FTP_SUFFIX) \
-	http://www.ibiblio.org/pub/Linux/system/network/netkit/$(NETKIT_FTP).$(NETKIT_FTP_SUFFIX)
+NETKIT_FTP_URL		:= http://www.ibiblio.org/pub/Linux/system/network/netkit/$(NETKIT_FTP).$(NETKIT_FTP_SUFFIX)
 NETKIT_FTP_SOURCE	:= $(SRCDIR)/$(NETKIT_FTP).$(NETKIT_FTP_SUFFIX)
 NETKIT_FTP_DIR		:= $(BUILDDIR)/$(NETKIT_FTP)
 NETKIT_FTP_LICENSE	:= BSD
@@ -31,12 +29,11 @@ NETKIT_FTP_LICENSE	:= BSD
 # Prepare
 # ----------------------------------------------------------------------------
 
-NETKIT_FTP_PATH	:= PATH=$(CROSS_PATH)
-
 #
 # autoconf
 #
-NETKIT_FTP_AUTOCONF := $(CROSS_AUTOCONF_USR)
+NETKIT_FTP_CONF_TOOL	:= autoconf
+NETKIT_FTP_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 $(STATEDIR)/netkit-ftp.prepare:
 	@$(call targetinfo)

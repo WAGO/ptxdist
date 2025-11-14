@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_JIMTCL) += jimtcl
 #
 # Paths and names
 #
-JIMTCL_VERSION	:= 0.78
-JIMTCL_MD5	:= bde9021d78a77fe28e1bbc423142ab23
+JIMTCL_VERSION	:= 0.83
+JIMTCL_MD5	:= d71bbf22ce74b5e8d90962990be3af43
 JIMTCL		:= jimtcl-$(JIMTCL_VERSION)
-JIMTCL_SUFFIX	:= tar.xz
-JIMTCL_URL	:= http://repo.or.cz/jimtcl.git;tag=$(JIMTCL_VERSION)
+JIMTCL_SUFFIX	:= tar.gz
+JIMTCL_URL	:= https://github.com/msteveb/jimtcl/archive/refs/tags/$(JIMTCL_VERSION).$(JIMTCL_SUFFIX)
 JIMTCL_SOURCE	:= $(SRCDIR)/$(JIMTCL).$(JIMTCL_SUFFIX)
 JIMTCL_DIR	:= $(BUILDDIR)/$(JIMTCL)
 JIMTCL_LICENSE	:= BSD-2-Clause
@@ -36,15 +36,15 @@ JIMTCL_CONF_TOOL	:= autoconf
 JIMTCL_CONF_ENV		:= \
 	$(CROSS_ENV) \
 	CCACHE=none \
-	autosetup_tclsh=$(PTXDIST_SYSROOT_HOST)/bin/jimsh
+	autosetup_tclsh=$(PTXDIST_SYSROOT_HOST)/usr/bin/jimsh
 JIMTCL_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
-	$(call ptx/ifdef, PTXCONF_JIMTCL_UTF8,--utf8,) \
+	$(call ptx/ifdef, PTXCONF_JIMTCL_UTF8,,--disable-utf8) \
 	$(call ptx/ifdef, PTXCONF_JIMTCL_LINEEDIT,,--disable-lineedit) \
 	$(call ptx/ifdef, PTXCONF_JIMTCL_REFERENCES,,--disable-references) \
-	$(call ptx/ifdef, PTXCONF_JIMTCL_MATH,--math,) \
-	$(call ptx/ifdef, PTXCONF_JIMTCL_SSL,--ssl,) \
-	$(call ptx/ifdef, PTXCONF_GLOBAL_IPV6,--ipv6,) \
+	$(call ptx/ifdef, PTXCONF_JIMTCL_MATH,,--disable-math) \
+	$(call ptx/ifdef, PTXCONF_JIMTCL_SSL,,--disable-ssl) \
+	$(call ptx/ifdef, PTXCONF_GLOBAL_IPV6,,--disable-ipv6) \
 	--shared \
 	$(call ptx/ifdef, PTXCONF_JIMTCL_POSIX_REGEX,--disable-jim-regexp,) \
 	--disable-docs \

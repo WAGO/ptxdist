@@ -28,29 +28,16 @@ PERLCROSS_VERSION	:= 5.18.2-cross-0.8.5
 PERLCROSS_MD5		:= 4744dbfd87bc1a694bc6f17ad4c2414f
 PERLCROSS_URL		:= https://raw.github.com/arsv/perl-cross/releases/perl-$(PERLCROSS_VERSION).tar.gz
 PERLCROSS_SOURCE	:= $(SRCDIR)/perlcross-$(PERLCROSS_VERSION).tar.gz
-$(PERLCROSS_SOURCE)	:= PERLCROSS
 PERLCROSS_DIR		:= $(PERL_DIR)
 
-PERL_SOURCES		:= $(PERL_SOURCE) $(PERLCROSS_SOURCE)
+PERL_PARTS		+= PERLCROSS
 
 # cross perl need the source dir
 PERL_DEVPKG		:= NO
 # use by perl modules
 PERL_SITELIB		:= /usr/lib/perl5/site_perl/$(PERL_VERSION)
 
-CROSS_PERL= $(PTXDIST_SYSROOT_CROSS)/bin/cross-perl
-
-# ----------------------------------------------------------------------------
-# Extract
-# ----------------------------------------------------------------------------
-
-$(STATEDIR)/perl.extract:
-	@$(call targetinfo)
-	@$(call clean, $(PERL_DIR))
-	@$(call extract, PERL)
-	@$(call extract, PERLCROSS)
-	@$(call patchin, PERL)
-	@$(call touch)
+CROSS_PERL= $(PTXDIST_SYSROOT_CROSS)/usr/bin/cross-perl
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -102,7 +89,6 @@ PERL_PROGRAMS := \
 	instmodsh \
 	json_pp \
 	libnetcfg \
-	perl \
 	perl$(PERL_VERSION) \
 	perlivp \
 	perlthanks \
@@ -130,9 +116,12 @@ $(STATEDIR)/perl.targetinstall:
 	@$(call install_fixup, perl,DESCRIPTION,missing)
 
 	@$(foreach prog, $(PERL_PROGRAMS), \
-		$(call install_copy, perl, 0, 0, 0755, -, /usr/bin/$(prog));)
+		$(call install_copy, perl, 0, 0, 0755, -, \
+			/usr/bin/$(prog))$(ptx/nl))
 
-	@$(call install_tree, perl, 0, 0, -, /usr/lib/perl5)
+	@$(call install_link, perl, perl$(PERL_VERSION), /usr/bin/perl)
+
+	@$(call install_glob, perl, 0, 0, -, /usr/lib/perl5,, */CORE)
 
 	@$(call install_finish, perl)
 

@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_MTDEV) += mtdev
 #
 # Paths and names
 #
-MTDEV_VERSION	:= 1.1.5
-MTDEV_MD5	:= 52c9610b6002f71d1642dc1a1cca5ec1
+MTDEV_VERSION	:= 1.1.7
+MTDEV_MD5	:= 483ed7fdf7c1e7b7375c05a62848cce7
 MTDEV		:= mtdev-$(MTDEV_VERSION)
 MTDEV_SUFFIX	:= tar.bz2
 MTDEV_URL	:= http://bitmath.org/code/mtdev/$(MTDEV).$(MTDEV_SUFFIX)
 MTDEV_SOURCE	:= $(SRCDIR)/$(MTDEV).$(MTDEV_SUFFIX)
 MTDEV_DIR	:= $(BUILDDIR)/$(MTDEV)
 MTDEV_LICENSE	:= MIT
+MTDEV_LICENSE_FILES := \
+	file://COPYING;md5=ea6bd0268bb0fcd6b27698616ceee5d6
 
 # ----------------------------------------------------------------------------
 # Prepare

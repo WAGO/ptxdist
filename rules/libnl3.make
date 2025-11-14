@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBNL3) += libnl3
 #
 # Paths and names
 #
-LIBNL3_VERSION	:= 3.5.0
-LIBNL3_MD5	:= 74ba57b1b1d6f9f92268aa8141d8e8e4
+LIBNL3_VERSION	:= 3.11.0
+LIBNL3_MD5	:= 0a5eb82b494c411931a47638cb0dba51
 LIBNL3		:= libnl-$(LIBNL3_VERSION)
 LIBNL3_RELEASE	:= libnl$(subst .,_,$(LIBNL3_VERSION))
 LIBNL3_SUFFIX	:= tar.gz
@@ -126,7 +126,8 @@ ifdef PTXCONF_LIBNL3_ENABLE_CLI
 endif
 
 	@$(foreach tool,$(LIBNL3_INSTALL_FILES-y), \
-		$(call install_copy, libnl3, 0, 0, 0755, -, /usr/bin/$(tool));)
+		$(call install_copy, libnl3, 0, 0, 0755, -, \
+			/usr/bin/$(tool))$(ptx/nl))
 
 	@$(call install_alternative, libnl3, 0, 0, 0644, /etc/libnl/classid)
 	@$(call install_alternative, libnl3, 0, 0, 0644, /etc/libnl/pktloc)

@@ -15,15 +15,15 @@ PACKAGES-$(PTXCONF_NTP) += ntp
 #
 # Paths and names
 #
-NTP_VERSION	:= 4.2.8p12
-NTP_MD5		:= 1522d66574bae14abb2622746dad2bdc
+NTP_VERSION	:= 4.2.8p18
+NTP_MD5		:= 516bdabd94ab7c824e9771390761a46c
 NTP		:= ntp-$(NTP_VERSION)
 NTP_SUFFIX	:= tar.gz
 NTP_URL		:= http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/$(NTP).$(NTP_SUFFIX)
 NTP_SOURCE	:= $(SRCDIR)/$(NTP).$(NTP_SUFFIX)
 NTP_DIR		:= $(BUILDDIR)/$(NTP)
 NTP_LICENSE	:= ntp
-NTP_LICENSE_FILES	:= file://COPYRIGHT;md5=e877a1d567a6a58996d2b66e3e387003
+NTP_LICENSE_FILES	:= file://COPYRIGHT;md5=2311915f6d5142b06395231b0ffeaf29
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -31,6 +31,8 @@ NTP_LICENSE_FILES	:= file://COPYRIGHT;md5=e877a1d567a6a58996d2b66e3e387003
 
 NTP_CONF_ENV	:= \
 	$(CROSS_ENV) \
+	ac_cv_search_MD5Init=no \
+	ol_cv_func_pthread_detach=yes \
 	libopts_cv_test_dev_zero=yes \
 	ntp_cv_vsnprintf_percent_m=yes
 
@@ -59,7 +61,6 @@ NTP_CONF_OPT	:= \
 	--enable-linuxcaps \
 	--disable-solarisprivs \
 	--disable-trustedbsd-mac \
-	--without-arlib \
 	--without-net-snmp-config \
 	--disable-libseccomp \
 	--disable-debug-timing \
@@ -120,7 +121,6 @@ NTP_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_NTP_VARITEXT)-VARITEXT \
 	--$(call ptx/endis, PTXCONF_NTP_SEL240X)-SEL240X \
 	--$(call ptx/wwo, PTXCONF_NTP_CRYPTO)-crypto \
-	--without-rpath \
 	--$(call ptx/endis, PTXCONF_NTP_CRYPTO)-openssl-random \
 	--$(call ptx/endis, PTXCONF_NTP_CRYPTO)-autokey \
 	--disable-kmem \
@@ -135,6 +135,8 @@ NTP_CONF_OPT	:= \
 	--disable-kernel-fll-bug \
 	--enable-bug1243-fix \
 	--enable-bug3020-fix \
+	--enable-bug3527-fix \
+	--enable-bug3767-fix \
 	--$(call ptx/endis, PTXCONF_NTP_IRIG_SAWTOOTH)-irig-sawtooth \
 	--$(call ptx/endis, PTXCONF_NTP_NIST)-nist \
 	--disable-ntp-signd \
@@ -144,7 +146,6 @@ NTP_CONF_OPT	:= \
 	--disable-saveconfig \
 	--disable-leap-smear \
 	--disable-dynamic-interleave \
-	--without-gtest \
 	--disable-problem-tests
 
 # ----------------------------------------------------------------------------
@@ -177,7 +178,6 @@ ifdef PTXCONF_NTP_NTPD
 	@$(call install_alternative, ntp, 0, 0, 0644, /etc/ntp-server.conf)
 endif
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NTP_NTPD_STARTSCRIPT
 	@$(call install_alternative, ntp, 0, 0, 0755, /etc/init.d/ntp-server)
 
@@ -185,7 +185,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_NTP_NTPD_BBINIT_LINK)),)
 	@$(call install_link, ntp, \
 		../init.d/ntp-server, \
 		/etc/rc.d/$(PTXCONF_NTP_NTPD_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_NTP_NTPD_SYSTEMD_UNIT
@@ -204,7 +203,6 @@ ifdef PTXCONF_NTP_NTPDC
 	@$(call install_alternative, ntp, 0, 0, 0644, /etc/ntp-client.conf)
 endif
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NTP_NTPC_STARTSCRIPT
 	@$(call install_alternative, ntp, 0, 0, 0755, /etc/init.d/ntp-client)
 
@@ -212,7 +210,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_NTP_NTPC_BBINIT_LINK)),)
 	@$(call install_link, ntp, \
 		../init.d/ntp-client, \
 		/etc/rc.d/$(PTXCONF_NTP_NTPC_BBINIT_LINK))
-endif
 endif
 endif
 

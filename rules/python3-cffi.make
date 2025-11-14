@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_PYTHON3_CFFI) += python3-cffi
 #
 # Paths and names
 #
-PYTHON3_CFFI_VERSION	:= 1.13.2
-PYTHON3_CFFI_MD5	:= 652203cf99faa254efff7fab23c2f3a2
+PYTHON3_CFFI_VERSION	:= 1.16.0
+PYTHON3_CFFI_MD5	:= 0bcaed453da3004d0bea103038345c1e
 PYTHON3_CFFI		:= cffi-$(PYTHON3_CFFI_VERSION)
 PYTHON3_CFFI_SUFFIX	:= tar.gz
-PYTHON3_CFFI_URL	:= https://pypi.python.org/packages/source/c/cffi/$(PYTHON3_CFFI).$(PYTHON3_CFFI_SUFFIX)
+PYTHON3_CFFI_URL	:= $(call ptx/mirror-pypi, cffi, $(PYTHON3_CFFI).$(PYTHON3_CFFI_SUFFIX))
 PYTHON3_CFFI_SOURCE	:= $(SRCDIR)/$(PYTHON3_CFFI).$(PYTHON3_CFFI_SUFFIX)
 PYTHON3_CFFI_DIR	:= $(BUILDDIR)/$(PYTHON3_CFFI)
 PYTHON3_CFFI_LICENSE	:= MIT
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-cffi.targetinstall:
 	@$(call install_fixup, python3-cffi, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-cffi, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/cffi,, *.py *.h)
+		$(PYTHON3_SITEPACKAGES)/cffi,, *.py *.h)
 
 	@$(call install_lib, python3-cffi, 0, 0, 0644, python$(PYTHON3_MAJORMINOR)/site-packages/_cffi_backend.cpython*)
 

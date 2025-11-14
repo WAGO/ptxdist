@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBPCAP) += libpcap
 #
 # Paths and names
 #
-LIBPCAP_VERSION	:= 1.8.1
-LIBPCAP_MD5	:= 3d48f9cd171ff12b0efd9134b52f1447
+LIBPCAP_VERSION	:= 1.10.5
+LIBPCAP_MD5	:= 0dc69ed81464e7a255715fa685daf134
 LIBPCAP		:= libpcap-$(LIBPCAP_VERSION)
 LIBPCAP_SUFFIX	:= tar.gz
-LIBPCAP_URL	:= http://www.tcpdump.org/release/$(LIBPCAP).$(LIBPCAP_SUFFIX)
+LIBPCAP_URL	:= https://www.tcpdump.org/release/$(LIBPCAP).$(LIBPCAP_SUFFIX)
 LIBPCAP_SOURCE	:= $(SRCDIR)/$(LIBPCAP).$(LIBPCAP_SUFFIX)
 LIBPCAP_DIR	:= $(BUILDDIR)/$(LIBPCAP)
 LIBPCAP_LICENSE	:= BSD-3-Clause
@@ -27,15 +27,11 @@ LIBPCAP_LICENSE	:= BSD-3-Clause
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBPCAP_PATH := PATH=$(CROSS_PATH)
-LIBPCAP_ENV  := \
+LIBPCAP_CONF_ENV  := \
 	$(CROSS_ENV) \
-	ac_cv_linux_vers=2 \
-	ac_cv_lib_nl_nl_socket_alloc=no \
-	ac_cv_lib_nl_nl_handle_alloc=no \
 	ac_cv_lbl_hci_channel_monitor_is_defined=no
 
-LIBPCAP_COMPILE_ENV := \
+LIBPCAP_MAKE_ENV := \
 	$(CROSS_ENV_CFLAGS) \
 	$(CROSS_ENV_CPPFLAGS) \
 	$(CROSS_ENV_LDFLAGS) \
@@ -44,31 +40,29 @@ LIBPCAP_COMPILE_ENV := \
 #
 # autoconf
 #
-LIBPCAP_AUTOCONF := \
+LIBPCAP_CONF_TOOL	:= autoconf
+LIBPCAP_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-instrument-functions \
 	--enable-protochain \
 	$(GLOBAL_IPV6_OPTION) \
+	--disable-remote \
 	--disable-optimizer-dbg \
 	--disable-yydebug \
 	--disable-universal \
 	--enable-shared \
 	--disable-usb \
+	--disable-netmap \
 	--$(call ptx/endis, PTXCONF_LIBPCAP_BLUETOOTH)-bluetooth \
 	--disable-dbus \
-	--disable-packet-ring \
-	--with-libnl=$(SYSROOT)/usr \
+	--disable-rdma \
+	--with-pcap=linux \
+	--with-libnl \
 	--without-dag \
 	--without-septel \
 	--without-snf \
 	--without-turbocap
-
-ifdef PTXCONF_ARCH_MINGW
-LIBPCAP_AUTOCONF += --with-pcap=null
-LIBPCAP_ENV += ac_cv_lbl_gcc_fixincludes=yes
-else
-LIBPCAP_AUTOCONF += --with-pcap=linux
-endif
 
 # ----------------------------------------------------------------------------
 # Target-Install

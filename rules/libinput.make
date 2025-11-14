@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_LIBINPUT) += libinput
 #
 # Paths and names
 #
-LIBINPUT_VERSION	:= 1.16.0
-LIBINPUT_MD5		:= b518dae7f603040872739216971ee97b
+LIBINPUT_VERSION	:= 1.27.0
+LIBINPUT_MD5		:= aa0f5da110bf51715b8899548e7e43c2
 LIBINPUT		:= libinput-$(LIBINPUT_VERSION)
-LIBINPUT_SUFFIX		:= tar.xz
-LIBINPUT_URL		:= http://www.freedesktop.org/software/libinput/$(LIBINPUT).$(LIBINPUT_SUFFIX)
+LIBINPUT_SUFFIX		:= tar.gz
+LIBINPUT_URL		:= https://gitlab.freedesktop.org/libinput/libinput/-/archive/$(LIBINPUT_VERSION)/$(LIBINPUT).$(LIBINPUT_SUFFIX)
 LIBINPUT_SOURCE		:= $(SRCDIR)/$(LIBINPUT).$(LIBINPUT_SUFFIX)
 LIBINPUT_DIR		:= $(BUILDDIR)/$(LIBINPUT)
 LIBINPUT_LICENSE	:= MIT
+LIBINPUT_LICENSE_FILES	:= \
+	file://COPYING;md5=bab4ac7dc1c10bc0fb037dc76c46ef8a
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,7 +37,7 @@ LIBINPUT_CONF_OPT	:= \
 	-Ddocumentation=false \
 	-Depoll-dir= \
 	-Dinstall-tests=false \
-	-Dlibwacom=false \
+	-Dlibwacom=$(call ptx/truefalse, PTXCONF_LIBINPUT_WACOM) \
 	-Dtests=false \
 	-Dudev-dir=/usr/lib/udev \
 	-Dzshcompletiondir=no

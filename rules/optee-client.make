@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_OPTEE_CLIENT) += optee-client
 #
 # Paths and names
 #
-OPTEE_CLIENT_VERSION	:= 3.5.0
-OPTEE_CLIENT_MD5	:= 2738729cb2457f2b4993ef6b91a6519d
+OPTEE_CLIENT_VERSION	:= 4.0.0
+OPTEE_CLIENT_MD5	:= e47b2d0cc95b3d1089e5373d3b477c35
 OPTEE_CLIENT		:= optee-client-$(OPTEE_CLIENT_VERSION)
 OPTEE_CLIENT_SUFFIX	:= tar.gz
 OPTEE_CLIENT_URL	:= https://github.com/OP-TEE/optee_client/archive/$(OPTEE_CLIENT_VERSION).$(OPTEE_CLIENT_SUFFIX)
@@ -32,7 +32,8 @@ OPTEE_CLIENT_MAKE_ENV := \
 	$(CROSS_ENV) \
 	LIBDIR=/usr/lib \
 	INCLUDEDIR=/usr/include \
-	CFG_TEE_CLIENT_LOAD_PATH=/usr/lib/
+	CFG_TEE_CLIENT_LOAD_PATH=/usr/lib/ \
+	CFG_TEE_SUPP_PLUGINS=n
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -48,6 +49,7 @@ $(STATEDIR)/optee-client.targetinstall:
 	@$(call install_fixup, optee-client,DESCRIPTION,missing)
 
 	@$(call install_lib, optee-client, 0, 0, 0644, libteec)
+	@$(call install_lib, optee-client, 0, 0, 0644, libckteec)
 	@$(call install_copy, optee-client, 0, 0, 0755, -, /usr/sbin/tee-supplicant)
 ifdef PTXCONF_OPTEE_CLIENT_SYSTEMD_UNIT
 	@$(call install_alternative, optee-client, 0, 0, 0644, \

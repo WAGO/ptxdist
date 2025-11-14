@@ -18,7 +18,7 @@ PYTHON3_IMPORTLIB_METADATA_VERSION	:= 1.7.0
 PYTHON3_IMPORTLIB_METADATA_MD5		:= 4505ea85600cca1e693a4f8f5dd27ba8
 PYTHON3_IMPORTLIB_METADATA		:= importlib_metadata-$(PYTHON3_IMPORTLIB_METADATA_VERSION)
 PYTHON3_IMPORTLIB_METADATA_SUFFIX	:= tar.gz
-PYTHON3_IMPORTLIB_METADATA_URL		:= https://pypi.python.org/packages/source/i/importlib_metadata/$(PYTHON3_IMPORTLIB_METADATA).$(PYTHON3_IMPORTLIB_METADATA_SUFFIX)
+PYTHON3_IMPORTLIB_METADATA_URL		:= $(call ptx/mirror-pypi, importlib_metadata, $(PYTHON3_IMPORTLIB_METADATA).$(PYTHON3_IMPORTLIB_METADATA_SUFFIX))
 PYTHON3_IMPORTLIB_METADATA_SOURCE	:= $(SRCDIR)/$(PYTHON3_IMPORTLIB_METADATA).$(PYTHON3_IMPORTLIB_METADATA_SUFFIX)
 PYTHON3_IMPORTLIB_METADATA_DIR		:= $(BUILDDIR)/$(PYTHON3_IMPORTLIB_METADATA)
 PYTHON3_IMPORTLIB_METADATA_LICENSE	:= Apache-2.0
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-importlib-metadata.targetinstall:
 	@$(call install_fixup, python3-importlib-metadata, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-importlib-metadata, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-importlib-metadata)
 

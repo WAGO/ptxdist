@@ -14,27 +14,27 @@ PACKAGES-$(PTXCONF_TERMCAP) += termcap
 #
 # Paths and names
 #
-TERMCAP_VERSION	:= 1.3.1
-TERMCAP_MD5	:= ffe6f86e63a3a29fa53ac645faaabdfa
-TERMCAP		:= termcap-$(TERMCAP_VERSION)
-TERMCAP_SUFFIX	:= tar.gz
-TERMCAP_URL	:= $(call ptx/mirror, GNU, termcap/$(TERMCAP).$(TERMCAP_SUFFIX))
-TERMCAP_SOURCE	:= $(SRCDIR)/$(TERMCAP).$(TERMCAP_SUFFIX)
-TERMCAP_DIR	:= $(BUILDDIR)/$(TERMCAP)
-TERMCAP_LICENSE	:= GPL-2.0-only
+TERMCAP_VERSION		:= 1.3.1
+TERMCAP_MD5		:= ffe6f86e63a3a29fa53ac645faaabdfa
+TERMCAP			:= termcap-$(TERMCAP_VERSION)
+TERMCAP_SUFFIX		:= tar.gz
+TERMCAP_URL		:= $(call ptx/mirror, GNU, termcap/$(TERMCAP).$(TERMCAP_SUFFIX))
+TERMCAP_SOURCE		:= $(SRCDIR)/$(TERMCAP).$(TERMCAP_SUFFIX)
+TERMCAP_DIR		:= $(BUILDDIR)/$(TERMCAP)
+TERMCAP_LICENSE		:= GPL-2.0-only
+TERMCAP_LICENSE_FILES	:= \
+	file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-TERMCAP_PATH	:= PATH=$(CROSS_PATH)
-TERMCAP_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-TERMCAP_AUTOCONF := \
-	--prefix= \
+TERMCAP_CONF_TOOL := autoconf
+TERMCAP_CONF_OPT := \
+	--prefix=/usr \
 	$(CROSS_AUTOCONF_ARCH) \
 	--enable-install-termcap
 

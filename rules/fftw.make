@@ -21,9 +21,7 @@ FFTW		:= fftw-$(FFTW_VERSION)
 FFTW_SUFFIX	:= tar.gz
 FFTW_SOURCE	:= $(SRCDIR)/$(FFTW).$(FFTW_SUFFIX)
 FFTW_DIR	:= $(BUILDDIR)/$(FFTW)
-FFTW_URL	:= \
-	http://www.fftw.org/$(FFTW).$(FFTW_SUFFIX) \
-	ftp://ftp.fftw.org/pub/fftw/old/$(FFTW).$(FFTW_SUFFIX)
+FFTW_URL	:= http://www.fftw.org/$(FFTW).$(FFTW_SUFFIX)
 FFTW_LICENSE	:= GPL-2.0-or-later
 FFTW_LICENSE_FILES	:= \
 	file://COPYRIGHT;md5=f19d163a5d9bc582a8ba578f591eab80 \
@@ -33,13 +31,11 @@ FFTW_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-FFTW_PATH	:= PATH=$(CROSS_PATH)
-FFTW_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-FFTW_AUTOCONF := \
+FFTW_CONF_TOOL	:= autoconf
+FFTW_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-shared
 

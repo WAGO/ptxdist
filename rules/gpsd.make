@@ -16,15 +16,15 @@ PACKAGES-$(PTXCONF_GPSD) += gpsd
 #
 # Paths and names
 #
-GPSD_VERSION	:= 3.20
-GPSD_MD5	:= cf7fdec7ce7221d20bee1a7246362b05
+GPSD_VERSION	:= 3.23.1
+GPSD_MD5	:= 7984a35e7104b46c2cb570fb30c4be03
 GPSD		:= gpsd-$(GPSD_VERSION)
-GPSD_SUFFIX	:= tar.gz
+GPSD_SUFFIX	:= tar.xz
 GPSD_URL	:= http://download.savannah.gnu.org/releases/gpsd/$(GPSD).$(GPSD_SUFFIX)
 GPSD_SOURCE	:= $(SRCDIR)/$(GPSD).$(GPSD_SUFFIX)
 GPSD_DIR	:= $(BUILDDIR)/$(GPSD)
 GPSD_LICENSE	:= BSD-2-Clause
-GPSD_LICENSE_FILES	:= file://COPYING;md5=01764c35ae34d9521944bb6ab312af53
+GPSD_LICENSE_FILES	:= file://COPYING;md5=7a5d174db44ec45f9638b2c747806821
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -57,16 +57,16 @@ GPSD_PROGS-$(PTXCONF_GPSD_ZERK)		+= zerk
 GPSD_CONF_TOOL	:= scons
 GPSD_CONF_ENV	:= \
 	$(CROSS_ENV_PKG_CONFIG)
-GPSD_CONF_OPT	:= \
+GPSD_CONF_OPT	= \
 	aivdm=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_AIVDM) \
 	ashtech=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_ASHTECH) \
 	bluez=$(call ptx/yesno, PTXCONF_GPSD_BLUEZ) \
-	clientdebug=no \
+	clientdebug=$(call ptx/yesno, PTXCONF_GPSD_DEBUG) \
 	control_socket=yes \
-	controlsend=$(call ptx/yesno, PTXCONF_GPSD_CONTROLSEND) \
 	coveraging=no \
 	dbus_export=$(call ptx/yesno, PTXCONF_GPSD_DBUS) \
-	debug=no \
+	debug=$(call ptx/yesno, PTXCONF_GPSD_DEBUG) \
+	debug_opt=false \
 	earthmate=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_EARTHMATE) \
 	evermore=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_EVERMORE) \
 	force_global=yes \
@@ -82,8 +82,7 @@ GPSD_CONF_OPT	:= \
 	implicit_link=yes \
 	isync=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_ISYNC) \
 	itrax=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_ITRAX) \
-	libdir=/usr/$(CROSS_LIB_DIR) \
-	libgpsmm=no \
+	libgpsmm=$(call ptx/yesno, PTXCONF_GPSD_LIBGPSMM) \
 	magic_hat=no \
 	manbuild=no \
 	minimal=yes \
@@ -103,16 +102,17 @@ GPSD_CONF_OPT	:= \
 	profiling=$(call ptx/yesno, PTXCONF_GPSD_PROFILING) \
 	python=$(call ptx/yesno, PTXCONF_GPSD_PYTHON) \
 	python_libdir=/usr/lib/python$(PYTHON3_MAJORMINOR) \
+	python_shebang=/usr/bin/python$(PYTHON3_MAJORMINOR) \
 	qt=no \
-	reconfigure=$(call ptx/yesno, PTXCONF_GPSD_RECONFIGURE) \
 	rtcm104v2=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_RTCM104V2) \
 	rtcm104v3=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_RTCM104V3) \
+	rundir=/run \
 	shared=yes \
 	shm_export=$(call ptx/yesno, PTXCONF_GPSD_SHM) \
 	sirf=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_SIRF) \
 	skytraq=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_SKYTRAQ) \
 	socket_export=$(call ptx/yesno, PTXCONF_GPSD_SOCKET) \
-	squelch=yes \
+	squelch=$(call ptx/noyes, PTXCONF_GPSD_LOGGING) \
 	superstar2=$(call ptx/yesno, PTXCONF_GPSD_DRIVER_SUPERSTAR2) \
 	sysconfdir=/etc \
 	systemd=$(call ptx/yesno, PTXCONF_GPSD_SYSTEMD) \
@@ -155,6 +155,7 @@ $(STATEDIR)/gpsd.targetinstall:
 	@$(call install_fixup, gpsd,DESCRIPTION,missing)
 
 	@$(call install_lib, gpsd, 0, 0, 0644, libgps)
+	@$(call install_lib, gpsd, 0, 0, 0644, libgpsdpacket)
 	@$(foreach prog, $(GPSD_PROGS-y), \
 		$(call install_copy, gpsd, 0, 0, 0755, -, \
 			/usr/bin/$(prog))$(ptx/nl))
@@ -165,25 +166,28 @@ ifdef PTXCONF_GPSD_GPSDCTL
 	@$(call install_copy, gpsd, 0, 0, 0755, -, /usr/sbin/gpsdctl)
 endif
 ifdef PTXCONF_GPSD_SYSTEMD_UNIT
-	@$(call install_alternative, gpsd, 0, 0, 644, \
+	@$(call install_alternative, gpsd, 0, 0, 0644, \
 		/usr/lib/systemd/system/gpsd.service)
 	@$(call install_replace, gpsd, \
 		/usr/lib/systemd/system/gpsd.service, \
 		@ARGS@, $(PTXCONF_GPSD_GPSD_ARGS))
 	@$(call install_link, gpsd, ../gpsd.service, \
 		/usr/lib/systemd/system/multi-user.target.wants/gpsd.service)
-	@$(call install_alternative, gpsd, 0, 0, 644, \
+	@$(call install_alternative, gpsd, 0, 0, 0644, \
 		/usr/lib/systemd/system/gpsd.socket)
 	@$(call install_link, gpsd, ../gpsd.socket, \
 		/usr/lib/systemd/system/sockets.target.wants/gpsd.socket)
 ifdef PTXCONF_GPSD_GPSDCTL
-	@$(call install_alternative, gpsd, 0, 0, 644, \
+	@$(call install_alternative, gpsd, 0, 0, 0644, \
 		/usr/lib/systemd/system/gpsdctl@.service)
 endif
 endif
 ifdef PTXCONF_GPSD_PYTHON
 	@$(call install_glob, gpsd, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR), *.so *.py)
+		/usr/lib/python$(PYTHON3_MAJORMINOR), *.py)
+endif
+ifdef PTXCONF_GPSD_DEBUG
+	@$(call install_copy, gpsd, 0, 0, 0755, -, /usr/bin/gpsdebuginfo)
 endif
 	@$(call install_finish, gpsd)
 

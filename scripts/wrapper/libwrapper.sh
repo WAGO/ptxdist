@@ -17,23 +17,96 @@ ARG_LIST=""
 LATE_ARG_LIST=""
 
 if [ -z "${PTXDIST_PLATFORMCONFIG}" ]; then
-	. "$(dirname "$(readlink -f "${0}")")/env" || exit
+	. "${WRAPPER_DIR}/env" || exit
 fi
 
 . ${PTXDIST_PLATFORMCONFIG}
 
 CMD="${0##*/}"
-FULL_CMD="${0%/*}/real/${CMD}"
+FULL_CMD="$(readlink "${0%/*}/real/${CMD}")"
 
 wrapper_exec() {
-	PATH="$(echo "${PATH}" | sed "s;${PTXDIST_PATH_SYSROOT_HOST}/lib/wrapper:;;")"
-	if [ "${PTXDIST_VERBOSE}" = 1 -a -n "${PTXDIST_FD_LOGFILE}" ]; then
-		echo "wrapper: ${PTXDIST_ICECC}${PTXDIST_CCACHE} ${CMD} ${ARG_LIST} $* ${LATE_ARG_LIST}" >&${PTXDIST_FD_LOGFILE}
+	IFS=:
+	tmp=
+	for P in ${PATH}; do
+		if [ "${P}" != "${PTXDIST_PATH_SYSROOT_HOST}/usr/lib/wrapper" ]; then
+			tmp="${tmp}${tmp:+:}${P}"
+		fi
+	done
+	unset IFS
+	PATH="${tmp}"
+	if [ -z "${ICECC_VERSION}" -o ! -e "${ICECC_VERSION}" ]; then
+		PTXDIST_ICECC=${PTXDIST_ICERUN}
 	fi
-	if [ -n "${FAKEROOTKEY}" -o -z "${ICECC_VERSION}" -o ! -e "${ICECC_VERSION}" ]; then
-		unset PTXDIST_ICECC
+	if [ -n "${FAKEROOTKEY}" ]; then
+		PTXDIST_ICECC=""
+	fi
+	if ! ${HOST} && [ -n "${PTXDIST_WORKSPACE}" ]; then
+		IFS="$(printf "\037")"
+		set -- $(filter_args "${@}")
+		unset IFS
+	fi
+	if $COMPILING && [ -n "${PTXDIST_COMPILE_COMMANDS}" ]; then
+		printf "%s\037%s\n" "${PWD}" "${CMD} ${ARG_LIST} $* ${LATE_ARG_LIST}" >> "${PTXDIST_COMPILE_COMMANDS}"
+	fi
+	if [ "${PTXDIST_VERBOSE}" = 1 -a -n "${PTXDIST_LOGFILE_PATH}" ]; then
+		echo "wrapper: ${PTXDIST_ICECC}${PTXDIST_CCACHE} ${CMD} ${ARG_LIST} $* ${LATE_ARG_LIST}" >>${PTXDIST_LOGFILE_PATH}
 	fi
 	exec ${PTXDIST_ICECC}${PTXDIST_CCACHE} "${FULL_CMD}" ${ARG_LIST} "$@" ${LATE_ARG_LIST}
+}
+
+filter_args() {
+	# PTXDIST_SYSROOT_TOOLCHAIN may not be defined yet
+	if [ -n "${PTXDIST_SYSROOT_TOOLCHAIN}" ]; then
+		pkg_wrapper_accept_paths="${PTXDIST_SYSROOT_TOOLCHAIN}${IFS}${pkg_wrapper_accept_paths}"
+		if [ "${PTXDIST_SYSROOT_TOOLCHAIN}" != "${PTXDIST_REAL_SYSROOT_TOOLCHAIN}" ]; then
+			pkg_wrapper_accept_paths="${PTXDIST_REAL_SYSROOT_TOOLCHAIN}${IFS}${pkg_wrapper_accept_paths}"
+		fi
+	fi
+	pkg_wrapper_accept_paths="${PTXDIST_PLATFORMDIR}${IFS}${pkg_wrapper_accept_paths}"
+	if [ "${PTXDIST_PLATFORMDIR}" != "${PTXDIST_REAL_PLATFORMDIR}" ]; then
+		pkg_wrapper_accept_paths="${PTXDIST_REAL_PLATFORMDIR}${IFS}${pkg_wrapper_accept_paths}"
+	fi
+	for ARG in "${@}"; do
+		good=false
+		for path in ${pkg_wrapper_accept_paths}; do
+			if [ -z "${path}" ]; then
+				continue
+			fi
+			case "${ARG}" in
+			-[IL]"${path}"*)
+				good=true
+				;;
+			esac
+			if ${good}; then
+				break
+			fi
+		done
+		if ! ${good}; then
+			case "${ARG}" in
+			-L/*|-I/*)
+				# skip all absolute search directories outside the BSP
+				echo "wrapper: removing '${ARG}' from the commandline" >&2
+				continue
+				;;
+			esac
+		fi
+		case "${ARG}" in
+			-I/*/sysroot-host/*|-I/*/sysroot-cross/*|-I/*/sysroot-target/*)
+				# turn include paths in sysroot into system includes
+				printf "%s\037" "-isystem"
+				ARG="${ARG#-I}"
+				;;
+			-isystem)
+				;;
+			-isystem*)
+				# not detected correctly without space by icecc so split it
+				printf "%s\037" "-isystem"
+				ARG="${ARG#-isystem}"
+				;;
+		esac
+		printf "%s\037" "${ARG}"
+	done
 }
 
 cc_check_args() {
@@ -71,16 +144,23 @@ cc_check_args() {
 			-ggdb3)
 				FULL_DEBUG=true
 				;;
-			-I/usr/include | -L/usr/lib | -L/lib)
-				if ! ${HOST}; then
-					echo "wrapper: Bad search path in:" >&2
-					echo "${CMD} $*" >&2
-					exit 1
-				fi
-				;;
 			-Wl,-rpath,/*build-target*)
 				if ! ${HOST}; then
 					add_late_arg "-Wl,-rpath-link${ARG#-Wl,-rpath}"
+				fi
+				;;
+			-fplugin=*)
+				# The plugins are not available on the icecc node
+				PTXDIST_ICECC=${PTXDIST_ICERUN}
+				;;
+			-save-temps*)
+				# only icecc >= 1.4 filters those correctly
+				PTXDIST_ICECC=${PTXDIST_ICERUN}
+				;;
+			-print-file-name=plugin)
+				if [ "${PTXDIST_NO_GCC_PLUGINS}" = "1" ]; then
+					echo "wrapper: gcc plugins disabled" >&2
+					exit 1
 				fi
 				;;
 			-|-print-search-dirs|--print-search-dirs)
@@ -91,6 +171,12 @@ cc_check_args() {
 				;;
 			*)
 				COMPILING=true
+				;;
+		esac
+		case " ${pkg_flags_blacklist} " in
+			*" ${ARG} "*)
+				echo "wrapper: found blacklisted flag '${ARG}'" >&2
+				exit 1
 				;;
 		esac
 	done
@@ -110,16 +196,16 @@ add_late_arg() {
 }
 
 test_opt() {
-	local opt="${1}"
+	local opt="${1}" popt
 
 	for item in ${pkg_wrapper_blacklist}; do
 		if [ "${item}" = "${opt}" ]; then
 			return 1
 		fi
 	done
-	opt="PTXCONF_${opt}"
-	eval "opt=\$${opt}"
-	if [ -z "${opt}" ]; then
+	popt="PTXCONF_${opt}"
+	eval "popt=\$${popt} opt=\$${opt}"
+	if [ -z "${opt}" -a -z "${popt}" ]; then
 		return 1
 	fi
 	return 0
@@ -231,12 +317,19 @@ cc_add_debug() {
 }
 
 cc_add_arch() {
-	add_opt_arg ARCH_ARM_NEON "-mfpu=neon"
+	if test_opt ARCH_ARM; then
+		add_opt_arg ARCH_ARM_NEON "-mfpu=neon"
+	fi
+}
+
+cc_add_optimizations() {
+	add_opt_arg TARGET_NO_SEMANTIC_INTERPOSITION "-fno-semantic-interposition"
 }
 
 cpp_add_target_extra() {
 	cc_check_args ${pkg_cppflags}
 	add_opt_arg TARGET_COMPILER_RECORD_SWITCHES "-frecord-gcc-switches"
+	add_opt_arg PTXDIST_Y2038 "-D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64"
 	add_late_arg ${PTXDIST_CROSS_CPPFLAGS}
 	add_arg ${pkg_cppflags}
 	add_opt_arg TARGET_EXTRA_CPPFLAGS ${PTXCONF_TARGET_EXTRA_CPPFLAGS}
@@ -245,6 +338,7 @@ cpp_add_target_extra() {
 cc_add_target_extra() {
 	cc_check_args ${pkg_cflags}
 	cpp_add_target_extra
+	cc_add_optimizations
 	cc_add_debug
 	cc_add_arch
 	add_arg ${pkg_cflags}
@@ -254,6 +348,7 @@ cc_add_target_extra() {
 cxx_add_target_extra() {
 	cc_check_args ${pkg_cxxflags}
 	cpp_add_target_extra
+	cc_add_optimizations
 	cc_add_debug
 	cc_add_arch
 	add_arg ${pkg_cxxflags}
@@ -262,7 +357,7 @@ cxx_add_target_extra() {
 
 cc_add_target_reproducible() {
 	add_arg -fdebug-prefix-map="${PTXDIST_PLATFORMDIR%/*}/="
-	add_arg -fdebug-prefix-map="$(readlink -f "${PTXDIST_PLATFORMDIR}")/=${PTXDIST_PLATFORMDIR##*/}/"
+	add_arg -fdebug-prefix-map="${WRAPPER_DIR%/sysroot-host/lib/wrapper}/=${PTXDIST_PLATFORMDIR##*/}/"
 }
 
 cpp_add_host_extra() {
@@ -283,19 +378,31 @@ cxx_add_host_extra() {
 	add_host_arg ${pkg_cxxflags}
 }
 
+cc_add_host_clang() {
+	add_arg --gcc-toolchain=/usr
+}
 
 add_icecc_args() {
 	if [ -n "${PTXDIST_ICECC}" ]; then
 		if [ "${1}" != clang ]; then
 			add_late_arg "-fno-diagnostics-show-caret"
 			add_late_arg "-gno-record-gcc-switches"
-		elif [ "${PTXDIST_ICECC_CLANG}" != 1 ]; then
-		    unset PTXDIST_ICECC
-		    return
 		fi
 		if [ "${PTXDIST_ICECC_REMOTE_CPP}" != 1 -o "${ICECC_REMOTE_CPP}" = "0" ]; then
 		    add_late_arg "-Wno-implicit-fallthrough"
 		fi
+	fi
+}
+
+clang_check_target_icecc() {
+	if [ "${PTXDIST_ICECC_CLANG}" != 1 ]; then
+	    PTXDIST_ICECC=${PTXDIST_ICERUN}
+	fi
+}
+
+clang_check_host_icecc() {
+	if [ "${PTXDIST_ICECC_HOST_CLANG}" != 1 ]; then
+	    PTXDIST_ICECC=${PTXDIST_ICERUN}
 	fi
 }
 
@@ -325,11 +432,10 @@ cxx_add_host_icecc() {
 
 cc_add_target_clang() {
 	triple="${CMD%-*}"
-	FULL_CMD=$(readlink "${0%/*}/real/${CMD}")
 	if [ -n "${PTXDIST_SYSROOT_TOOLCHAIN}" ]; then
 		add_arg --sysroot="${PTXDIST_SYSROOT_TOOLCHAIN}"
 	fi
-	env="$(dirname "${FULL_CMD}")/.${triple}.flags"
+	env="${FULL_CMD%/*}/.${triple}.flags"
 	if [ -e "${env}" ]; then
 		. "${env}"
 		add_arg ${flags}

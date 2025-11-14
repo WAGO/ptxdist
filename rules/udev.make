@@ -56,7 +56,7 @@ UDEV_LEGACY_CONF_OPT	:= \
 	--disable-floppy \
 	--without-selinux \
 	--with-usb-ids-path=/usr/share/usb.ids \
-	--with-pci-ids-path=/usr/share/pci.ids$(call ptx/ifdef, PTXCONF_PCIUTILS_COMPRESS,.gz,)
+	--with-pci-ids-path=/usr/share/pci.ids
 
 UDEV_LEGACY_RULES-y := \
 	50-udev-default.rules \
@@ -116,7 +116,7 @@ endif
 
 	@$(foreach rule, $(UDEV_LEGACY_RULES-y), \
 		$(call install_copy, udev, 0, 0, 0644, -, \
-			/usr/lib/udev/rules.d/$(rule));)
+			/usr/lib/udev/rules.d/$(rule))$(ptx/nl))
 
 ifdef PTXCONF_UDEV_LEGACY_KEYMAPS
 	@cd $(UDEV_LEGACY_PKGDIR) && \
@@ -131,21 +131,19 @@ endif
 
 	@$(foreach helper, $(UDEV_LEGACY_HELPER-y), \
 		$(call install_copy, udev, 0, 0, 0755, -, \
-			/usr/lib/udev/$(helper));)
+			/usr/lib/udev/$(helper))$(ptx/nl))
 
 ifdef PTXCONF_UDEV_LEGACY_LIBUDEV
 	@$(call install_lib, udev, 0, 0, 0644, libudev)
 endif
 
 ifdef PTXCONF_UDEV_LEGACY_STARTSCRIPT
-ifdef PTXCONF_INITMETHOD_BBINIT
 	@$(call install_alternative, udev, 0, 0, 0755, /etc/init.d/udev)
 
 ifneq ($(call remove_quotes,$(PTXCONF_UDEV_BBINIT_LINK)),)
 	@$(call install_link, udev, \
 		../init.d/udev, \
 		/etc/rc.d/$(PTXCONF_UDEV_BBINIT_LINK))
-endif
 endif
 endif
 	@$(call install_finish, udev)

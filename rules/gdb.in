@@ -7,6 +7,11 @@ menuconfig GDB
 	select LIBC_DL
 	select GCCLIBS_GCC_S
 	select NCURSES
+	select ZLIB
+	select ZSTD		if GDB_ZSTD
+	select LIBGMP		if GDB_11_1
+	select MPFR		if GDB_14_1
+	select XZ		if GDB_DEBUGINFO_SUPPORT
 	help
 	  The GNU Debugger
 
@@ -18,13 +23,41 @@ menuconfig GDB
 
 if GDB
 
+config GDB_ZSTD
+	bool
+
 config GDB_SHARED
 	bool "build shared"
 	default y
-	select LIBC_M
 	help
 	  If not set, the build option
 	  LDFLAGS=-static will be activated.
+
+config GDB_DEBUGINFO_SUPPORT
+	bool
+	prompt "support reading .gnu_debuginfo sections"
+	help
+	  Configures whether to link with liblzma to support reading the
+	  .gnu_debuginfo sections in binaries.
+
+	  Note: This is useful if TARGET_MINI_DEBUGINFO has been enabled
+	  in the platform configuration to add .gnu_debuginfo sections
+	  to all the binaries.
+
+config GDB_11_1
+	bool
+	prompt "gdb-11.1 or later"
+	help
+	  Since gdb-11.1, GMP is a required dependency. Enable this option
+	  if your toolchain gdb version is 11.1 or later.
+
+config GDB_14_1
+	bool
+	select GDB_ZSTD
+	prompt "gdb-14.1 or later"
+	help
+	  Since gdb-14.1, MPFR is a required dependency. Enable this option
+	  if your toolchain gdb version is 14.1 or later.
 
 endif
 

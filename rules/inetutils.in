@@ -2,10 +2,7 @@
 menuconfig INETUTILS
 	tristate
 	prompt "inetutils                     "
-	select LIBC_NSL		if INETUTILS_PING
-	select LIBC_RESOLV	if INETUTILS_PING
 	select LIBC_UTIL	if INETUTILS_RLOGIND
-	select LIBC_CRYPT	if INETUTILS_RCP || INETUTILS_RLOGIND || INETUTILS_RSH || INETUTILS_RSHD
 	help
 	  Inetutils is a collection of common network programs. It includes:
 	  * An ftp client and server.
@@ -33,6 +30,7 @@ if INETUTILS_INETD
 config INETUTILS_INETD_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/inetd"
 	help
 	  Install an init script for the network super daemon inetd
@@ -116,6 +114,7 @@ config INETUTILS_SYSLOGD_STARTSCRIPT
 	bool
 	prompt "install /etc/init.d/syslogd"
 	default y
+	depends on INITMETHOD_BBINIT
 	help
 	  Install this script to be able to run this service at system startup
 
@@ -138,12 +137,12 @@ menuconfig INETUTILS_TFTPD
 	prompt "tftpd                         "
 	depends on !BUSYBOX_TFTPD || ALLYES
 	help
-	  TFTPD is a ftp daemon to be used for diskless clients. Most bootloaders
+	  TFTPD is an ftp daemon to be used for diskless clients. Most bootloaders
 	  use the Trivial File Transfer Protocol to load their OS image. Note:
 	  There is no authentication!
 
 comment "BusyBox' tftpd is selected!"
-        depends on BUSYBOX_TFTPD
+	depends on BUSYBOX_TFTPD
 
 if INETUTILS_TFTPD
 

@@ -18,7 +18,7 @@ PYTHON3_PLUGGY_VERSION	:= 0.13.1
 PYTHON3_PLUGGY_MD5	:= 7f610e28b8b34487336b585a3dfb803d
 PYTHON3_PLUGGY		:= pluggy-$(PYTHON3_PLUGGY_VERSION)
 PYTHON3_PLUGGY_SUFFIX	:= tar.gz
-PYTHON3_PLUGGY_URL	:= https://pypi.python.org/packages/source/p/pluggy/$(PYTHON3_PLUGGY).$(PYTHON3_PLUGGY_SUFFIX)
+PYTHON3_PLUGGY_URL	:= $(call ptx/mirror-pypi, pluggy, $(PYTHON3_PLUGGY).$(PYTHON3_PLUGGY_SUFFIX))
 PYTHON3_PLUGGY_SOURCE	:= $(SRCDIR)/$(PYTHON3_PLUGGY).$(PYTHON3_PLUGGY_SUFFIX)
 PYTHON3_PLUGGY_DIR	:= $(BUILDDIR)/$(PYTHON3_PLUGGY)
 PYTHON3_PLUGGY_LICENSE	:= MIT
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-pluggy.targetinstall:
 	@$(call install_fixup, python3-pluggy, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-pluggy, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-pluggy)
 

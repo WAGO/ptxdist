@@ -18,7 +18,7 @@ DBENCH_VERSION	:= 3.04
 DBENCH_MD5	:= efd0c958da79c1cd941ecd3f63e637ae
 DBENCH		:= dbench-$(DBENCH_VERSION)
 DBENCH_SUFFIX	:= tar.gz
-DBENCH_URL	:= http://samba.org/ftp/tridge/dbench/$(DBENCH).$(DBENCH_SUFFIX)
+DBENCH_URL	:= https://www.samba.org/ftp/tridge/dbench/$(DBENCH).$(DBENCH_SUFFIX)
 DBENCH_SOURCE	:= $(SRCDIR)/$(DBENCH).$(DBENCH_SUFFIX)
 DBENCH_DIR	:= $(BUILDDIR)/$(DBENCH)
 DBENCH_LICENSE	:= GPL-2.0-or-later
@@ -30,15 +30,17 @@ DBENCH_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-DBENCH_PATH		:= PATH=$(CROSS_PATH)
-DBENCH_CONV_ENV		:= $(CROSS_ENV)
-DBENCH_MAKE_ENV		:= $(CROSS_ENV)
-DBENCH_INSTALL_OPT	:= prefix=$(PKGDIR)/$(DBENCH)/usr install
-
 #
 # autoconf
 #
-DBENCH_AUTOCONF := $(CROSS_AUTOCONF_USR)
+DBENCH_CONF_TOOL	:= autoconf
+DBENCH_CONF_OPT		:= $(CROSS_AUTOCONF_USR)
+
+# ----------------------------------------------------------------------------
+# Install
+# ----------------------------------------------------------------------------
+
+DBENCH_INSTALL_OPT	:= prefix=$(PKGDIR)/$(DBENCH)/usr install
 
 # ----------------------------------------------------------------------------
 # Target-Install

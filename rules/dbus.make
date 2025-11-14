@@ -16,14 +16,19 @@ PACKAGES-$(PTXCONF_DBUS) += dbus
 #
 # Paths and names
 #
-DBUS_VERSION	:= 1.12.20
-DBUS_MD5	:= dfe8a71f412e0b53be26ed4fbfdc91c4
-DBUS		:= dbus-$(DBUS_VERSION)
-DBUS_SUFFIX	:= tar.gz
-DBUS_URL	:= http://dbus.freedesktop.org/releases/dbus/$(DBUS).$(DBUS_SUFFIX)
-DBUS_SOURCE	:= $(SRCDIR)/$(DBUS).$(DBUS_SUFFIX)
-DBUS_DIR	:= $(BUILDDIR)/$(DBUS)
-DBUS_LICENSE	:= AFL-2.1 AND GPL-2.0-or-later
+DBUS_VERSION		:= 1.15.12
+DBUS_MD5		:= cc1a1e2ae4ad166ed3d3da36172bbb8a
+DBUS			:= dbus-$(DBUS_VERSION)
+DBUS_SUFFIX		:= tar.xz
+DBUS_URL		:= https://dbus.freedesktop.org/releases/dbus/$(DBUS).$(DBUS_SUFFIX)
+DBUS_SOURCE		:= $(SRCDIR)/$(DBUS).$(DBUS_SUFFIX)
+DBUS_DIR		:= $(BUILDDIR)/$(DBUS)
+DBUS_LICENSE		:= (AFL-2.1 OR GPL-2.0-or-later) AND MIT
+DBUS_LICENSE_FILES	:= \
+	file://COPYING;md5=eb0ffc69a965797a3d6686baa153ef05 \
+	file://LICENSES/AFL-2.1.txt;md5=f3ad2f482ec639b440413665cfb9e714 \
+	file://LICENSES/GPL-2.0-or-later.txt;md5=3d26203303a722dedc6bf909d95ba815 \
+	file://LICENSES/MIT.txt;md5=7dda4e90ded66ab88b86f76169f28663
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,50 +40,41 @@ DBUS_CONF_ENV	:= \
 	ac_cv_lib_ICE_IceConnectionNumber=no
 
 #
-# autoconf
+# meson
 #
-DBUS_CONF_TOOL	:= autoconf
+DBUS_CONF_TOOL	:= meson
 DBUS_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--runstatedir=/run \
-	--enable-silent-rules \
-	--disable-developer \
-	--disable-debug \
-	$(GLOBAL_LARGE_FILE_OPTION) \
-	--disable-static \
-	--disable-ansi \
-	--disable-verbose-mode \
-	--disable-asserts \
-	--disable-checks \
-	--disable-xml-docs \
-	--disable-doxygen-docs \
-	--disable-ducktype-docs \
-	--$(call ptx/endis, PTXCONF_DBUS_SELINUX)-selinux \
-	--disable-apparmor \
-	--disable-libaudit \
-	--enable-inotify \
-	--disable-kqueue \
-	--disable-console-owner-file \
-	--disable-launchd \
-	--$(call ptx/endis, PTXCONF_DBUS_SYSTEMD)-systemd \
-	--disable-embedded-tests \
-	--disable-modular-tests \
-	--disable-tests \
-	--disable-installed-tests \
-	--disable-code-coverage \
-	--enable-epoll \
-	--$(call ptx/endis, PTXCONF_DBUS_X)-x11-autolaunch \
-	--disable-compile-warnings \
-	--disable-Werror \
-	--disable-relocation \
-	--disable-stats \
-	--$(call ptx/endis, PTXCONF_DBUS_SYSTEMD)-user-session \
-	--with-system-socket=/run/dbus/system_bus_socket \
-	--with-dbus-user=messagebus \
-	--without-valgrind \
-	--$(call ptx/wwo, PTXCONF_DBUS_X)-x$(call ptx/ifdef,PTXCONF_DBUS_X,=$(SYSROOT)/usr,) \
-	--with-systemdsystemunitdir=/usr/lib/systemd/system \
-	--with-systemduserunitdir=/usr/lib/systemd/user
+	$(CROSS_MESON_USR) \
+	-Dapparmor=disabled \
+	-Dasserts=false \
+	-Dchecks=false \
+	-Dcontainers=false \
+	-Ddbus_user=messagebus \
+	-Ddoxygen_docs=disabled \
+	-Dducktype_docs=disabled \
+	-Dembedded_tests=false \
+	-Depoll=enabled \
+	-Dinotify=enabled \
+	-Dinstalled_tests=false \
+	-Dkqueue=disabled \
+	-Dlaunchd=disabled \
+	-Dlibaudit=disabled \
+	-Dmessage_bus=true \
+	-Dmodular_tests=disabled \
+	-Dqt_help=disabled \
+	-Drelocation=disabled \
+	-Dselinux=$(call ptx/endis, PTXCONF_DBUS_SELINUX)d \
+	-Dstats=false \
+	-Dsystemd=$(call ptx/endis, PTXCONF_DBUS_SYSTEMD)d \
+	-Dsystemd_system_unitdir=/usr/lib/systemd/system \
+	-Dsystemd_user_unitdir=/usr/lib/systemd/user \
+	-Dtools=true \
+	-Dtraditional_activation=true \
+	-Duser_session=$(call ptx/truefalse, PTXCONF_DBUS_SYSTEMD) \
+	-Dvalgrind=disabled \
+	-Dverbose_mode=false \
+	-Dx11_autolaunch=$(call ptx/endis, PTXCONF_DBUS_X)d \
+	-Dxml_docs=disabled
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -122,7 +118,6 @@ $(STATEDIR)/dbus.targetinstall:
 #	# busybox init: start script
 #	#
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_DBUS_STARTSCRIPT
 	@$(call install_alternative, dbus, 0, 0, 0755, /etc/init.d/dbus)
 
@@ -130,7 +125,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_DBUS_BBINIT_LINK)),)
 	@$(call install_link, dbus, \
 		../init.d/dbus, \
 		/etc/rc.d/$(PTXCONF_DBUS_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_DBUS_SYSTEMD_UNIT

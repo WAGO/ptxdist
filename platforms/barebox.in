@@ -8,12 +8,18 @@ config BAREBOX_ARCH_STRING
 	default "ppc"			if ARCH_PPC
 	default "x86"			if ARCH_X86
 
+config BAREBOX_DEPENDENCIES
+	tristate
+	select VIRTUAL
+
 menuconfig BAREBOX
+	select BAREBOX_DEPENDENCIES
 	select BOOTLOADER
 	select HOST_LIBUSB if BAREBOX_NEEDS_HOST_LIBUSB
 	select HOST_OPENSSL if BAREBOX_NEEDS_HOST_OPENSSL
 	select HOST_IMX_CST if BAREBOX_NEEDS_HOST_IMX_CST
 	select HOST_LZOP if BAREBOX_NEEDS_HOST_LZOP
+	select HOST_LZ4 if BAREBOX_NEEDS_HOST_LZ4
 	select CODE_SIGNING if BAREBOX_NEEDS_KEYS
 	prompt "barebox                       "
 	bool
@@ -27,9 +33,25 @@ config BAREBOX_VERSION
 	string
 	default "2016.08.0"
 
+config BAREBOX_CONFIG_BUILDSYSTEM_VERSION
+	prompt "add a buildsystem version to the barebox binary"
+	bool
+	help
+	  When this option is enabled, the nv variable "nv.buildsystem_version"
+	  in barebox is set to PTXCONF_BAREBOX_BUILDSYSTEM_VERSION.
+
+config BAREBOX_BUILDSYSTEM_VERSION
+	prompt "barebox buildsystem version"
+	depends on BAREBOX_CONFIG_BUILDSYSTEM_VERSION
+	string
+	default "${PTXDIST_VCS_VERSION}"
+
 config BAREBOX_MD5
 	prompt "barebox source md5sum"
 	string
+	help
+	  To ensure integrity of the downloaded source tarball, fill in its
+	  MD5 sum here.
 
 config BAREBOX_CONFIG
 	prompt "config file"
@@ -38,6 +60,14 @@ config BAREBOX_CONFIG
 	help
 	  This entry specifies the .config file used to compile
 	  barebox.
+
+menuconfig BAREBOX_FIRMWARE
+	bool
+	prompt "integrate firmware blobs      "
+
+if BAREBOX_FIRMWARE
+source "generated/barebox_firmware.in"
+endif
 
 config BAREBOX_EXTRA_ENV
 	prompt "extend the builtin barebox environment"
@@ -59,6 +89,14 @@ config BAREBOX_BAREBOXENV
 	  The tool 'bareboxenv' can be used to manipulate the barebox
 	  environment. Enable this option to access the barebox environment
 	  from the target Linux system.
+
+config BAREBOX_INSTALL_DTBS
+	prompt "install dtbs"
+	bool
+	help
+	  Install barebox generated dtbs into the image directory.
+	  These dtbs can, for example, be used when constructing a
+	  FIP image for TF-A boot.
 
 config BAREBOX_BAREBOXCRC32
 	prompt "install 'bareboxcrc32'"
@@ -83,6 +121,8 @@ config BAREBOX_BAREBOXIMD
 	  The tool 'bareboximd' can be used to extract metadata from
 	  the (flashed) barebox image.
 
+comment "build dependencies"
+
 config BAREBOX_NEEDS_HOST_LIBUSB
 	prompt "barebox needs libusb"
 	bool
@@ -95,16 +135,17 @@ config BAREBOX_NEEDS_HOST_IMX_CST
 	prompt "barebox needs imx-cst"
 	bool
 	help
-	  The imx "CST" is the propretary "Code Signing Tool" by
+	  The imx "CST" is the proprietary "Code Signing Tool" by
 	  freescale, that is needed to sign the bootloader with a
-	  cryptographic signature. This part of freescale's high
+	  cryptographic signature. This is part of freescale's high
 	  assurance boot (HAB) scenario where only correctly signed
 	  images can be started.
-	  Barebox currently supports HABv4 for i.MX6 only.
+	  Barebox currently supports HABv4 for i.MX6, i.MX8MM, 8MN,
+	  8MQ & 8MP.
 
-	  This options does not do the signing, it just creates the
-	  correct dependencies so that the proprieraty "cst" program
-	  is installed before barebox is compiled. THe signing is done
+	  This option does not do the signing, it just creates the
+	  correct dependencies so that the proprietary "cst" program
+	  is installed before barebox is compiled. The signing is done
 	  in barebox and needs special configuration for your board.
 
 config BAREBOX_NEEDS_KEYS
@@ -128,6 +169,14 @@ config BAREBOX_NEEDS_HOST_LZOP
 	help
 	  The barebox executable can be compressed. Select this if
 	  lzop is used in order to compile lzop for your development
+	  host.
+
+config BAREBOX_NEEDS_HOST_LZ4
+	prompt "barebox needs lz4"
+	bool
+	help
+	  The barebox executable can be compressed. Select this if
+	  lz4 is used in order to compile lz4 for your development
 	  host.
 
 endif

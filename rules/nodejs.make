@@ -17,24 +17,16 @@ endif
 #
 # Paths and names
 #
-NODEJS_VERSION		:= v12.16.1
-NODEJS_MD5		:= 549582c075072c689c245ba12ecac54a
+NODEJS_VERSION		:= v20.11.0
+NODEJS_MD5		:= e112c8d089843052639ac5c438149c4e
 NODEJS			:= node-$(NODEJS_VERSION)
 NODEJS_SUFFIX		:= tar.xz
 NODEJS_URL		:= http://nodejs.org/dist/$(NODEJS_VERSION)/$(NODEJS).$(NODEJS_SUFFIX)
 NODEJS_SOURCE		:= $(SRCDIR)/$(NODEJS).$(NODEJS_SUFFIX)
 NODEJS_DIR		:= $(BUILDDIR)/$(NODEJS)
-NODEJS_LICENSE		:= MIT AND ISC AND BSD-3-Clause
+NODEJS_LICENSE		:= MIT AND ISC AND BSD-3-Clause AND BSD-2-Clause AND Apache-2.0
 NODEJS_LICENSE_FILES	:= \
-        file://LICENSE;md5=126890df35936bbffe9fa00c90ad4870
-
-NODEJS_HOST_TOOLS	:= \
-	bytecode_builtins_list_generator \
-	gen-regexp-special-case \
-	mkcodecache \
-	mksnapshot \
-	node_mksnapshot \
-	torque
+        file://LICENSE;md5=78ad16dab3c1d15d4878c81770be0be7
 
 node/env = \
 	$(CROSS_ENV) \
@@ -67,32 +59,34 @@ endif
 NODEJS_CONF_OPT := \
 	--prefix=/usr \
 	--dest-cpu=$(NODEJS_ARCH) \
-	--no-cross-compiling \
+	--cross-compiling \
 	--dest-os=linux \
 	$(call ptx/ifdef,PTXCONF_ARCH_ARM,--with-arm-float-abi=$(NODEJS_ARM_FLOAT_ABI)) \
 	$(call ptx/ifdef,PTXCONF_ARCH_ARM,--with-arm-fpu=$(NODEJS_ARM_FPU)) \
-	--without-dtrace \
-	--without-etw \
 	--without-npm \
 	--shared \
 	--shared-libuv \
 	--shared-openssl \
 	--shared-zlib \
+	--shared-brotli \
 	--shared-cares \
-	--with-intl=none \
-	--without-snapshot
+	--with-intl=none
+
+ifdef PTXCONF_GLOBAL_LARGE_FILE
+# these flags are supposed to come from libuv but that does not work with shared libuv
+NODEJS_CPPFLAGS := \
+	-D_LARGEFILE_SOURCE \
+	-D_FILE_OFFSET_BITS=64
+endif
 
 $(STATEDIR)/nodejs.prepare:
 	@$(call targetinfo)
 
-#	# Using a patch here isn't enough, as we need absolute paths
-#	# to the pre-built host tool binaries, which are different for
-#	# each individual checkout of a BSP.  -_-
-	$(foreach f,$(NODEJS_HOST_TOOLS), \
-		sed -i -e "s#<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)$(f)<(EXECUTABLE_SUFFIX)#$(PTXDIST_SYSROOT_HOST)/bin/$(f)#" \
-			$(NODEJS_DIR)/node.gyp $(NODEJS_DIR)/tools/v8_gypfiles/v8.gyp $(ptx/nl))
-
-	@$(call world/prepare, NODEJS)
+	@$(call world/execute, NODEJS, \
+		python3 ./configure $(NODEJS_CONF_OPT))
+	@mkdir -p $(NODEJS_DIR)/out/Release/
+	@ ln -svf $(PTXDIST_SYSROOT_CROSS)/usr/bin/qemu-cross \
+		$(NODEJS_DIR)/out/Release/tool-wrapper
 
 	@$(call touch)
 

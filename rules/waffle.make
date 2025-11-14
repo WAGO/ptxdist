@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_WAFFLE) += waffle
 #
 # Paths and names
 #
-WAFFLE_VERSION	:= 1.5.2
-WAFFLE_MD5	:= c669c91bf2f7e13a5d781c3dbb30fd8c
+WAFFLE_VERSION	:= 1.8.1
+WAFFLE_MD5	:= 96de2ce2ad25ec0b53a26f4e5665c391
 WAFFLE		:= waffle-$(WAFFLE_VERSION)
 WAFFLE_SUFFIX	:= tar.xz
-WAFFLE_URL	:= http://www.waffle-gl.org/files/release/$(WAFFLE)/$(WAFFLE).$(WAFFLE_SUFFIX)
+WAFFLE_URL	:= https://mesa.pages.freedesktop.org/waffle/files/release/$(WAFFLE)/$(WAFFLE).$(WAFFLE_SUFFIX)
 WAFFLE_SOURCE	:= $(SRCDIR)/$(WAFFLE).$(WAFFLE_SUFFIX)
 WAFFLE_DIR	:= $(BUILDDIR)/$(WAFFLE)
 WAFFLE_LICENSE	:= BSD-2-Clause
@@ -29,14 +29,19 @@ WAFFLE_LICENSE_FILES := \
 # Prepare
 # ----------------------------------------------------------------------------
 
-WAFFLE_CONF_TOOL	:= cmake
+WAFFLE_CONF_TOOL	:= meson
 WAFFLE_CONF_OPT	:= \
-	$(CROSS_CMAKE_USR) \
-	-Dwaffle_has_glx=$(call ptx/ifdef,PTXCONF_WAFFLE_GLX,1,0) \
-	-Dwaffle_has_wayland=$(call ptx/ifdef,PTXCONF_WAFFLE_WAYLAND,1,0) \
-	-Dwaffle_has_x11_egl=$(call ptx/ifdef,PTXCONF_WAFFLE_X11_EGL,1,0) \
-	-Dwaffle_has_gbm=$(call ptx/ifdef,PTXCONF_WAFFLE_GBM,1,0)
-
+	$(CROSS_MESON_USR) \
+	-Dbuild-examples=false \
+	-Dbuild-htmldocs=false \
+	-Dbuild-manpages=false \
+	-Dbuild-tests=false \
+	-Dgbm=$(call ptx/endis,PTXCONF_WAFFLE_GBM)d \
+	-Dglx=$(call ptx/endis,PTXCONF_WAFFLE_GLX)d \
+	-Dnacl=false \
+	-Dsurfaceless_egl=disabled \
+	-Dwayland=$(call ptx/endis,PTXCONF_WAFFLE_WAYLAND)d \
+	-Dx11_egl=$(call ptx/endis,PTXCONF_WAFFLE_X11_EGL)d
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -52,6 +57,7 @@ $(STATEDIR)/waffle.targetinstall:
 	@$(call install_fixup, waffle,DESCRIPTION,missing)
 
 	@$(call install_lib, waffle, 0, 0, 0644, libwaffle-1)
+	@$(call install_copy, waffle, 0, 0, 0755, -, /usr/bin/wflinfo)
 
 	@$(call install_finish, waffle)
 

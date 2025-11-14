@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_GPGME) += gpgme
 #
 # Paths and names
 #
-GPGME_VERSION	:= 1.11.1
-GPGME_MD5	:= 129c46fb85a7ffa41e43345e48aee884
+GPGME_VERSION	:= 1.23.2
+GPGME_MD5	:= 01a8c05b409847e87daf0543e91f8c37
 GPGME		:= gpgme-$(GPGME_VERSION)
 GPGME_SUFFIX	:= tar.bz2
 GPGME_URL	:= https://www.gnupg.org/ftp/gcrypt/gpgme/$(GPGME).$(GPGME_SUFFIX)
@@ -33,6 +33,10 @@ GPGME_LANG-$(PTXCONF_GPGME_CPP)		+= cpp
 # Note: qt bindings are GPLv2.0+
 
 GPGME_LANG := $(subst $(space),$(comma),$(strip $(GPGME_LANG-y)))
+
+GPGME_CONF_ENV	:= \
+	$(CROSS_ENV) \
+	LIBASSUAN_CONFIG="$(PTXDIST_SYSROOT_CROSS)/usr/bin/libassuan-config"
 
 #
 # autoconf

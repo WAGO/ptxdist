@@ -28,13 +28,11 @@ LIBDAEMON_LICENSE	:= LGPL-2.1-or-later
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBDAEMON_PATH	:= PATH=$(CROSS_PATH)
-LIBDAEMON_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBDAEMON_AUTOCONF := \
+LIBDAEMON_CONF_TOOL	:= autoconf
+LIBDAEMON_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-lynx
 

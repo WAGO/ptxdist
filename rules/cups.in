@@ -19,11 +19,7 @@ menuconfig CUPS
 	select AVAHI			if CUPS_AVAHI
 	select AVAHI_LIBAVAHI_CLIENT	if CUPS_AVAHI
 	select PERL			if CUPS_PERL && RUNTIME
-	select PHP5			if CUPS_PHP && RUNTIME
-	select PHP5_SAPI_CLI		if CUPS_PHP5_CLI && RUNTIME
-	select PHP5_SAPI_CGI		if CUPS_PHP5_CGI && RUNTIME
-	select PYTHON			if CUPS_PYTHON && CUPS_PYTHON2 && RUNTIME
-	select PYTHON3			if CUPS_PYTHON && CUPS_PYTHON3 && RUNTIME
+	select PYTHON3			if CUPS_PYTHON && RUNTIME
 
 	help
 	  CUPS is the standards-based, open source printing system. It uses the
@@ -57,10 +53,11 @@ config CUPS_JAVA_PATH
 endif
 
 config CUPS_PERL
+	depends on STAGING
 	bool "enable Perl support for web interface"
 
 config CUPS_PHP
-	depends on STAGING
+	depends on BROKEN
 	bool "enable PHP support for web interface"
 
 if CUPS_PHP
@@ -80,20 +77,6 @@ endif	# CUPS_PHP
 config CUPS_PYTHON
 	bool "enable Python support for web interface"
 
-if CUPS_PYTHON
-choice
-	prompt "Python interpreter"
-	default CUPS_PYTHON3
-
-config CUPS_PYTHON2
-	bool "python2"
-
-config CUPS_PYTHON3
-	bool "python3"
-
-endchoice
-endif # CUPS_PYTHON
-
 endif # CUPS_WEBINTERFACE
 
 config CUPS_SYSTEMD_UNIT
@@ -112,7 +95,6 @@ config CUPS_STARTSCRIPT
 
 config CUPS_TEST_TOOLS
 	bool "install cupstest* tools"
-	default n
 	help
 	  Install cupstestdsc and cupstestppd on the target.
 

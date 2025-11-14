@@ -15,14 +15,19 @@ PACKAGES-$(PTXCONF_RTMPDUMP) += rtmpdump
 # Paths and names
 #
 # No tags: use a fake descriptive commit-ish to include the date
-RTMPDUMP_VERSION	:= 2015-12-23-0-gfa8646daeb19
-RTMPDUMP_MD5		:= 0f44c17bba8d601395b041a51d951488
+RTMPDUMP_VERSION	:= 2021-02-19-gf1b83c10d8be
+RTMPDUMP_MD5		:= 33390d59c4eac5ae34ac155804d44fb6 b0f9380fc56d42e5a12094c467188de9
 RTMPDUMP		:= rtmpdump-$(RTMPDUMP_VERSION)
-RTMPDUMP_SUFFIX		:= tar.xz
-RTMPDUMP_URL		:= git://git.ffmpeg.org/rtmpdump.git;tag=$(RTMPDUMP_VERSION)
+RTMPDUMP_SUFFIX		:= tar.gz
+RTMPDUMP_URL		:= git+https://git.ffmpeg.org/rtmpdump.git;tag=$(RTMPDUMP_VERSION)
 RTMPDUMP_SOURCE		:= $(SRCDIR)/$(RTMPDUMP).$(RTMPDUMP_SUFFIX)
 RTMPDUMP_DIR		:= $(BUILDDIR)/$(RTMPDUMP)
 RTMPDUMP_LICENSE	:= LGPL-2.1-or-later AND GPL-2.0-or-later
+RTMPDUMP_LICENSE_FILES	:= \
+	file://librtmp/rtmp.c;startline=1;endline=24;md5=96a5f261b5569d2c1daf56477675485a \
+	file://librtmp/COPYING;md5=e344c8fa836c3a41c4cbd79d7bd3a379 \
+	file://rtmpdump.c;startline=1;endline=21;md5=f5d34dc0445bc1d3984f7efcfeaab1cf \
+	file://COPYING;md5=751419260aa954499f7abaabaa882bbe
 
 # ----------------------------------------------------------------------------
 # Prepare

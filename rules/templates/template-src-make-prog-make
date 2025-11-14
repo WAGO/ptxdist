@@ -19,6 +19,7 @@ PACKAGES-$(PTXCONF_@PACKAGE@) += @package@
 @PACKAGE@_URL		:= file://local_src/@package@
 @PACKAGE@_DIR		:= $(BUILDDIR)/$(@PACKAGE@)
 @PACKAGE@_LICENSE	:= unknown
+@PACKAGE@_LICENSE_FILES	:=
 
 # ----------------------------------------------------------------------------
 # Extract
@@ -91,8 +92,7 @@ $(STATEDIR)/@package@.targetinstall:
 
 $(STATEDIR)/@package@.clean:
 	@$(call targetinfo)
-	@-cd $(@PACKAGE@_DIR) && \
-		$(@PACKAGE@_ENV) $(@PACKAGE@_PATH) $(MAKE) clean
+	@-$(call execute, @PACKAGE@, $(@PACKAGE@_MAKE_ENV) $(MAKE) clean)
 	@$(call clean_pkg, @PACKAGE@)
 
 # vim: syntax=make

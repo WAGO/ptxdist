@@ -23,13 +23,15 @@ HOST_LIBTIRPC_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--disable-gssapi \
 	--disable-shared \
-	--enable-static
+	--enable-static \
+	--disable-authdes \
+	--enable-symvers
 
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
 
-HOST_LIBTIRPC_PC := $(HOST_LIBTIRPC_PKGDIR)/lib/pkgconfig/libtirpc.pc
+HOST_LIBTIRPC_PC := $(HOST_LIBTIRPC_PKGDIR)/usr/lib/pkgconfig/libtirpc.pc
 
 $(STATEDIR)/host-libtirpc.install:
 	@$(call targetinfo)

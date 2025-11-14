@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_SAMBA) += samba
 #
 # Paths and names
 #
-SAMBA_VERSION	:= 4.9.5
-SAMBA_MD5	:= e761ba58bdbcb903bd3692283d46103a
+SAMBA_VERSION	:= 4.14.6
+SAMBA_MD5	:= 0e6b5607ad37209a5a10235579fa9765
 SAMBA		:= samba-$(SAMBA_VERSION)
 SAMBA_SUFFIX	:= tar.gz
 SAMBA_URL	:= https://download.samba.org/pub/samba/stable/$(SAMBA).$(SAMBA_SUFFIX)
@@ -24,7 +24,7 @@ SAMBA_SOURCE	:= $(SRCDIR)/$(SAMBA).$(SAMBA_SUFFIX)
 SAMBA_DIR	:= $(BUILDDIR)/$(SAMBA)
 SAMBA_LICENSE	:= GPL-3.0-or-later AND LGPL-3.0-or-later
 # cross-compile runtime checks. Initial file generated with
-# --cross-execute=$(PTXDIST_SYSROOT_CROSS)/bin/qemu-cross
+# --cross-execute=$(PTXDIST_SYSROOT_CROSS)/usr/bin/qemu-cross
 SAMBA_CONFIG	 = $(call ptx/get-alternative, config/samba, cross-answers)
 
 # ----------------------------------------------------------------------------
@@ -36,12 +36,10 @@ SAMBA_CONFIG	 = $(call ptx/get-alternative, config/samba, cross-answers)
 #
 SAMBA_CONF_TOOL	:= NO
 SAMBA_CONF_OPT	:= \
-	--nocache \
-	--without-json-audit \
 	--without-gettext \
 	--disable-python \
-	--disable-gnutls \
 	--without-gpgme \
+	--with-shared-modules="!vfs_snapper" \
 	--without-winbind \
 	--without-ads \
 	--without-ldap \
@@ -67,6 +65,7 @@ SAMBA_CONF_OPT	:= \
 	--disable-glusterfs \
 	--disable-cephfs \
 	--disable-spotlight \
+	--disable-fault-handling \
 	--$(call ptx/wwo, PTXCONF_SAMBA_SYSTEMD_UNIT)-systemd \
 	--without-lttng \
 	--accel-aes=$(call ptx/ifdef,PTXCONF_ARCH_X86_64,intelaesni,none) \
@@ -74,18 +73,18 @@ SAMBA_CONF_OPT	:= \
 	--with-system-mitkrb5 \
 	--without-ad-dc \
 	--without-ntvfs-fileserver \
+	--without-json \
 	$(CROSS_AUTOCONF_SYSROOT_USR) \
-	--bundled-libraries=NONE,cmocka,tdb,talloc,tevent,ldb \
+	--bundled-libraries=NONE,cmocka,tdb,tevent,ldb \
 	--disable-rpath \
 	--disable-rpath-install \
 	--enable-auto-reconfigure \
 	--cross-compile \
-	--cross-execute=/does/not/exist/and/triggers/exceptions \
 	--cross-answers=$(SAMBA_DIR)/cross-answers \
 	--hostcc=$(HOSTCC) \
 	--enable-fhs \
-	--with-piddir=/run/samba \
 	--with-lockdir=/var/lib/samba/lock \
+	--with-piddir=/run/samba \
 	$(call ptx/ifdef,PTXCONF_SAMBA_SYSTEMD_UNIT,--systemd-install-services,) \
 	--with-systemddir=/usr/lib/systemd/system
 
@@ -96,11 +95,11 @@ $(STATEDIR)/samba.prepare:
 		UNAME_V=$(if $(KERNEL_HEADER_VERSION),$(KERNEL_HEADER_VERSION),$(KERNEL_VERSION)) \
 		HAS_64BIT=$(call ptx/ifdef,PTXCONF_ARCH_LP64,OK,NO) \
 		ptxd_replace_magic $(SAMBA_CONFIG) > $(SAMBA_DIR)/cross-answers
-	@$(call world/execute, SAMBA, $(SYSTEMPYTHON) ./buildtools/bin/waf configure $(SAMBA_CONF_OPT))
+	@$(call world/execute, SAMBA, $(SYSTEMPYTHON3) ./buildtools/bin/waf configure $(SAMBA_CONF_OPT))
 	@$(call touch)
 
-SAMBA_COMPILE_ENV := \
-	PTXDIST_ICECC=
+SAMBA_MAKE_ENV := \
+	PTXDIST_ICECC=$(PTXDIST_ICERUN)
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -109,6 +108,7 @@ SAMBA_COMPILE_ENV := \
 SAMBA_COMMON_LIBS := \
 	libdcerpc \
 	libdcerpc-binding \
+	libdcerpc-server-core \
 	libndr-krb5pac \
 	libndr-nbt \
 	libndr-standard \
@@ -124,7 +124,6 @@ SAMBA_COMMON_LIBS := \
 	libtevent-util \
 	libwbclient \
 	samba/libldb \
-	samba/libtalloc \
 	samba/libtdb \
 	samba/libtevent
 
@@ -196,7 +195,6 @@ endif
 #	#
 #	# busybox init
 #	#
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_SAMBA_STARTSCRIPT
 	@$(call install_alternative, samba, 0, 0, 0755, /etc/init.d/samba)
 
@@ -204,7 +202,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_SAMBA_BBINIT_LINK)),)
 	@$(call install_link, samba, \
 		../init.d/samba, \
 		/etc/rc.d/$(PTXCONF_SAMBA_BBINIT_LINK))
-endif
 endif
 endif
 

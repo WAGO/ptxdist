@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_BAREBOX_MLO) += barebox_mlo
 #
 # Paths and names
 #
-BAREBOX_MLO_VERSION	:= $(call remove_quotes,$(PTXCONF_BAREBOX_MLO_VERSION))
-BAREBOX_MLO_MD5		:= $(call remove_quotes,$(PTXCONF_BAREBOX_MLO_MD5))
+BAREBOX_MLO_VERSION	:= $(call ptx/config-version, PTXCONF_BAREBOX_MLO)
+BAREBOX_MLO_MD5		:= $(call ptx/config-md5, PTXCONF_BAREBOX_MLO)
 BAREBOX_MLO		:= barebox-$(BAREBOX_MLO_VERSION)
 BAREBOX_MLO_URL		= http://www.barebox.org/download/$(BAREBOX_MLO).$(BAREBOX_SUFFIX)
 BAREBOX_MLO_DIR		:= $(BUILDDIR)/barebox_mlo-$(BAREBOX_MLO_VERSION)
@@ -68,18 +68,18 @@ $(STATEDIR)/barebox_mlo.install:
 
 $(STATEDIR)/barebox_mlo.targetinstall:
 	@$(call targetinfo)
+	@$(call world/image-clean, BAREBOX_MLO)
 #	#barebox renamed barebox.bin.ift to MLO, so fall back to barebox.bin.ift
-	@rm -f $(IMAGEDIR)/MLO
 	@for image in `ls $(BAREBOX_MLO_DIR)/images/barebox-*.img`; do \
-		install -D -m644 $$image $(IMAGEDIR)/`basename $$image`; \
+		$(call ptx/image-install, BAREBOX_MLO, $$image); \
 		if [ ! -e "$(IMAGEDIR)/MLO" ]; then \
-			ln -sf `basename $$image` $(IMAGEDIR)/MLO; \
+			$(call ptx/image-install-link, BAREBOX_MLO, `basename $$image`, MLO); \
 		fi; \
 	done
 	@if [ ! -e "$(IMAGEDIR)/MLO" ]; then \
 		ptxd_get_path "$(BAREBOX_MLO_DIR)/MLO" \
 			"$(BAREBOX_MLO_DIR)/barebox.bin.ift" && \
-		install -D -m644 "$${ptxd_reply}" "$(IMAGEDIR)/MLO"; \
+		$(call ptx/image-install, BAREBOX_MLO, "$${ptxd_reply}", MLO); \
 	fi
 
 	@$(call touch)
@@ -91,13 +91,12 @@ $(STATEDIR)/barebox_mlo.targetinstall:
 $(STATEDIR)/barebox_mlo.clean:
 	@$(call targetinfo)
 	@$(call clean_pkg, BAREBOX_MLO)
-	rm -rf $(IMAGEDIR)/MLO
 
 # ----------------------------------------------------------------------------
 # oldconfig / menuconfig
 # ----------------------------------------------------------------------------
 
-barebox_mlo_oldconfig barebox_mlo_menuconfig barebox_mlo_nconfig: $(STATEDIR)/barebox_mlo.extract
+$(call ptx/kconfig-targets, barebox_mlo): $(STATEDIR)/barebox_mlo.extract
 	@if test -e $(BAREBOX_MLO_CONFIG); then \
 		cp $(BAREBOX_MLO_CONFIG) $(BAREBOX_MLO_DIR)/.config; \
 	fi

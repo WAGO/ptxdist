@@ -30,14 +30,14 @@ LIBLOCKFILE_LICENSE_FILES := file://COPYRIGHT;md5=35127b30003a121544b5d13a2ac868
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBLOCKFILE_PATH	:= PATH=$(CROSS_PATH)
-LIBLOCKFILE_ENV 	:= $(CROSS_ENV)
-LIBLOCKFILE_MAKEVARS	:= ROOT=$(PKGDIR)/$(LIBLOCKFILE) $(CROSS_ENV_AR)
+LIBLOCKFILE_MAKE_OPT	:= $(CROSS_ENV_AR)
+LIBLOCKFILE_INSTALL_OPT	:= ROOT=$(PKGDIR)/$(LIBLOCKFILE) install
 
 #
 # autoconf
 #
-LIBLOCKFILE_AUTOCONF	:= $(CROSS_AUTOCONF_USR)
+LIBLOCKFILE_CONF_TOOL	:= autoconf
+LIBLOCKFILE_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

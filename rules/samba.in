@@ -4,10 +4,10 @@ menuconfig SAMBA
 	tristate
 	prompt "samba                         "
 	select HOST_SYSTEM_PERL
-	select HOST_SYSTEM_PYTHON
+	select HOST_SYSTEM_PERL_YAPP
+	select HOST_SYSTEM_PYTHON3
 	select LIBC_CRYPT
 	select LIBC_DL
-	select LIBC_NSL
 	select LIBC_RESOLV
 	select GCCLIBS_GCC_S
 	select ACL
@@ -17,8 +17,10 @@ menuconfig SAMBA
 	select LIBBSD
 	select LIBCAP
 	select LIBPOPT
+	select GNUTLS
 	select READLINE
 	select SYSTEMD				if SAMBA_SYSTEMD_UNIT
+	select TALLOC
 	select ZLIB
 	select ROOTFS_VAR_LIB			if RUNTIME
 	select ROOTFS_VAR_CACHE			if RUNTIME
@@ -29,7 +31,7 @@ menuconfig SAMBA
 	  Windows operating systems. Samba is freely available under the
 	  GNU General Public License
 
-	  See http://www.samba.org for details.
+	  See https://www.samba.org for details.
 
 	  Note: on a read-only root filesystem this package still requires a
 	  writable '/var/lib' and '/var/cache'.
@@ -50,6 +52,7 @@ config SAMBA_SERVER
 config SAMBA_CLIENT
 	bool
 	select SAMBA_COMMON
+	select SAMBA_LIBCLIENT
 	prompt "Samba client"
 	help
 	  Installs some client components of the Samba suite.
@@ -78,5 +81,4 @@ config SAMBA_SYSTEMD_UNIT
 	default y
 	depends on SAMBA_SERVER && INITMETHOD_SYSTEMD
 	prompt "install systemd unit files"
-
 endif

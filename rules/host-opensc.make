@@ -40,9 +40,18 @@ HOST_OPENSC_CONF_OPT	:= \
 	--disable-doc \
 	--disable-dnie-ui \
 	--disable-notify \
-	--enable-tests=no \
+	--disable-cmocka \
 	--disable-static
 
 HOST_OPENSC_CPPFLAGS := -Wno-implicit-fallthrough
+
+$(STATEDIR)/host-opensc.install.post:
+	@$(call targetinfo)
+#	# These files are symlinks to ../<name>. PTXdist updates the rpath for
+#	# the real file so it is wrong for the symlink. Fix it here afterwards.
+	@$(foreach plugin,$(wildcard $(HOST_OPENSC_PKGDIR)/usr/lib/pkcs11/*.so), \
+		chrpath --replace '$${ORIGIN}/../' $(plugin) > /dev/null$(ptx/nl))
+	@$(call world/install.post, HOST_OPENSC)
+	@$(call touch)
 
 # vim: syntax=make

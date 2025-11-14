@@ -3,7 +3,6 @@
 menuconfig PYTHON3
 	tristate "python3                       "
 	select HOST_PYTHON3
-	select HOST_PYTHON3_ZLIB	if PYTHON3_ENSUREPIP
 	select HOST_PYTHON3_SETUPTOOLS
 	select LIBC_DL
 	select LIBC_CRYPT
@@ -55,19 +54,17 @@ config PYTHON3_SSL
 	bool "ssl & hashlib bindings"
 
 config PYTHON3_SYMLINK
-        depends on !PYTHON_SYMLINK
 	bool
 	prompt "install symbolic link /usr/bin/python"
-	default y if !PYTHON_SYMLINK
+	default y
 
 config PYTHON3_DISTUTILS
 	bool
 	prompt "Include distutils packages"
 
-config PYTHON3_ENSUREPIP
-	select PYTHON3_SSL
+config PYTHON3_KEEP_ENSUREPIP
 	bool
-	prompt "Include bundled pip"
+	prompt "Include ensurepip module"
 
 endif
 

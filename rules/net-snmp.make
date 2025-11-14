@@ -16,8 +16,8 @@ PACKAGES-$(PTXCONF_NET_SNMP) += net-snmp
 #
 # Paths and names
 #
-NET_SNMP_VERSION	:= 5.8
-NET_SNMP_MD5		:= 63bfc65fbb86cdb616598df1aff6458a
+NET_SNMP_VERSION	:= 5.9.4
+NET_SNMP_MD5		:= 395f7988f1ee4fd9b61eebbbb0961245
 NET_SNMP		:= net-snmp-$(NET_SNMP_VERSION)
 NET_SNMP_SUFFIX		:= tar.gz
 NET_SNMP_URL		:= $(call ptx/mirror, SF, net-snmp/$(NET_SNMP).$(NET_SNMP_SUFFIX))
@@ -39,19 +39,20 @@ NET_SNMP_MIB_MODULES-$(PTXCONF_NET_SNMP_MIB_MODULES_UCD_SNMP) += ucd_snmp
 NET_SNMP_MIB_MODULES-$(PTXCONF_NET_SNMP_MIB_MODULES_LM_SENSORS) += ucd-snmp/lmsensorsMib
 
 
-NET_SNMP_ENV := \
+NET_SNMP_CONF_ENV := \
 	$(CROSS_ENV) \
 	ac_cv_header_pcre_h=no
 
 ifndef PTXCONF_NET_SNMP_PCI
-NET_SNMP_ENV += \
+NET_SNMP_CONF_ENV += \
 	netsnmp_cv_func_pci_lookup_name_LMIBLIBS=no
 endif
 
 #
 # autoconf
 #
-NET_SNMP_AUTOCONF := \
+NET_SNMP_CONF_TOOL := autoconf
+NET_SNMP_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--$(call ptx/endis, PTXCONF_NET_SNMP_AGENT)-agent \
 	--$(call ptx/endis, PTXCONF_NET_SNMP_APPLICATIONS)-applications \
@@ -95,8 +96,6 @@ NET_SNMP_AUTOCONF := \
 	--enable-shared \
 	--disable-static \
 	--with-endianness=$(call ptx/ifdef, PTXCONF_ENDIAN_LITTLE, little, big) \
-	--without-dmalloc \
-	--without-efence \
 	--$(call ptx/wwo, PTXCONF_NET_SNMP_SHA_AES)-openssl \
 	--without-pkcs \
 	--without-krb5 \
@@ -115,8 +114,6 @@ NET_SNMP_AUTOCONF := \
 	--without-zlib \
 	--without-bzip2 \
 	--without-mysql
-
-NET_SNMP_MAKE_PAR := NO
 
 # ----------------------------------------------------------------------------
 # Target-Install

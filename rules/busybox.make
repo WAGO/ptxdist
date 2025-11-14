@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_BUSYBOX) += busybox
 #
 # Paths and names
 #
-BUSYBOX_VERSION	:= 1.31.1
-BUSYBOX_MD5	:= 70913edaf2263a157393af07565c17f0
+BUSYBOX_VERSION	:= 1.37.0
+BUSYBOX_MD5	:= 865b68ab41b923d9cdbebf3f2c8b04ec
 BUSYBOX		:= busybox-$(BUSYBOX_VERSION)
 BUSYBOX_SUFFIX	:= tar.bz2
 BUSYBOX_URL	:= https://www.busybox.net/downloads/$(BUSYBOX).$(BUSYBOX_SUFFIX)
@@ -39,6 +39,18 @@ $(STATEDIR)/busybox.prepare:
 	@$(call compile, BUSYBOX, distclean)
 	@grep -e PTXCONF_BUSYBOX_ $(PTXDIST_PTXCONFIG) | \
 		sed -e 's/PTXCONF_BUSYBOX_/CONFIG_/g' > $(BUSYBOX_DIR)/.config
+ifdef PTXCONF_BUSYBOX_NEED_LIBTIRPC
+	@sed -i \
+		-e 's;^\(CONFIG_EXTRA_CFLAGS="\)\(.*"\);\1-I$(PTXDIST_SYSROOT_TARGET)/usr/include/tirpc \2;' \
+		-e 's;^\(CONFIG_EXTRA_LDLIBS="\)\(.*"\);\1tirpc \2;' \
+		$(BUSYBOX_DIR)/.config
+endif
+ifndef ARCH_X86
+#	# SHA1/SHA256 hwaccel is only implemented for x86/x86_64
+	@sed -i \
+		-e 's;\(CONFIG_SHA[0-9]*_HWACCEL\)=y;# \1 is not set;' \
+		$(BUSYBOX_DIR)/.config
+endif
 	@$(call ptx/oldconfig, BUSYBOX)
 
 	@$(call touch)
@@ -112,7 +124,7 @@ ifdef PTXCONF_BUSYBOX_FEATURE_INDIVIDUAL
 	@$(call install_lib, busybox, 0, 0, 0644, libbusybox)
 
 	@cat $(BUSYBOX_PKGDIR)/etc/busybox.links | while read link; do \
-		$(call install_copy, busybox, 0, 0, 755, \
+		$(call install_copy, busybox, 0, 0, 0755, \
 		"$(BUSYBOX_PKGDIR)/usr/lib/busybox/$${link##*/}", "/usr$${link}"); \
 	done
 else
@@ -125,7 +137,7 @@ ifdef PTXCONF_BUSYBOX_FEATURE_SUID_CONFIG
 	@$(call install_alternative, busybox, 0, 0, 0644, /etc/busybox.conf)
 endif
 else
-	@$(call install_copy, busybox, 0, 0, 755, -, /usr/bin/busybox)
+	@$(call install_copy, busybox, 0, 0, 0755, -, /usr/bin/busybox)
 endif
 	@cat $(BUSYBOX_PKGDIR)/etc/busybox.links | while read link; do		\
 		case "$${link}" in						\
@@ -150,7 +162,6 @@ endif
 #	# bb init: start scripts
 #	#
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_BUSYBOX_INETD_STARTSCRIPT
 	@$(call install_alternative, busybox, 0, 0, 0755, /etc/init.d/inetd)
 
@@ -220,8 +231,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_BUSYBOX_BB_SYSCTL_BBINIT_LINK)),)
 		/etc/rc.d/$(PTXCONF_BUSYBOX_BB_SYSCTL_BBINIT_LINK))
 endif
 endif
-
-endif # PTXCONF_INITMETHOD_BBINIT
 
 ifdef PTXCONF_BUSYBOX_TELNETD_SYSTEMD_UNIT
 	@$(call install_alternative, busybox, 0, 0, 0644, \

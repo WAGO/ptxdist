@@ -3,29 +3,23 @@
 # conf:	  Used for defconfig, oldconfig and related targets
 # mconf:  Used for the mconfig target.
 #         Utilizes the lxdialog package
-# qconf:  Used for the xconfig target
-#         Based on QT which needs to be installed to compile it
-# gconf:  Used for the gconfig target
-#         Based on GTK which needs to be installed to compile it
 # object files used by all kconfig flavours
 
-ifndef CURSES_LOC
-CURSES_LOC := <ncurses.h>
-endif
+CC		:= gcc
+CXX		:= g++
+CFLAGS		:= -g -O2 -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600
+CPPFLAGS	:= 
+LDFLAGS		:= 
 
 CPPFLAGS += \
-	-DCURSES_LOC="$(CURSES_LOC)" \
-	-DKBUILD_NO_NLS \
 	-DPACKAGE='"ptxdist"' \
 	-DCONFIG_='"PTXCONF_"'
 
-ifndef MCONF_LIBS
-MCONF_LIBS := -lncurses
-endif
+YACC		:= /usr/bin/bison
+LEX		:= /usr/bin/flex
 
-conf-libs  := $(CONF_LIBS)
-mconf-libs := $(MCONF_LIBS)
-nconf-libs := $(NCONF_LIBS)
+MCONF_LIBS := -Wl,-Bsymbolic-functions -lncursesw -ltinfo
+NCONF_LIBS := -Wl,-Bsymbolic-functions -lncursesw -ltinfo -Wl,-Bsymbolic-functions -lmenuw -Wl,-Bsymbolic-functions -lpanelw
 
 lkc-deps := lkc.h lkc_defs.h expr.h
 
@@ -43,7 +37,8 @@ common-objs := \
 	lexer.lex.o \
 	parser.tab.o \
 	preprocess.o \
-	symbol.o
+	symbol.o \
+	util.o
 
 conf-objs := \
 	$(common-objs) \
@@ -59,35 +54,26 @@ nconf-objs := \
 	nconf.o \
 	nconf.gui.o
 
+NCONF = nconf
+
+all: conf mconf $(NCONF)
+
 conf: $(conf-objs)
-	$(CC) $^ $(LDFLAGS) -o $@ $(conf-libs)
+	$(CC) $^ $(LDFLAGS) -o $@
 
 mconf: $(mconf-objs)
-	$(CC) $^ $(LDFLAGS) -o $@ $(mconf-libs)
+	$(CC) $^ $(LDFLAGS) -o $@ $(MCONF_LIBS)
 
 nconf: $(nconf-objs)
-	$(CC) $^ $(LDFLAGS) -o $@ $(nconf-libs)
-
-%.moc: %.h
-	$(MOC) -i $< -o $@
+	$(CC) $^ $(LDFLAGS) -o $@ $(NCONF_LIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
-
-%.o: %.cc
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
-
-%.moc: %.h
-	$(KC_QT_MOC) -i $< -o $@
 
 lkc_defs.h: lkc_proto.h
 	sed < $< > $@ 's/P(\([^,]*\),.*/#define \1 (\*\1_p)/'
 
 kconfig_load.o: $(lkc-deps)
-
-qconf.o: qconf.moc $(lkc-deps)
-
-gconf.o: $(lkc-deps)
 
 lexer.lex.o: parser.tab.h
 
@@ -95,41 +81,15 @@ parser.tab.o: menu.c
 
 .INTERMEDIATE: parser.tab.h
 
-###
-# The following requires flex/bison
-# By default we use the _shipped versions, uncomment the following line if
-# you are modifying the flex/bison src.
-# LKC_GENPARSER := 1
-
-ifdef LKC_GENPARSER
-
-lex.zconf.c: zconf.l
-
 %.tab.c: %.y
-	bison -o$@ -t -l $<
-	cp $@ $@_shipped
+	$(YACC) -o$@ -t -l $<
 
 %.tab.h: %.y
-	bison -o/dev/null --defines=$@ -t -l $<
-	cp $@ $@_shipped
+	$(YACC) -o/dev/null --defines=$@ -t -l $<
 
 %.lex.c: %.l
-	flex -o$@ -L $<
-	cp $@ $@_shipped
-
-else
-
-%.tab.c: %.y
-	cp $@_shipped $@
-
-%.tab.h: %.y
-	cp $@_shipped $@
-
-%.lex.c: %.l
-	cp $@_shipped $@
-
-endif
+	$(LEX) -o$@ -L $<
 
 clean:
-	rm -f $(conf-objs) $(mconf-objs) $(nconf-objs) conf mconf nconf gconf qconf
+	rm -f $(conf-objs) $(mconf-objs) $(nconf-objs) conf mconf nconf
 	rm -f lkc_defs.h *.lex.c *.tab.c *.tab.h

@@ -200,7 +200,7 @@ s/^\(\(# \)\?PTXCONF_\)GLIBC\(_LOCALTIME\)/\1TIMEZONE\3/
 # from   : ptxdist-2013.01.0
 # to     : ptxdist-2013.02.0
 # symbol : HOST_LIBBZ2 -> HOST_BZIP2
-# reason : allign with target package name
+# reason : align with target package name
 #
 s/^\(\(# \)\?PTXCONF_HOST\)_LIBBZ2/\1_BZIP2/
 
@@ -208,7 +208,7 @@ s/^\(\(# \)\?PTXCONF_HOST\)_LIBBZ2/\1_BZIP2/
 # from   : ptxdist-2013.04.0
 # to     : ptxdist-2013.05.0
 # symbol : GST*11 -> GST*1
-# reason : allign with target package name
+# reason : align with target package name
 #
 s/^\(\(# \)\?PTXCONF_GST[A-Z_]*1\)1/\1/
 
@@ -410,3 +410,94 @@ s/^\(\(# \)\?PTXCONF_SQLITE_LOAD_\)EXTENTION/\1EXTENSION/
 # reason : options were renamed / merged
 #
 s/^\(\(# \)\?PTXCONF_GPSD_DRIVER\)_UBX\>/\1_UBLOX/
+
+#
+# from   : ptxdist-2020.08.0
+# to     : ptxdist-2020.09.0
+# symbol : GST_VALIDATE1 -> GST_DEVTOOLS1
+# reason : gst-validate is part of gst-devtools, not released separately anymore
+#
+s/^\(\(# \)\?PTXCONF_GST_\)VALIDATE1\>/\1DEVTOOLS1/
+
+#
+# from   : ptxdist-2021.03.0
+# to     : ptxdist-2021.04.0
+# symbol : PYTHON3_ENSUREPIP -> PYTHON3_PIP
+# reason : pip is now a separate package instead of the bundled version
+#
+s/^\(\(# \)\?PTXCONF_PYTHON3_\)ENSUREPIP\>/\1PIP/
+
+# from   : ptxdist-2021.06.0
+# to     : ptxdist-2021.07.0
+# symbol : BERLIOS_CAN_UTILS_JSPY -> PTXCONF_BERLIOS_CAN_UTILS_J1939SPY
+# symbol : BERLIOS_CAN_UTILS_JSR -> PTXCONF_BERLIOS_CAN_UTILS_J1939SR
+# symbol : BERLIOS_CAN_UTILS_JACD -> PTXCONF_BERLIOS_CAN_UTILS_J1939ACD
+# symbol : BERLIOS_CAN_UTILS_JCAT -> PTXCONF_BERLIOS_CAN_UTILS_J1939CAT
+# reason : This utils was renamed mainline to avoid conflicts on debian
+#
+s/^\(\(# \)\?PTXCONF_BERLIOS_CAN_UTILS_\)JSPY\>/\1J1939SPY/
+s/^\(\(# \)\?PTXCONF_BERLIOS_CAN_UTILS_\)JSR\>/\1J1939SR/
+s/^\(\(# \)\?PTXCONF_BERLIOS_CAN_UTILS_\)JACD\>/\1J1939ACD/
+s/^\(\(# \)\?PTXCONF_BERLIOS_CAN_UTILS_\)JCAT\>/\1J1939CAT/
+
+# from   : ptxdist-2021.07.0
+# to     : ptxdist-2021.08.0
+# symbol : LIBTHEORA__* -> LIBTHEORA_*
+# reason : cleanup to remove the double '_'
+#
+s/^\(\(# \)\?PTXCONF_LIBTHEORA_\)_/\1/
+
+# from   : ptxdist-2021.07.0
+# to     : ptxdist-2021.08.0
+# symbol : LIGHTTPD_MOD_COMPRESS -> LIGHTTPD_MOD_DEFLATE
+# reason : upstream lighttpd module mod_compress was replaced by mod_deflate
+#
+s/^\(\(# \)\?PTXCONF_LIGHTTPD_MOD_\)COMPRESS\>/\1DEFLATE/
+
+# from   : ptxdist-2022.10.0
+# to     : ptxdist-2022.11.0
+# symbol : UTIL_LINUX_NG* -> UTIL_LINUX*
+# reason : upstream util-linux-ng fork was renamed back to util-linux over a decade ago
+#
+s/^\(\(# \)\?PTXCONF_UTIL_LINUX\)_NG/\1/
+
+# from   : ptxdist-2023.10.0
+# to     : ptxdist-2023.11.0
+# symbol : SYSTEMD -> SYSTEMD + SYSTEMD_HELPER
+# reason : SYSTEMD_HELPER was added as indirection to avoid cyclic dependencies
+#
+/^\(PTXCONF_SYSTEMD_HELPER\>\)\(.*\)/!bnot_systemd_helper
+# add the next line
+/^\(PTXCONF_SYSTEMD_HELPER\>\)\(.*\)/N
+# print SYSTEMD_HELPER + SYSTEMD and restart
+/^\(PTXCONF_SYSTEMD_HELPER\>\)\(.*\)\<PTXCONF_SYSTEMD\>/{p;d}
+# print SYSTEMD_HELPER and restart with the next line that is not SYSTEMD
+P
+D
+:not_systemd_helper
+# SYSTEMD without SYSTEMD_HELPER so add it
+s/^\(# \)\?\(PTXCONF_SYSTEMD\>\)\(.*\)/\1\2_HELPER\3\n\1\2\3/
+
+# from   : ptxdist-2024.05.0
+# to     : ptxdist-2024.06.0
+# symbol : ATK               -> AT_SPI2_CORE
+# symbol : ATK_INTROSPECTION -> AT_SPI2_CORE_INTROSPECTION
+# reason : libatk was merged into at-spi2-core
+#
+s/^\(\(# \)\?PTXCONF_\)ATK/\1AT_SPI2_CORE/
+s/^\(\(# \)\?PTXCONF_\)ATK_INTROSPECTION/\1AT_SPI2_CORE_INTROSPECTION/
+
+# from   : ptxdist-2024.06.0
+# to     : ptxdist-2024.07.0
+# symbol : LIGHTTPD_PCRE -> LIGHTTPD_PCRE2
+# reason : switch to pcre2 in lighttpd
+#
+s/^\(\(# \)\?PTXCONF_LIGHTTPD_PCRE\)\>/\12/
+
+# from   : ptxdist-2024.08.0
+# to     : ptxdist-2024.09.0
+# symbol : MESALIB_DRI_SWRAST -> MESALIB_DRI_SOFTPIPE + MESALIB_DRI_LLVMPIPE
+# reason : mesalib 24.2 deconflated swrast/softpipe/llvmpipe
+#
+/^\(PTXCONF_MESALIB_DRI_\)SWRAST\([^_]*$\)/N
+s/^\(\(# \)\?PTXCONF_MESALIB_DRI_\)SWRAST\([^\n]*\n\)\(.*\)$/\1SOFTPIPE\3\1LLVMPIPE\3\4/

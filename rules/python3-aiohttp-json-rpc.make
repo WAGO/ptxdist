@@ -18,7 +18,7 @@ PYTHON3_AIOHTTP_JSON_RPC_VERSION	:= 0.11.2
 PYTHON3_AIOHTTP_JSON_RPC_MD5		:= b1c50cd12a19183c568fea8dbb45fefe
 PYTHON3_AIOHTTP_JSON_RPC		:= aiohttp-json-rpc-$(PYTHON3_AIOHTTP_JSON_RPC_VERSION)
 PYTHON3_AIOHTTP_JSON_RPC_SUFFIX		:= tar.gz
-PYTHON3_AIOHTTP_JSON_RPC_URL		:= https://pypi.io/packages/source/a/aiohttp-json-rpc/$(PYTHON3_AIOHTTP_JSON_RPC).$(PYTHON3_AIOHTTP_JSON_RPC_SUFFIX)
+PYTHON3_AIOHTTP_JSON_RPC_URL		:= $(call ptx/mirror-pypi, aiohttp-json-rpc, $(PYTHON3_AIOHTTP_JSON_RPC).$(PYTHON3_AIOHTTP_JSON_RPC_SUFFIX))
 PYTHON3_AIOHTTP_JSON_RPC_SOURCE		:= $(SRCDIR)/$(PYTHON3_AIOHTTP_JSON_RPC).$(PYTHON3_AIOHTTP_JSON_RPC_SUFFIX)
 PYTHON3_AIOHTTP_JSON_RPC_DIR		:= $(BUILDDIR)/$(PYTHON3_AIOHTTP_JSON_RPC)
 PYTHON3_AIOHTTP_JSON_RPC_LICENSE	:= Apache-2.0
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-aiohttp-json-rpc.targetinstall:
 	@$(call install_fixup, python3-aiohttp-json-rpc, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-aiohttp-json-rpc, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/aiohttp_json_rpc,, *.py)
+		$(PYTHON3_SITEPACKAGES)/aiohttp_json_rpc,, *.py)
 
 	@$(call install_finish, python3-aiohttp-json-rpc)
 

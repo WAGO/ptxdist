@@ -20,12 +20,9 @@ HOST_LIBPTHREAD_STUBS_DIR	= $(HOST_BUILDDIR)/$(LIBPTHREAD_STUBS)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBPTHREAD_STUBS_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBPTHREAD_STUBS_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_LIBPTHREAD_STUBS_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_LIBPTHREAD_STUBS_CONF_TOOL	:= autoconf
 
 # vim: syntax=make

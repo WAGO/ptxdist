@@ -1,0 +1,8 @@
+## SECTION=hosttools_noprompt
+
+config HOST_UTIL_LINUX
+	tristate
+	select HOST_MESON
+	default y if ALLYES
+	help
+	  Useful hosttools and libs for linux utils.

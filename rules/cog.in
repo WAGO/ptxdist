@@ -1,12 +1,24 @@
 ## SECTION=applications
 
-config COG
+menuconfig COG
 	tristate
-	prompt "cog"
-	select HOST_CMAKE
-	select HOST_NINJA
+	prompt "cog                           "
+	select HOST_MESON
+	select DBUS
 	select WAYLAND_PROTOCOLS
 	select WPEWEBKIT
 	select WPEBACKEND_FDO
 	help
 	  Cog launcher and webapp container.
+
+if COG
+
+config COG_REMOTE_DBUS_SYSTEM_BUS
+	bool
+	prompt "Expose remote control interface on system bus"
+
+config COG_COGCTL
+	bool
+	prompt "Install cogctl"
+
+endif

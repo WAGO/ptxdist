@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_PYTHON3_ASYNC_TIMEOUT) += python3-async-timeout
 #
 # Paths and names
 #
-PYTHON3_ASYNC_TIMEOUT_VERSION	:= 2.0.0
-PYTHON3_ASYNC_TIMEOUT_MD5	:= 36e75397e54c6b899ffabdfe295a9f7c
+PYTHON3_ASYNC_TIMEOUT_VERSION	:= 4.0.2
+PYTHON3_ASYNC_TIMEOUT_MD5	:= 10571272b2e0fab839ec23f8293bf482
 PYTHON3_ASYNC_TIMEOUT		:= async-timeout-$(PYTHON3_ASYNC_TIMEOUT_VERSION)
 PYTHON3_ASYNC_TIMEOUT_SUFFIX	:= tar.gz
-PYTHON3_ASYNC_TIMEOUT_URL	:= https://pypi.python.org/packages/78/10/7fd2551dc51f6065bdbba07d395865df4582cc18169297e7a5c8d90f5bd2/$(PYTHON3_ASYNC_TIMEOUT).$(PYTHON3_ASYNC_TIMEOUT_SUFFIX)
+PYTHON3_ASYNC_TIMEOUT_URL	:= $(call ptx/mirror-pypi, async-timeout, $(PYTHON3_ASYNC_TIMEOUT).$(PYTHON3_ASYNC_TIMEOUT_SUFFIX))
 PYTHON3_ASYNC_TIMEOUT_SOURCE	:= $(SRCDIR)/$(PYTHON3_ASYNC_TIMEOUT).$(PYTHON3_ASYNC_TIMEOUT_SUFFIX)
 PYTHON3_ASYNC_TIMEOUT_DIR	:= $(BUILDDIR)/$(PYTHON3_ASYNC_TIMEOUT)
 PYTHON3_ASYNC_TIMEOUT_LICENSE	:= Apache-2.0
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-async-timeout.targetinstall:
 	@$(call install_fixup, python3-async-timeout, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-async-timeout, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/async_timeout,, *.py)
+		$(PYTHON3_SITEPACKAGES)/async_timeout,, *.py)
 
 	@$(call install_finish, python3-async-timeout)
 

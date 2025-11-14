@@ -1,0 +1,31 @@
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Date: Fri, 13 Nov 2015 14:02:42 +0100
+Subject: [PATCH] evmctl: find(): add missing closedir(dir) on error
+
+If a failure in find() happens the directory stream is not closed.
+
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ src/evmctl.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/evmctl.c b/src/evmctl.c
+index 1815f55d73e0..cca2fabdb2a6 100644
+--- a/src/evmctl.c
++++ b/src/evmctl.c
+@@ -1331,6 +1331,7 @@ static int find(const char *path, int dts, find_cb_t func)
+ 
+ 	if (fchdir(dirfd(dir))) {
+ 		log_err("Failed to chdir %s\n", path);
++		closedir(dir);
+ 		return -1;
+ 	}
+ 
+@@ -1346,6 +1347,7 @@ static int find(const char *path, int dts, find_cb_t func)
+ 
+ 	if (chdir("..")) {
+ 		log_err("Failed to chdir: %s\n", path);
++		closedir(dir);
+ 		return -1;
+ 	}
+ 

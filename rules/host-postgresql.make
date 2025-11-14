@@ -15,8 +15,6 @@ HOST_PACKAGES-$(PTXCONF_HOST_POSTGRESQL) += host-postgresql
 # Prepare
 # ----------------------------------------------------------------------------
 
-#HOST_POSTGRESQL_CONF_ENV	:= $(HOST_ENV)
-
 #
 # autoconf
 #
@@ -28,7 +26,6 @@ HOST_POSTGRESQL_CONF_OPT	:= \
 	--disable-rpath \
 	--enable-spinlocks \
 	--enable-atomics \
-	--enable-strong-random \
 	--disable-debug \
 	--disable-profiling \
 	--disable-coverage \
@@ -38,8 +35,6 @@ HOST_POSTGRESQL_CONF_OPT	:= \
 	--disable-cassert \
 	--enable-thread-safety \
 	--enable-largefile \
-	--disable-float4-byval \
-	--disable-float8-byval \
 	--without-llvm \
 	--without-icu \
 	--without-tcl \

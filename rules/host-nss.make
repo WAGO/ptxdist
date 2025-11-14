@@ -21,16 +21,18 @@ HOST_NSS_CONF_TOOL	:= NO
 
 HOST_NSS_MAKE_ENV   := \
 	$(HOST_ENV) \
+	NATIVE_CC="gcc -D_DEFAULT_SOURCE" \
 	BUILD_OPT=1 \
 	NS_USE_GCC=1 \
 	NSS_ENABLE_ECC=1 \
 	NSS_DISABLE_GTESTS=1 \
-	NSPR_INCLUDE_DIR=$(PTXDIST_SYSROOT_HOST)/include/nspr \
+	NSPR_INCLUDE_DIR=$(PTXDIST_SYSROOT_HOST)/usr/include/nspr \
 	$(if $(filter x86_64%,$(GNU_HOST)),USE_64=1)
 
-# needed for old glibc
+# needed for old glibc and gcc11
 HOST_NSS_CFLAGS := \
-	-D_XOPEN_SOURCE
+	-D_XOPEN_SOURCE \
+	-Wno-array-parameter
 
 HOST_NSS_MAKE_OPT := \
 	all
@@ -57,14 +59,14 @@ $(STATEDIR)/host-nss.install:
 
 	@$(foreach lib,$(HOST_NSS_LIBS), \
 		install -v -m644 -D $(HOST_NSS_DIR)/dist/*/lib/$(lib).so \
-			$(HOST_NSS_PKGDIR)/lib/$(lib).so$(ptx/nl))
+			$(HOST_NSS_PKGDIR)/usr/lib/$(lib).so$(ptx/nl))
 
-	install -d $(HOST_NSS_PKGDIR)/lib/pkgconfig/
+	install -d $(HOST_NSS_PKGDIR)/usr/lib/pkgconfig/
 	VERSION=$(NSS_VERSION) ptxd_replace_magic \
-		$(HOST_NSS_DIR)/nss/nss.pc.in > $(HOST_NSS_PKGDIR)/lib/pkgconfig/nss.pc
+		$(HOST_NSS_DIR)/nss/nss.pc.in > $(HOST_NSS_PKGDIR)/usr/lib/pkgconfig/nss.pc
 
-	install -d $(PTXDIST_SYSROOT_HOST)/include/nss
-	install -m 644 -t $(PTXDIST_SYSROOT_HOST)/include/nss $(HOST_NSS_DIR)/dist/public/nss/*
+	install -d $(PTXDIST_SYSROOT_HOST)/usr/include/nss
+	install -m 644 -t $(PTXDIST_SYSROOT_HOST)/usr/include/nss $(HOST_NSS_DIR)/dist/public/nss/*
 
 	@$(call touch)
 

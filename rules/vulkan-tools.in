@@ -6,9 +6,11 @@ config VULKAN_TOOLS
 	select HOST_CMAKE
 	select HOST_GLSLANG
 	select VULKAN_LOADER
-	select LIBXCB		if VULKAN_TOOLS_XCB
-	select XORG_LIB_X11	if VULKAN_TOOLS_XCB
-	select WAYLAND		if VULKAN_TOOLS_WAYLAND
+	select VOLK			if BUILDTIME
+	select LIBXCB			if VULKAN_TOOLS_XCB
+	select XORG_LIB_X11		if VULKAN_TOOLS_XCB
+	select WAYLAND			if VULKAN_TOOLS_WAYLAND
+	select WAYLAND_PROTOCOLS	if VULKAN_TOOLS_WAYLAND
 	help
 	  Vulkan Utilities and Tools
 
@@ -23,11 +25,11 @@ config VULKAN_TOOLS_CUBE
 	  Install vkcube and vkcubepp examples.
 
 config VULKAN_TOOLS_XCB
-        bool
-        default y if VULKAN_LOADER_XCB
+	bool
+	default y if VULKAN_LOADER_XCB
 
 config VULKAN_TOOLS_WAYLAND
-        bool
-        default y if VULKAN_LOADER_WAYLAND
+	bool
+	default y if VULKAN_LOADER_WAYLAND
 
 endif

@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_PYTHON3_SIX) += python3-six
 #
 # Paths and names
 #
-PYTHON3_SIX_VERSION	:= 1.10.0
-PYTHON3_SIX_MD5		:= 34eed507548117b2ab523ab14b2f8b55
+PYTHON3_SIX_VERSION	:= 1.16.0
+PYTHON3_SIX_MD5		:= a7c927740e4964dd29b72cebfc1429bb
 PYTHON3_SIX		:= six-$(PYTHON3_SIX_VERSION)
 PYTHON3_SIX_SUFFIX	:= tar.gz
-PYTHON3_SIX_URL		:= https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/$(PYTHON3_SIX).$(PYTHON3_SIX_SUFFIX)
+PYTHON3_SIX_URL		:= $(call ptx/mirror-pypi, six, $(PYTHON3_SIX).$(PYTHON3_SIX_SUFFIX))
 PYTHON3_SIX_SOURCE	:= $(SRCDIR)/$(PYTHON3_SIX).$(PYTHON3_SIX_SUFFIX)
 PYTHON3_SIX_DIR		:= $(BUILDDIR)/python3-$(PYTHON3_SIX)
 PYTHON3_SIX_LICENSE	:= MIT
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-six.targetinstall:
 	@$(call install_fixup, python3-six,DESCRIPTION,missing)
 
 	@$(call install_glob, python3-six, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-six)
 

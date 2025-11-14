@@ -30,13 +30,11 @@ LIBSYSFS_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBSYSFS_PATH	:= PATH=$(CROSS_PATH)
-LIBSYSFS_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBSYSFS_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBSYSFS_CONF_TOOL	:= autoconf
+LIBSYSFS_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

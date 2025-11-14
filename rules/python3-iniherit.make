@@ -18,7 +18,7 @@ PYTHON3_INIHERIT_VERSION	:= 0.3.9
 PYTHON3_INIHERIT_MD5		:= 0e501d38a1ad7c9bde7bff9387d4a582
 PYTHON3_INIHERIT		:= iniherit-$(PYTHON3_INIHERIT_VERSION)
 PYTHON3_INIHERIT_SUFFIX		:= tar.gz
-PYTHON3_INIHERIT_URL		:= https://files.pythonhosted.org/packages/source/i/iniherit/$(PYTHON3_INIHERIT).$(PYTHON3_INIHERIT_SUFFIX)
+PYTHON3_INIHERIT_URL		:= $(call ptx/mirror-pypi, iniherit, $(PYTHON3_INIHERIT).$(PYTHON3_INIHERIT_SUFFIX))
 PYTHON3_INIHERIT_SOURCE		:= $(SRCDIR)/$(PYTHON3_INIHERIT).$(PYTHON3_INIHERIT_SUFFIX)
 PYTHON3_INIHERIT_DIR		:= $(BUILDDIR)/$(PYTHON3_INIHERIT)
 PYTHON3_INIHERIT_LICENSE	:= MIT
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-iniherit.targetinstall:
 	@$(call install_fixup, python3-iniherit,DESCRIPTION,missing)
 
 	@$(call install_glob,python3-iniherit, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,*.pyc,)
+		$(PYTHON3_SITEPACKAGES),*.pyc,)
 
 	@$(call install_finish, python3-iniherit)
 

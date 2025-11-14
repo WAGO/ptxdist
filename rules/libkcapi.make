@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBKCAPI) += libkcapi
 #
 # Paths and names
 #
-LIBKCAPI_VERSION	:= 1.1.5
-LIBKCAPI_MD5		:= 38776243296c2fb1ad78ca92bab4adcf
+LIBKCAPI_VERSION	:= 1.5.0
+LIBKCAPI_MD5		:= 1114dc32e6055f09076ca04b7e0c93e2
 LIBKCAPI		:= libkcapi-$(LIBKCAPI_VERSION)
-LIBKCAPI_SUFFIX		:= tar.xz
-LIBKCAPI_URL		:= http://www.chronox.de/libkcapi//$(LIBKCAPI).$(LIBKCAPI_SUFFIX)
+LIBKCAPI_SUFFIX		:= tar.gz
+LIBKCAPI_URL		:= https://github.com/smuellerDD/libkcapi/archive/refs/tags/v$(LIBKCAPI_VERSION).$(LIBKCAPI_SUFFIX)
 LIBKCAPI_SOURCE		:= $(SRCDIR)/$(LIBKCAPI).$(LIBKCAPI_SUFFIX)
 LIBKCAPI_DIR		:= $(BUILDDIR)/$(LIBKCAPI)
 LIBKCAPI_LICENSE	:= GPLv2+
@@ -37,12 +37,18 @@ LIBKCAPI_CONF_ENV	:= \
 LIBKCAPI_CONF_TOOL	:= autoconf
 LIBKCAPI_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-werror \
+	--$(call ptx/endis, PTXCONF_LIBKCAPI_TEST)-kcapi-test \
+	--enable-kcapi-speed \
 	--enable-kcapi-hasher \
 	--enable-kcapi-rngapp \
-	--enable-kcapi-speed \
-	--$(call ptx/endis, PTXCONF_LIBKCAPI_TEST)-kcapi-test \
 	--enable-kcapi-encapp \
 	--enable-kcapi-dgstapp \
+	--enable-lib-kdf \
+	--enable-lib-sym \
+	--enable-lib-md \
+	--enable-lib-aead \
+	--enable-lib-rng \
 	--disable-lib-asym \
 	--disable-lib-kpp
 
@@ -66,33 +72,37 @@ $(STATEDIR)/libkcapi.targetinstall:
 	@$(call install_copy, libkcapi, 0, 0, 0755, -, /usr/bin/kcapi-enc);
 	@$(call install_copy, libkcapi, 0, 0, 0755, -, /usr/bin/kcapi-dgst);
 
-	@$(call install_copy, libkcapi, 0, 0, 0755, $(LIBKCAPI_PKGDIR)/usr/bin/fipscheck, /usr/bin/kcapi-hasher);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/fipscheck);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/fipshmac);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha1hmac);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha224hmac);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha256hmac);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha384hmac);
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha512hmac);
+	@$(call install_copy, libkcapi, 0, 0, 0755, -, /usr/bin/kcapi-hasher);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/fipscheck);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/fipshmac);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha1hmac);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha224hmac);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha256hmac);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha384hmac);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha512hmac);
 
 ifdef PTXCONF_LIBKCAPI_MD5SUM
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/md5sum);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/md5sum);
 endif
 
 ifdef PTXCONF_LIBKCAPI_SHA1SUM
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha1sum);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha1sum);
+endif
+
+ifdef PTXCONF_LIBKCAPI_SHA224SUM
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha224sum);
 endif
 
 ifdef PTXCONF_LIBKCAPI_SHA256SUM
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha256sum);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha256sum);
 endif
 
 ifdef PTXCONF_LIBKCAPI_SHA384SUM
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha384sum);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha384sum);
 endif
 
 ifdef PTXCONF_LIBKCAPI_SHA512SUM
-	@$(call install_link, libkcapi, /usr/bin/kcapi-hasher, /usr/bin/sha512sum);
+	@$(call install_link, libkcapi, kcapi-hasher, /usr/bin/sha512sum);
 endif
 
 ifdef PTXCONF_LIBKCAPI_TEST

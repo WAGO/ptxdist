@@ -2,32 +2,44 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-DROPBEAR_RSAKEY_DEFAULT="@KEYDIR@/dropbear_rsa_host_key"
-DROPBEAR_DSSKEY_DEFAULT="@KEYDIR@/dropbear_dss_host_key"
-
-test -n "$DROPBEAR_RSAKEY" || \
-  DROPBEAR_RSAKEY=$DROPBEAR_RSAKEY_DEFAULT
-test -n "$DROPBEAR_DSSKEY" || \
-  DROPBEAR_DSSKEY=$DROPBEAR_DSSKEY_DEFAULT
+. /usr/lib/init/dropbear.sh
 
 gen_key() {
-
 	key_type=$1
 	key_file=$2
 
+	# do not overwrite valid key files
+	[ -s "$key_file" ] && dropbearkey -y -f "$key_file" > /dev/null 2>&1 && return
+
 	rm -f $key_file > /dev/null 2>&1
 
-	echo -n "generating $key_type key..."
-	dropbearkey -t $key_type -f $key_file > /dev/null 2>&1
-
-	if [ "$?" = "0" ]; then
-		echo "done"
-	else
-		echo "failed"
-		exit 1
-	fi
+	echo "Create $key_type key; this may take some time ..."
+	dropbearkey -t $key_type -f $key_file > /dev/null 2>&1 || return
+	echo "Created $key_type key."
 }
 
-[ -e "$DROPBEAR_RSAKEY" ] || gen_key rsa "$DROPBEAR_RSAKEY"
-[ -e "$DROPBEAR_DSSKEY" ] || gen_key dss "$DROPBEAR_DSSKEY"
+gen_keys() {
+	for keytype in $DROPBEAR_KEYTYPES
+	do
+		case "$keytype" in
+			rsa)
+				gen_key rsa "$DROPBEAR_RSAKEY" || return
+				;;
+			ecdsa)
+				gen_key ecdsa "$DROPBEAR_ECDSAKEY" || return
+				;;
+			ed25519)
+				gen_key ed25519 "$DROPBEAR_ED25519KEY" || return
+				;;
+			*)
+				echo "Key type '$keytype' not supported"
+				;;
+		esac
+	done
+}
 
+if ! gen_keys
+then
+	echo "Generating SSH keys failed!"
+	exit 1
+fi

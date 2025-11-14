@@ -21,12 +21,13 @@ CALIBRATOR_SUFFIX	:= tar.bz2
 CALIBRATOR_URL		:= http://www.pengutronix.de/software/ptxdist/temporary-src/$(CALIBRATOR).$(CALIBRATOR_SUFFIX)
 CALIBRATOR_SOURCE	:= $(SRCDIR)/$(CALIBRATOR).$(CALIBRATOR_SUFFIX)
 CALIBRATOR_DIR		:= $(BUILDDIR)/$(CALIBRATOR)
+CALIBRATOR_LICENSE	:= custom
+CALIBRATOR_LICENSE_FILES	:= file://calibrator.c;md5=8f7790f3cb58345fcb862c4ceab869ce;startline=6;endline=37
 
 # ----------------------------------------------------------------------------
 # Compile
 # ----------------------------------------------------------------------------
 
-CALIBRATOR_PATH		:= PATH=$(CROSS_PATH)
 CALIBRATOR_MAKE_ENV	:= $(CROSS_ENV) LDLIBS=-lm
 CALIBRATOR_MAKE_OPT	:= calibrator
 

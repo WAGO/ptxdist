@@ -2,13 +2,39 @@
 
 config GLIBC
 	tristate
-	select BASE if RUNTIME
+	select GLOBAL_LARGE_FILE	if GLIBC_Y2038
+	select BUSYBOX_TIME64		if GLIBC_Y2038 && BUSYBOX
+	select BASE			if RUNTIME
 
 if GLIBC
 
 menu "glibc                         "
 
+config GLIBC_Y2038
+	bool
+	prompt "enable Y2038 support"
+	help
+	  Build the BSP with _TIME_BITS=64 to support dates beyond
+	  2038-01-19 03:14:07.
+
 comment	"Install options"
+
+config GLIBC_2_34
+	bool
+	prompt "glibc-2.34 or later"
+	help
+	  Since glibc-2.34 libpthread, libdl, libutil, libanl and librt are
+	  merged into libc. By selecting this option, these libraries are
+	  no longer installed through the package dependencies. The
+	  libraries can still be selected explicitly here if necessary.
+	  For example if legacy binaries link to such a library.
+
+config GLIBC_2_38
+	bool
+	prompt "glibc-2.38 or later"
+	help
+	  In glibc-2.38 libcrypt was deprecated and removed afterwards.
+	  So libxcrypt is needed to provide the libcrypt implementation.
 
 config GLIBC_LD
 	bool
@@ -81,6 +107,7 @@ config GLIBC_DL
 
 config GLIBC_CRYPT
 	bool
+	depends on !GLIBC_2_38
 	prompt "Install libcrypt"
 	help
 	  The encryption/decryption library
@@ -98,6 +125,15 @@ config GLIBC_M
 	help
 	  If at least one application on your target does any kind of math
 	  calculation, you should install this library.
+
+config GLIBC_MVEC
+	bool
+	depends on GLIBC_M
+	prompt "Install libmvec"
+	help
+	  Libmvec is vector math library. It may be used implicitly as needed.
+	  Whether it is needed depends on the architecture and the glibc
+	  version, among other things.
 
 config GLIBC_ANL
 	bool
@@ -231,13 +267,13 @@ config GLIBC_I18N_RAWDATA
 
 menu "Install gconv libraries       "
 
-config GLIBC_GCONF_BASE
+config GLIBC_GCONV_BASE
 	bool
 
 config GLIBC_GCONV_DEF
 	bool
 	prompt "default gconv modules"
-	select GLIBC_GCONF_BASE
+	select GLIBC_GCONV_BASE
 	default y
 	help
 	  install the iso8859-1 (Latin Alphabet No.1) and the iso8859-15 (Latin
@@ -247,14 +283,14 @@ config GLIBC_GCONV_DEF
 config GLIBC_GCONV_UTF
 	bool
 	prompt "gconv modules for UTF"
-	select GLIBC_GCONF_BASE
+	select GLIBC_GCONV_BASE
 	help
 	  install the gconv modules for UTF conversion
 
 config GLIBC_GCONV_ZH
 	bool
 	prompt "gconv modules for chinese language"
-	select GLIBC_GCONF_BASE
+	select GLIBC_GCONV_BASE
 	help
 	  install the gconv modules for chinese language, including BIG5
 	  and GB18030

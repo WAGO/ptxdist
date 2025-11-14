@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_LIBLTDL) += libltdl
 #
 # Paths and names
 #
-LIBLTDL_VERSION	:= 2.4.3
-LIBLTDL_MD5	:= ec4dabd3bc580dc188197d4d5eb95fe3
+LIBLTDL_VERSION	:= 2.5.3
+LIBLTDL_MD5	:= 42abe5bed6cc8207f0868968d89d77cf
 LIBLTDL		:= libtool-$(LIBLTDL_VERSION)
 LIBLTDL_SUFFIX	:= tar.gz
 LIBLTDL_URL	:= $(call ptx/mirror, GNU, libtool/$(LIBLTDL).$(LIBLTDL_SUFFIX))
@@ -30,13 +30,13 @@ LIBLTDL_LICENSE_FILES := \
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBLTDL_PATH	:= PATH=$(CROSS_PATH)
-LIBLTDL_ENV 	:= $(CROSS_ENV) HELP2MAN=:
+LIBLTDL_CONF_ENV := $(CROSS_ENV) HELP2MAN=:
 
 #
 # autoconf
 #
-LIBLTDL_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBLTDL_CONF_TOOL := autoconf
+LIBLTDL_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

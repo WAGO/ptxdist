@@ -5,6 +5,8 @@ menuconfig WLROOTS
 	select HOST_MESON
 	select WAYLAND
 	select WAYLAND_PROTOCOLS
+	select HWDATA
+	select HWDATA_PNP
 	select LIBDRM
 	select MESALIB
 	select MESALIB_EGL
@@ -15,9 +17,10 @@ menuconfig WLROOTS
 	select UDEV
 	select UDEV_LIBUDEV
 	select PIXMAN
-	select LIBCAP			if WLROOTS_LIBCAP
-	select SYSTEMD			if WLROOTS_SYSTEMD
-	select SYSTEMD_LOGIND		if WLROOTS_SYSTEMD_LOGIND
+	select SEATD
+	select XORG			if WLROOTS_XWAYLAND
+	select XCB_UTIL_WM		if WLROOTS_XWAYLAND
+	select XWAYLAND			if WLROOTS_XWAYLAND
 	prompt "wlroots                       "
 	help
 	  wlroots provides pluggable, composable, unopinionated modules for
@@ -25,17 +28,8 @@ menuconfig WLROOTS
 
 if WLROOTS
 
-config WLROOTS_LIBCAP
+config WLROOTS_XWAYLAND
 	bool
-	prompt "support rootless session via libcap"
-
-config WLROOTS_SYSTEMD
-	bool
-	default INITMETHOD_SYSTEMD
-
-config WLROOTS_SYSTEMD_LOGIND
-	bool
-	depends on WESTON_SYSTEMD
-	prompt "support rootless session via logind"
+	prompt "Xwayland support"
 
 endif

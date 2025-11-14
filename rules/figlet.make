@@ -17,13 +17,15 @@ PACKAGES-$(PTXCONF_FIGLET) += figlet
 # Paths and names
 #
 FIGLET_VERSION		:= 2.2.5
-FIGLET_MD5		:= d88cb33a14f1469fff975d021ae2858e
+FIGLET_MD5		:= eaaeb356007755c9770a842aefd8ed5f d88cb33a14f1469fff975d021ae2858e
 FIGLET			:= figlet-$(FIGLET_VERSION)
 FIGLET_SUFFIX		:= tar.gz
-FIGLET_URL		:= ftp://ftp.figlet.org/pub/figlet/program/unix/$(FIGLET).$(FIGLET_SUFFIX)
+FIGLET_URL		:= https://github.com/cmatsuoka/figlet/archive/refs/tags/$(FIGLET_VERSION).$(FIGLET_SUFFIX)
 FIGLET_SOURCE		:= $(SRCDIR)/$(FIGLET).$(FIGLET_SUFFIX)
 FIGLET_DIR		:= $(BUILDDIR)/$(FIGLET)
-FIGLET_LICENSE		:= figlet
+FIGLET_LICENSE		:= BSD-3-clause
+FIGLET_LICENSE_FILES	:= \
+	file://LICENSE;md5=1688bcd97b27704f1afcac7336409857
 
 # ----------------------------------------------------------------------------
 # Compile

@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_NSS) += nss
 #
 # Paths and names
 #
-NSS_VERSION	:= 3.54
-NSS_MD5		:= f02eddf6aa8449187e7ffe1c8f470734
+NSS_VERSION	:= 3.106
+NSS_MD5		:= 5beed92d43d33b03faf0ec5efd44d1b0
 NSS		:= nss-$(NSS_VERSION)
 NSS_SUFFIX	:= tar.gz
 NSS_URL		:= https://ftp.mozilla.org/pub/security/nss/releases/NSS_$(subst .,_,$(NSS_VERSION))_RTM/src/$(NSS).$(NSS_SUFFIX)
@@ -49,20 +49,21 @@ NSS_MAKE_ENV := \
 	CCC=$(CROSS_CXX) \
 	CPU_ARCH=$(NSS_ARCH) \
 	CROSS_COMPILE=1 \
-	NATIVE_CC="gcc" \
+	NATIVE_CC="gcc -D_DEFAULT_SOURCE" \
 	BUILD_OPT=1 \
 	MOZILLA_CLIENT=1 \
 	NS_USE_GCC=1 \
 	NSS_USE_SYSTEM_SQLITE=1 \
 	NSS_ENABLE_ECC=1 \
 	NSS_DISABLE_ARM32_NEON=$(call ptx/ifdef, PTXCONF_ARCH_ARM_NEON,,1) \
+	NSS_DISABLE_AVX2=$(call ptx/ifdef, PTXCONF_ARCH_X86_64,,1) \
 	NSS_DISABLE_GTESTS=1 \
 	NSPR_INCLUDE_DIR=$(SYSROOT)/usr/include/nspr \
 	USE_64=$(call ptx/ifdef, PTXCONF_ARCH_LP64,1)
 
 NSS_MAKE_OPT := \
 	OS_ARCH=Linux \
-	OS_RELEASE=$(PTXCONF_KERNEL_VERSION) \
+	OS_RELEASE=$(KERNEL_VERSION) \
 	OS_TEST=$(NSS_ARCH) \
 	all
 
@@ -91,7 +92,7 @@ $(STATEDIR)/nss.install:
 	@$(call world/install, NSS)
 
 	@$(foreach lib,$(NSS_LIBS), \
-		install -v -m644 -D $(NSS_DIR)/dist/Linux$(PTXCONF_KERNEL_VERSION)_$(NSS_ARCH)_*/lib/$(lib).so \
+		install -v -m644 -D $(NSS_DIR)/dist/Linux$(KERNEL_VERSION)_$(NSS_ARCH)_*/lib/$(lib).so \
 			$(NSS_PKGDIR)/usr/lib/$(lib).so$(ptx/nl))
 
 	install -d $(NSS_PKGDIR)/usr/lib/pkgconfig/

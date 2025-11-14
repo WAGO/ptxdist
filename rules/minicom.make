@@ -2,6 +2,7 @@
 #
 # Copyright (C) 2007 by Carsten Schlote <c.schlote@konzeptpark.de>
 #               2009, 2010 by Marc Kleine-Budde <mkl@pengutronix.de>
+#               2021 Roland Hieber, Pengutronix <rhi@pengutronix.de>
 #
 # For further information about the PTXdist project and license conditions
 # see the README file.
@@ -15,15 +16,19 @@ PACKAGES-$(PTXCONF_MINICOM) += minicom
 #
 # Paths and names
 #
-MINICOM_VERSION	:= 2.6.2
-MINICOM_MD5	:= 203c56c4b447f45e2301b0cc4e83da3c
-MINICOM_SUFFIX	:= tar.gz
+MINICOM_VERSION	:= 2.9
+MINICOM_MD5	:= e61ea3d07e73e245513c119e91989254
+MINICOM_SUFFIX	:= tar.bz2
 MINICOM		:= minicom-$(MINICOM_VERSION)
-MINICOM_TARBALL	:= minicom_$(MINICOM_VERSION).orig.$(MINICOM_SUFFIX)
-MINICOM_URL	:= http://snapshot.debian.org/archive/debian/20130208T032801Z/pool/main/m/minicom/$(MINICOM_TARBALL)
+MINICOM_URL	:= https://salsa.debian.org/minicom-team/minicom/-/archive/$(MINICOM_VERSION)/$(MINICOM).$(MINICOM_SUFFIX)
 MINICOM_SOURCE	:= $(SRCDIR)/$(MINICOM).$(MINICOM_SUFFIX)
 MINICOM_DIR	:= $(BUILDDIR)/$(MINICOM)
-MINICOM_LICENSE	:= GPL-2.0-only
+MINICOM_LICENSE	:= LGPL-2.0-or-later AND xinetd AND GPL-2.0-or-later
+MINICOM_LICENSE_FILES	:= \
+	file://lib/getopt.c;startline=12;endline=20;md5=33478700692dbfddf8702809f842f9dc \
+	file://lib/snprintf.c;startline=15;endline=40;md5=a311a669ac916dad747dde2011caed9b \
+	file://src/main.c;startline=7;endline=10;md5=908a4d755c7a49f4c6156a07400f3d60 \
+	file://COPYING;md5=420477abc567404debca0a2a1cb6b645
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,12 +37,21 @@ MINICOM_LICENSE	:= GPL-2.0-only
 #
 # autoconf
 #
-MINICOM_AUTOCONF := \
+MINICOM_CONF_TOOL	:= autoconf
+MINICOM_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-nls \
+	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-rpath \
+	--disable-music \
 	--enable-socket \
-	--disable-music
+	--enable-lockdev \
+	--enable-lock-dir=/var/lock \
+	--enable-dfl-port=/dev/modem \
+	--enable-dfl-baud=115200 \
+	--enable-cfg-dir=/etc \
+	--enable-kermit=$(call ptx/ifdef,PTXCONF_MINICOM_KERMIT,/usr/bin/ckermit,/usr/bin/false) \
+	--disable-nls \
+	--without-dmalloc
 
 # ----------------------------------------------------------------------------
 # Target-Install

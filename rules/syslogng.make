@@ -30,16 +30,21 @@ SYSLOGNG_LICENSE	:= GPL-2.0-or-later AND LGPL-2.1-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-SYSLOGNG_ENV 	= \
+SYSLOGNG_CONF_ENV	:= \
 	$(CROSS_ENV) \
+	ac_cv_lib_nsl_gethostbyname=no \
+	am_cv_python_version=$(PYTHON3_MAJORMINOR) \
 	ac_cv_path_PYTHON=$(CROSS_PYTHON3)
 
 #
 # autoconf
 #
-SYSLOGNG_AUTOCONF = \
+SYSLOGNG_CONF_TOOL	:= autoconf
+SYSLOGNG_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--localstatedir=/var/run \
+	--with-module-dir=/usr/lib/syslog-ng \
+	--with-module-path=/usr/lib/syslog-ng \
 	--enable-forced-server-mode \
 	--disable-debug \
 	--enable-force-gnu99 \
@@ -50,7 +55,7 @@ SYSLOGNG_AUTOCONF = \
 	--enable-dynamic-linking \
 	--disable-mixed-linking \
 	$(GLOBAL_IPV6_OPTION) \
-	--$(call ptx/endis, PTXCONF_SYSLOGNG_TCP_WRAPPER)-tcp-wrapper \
+	--disable-tcp-wrapper \
 	--$(call ptx/endis, PTXCONF_SYSLOGNG_SPOOF_SOURCE)-spoof-source \
 	--disable-sun-streams \
 	--disable-openbsd-system-source \
@@ -69,7 +74,7 @@ SYSLOGNG_AUTOCONF = \
 	--$(call ptx/endis, PTXCONF_SYSLOGNG_SYSTEMD)-systemd \
 	--disable-geoip2 \
 	--disable-riemann \
-	--with-python=$(PYTHON3_MAJORMINOR) \
+	--with-python=auto \
 	--$(call ptx/endis, PTXCONF_SYSLOGNG_PYTHON_DESTINATION)-python \
 	--disable-kafka \
 	--disable-manpages \
@@ -129,7 +134,6 @@ ifdef PTXCONF_SYSLOGNG_CONFIG
 endif
 
 #	# bb init: start scripts
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_SYSLOGNG_STARTSCRIPT
 	@$(call install_alternative, syslogng, 0, 0, 0755, /etc/init.d/syslog-ng, n)
 
@@ -137,7 +141,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_SYSLOGNG_BBINIT_LINK)),)
 	@$(call install_link, syslogng, \
 		../init.d/syslog-ng, \
 		/etc/rc.d/$(PTXCONF_SYSLOGNG_BBINIT_LINK))
-endif
 endif
 endif
 

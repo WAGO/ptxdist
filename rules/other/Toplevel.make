@@ -40,7 +40,7 @@ $(file $(1),$(2))
 endef
 endif
 
-# allow skiping thing for the second make all with --progress
+# allow skipping thing for the second make all with --progress
 ifeq ($(wildcard $(PTXDIST_TEMPDIR)/setup-once),)
 PTXDIST_SETUP_ONCE := 1
 $(call ptx/file,>>$(PTXDIST_TEMPDIR)/setup-once)
@@ -147,6 +147,7 @@ PTX_PACKAGES_INSTALL	:= \
 
 export \
 	PTX_PACKAGES_ALL \
+	PTX_PACKAGES_VIRTUAL \
 	PTX_PACKAGES_SELECTED \
 	PTX_PACKAGES_DISABLED \
 	PTX_PACKAGES_INSTALL
@@ -190,9 +191,19 @@ $(foreach v,$(call ptx/check-expand,$(1)),$(call ptx/print-var,$(v)))
 endef
 
 #
+# remember all variables for lint checks
+# do this here to really catch all variable definition
+#
+ifdef PTXDIST_GEN_ALL
+ifndef PTXDIST_OLD_MAKE
+$(file >$(PTXDIST_TEMPDIR)/VARIABLES_ALL,$(.VARIABLES))
+endif
+endif
+
+#
 # Pattern target to allow printing variable
 # $(filter ..) is used to match against all existing variables so patterns
-# containing '%' can be uses to print multiple variables.
+# containing '%' can be used to print multiple variables.
 # In verbose mode, '<name>=<value>' is printed.
 # Trying to print undefined variables results in an error unless '-k' is
 # used. In this case an empty value is printed.
@@ -201,7 +212,7 @@ endef
 	@:$(call ptx/print-vars,$(*))
 
 #
-# As above but tread the variable value as another variable and prints
+# As above but treat the variable value as another variable and prints
 # the value of this variable.
 # Patterns are expanded as above on both levels.
 # Printing stops at the first error.
@@ -214,6 +225,21 @@ endef
 # for backwards compatibility
 print-%: /print-%
 	@:
+
+ifneq ($(call ptx/have-errors),)
+# skip error reporting for 'ptxdist print'
+ifeq ($(filter /print-% print-%,$(MAKECMDGOALS)),)
+ptxdist-error-report:
+	@$(call ptx/report-errors)
+
+ptxdist-error-target: ptxdist-error-report
+	@$(error failed)
+
+PHONY += ptxdist-error-target ptxdist-error-report
+# make sure this is executed befor any other target
+-include ptxdist-error-target
+endif
+endif
 
 .PHONY: $(PHONY)
 

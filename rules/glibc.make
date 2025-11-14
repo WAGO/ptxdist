@@ -18,9 +18,23 @@ PACKAGES-$(PTXCONF_GLIBC) += glibc
 #
 # Paths and names
 #
-GLIBC_VERSION	:= $(call remove_quotes,$(PTXCONF_GLIBC_VERSION))
+GLIBC_VERSION	:= $(call ptx/config-version, PTXCONF_GLIBC)
 # for license information
 -include $(PTXDIST_PLATFORMDIR)/selected_toolchain/../share/compliance/glibc.make
+
+# ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/glibc.prepare:
+	@$(call targetinfo)
+ifdef PTXCONF_GLIBC_Y2038
+	@echo Checking Y2038 support...
+	@echo 'static_assert(sizeof(time_t) == 8, "y2038");' | \
+		$(CROSS_CC) -c -x c -fsyntax-only -include sys/types.h -include assert.h - &>/dev/null || \
+		ptxd_bailout "PTXCONF_GLIBC_Y2038 is enabled but the toolchain has no Y2038 support!"
+endif
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -36,6 +50,9 @@ $(STATEDIR)/glibc.targetinstall:
 	@$(call install_fixup, glibc,DESCRIPTION,missing)
 
 ifdef PTXCONF_GLIBC_LD
+ifneq ($(CROSS_LINKER_LIB_DIR),lib)
+	@$(call install_link, glibc, lib, /$(CROSS_LINKER_LIB_DIR))
+endif
 	@$(call install_copy_toolchain_dl, glibc)
 endif
 
@@ -44,7 +61,7 @@ ifdef PTXCONF_GLIBC_C
 endif
 
 ifdef PTXCONF_GLIBC_PTHREAD
-	@$(call install_copy_toolchain_lib, glibc, libpthread.so)
+	@$(call install_copy_toolchain_lib, glibc, libpthread.so.0)
 endif
 
 ifdef PTXCONF_GLIBC_THREAD_DB
@@ -52,7 +69,7 @@ ifdef PTXCONF_GLIBC_THREAD_DB
 endif
 
 ifdef PTXCONF_GLIBC_RT
-	@$(call install_copy_toolchain_lib, glibc, librt.so)
+	@$(call install_copy_toolchain_lib, glibc, librt.so.1)
 endif
 
 ifdef PTXCONF_GLIBC_DL
@@ -60,23 +77,27 @@ ifdef PTXCONF_GLIBC_DL
 endif
 
 ifdef PTXCONF_GLIBC_CRYPT
-	@$(call install_copy_toolchain_lib, glibc, libcrypt.so)
+	@$(call install_copy_toolchain_lib, glibc, libcrypt.so.1)
 endif
 
 ifdef PTXCONF_GLIBC_UTIL
-	@$(call install_copy_toolchain_lib, glibc, libutil.so)
+	@$(call install_copy_toolchain_lib, glibc, libutil.so.1)
 endif
 
 ifdef PTXCONF_GLIBC_M
-	@$(call install_copy_toolchain_lib, glibc, libm.so)
+	@$(call install_copy_toolchain_lib, glibc, libm.so.6)
+endif
+
+ifdef PTXCONF_GLIBC_MVEC
+	@$(call install_copy_toolchain_lib, glibc, libmvec.so.1)
 endif
 
 ifdef PTXCONF_GLIBC_NSS_DNS
-	@$(call install_copy_toolchain_lib, glibc, libnss_dns.so)
+	@$(call install_copy_toolchain_lib, glibc, libnss_dns.so.2)
 endif
 
 ifdef PTXCONF_GLIBC_NSS_FILES
-	@$(call install_copy_toolchain_lib, glibc, libnss_files.so)
+	@$(call install_copy_toolchain_lib, glibc, libnss_files.so.2)
 endif
 
 ifdef PTXCONF_GLIBC_NSS_HESIOD
@@ -84,7 +105,7 @@ ifdef PTXCONF_GLIBC_NSS_HESIOD
 endif
 
 ifdef PTXCONF_GLIBC_ANL
-	@$(call install_copy_toolchain_lib, glibc, libanl.so)
+	@$(call install_copy_toolchain_lib, glibc, libanl.so.1)
 endif
 
 ifdef PTXCONF_GLIBC_NSS_NIS
@@ -100,14 +121,14 @@ ifdef PTXCONF_GLIBC_NSS_COMPAT
 endif
 
 ifdef PTXCONF_GLIBC_RESOLV
-	@$(call install_copy_toolchain_lib, glibc, libresolv.so)
+	@$(call install_copy_toolchain_lib, glibc, libresolv.so.2)
 endif
 
 ifdef PTXCONF_GLIBC_NSL
-	@$(call install_copy_toolchain_lib, glibc, libnsl.so)
+	@$(call install_copy_toolchain_lib, glibc, libnsl.so.1)
 endif
 
-ifdef PTXCONF_GLIBC_GCONF_BASE
+ifdef PTXCONF_GLIBC_GCONV_BASE
 	@$(call install_copy_toolchain_lib, glibc, gconv/gconv-modules,, n)
 endif
 

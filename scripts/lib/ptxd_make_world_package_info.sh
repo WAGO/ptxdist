@@ -7,6 +7,8 @@
 #
 
 ptxd_make_world_package_info() {
+    local last_config base_config ref_config makefile
+
     # use patchin_init for  pkg_patch_dir
     ptxd_make_world_patchin_init || return
     do_echo() {
@@ -26,8 +28,24 @@ ptxd_make_world_package_info() {
     do_echo "image:" "$(ptxd_print_path "${image_image}")"
     echo
 
+    # not all packages with pkg_config set actually use the config diffs
+    # so don't try to determine base/ref configs when ptxd_make_kconfig_init fails
+    if [ -n "${pkg_config}" ] && ( ptxd_make_kconfig_init ) &> /dev/null; then
+	local file_dotconfig="${pkg_config}"
+	local ref_file_dotconfig="${pkg_ref_config}"
+	ptxd_make_kconfig_init
+	ptxd_kconfig_find_config "update" "${relative_file_dotconfig}" "${relative_ref_file_dotconfig}"
+	if [ "${base_config}" = "${pkg_ref_config}" ]; then
+	    base_config=
+	fi
+	if [ -z "${base_config}" ]; then
+	    ref_config="${pkg_ref_config}"
+	fi
+    fi
+
     do_echo "config:" "$(ptxd_print_path "${pkg_config}")"
-    do_echo "ref config:" "$(ptxd_print_path "${pkg_ref_config}")"
+    do_echo "base config:" "$(ptxd_print_path "${base_config}")"
+    do_echo "ref config:" "$(ptxd_print_path "${ref_config}")"
     do_echo "${pkg_config}"
 
     do_echo "license:" "${pkg_license}"
@@ -45,6 +63,9 @@ ptxd_make_world_package_info() {
     do_echo "${pkg_dir}${pkg_pkg_dir}"
 
     do_echo "rule file:" "$(ptxd_print_path "${pkg_makefile}")"
+    for makefile in ${pkg_extra_makefiles}; do
+        do_echo "" "$(ptxd_print_path "${makefile}")"
+    done
     do_echo "menu file:" "$(ptxd_print_path "${pkg_infile}")"
     echo
 

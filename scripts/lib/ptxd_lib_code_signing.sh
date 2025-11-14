@@ -100,6 +100,51 @@ cs_define_role() {
 export -f cs_define_role
 
 #
+# cs_define_group <group>
+#
+# Define a new role group.
+#
+cs_define_group() {
+    local group="${1}"
+    cs_init_variables
+
+    mkdir -p "${keydir}/${group}.group" &&
+    rm -f "${keydir}/${group}.group/roles"
+}
+export -f cs_define_group
+
+#
+# cs_group_add_roles <group> <role> ... <role>
+#
+# Set the roles for a group
+#
+cs_group_add_roles() {
+    local group="${1}"
+    shift
+    cs_init_variables
+
+    local orig_IFS="${IFS}"
+    IFS="
+"
+    echo "${*}" >> "${keydir}/${group}.group/roles" &&
+    IFS=${orig_IFS}
+}
+export -f cs_group_add_roles
+
+#
+# cs_group_get_roles <group>
+#
+# Gets the roles of a group
+#
+cs_group_get_roles() {
+    local group="${1}"
+    cs_init_variables
+
+    cat "${keydir}/${group}.group/roles"
+}
+export -f cs_group_get_roles
+
+#
 # cs_set_uri <role> <uri>
 #
 # Set the uri for a role
@@ -168,6 +213,7 @@ cs_import_cert_from_pem() {
 	"${openssl_keyopt[@]}" \
 	-in "${pem}" -inform pem -outform der |
     softhsm_pkcs11_tool --type cert --write-object /dev/stdin --label "${role}"
+    check_pipe_status
 }
 export -f cs_import_cert_from_pem
 
@@ -187,7 +233,7 @@ cs_import_pubkey_from_pem() {
 	openssl_keyopt=( -passin "file:${OPENSSL_KEYPASS}" )
     fi
 
-    openssl rsa \
+    openssl pkey \
 	"${openssl_keyopt[@]}" \
 	-in "${pem}" -inform pem -pubout -outform der |
     softhsm_pkcs11_tool --type pubkey --write-object /dev/stdin --label "${role}"
@@ -211,7 +257,7 @@ cs_import_privkey_from_pem() {
 	openssl_keyopt=( -passin "file:${OPENSSL_KEYPASS}" )
     fi
 
-    openssl rsa \
+    openssl pkey \
 	"${openssl_keyopt[@]}" \
 	-in "${pem}" -inform pem -outform der |
     softhsm_pkcs11_tool --type privkey --write-object /dev/stdin --label "${role}"
@@ -243,7 +289,16 @@ cs_get_ca() {
     local role="${1}"
     cs_init_variables
 
-    echo "${keydir}/${role}/ca.pem"
+    local ca="${keydir}/${role}/ca.pem"
+
+    if [ ! -d "${keydir}" ]; then
+	echo "ERROR_CA_NOT_YET_SET"
+	return 1
+    fi
+
+    if [ -e "${ca}" ]; then
+	echo "${ca}"
+    fi
 }
 export -f cs_get_ca
 

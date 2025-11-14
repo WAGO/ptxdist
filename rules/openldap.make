@@ -14,16 +14,17 @@ PACKAGES-$(PTXCONF_OPENLDAP) += openldap
 #
 # Paths and names
 #
-OPENLDAP_VERSION	:= 2.4.47
-OPENLDAP_LIBVERSION	:= 2.4
-OPENLDAP_MD5		:= e508f97bfd778fec7799f286e5c07176
+OPENLDAP_VERSION	:= 2.6.3
+OPENLDAP_MD5		:= 6b7229396b335dd5ab2d24841d7f4b53
 OPENLDAP		:= openldap-$(OPENLDAP_VERSION)
 OPENLDAP_SUFFIX		:= tgz
-OPENLDAP_URL		:= ftp://ftp.openldap.org/pub/OpenLDAP/openldap-release/$(OPENLDAP).$(OPENLDAP_SUFFIX)
+OPENLDAP_URL		:= https://www.openldap.org/software/download/OpenLDAP/openldap-release/$(OPENLDAP).$(OPENLDAP_SUFFIX)
 OPENLDAP_SOURCE		:= $(SRCDIR)/$(OPENLDAP).$(OPENLDAP_SUFFIX)
 OPENLDAP_DIR		:= $(BUILDDIR)/$(OPENLDAP)
-# http://www.openldap.org/software/release/license.html
-OPENLDAP_LICENSE	:= OpenLDAP Public License
+OPENLDAP_LICENSE	:= OLDAP-2.8
+OPENLDAP_LICENSE_FILES	:= \
+	file://COPYRIGHT;md5=beceb5ac7100b6430640c61655b25c1f \
+	file://LICENSE;md5=153d07ef052c4a37a8fac23bc6031972
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -31,6 +32,7 @@ OPENLDAP_LICENSE	:= OpenLDAP Public License
 
 OPENLDAP_CONF_ENV	:= \
 	$(CROSS_ENV) \
+	ac_cv_header_unicode_utypes_h=no \
 	ac_cv_header_uuid_uuid_h=no
 
 OPENLDAP_TLS_CONF_OPT-$(PTXCONF_OPENLDAP_TLS_GNUTLS)	:= gnutls
@@ -43,49 +45,47 @@ OPENLDAP_TLS_CONF_OPT-$(PTXCONF_OPENLDAP_TLS_DISABLED)	:= no
 OPENLDAP_CONF_TOOL	:= autoconf
 OPENLDAP_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--$(call ptx/endis, PTXCONF_GLOBAL_IPV6)-ipv6 \
-	--enable-syslog \
-	--enable-local \
-	--enable-proctitle \
+	--disable-debug \
 	--enable-dynamic \
+	--enable-syslog \
+	--$(call ptx/endis, PTXCONF_GLOBAL_IPV6)-ipv6 \
+	--enable-local \
 	\
 	--$(call ptx/endis, PTXCONF_OPENLDAP_SLAPD)-slapd \
 	--disable-dynacl \
 	--disable-aci \
 	--enable-cleartext \
 	--enable-crypt \
-	--disable-lmpasswd \
 	--disable-spasswd \
 	--disable-modules \
-	--enable-rewrite \
 	--disable-rlookups \
 	--disable-slapi \
 	--disable-slp \
 	--disable-wrappers \
 	\
-	--enable-hdb=no \
+	--disable-backends \
 	--enable-dnssrv=no \
-	--enable-bdb=no \
 	--enable-ldap=yes \
 	--enable-mdb=yes \
 	--enable-meta=no \
-	--enable-monitor=yes \
-	--enable-ndb=no \
+	--enable-asyncmeta=no \
 	--enable-null=yes \
 	--enable-passwd=yes \
 	--enable-perl=no \
 	--enable-relay=yes \
-	--enable-shell=no \
 	--enable-sock=no \
 	--enable-sql=no \
+	--enable-wt=no \
 	\
 	--enable-overlays=no \
 	\
 	--without-cyrus-sasl \
+	--without-systemd \
 	--without-fetch \
-	--with-yielding_select=yes \
 	--with-threads \
-	--with-tls=$(OPENLDAP_TLS_CONF_OPT-y)
+	--with-tls=$(OPENLDAP_TLS_CONF_OPT-y) \
+	--with-yielding_select=yes \
+	--with-mp=longlong
 
 
 # ----------------------------------------------------------------------------
@@ -118,9 +118,8 @@ endif
 
 #	libraries
 
-	@$(call install_lib, openldap, 0, 0, 0644, liblber-$(OPENLDAP_LIBVERSION))
-	@$(call install_lib, openldap, 0, 0, 0644, libldap-$(OPENLDAP_LIBVERSION))
-	@$(call install_lib, openldap, 0, 0, 0644, libldap_r-$(OPENLDAP_LIBVERSION))
+	@$(call install_lib, openldap, 0, 0, 0644, liblber)
+	@$(call install_lib, openldap, 0, 0, 0644, libldap)
 
 #	tools
 

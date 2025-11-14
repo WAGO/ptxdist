@@ -33,6 +33,18 @@ HOST_JIMTCL_CONF_ENV	:= \
 HOST_JIMTCL_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--disable-lineedit \
+	--disable-ssl \
+	--shared \
 	--disable-docs
+
+# ----------------------------------------------------------------------------
+# Install
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/host-jimtcl.install:
+	@$(call targetinfo)
+	@$(call world/install, HOST_JIMTCL)
+	@ln -sf libjim.so.$(HOST_JIMTCL_VERSION) $(HOST_JIMTCL_PKGDIR)/usr/lib/libjim.so
+	@$(call touch)
 
 # vim: syntax=make

@@ -15,14 +15,18 @@ PACKAGES-$(PTXCONF_MMC_UTILS) += mmc-utils
 # Paths and names
 #
 # No tags: use a fake descriptive commit-ish to include the date
-MMC_UTILS_VERSION	:= 2018-03-27-gb4fe0c8c0e57
-MMC_UTILS_MD5		:= 1018cdca94530054cc11e4bcb97d4b11
+MMC_UTILS_VERSION	:= 2022-09-27-gdfc3b6ecda84
+MMC_UTILS_MD5		:= 791e4c512cb044045ae34d7f4b781ac1
 MMC_UTILS		:= mmc-utils-$(MMC_UTILS_VERSION)
 MMC_UTILS_SUFFIX	:= tar.gz
-MMC_UTILS_URL		:= https://git.kernel.org/pub/scm/linux/kernel/git/cjb/mmc-utils.git;tag=$(MMC_UTILS_VERSION)
+MMC_UTILS_URL		:= https://git.kernel.org/pub/scm/utils/mmc/mmc-utils.git/snapshot/$(MMC_UTILS).$(MMC_UTILS_SUFFIX)
 MMC_UTILS_SOURCE	:= $(SRCDIR)/$(MMC_UTILS).$(MMC_UTILS_SUFFIX)
 MMC_UTILS_DIR		:= $(BUILDDIR)/$(MMC_UTILS)
 MMC_UTILS_LICENSE	:= GPL-2.0-only AND BSD-3-Clause
+MMC_UTILS_LICENSE_FILES := \
+	file://README;startline=28;endline=31;md5=73e5e3ce638b21eca6e204e260201d4a \
+	file://mmc.c;startline=1;endline=20;md5=fae32792e20f4d27ade1c5a762d16b7d \
+	file://3rdparty/hmac_sha/sha2.h;startline=1;endline=36;md5=6ce341e87c5fcac36e417f4a0e283afd
 
 # ----------------------------------------------------------------------------
 # Prepare

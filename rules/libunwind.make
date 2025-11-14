@@ -14,14 +14,16 @@ PACKAGES-$(PTXCONF_LIBUNWIND) += libunwind
 #
 # Paths and names
 #
-LIBUNWIND_VERSION	:= 1.4.0
-LIBUNWIND_MD5		:= 5114504c74ac3992ac06aa551cd55678
+LIBUNWIND_VERSION	:= 1.8.1
+LIBUNWIND_MD5		:= 10c96118ff30b88c9eeb6eac8e75599d
 LIBUNWIND		:= libunwind-$(LIBUNWIND_VERSION)
 LIBUNWIND_SUFFIX	:= tar.gz
-LIBUNWIND_URL		:= http://download.savannah.gnu.org/releases/libunwind/$(LIBUNWIND).$(LIBUNWIND_SUFFIX)
+LIBUNWIND_URL		:= https://github.com/libunwind/libunwind/releases/download/v$(LIBUNWIND_VERSION)/$(LIBUNWIND).$(LIBUNWIND_SUFFIX)
 LIBUNWIND_SOURCE	:= $(SRCDIR)/$(LIBUNWIND).$(LIBUNWIND_SUFFIX)
 LIBUNWIND_DIR		:= $(BUILDDIR)/$(LIBUNWIND)
 LIBUNWIND_LICENSE	:= MIT
+LIBUNWIND_LICENSE_FILES	:= \
+	file://COPYING;md5=2d80c8ed4062b8339b715f90fa68cc9f
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,17 +38,22 @@ LIBUNWIND_CONF_OPT	:= \
 	--includedir=/usr/include/libunwind \
 	--$(call ptx/disen, PTXCONF_ARCH_PPC)-coredump \
 	--enable-ptrace \
+	--disable-nto \
 	--enable-setjmp \
-	--disable-documentation \
+	--enable-weak-backtrace \
+	--enable-unwind-header \
+	--disable-per-thread-cache \
 	--disable-tests \
 	--disable-debug \
 	--disable-cxx-exceptions \
+	--disable-documentation \
 	--enable-debug-frame \
 	--enable-block-signals \
 	--enable-conservative-checks \
 	--disable-msabi-support \
 	--disable-minidebuginfo \
-	--disable-per-thread-cache
+	--enable-zlibdebuginfo \
+	--without-testdriver
 
 # ----------------------------------------------------------------------------
 # Target-Install

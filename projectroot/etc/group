@@ -18,9 +18,9 @@ kmem:x:109:
 lp:x:110:
 tape:x:111:
 tty:x:112:
-video:x:113:
+video:x:113:pipewire
 lock:x:114:
-audio:x:115:
+audio:x:115:pipewire
 input:x:116:
 mysql:x:117:
 mosquitto:x:118:
@@ -32,4 +32,11 @@ systemd-journal-upload:x:208:
 render:x:209:
 pulse:x:210:
 chrony:x:211:
+rauc-hawkbit:x:212:
+redis:x:213:
+sgx:x:214:
+seat:x:215:
+pipewire:x:216:
+mongodb:x:217:
+polkitd:x:218:
 nogroup:x:65534:

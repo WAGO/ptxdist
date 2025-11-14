@@ -27,13 +27,11 @@ CAIROMM_DIR	:= $(BUILDDIR)/$(CAIROMM)
 # Prepare
 # ----------------------------------------------------------------------------
 
-CAIROMM_PATH	:= PATH=$(CROSS_PATH)
-CAIROMM_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-CAIROMM_AUTOCONF := \
+CAIROMM_CONF_TOOL	:= autoconf
+CAIROMM_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-documentation \
 	--disable-tests

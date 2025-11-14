@@ -14,13 +14,11 @@ PACKAGES-$(PTXCONF_CA_CERTIFICATES) += ca-certificates
 #
 # Paths and names
 #
-CA_CERTIFICATES_VERSION		:= 2016.08.08
-# The commit hash of the default branch. Update this in sync with the date above.
-CA_CERTIFICATES_HASH		:= 79f079284141
-CA_CERTIFICATES_MD5		:= 4be3172ed2528ade3574cfbe35eec421
+CA_CERTIFICATES_VERSION		:= NSS_3_106_RTM
+CA_CERTIFICATES_MD5		:= bfbde652b57df8b291e128a138b7f028
 CA_CERTIFICATES			:= ca-certificates-$(CA_CERTIFICATES_VERSION)
 CA_CERTIFICATES_SUFFIX		:= txt
-CA_CERTIFICATES_URL		:= https://hg.mozilla.org/releases/mozilla-release/raw-file/$(CA_CERTIFICATES_HASH)/security/nss/lib/ckfw/builtins/certdata.$(CA_CERTIFICATES_SUFFIX)
+CA_CERTIFICATES_URL		:= https://hg.mozilla.org/projects/nss/raw-file/$(CA_CERTIFICATES_VERSION)/lib/ckfw/builtins/certdata.$(CA_CERTIFICATES_SUFFIX)
 CA_CERTIFICATES_SOURCE		:= $(SRCDIR)/certdata-$(CA_CERTIFICATES_VERSION).$(CA_CERTIFICATES_SUFFIX)
 CA_CERTIFICATES_DIR		:= $(BUILDDIR)/$(CA_CERTIFICATES)
 CA_CERTIFICATES_LICENSE		:= MPL-2.0

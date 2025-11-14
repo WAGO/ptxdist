@@ -15,7 +15,7 @@ PYTHON3_OPCUA_VERSION	:= 0.98.7
 PYTHON3_OPCUA_MD5	:= beca06f61d4acd4349a118b81fc37aad
 PYTHON3_OPCUA		:= opcua-$(PYTHON3_OPCUA_VERSION)
 PYTHON3_OPCUA_SUFFIX	:= tar.gz
-PYTHON3_OPCUA_URL	:= https://files.pythonhosted.org/packages/source/o/opcua/$(PYTHON3_OPCUA).$(PYTHON3_OPCUA_SUFFIX)
+PYTHON3_OPCUA_URL	:= $(call ptx/mirror-pypi, opcua, $(PYTHON3_OPCUA).$(PYTHON3_OPCUA_SUFFIX))
 PYTHON3_OPCUA_SOURCE	:= $(SRCDIR)/$(PYTHON3_OPCUA).$(PYTHON3_OPCUA_SUFFIX)
 PYTHON3_OPCUA_DIR	:= $(BUILDDIR)/$(PYTHON3_OPCUA)
 PYTHON3_OPCUA_LICENSE	:= LGPL-3.0-only
@@ -40,7 +40,7 @@ $(STATEDIR)/python3-opcua.targetinstall:
 	@$(call install_fixup,python3-opcua,DESCRIPTION,missing)
 
 	@$(call install_glob, python3-opcua, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/opcua,, *.py)
+		$(PYTHON3_SITEPACKAGES)/opcua,, *.py)
 
 	@$(call install_finish,python3-opcua)
 

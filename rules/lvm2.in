@@ -4,6 +4,7 @@ menuconfig LVM2
 	tristate
 	select LIBC_DL
 	select GCCLIBS_GCC_S
+	select LIBAIO
 	select READLINE
 	select NCURSES
 	select SYSTEMD if LVM2_SYSTEMD
@@ -27,7 +28,8 @@ if LVM2_LVM_TOOLS
 config LVM2_STARTSCRIPT
 	bool
 	default y
-        prompt "install /etc/init.d/lvm2"
+	depends on INITMETHOD_BBINIT
+	prompt "install /etc/init.d/lvm2"
 
 endif
 

@@ -2,7 +2,8 @@
 
 menuconfig RAUC
 	tristate
-	prompt "Rauc Update Tool              "
+	prompt "RAUC Update Tool              "
+	select HOST_MESON
 	select OPENSSL
 	select GLIB
 	select GLIB_LIBMOUNT
@@ -13,7 +14,9 @@ menuconfig RAUC
 	select BUSYBOX_FEATURE_SEAMLESS_GZ	if BUSYBOX_TAR
 	select DBUS				if RAUC_SERVICE
 	select LIBCURL				if RAUC_NETWORK
+	select LIBNL3				if RAUC_STREAMING
 	select JSON_GLIB			if RAUC_JSON
+	select UTIL_LINUX_LIBFDISK		if RAUC_GPT
 	select SQUASHFS_TOOLS			if RUNTIME
 	select SQUASHFS_TOOLS_UNSQUASHFS	if RUNTIME
 	select DT_UTILS				if RUNTIME && RAUC_BAREBOX
@@ -24,6 +27,15 @@ menuconfig RAUC
 	  Robust Auto-Update Controller. RAUC controls the update process on embedded linux systems.
 
 if RAUC
+
+config RAUC_CREATE
+	bool
+	prompt "Enable bundle creation support on target"
+	help
+	  Enables support for creating bundles on target.
+	  Disabling this will remove functionality required for bundle
+	  creation which is not required on the target in most cases and thus
+	  allows to save space.
 
 config RAUC_SERVICE
 	bool
@@ -43,12 +55,31 @@ config RAUC_NETWORK
 	  Note that network is primarily designed to be used for RAUC'S casync
 	  capabilities, not for fetching full bundles.
 
+config RAUC_STREAMING
+	bool
+	prompt "Enable streaming support"
+	select RAUC_NETWORK
+	help
+	  Enables built-in HTTP(S) streaming support that allows RAUC to
+	  access remote bundles via http/https and write images without the
+	  need for intermediate storage on the target.
+
 config RAUC_JSON
 	bool
 	prompt "JSON support"
 	help
 	  Enables JSON output format for 'rauc info' and 'rauc status'.
 	  Output format can be selected via '--output-format=<json/json-pretty>'
+
+config RAUC_GPT
+	bool
+	prompt "Support atomic EFI/bootloader partition updates (GPT)"
+	help
+	  Enables support for atomic bootloader updates on first GPT (EFI)
+	  partition (slot type 'boot-gpt-switch').
+	  For details, see
+	  https://rauc.readthedocs.io/en/latest/advanced.html#update-boot-partition-in-gpt
+
 
 config RAUC_CONFIGURATION
 	bool
@@ -73,13 +104,6 @@ config RAUC_COMPATIBLE
 
 	  Only if the compatible in the targets RAUC system.conf file and those
 	  in the Bundle's manifest match exactly, an update will be performed
-
-config RAUC_BUNDLE_VERSION
-	string
-	prompt "RAUC Bundle Version"
-	default "${PTXDIST_BSP_AUTOVERSION}"
-	help
-	  Overwrite the bundle version if needed.
 
 endif
 

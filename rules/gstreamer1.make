@@ -15,28 +15,36 @@ PACKAGES-$(PTXCONF_GSTREAMER1) += gstreamer1
 #
 # Paths and names
 #
-GSTREAMER1_VERSION	:= 1.16.2
-GSTREAMER1_MD5		:= 0e661ed5bdf1d8996e430228d022628e
+GSTREAMER1_VERSION	:= 1.24.9
+GSTREAMER1_MD5		:= 6a794bebd3506c9075faee588aef4c2f
 GSTREAMER1		:= gstreamer-$(GSTREAMER1_VERSION)
 GSTREAMER1_SUFFIX	:= tar.xz
 GSTREAMER1_URL		:= http://gstreamer.freedesktop.org/src/gstreamer/$(GSTREAMER1).$(GSTREAMER1_SUFFIX)
 GSTREAMER1_SOURCE	:= $(SRCDIR)/$(GSTREAMER1).$(GSTREAMER1_SUFFIX)
 GSTREAMER1_DIR		:= $(BUILDDIR)/$(GSTREAMER1)
 GSTREAMER1_LICENSE	:= LGPL-2.1-or-later
+GSTREAMER1_LICENSE_FILES:= \
+	file://COPYING;md5=69333daa044cb77e486cc36129f7a770
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
+GSTREAMER1_CONF_ENV := \
+	$(CROSS_ENV) \
+	$(CROSS_CARGO_ENV)
+
+GSTREAMER1_MAKE_ENV := \
+	$(CROSS_CARGO_ENV)
+
 #
 # meson
 #
 GSTREAMER1_GENERIC_CONF_OPT = \
-	-Dexamples=disabled \
-	-Dglib-asserts=disabled \
-	-Dglib-checks=disabled \
-	-Dgobject-cast-checks=disabled \
-	-Dnls=disabled \
+	-Ddoc=disabled \
+	-Dglib-asserts=$(call ptx/endis,PTXCONF_GSTREAMER1_DEBUG)d \
+	-Dglib-checks=$(call ptx/endis,PTXCONF_GSTREAMER1_DEBUG)d \
+	-Dgobject-cast-checks=$(call ptx/endis,PTXCONF_GSTREAMER1_DEBUG)d \
 	-Dpackage-name="$(1) source release" \
 	-Dpackage-origin=PTXdist \
 	-Dtests=disabled
@@ -48,17 +56,21 @@ GSTREAMER1_CONF_OPT	:= \
 	-Dbash-completion=disabled \
 	-Dbenchmarks=disabled \
 	-Dcheck=$(call ptx/endis,PTXCONF_GSTREAMER1_CHECK)d \
+	-Dcoretracers=$(call ptx/endis,PTXCONF_GSTREAMER1_DEBUG)d \
 	-Ddbghelp=disabled \
-	-Dextra-checks=false \
+	-Dexamples=disabled \
+	-Dextra-checks=disabled \
 	-Dgst_debug=$(call ptx/truefalse,PTXCONF_GSTREAMER1_DEBUG) \
 	-Dgst_parse=true \
-	-Dgtk_doc=disabled \
+	-Dgstreamer-static-full=false \
 	-Dintrospection=$(call ptx/endis,PTXCONF_GSTREAMER1_INTROSPECTION)d \
 	-Dlibdw=disabled \
 	-Dlibunwind=enabled \
 	-Dmemory-alignment=malloc \
+	-Dnls=disabled \
 	-Doption-parsing=true \
 	-Dpoisoning=false \
+	-Dptp-helper=$(call ptx/endis,PTXCONF_GSTREAMER1_PTP)d \
 	-Dptp-helper-permissions=setuid-root \
 	-Dptp-helper-setuid-group=nogroup \
 	-Dptp-helper-setuid-user=nobody \
@@ -118,8 +130,10 @@ endif
 
 	@$(call install_copy, gstreamer1, 0, 0, 0755, -, \
 		/usr/libexec/gstreamer-1.0/gst-plugin-scanner)
+ifdef PTXCONF_GSTREAMER1_PTP
 	@$(call install_copy, gstreamer1, 0, 0, 4755, -, \
 		/usr/libexec/gstreamer-1.0/gst-ptp-helper)
+endif
 
 ifdef PTXCONF_GSTREAMER1_INTROSPECTION
 	@$(call install_tree, gstreamer1, 0, 0, -, \

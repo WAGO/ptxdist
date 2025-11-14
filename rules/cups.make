@@ -100,15 +100,12 @@ CUPS_CONF_OPT	+= \
 CUPS_PHP_PATH	:= \
 	$(if PTXCONF_CUPS_PHP5_CLI,/usr/bin/php, \
 	$(if PTXCONF_CUPS_PHP5_CGI,/usr/bin/php-cgi))
-CUPS_PYTHON_PATH	:= \
-	$(if PTXCONF_CUPS_PYTHON2,/usr/bin/python2, \
-	$(if PTXCONF_CUPS_PYTHON3,/usr/bin/python3))
 
 CUPS_CONF_OPT	+= \
 	$(call ptx/ifdef,PTXCONF_CUPS_JAVA,--with-java=$(PTXCONF_CUPS_JAVA_PATH),--without-java) \
 	$(call ptx/ifdef,PTXCONF_CUPS_PERL,--with-perl=/usr/bin/perl,--without-perl) \
 	$(call ptx/ifdef,PTXCONF_CUPS_PHP,--with-php=$(CUPS_PHP_PATH),--without-php) \
-	$(call ptx/ifdef,PTXCONF_CUPS_PYTHON,--with-python=$(CUPS_PYTHON_PATH),--without-python)
+	$(call ptx/ifdef,PTXCONF_CUPS_PYTHON,--with-python=/usr/bin/python3,--without-python)
 
 # ----------------------------------------------------------------------------
 # Compile & Install
@@ -134,7 +131,7 @@ $(STATEDIR)/cups.targetinstall:
 	@$(call install_fixup, cups,DESCRIPTION,missing)
 
 # ----- config files, install as daemon:lp
-	@$(call install_copy, cups, daemon, lp, 750, /etc/cups)
+	@$(call install_copy, cups, daemon, lp, 0750, /etc/cups)
 	@$(call install_alternative, cups, daemon, lp, 0640, /etc/cups/cups-files.conf)
 	@$(call install_alternative, cups, daemon, lp, 0640, /etc/cups/cupsd.conf)
 	@$(call install_alternative, cups, daemon, lp, 0600, /etc/cups/classes.conf)

@@ -134,6 +134,14 @@ choice
 		help
 		  This is support for the RISC-V architecture.
 
+	config ARCH_LOONGARCH
+		bool "loongarch  "
+		select HAS_MMU
+		select ARCH_LP64
+		select ARCH_SUPPORTS_ENDIAN_LITTLE
+		help
+		  This is support for the LoongArch architecture.
+
 endchoice
 
 #
@@ -189,7 +197,7 @@ choice
 		  The compiler will generate code for Pentium II CPUs as default.
 		  This code will run on Pentium II and above CPUs.
 
-  	config ARCH_X86_P3M
+	config ARCH_X86_P3M
 		bool "PIII/M     "
 		help
 		  The compiler will generate code for Pentium III and Pentium M CPUs as default.
@@ -216,10 +224,10 @@ config ARCH_LP64
 # endianness
 #
 config ARCH_SUPPORTS_ENDIAN_BIG
-       bool
+	bool
 
 config ARCH_SUPPORTS_ENDIAN_LITTLE
-       bool
+	bool
 
 choice
 	prompt "endianness      "
@@ -249,6 +257,17 @@ config ARCH_ARM_V6
 	  architecture version of ARMv6 or newer. Which is the case
 	  for the ARM11 and Cortex A Cores.
 
+config ARCH_ARM_V7
+	bool "arm architecture version >= ARMv7"
+	depends on ARCH_ARM
+	select ARCH_ARM_V6
+	help
+	  This options enables optimisation for ARMv6 cores.
+
+	  Select this if you have an arm processor with an
+	  architecture version of ARMv7. Which is the case
+	  for the Cortex A8 and later Cores.
+
 config ARCH_ARM_IWMMXT
 	bool "support iwmmxt extension"
 	depends on ARCH_ARM
@@ -257,11 +276,30 @@ config ARCH_ARM_IWMMXT
 	  but not all pxa processors.
 
 config ARCH_ARM_NEON
-	bool "support NEON extension"
-	depends on ARCH_ARM
+	bool "support NEON extension" if ARCH_ARM
+	# NEON is not optional on ARM64
+	default y if ARCH_ARM64
+	depends on ARCH_ARM || ARCH_ARM64
 	help
 	  This enables the NEON extension. This is e.g. present on
 	  Cortex A8 processors.
+
+config ARCH_ARMV7_NEON
+	bool
+	select ARCH_ARM_V7
+	default ARCH_ARM_NEON if ARCH_ARM
+
+#
+# PPC vector instructions
+#
+config ARCH_PPC_ALTIVEC
+	bool
+	prompt "AltiVec/VMX/Velocity Engine"
+	depends on ARCH_PPC
+	help
+	  This enables optimizations corresponding to single precision
+	  floating point and integer SIMD instructions on PPC processors.
+	  This is present on more modern CPUs.
 
 #
 # hardware / software floating point
@@ -274,7 +312,7 @@ config HAS_HARDFLOAT
 	default y if ARCH_SPARC
 	default y if ARCH_ARM64
 	default y if ARCH_RISCV
-	default n
+	default y if ARCH_LOONGARCH
 
 #
 # memory management unit
@@ -287,7 +325,7 @@ config HAS_MMU
 #
 config SIZEOF_LONG_DOUBLE
 	string
-	default "16" if ARCH_X86_64 || ARCH_ARM64
+	default "16" if ARCH_X86_64 || ARCH_ARM64 || ARCH_LOONGARCH
 	default "12" if ARCH_X86
 	default "8"
 	# FIXME: add more values
@@ -315,3 +353,4 @@ config ARCH_STRING
 	default "parisc"		if ARCH_PARISC
 	default "sh"			if ARCH_SH
 	default "riscv"			if ARCH_RISCV
+	default "loongarch"		if ARCH_LOONGARCH

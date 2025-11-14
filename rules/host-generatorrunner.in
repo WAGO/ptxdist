@@ -1,7 +1,0 @@
-## SECTION=hosttools_noprompt
-
-config HOST_GENERATORRUNNER
-	tristate
-	default y if ALLYES
-	select HOST_APIEXTRACTOR
-	select HOST_CMAKE

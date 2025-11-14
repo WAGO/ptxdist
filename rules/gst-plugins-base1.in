@@ -8,6 +8,7 @@ menuconfig GST_PLUGINS_BASE1
 
 	select GLIB
 	select GSTREAMER1
+	select LIBDRM
 	select ORC
 	select ALSA_LIB			if GST_PLUGINS_BASE1_ALSA
 	select ALSA_LIB_PCM		if GST_PLUGINS_BASE1_ALSA
@@ -16,16 +17,17 @@ menuconfig GST_PLUGINS_BASE1
 	select GLIB			if GST_PLUGINS_BASE1_GIO
 	select LIBOGG			if GST_PLUGINS_BASE1_OGG
 	select LIBTHEORA		if GST_PLUGINS_BASE1_THEORA
+	select LIBTHEORA_ENCODING	if GST_PLUGINS_BASE1_THEORA
 	select LIBVORBIS		if GST_PLUGINS_BASE1_VORBIS
 	select PANGO			if GST_PLUGINS_BASE1_PANGO
 	select OPUS			if GST_PLUGINS_BASE1_OPUS
 	select ZLIB			if GST_PLUGINS_BASE1_ZLIB
 	select LIBTREMOR		if GST_PLUGINS_BASE1_TREMOR
-	select LIBPNG			if GST_PLUGINS_BASE1_OPENGL
-	select LIBJPEG			if GST_PLUGINS_BASE1_OPENGL
+	select LIBPNG			if GST_PLUGINS_BASE1_GL
+	select LIBJPEG			if GST_PLUGINS_BASE1_GL
 	select MESALIB			if GST_PLUGINS_BASE1_GL
 	select MESALIB_GBM		if GST_PLUGINS_BASE1_GL
-	select MESALIB_OPENGL		if GST_PLUGINS_BASE1_OPENGL
+	select MESALIB_GLX		if GST_PLUGINS_BASE1_OPENGL
 	select MESALIB_GLES2		if GST_PLUGINS_BASE1_GLES2
 	select MESALIB_EGL		if GST_PLUGINS_BASE1_EGL
 	select MESALIB_EGL_WAYLAND	if GST_PLUGINS_BASE1_EGL_WAYLAND
@@ -37,6 +39,7 @@ menuconfig GST_PLUGINS_BASE1
 	# x features need libx11 + Xv
 	select XORG			if GST_PLUGINS_BASE1_X
 	select XORG_LIB_X11		if GST_PLUGINS_BASE1_X
+	select XORG_LIB_XI		if GST_PLUGINS_BASE1_X
 	select XORG_LIB_XV		if GST_PLUGINS_BASE1_X
 	prompt "gst-plugins-base              "
 	help
@@ -87,6 +90,14 @@ config GST_PLUGINS_BASE1_COMPOSITOR
 	bool
 	prompt "compositor"
 
+config GST_PLUGINS_BASE1_DEBUGUTILS
+	bool
+	prompt "debugutils"
+
+config GST_PLUGINS_BASE1_DSD
+	bool
+	prompt "dsd"
+
 config GST_PLUGINS_BASE1_ENCODING
 	bool
 	prompt "encoding"
@@ -124,17 +135,13 @@ config GST_PLUGINS_BASE1_TYPEFIND
 	bool
 	prompt "typefind"
 
-config GST_PLUGINS_BASE1_VIDEOCONVERT
+config GST_PLUGINS_BASE1_VIDEOCONVERTSCALE
 	bool
-	prompt "videoconvert"
+	prompt "videoconvertscale"
 
 config GST_PLUGINS_BASE1_VIDEORATE
 	bool
 	prompt "videorate"
-
-config GST_PLUGINS_BASE1_VIDEOSCALE
-	bool
-	prompt "videoscale"
 
 config GST_PLUGINS_BASE1_VIDEOTESTSRC
 	bool
@@ -174,6 +181,7 @@ config GST_PLUGINS_BASE1_GLES2
 
 config GST_PLUGINS_BASE1_OPENGL
 	bool
+	depends on XORG
 	prompt "opengl"
 
 config GST_PLUGINS_BASE1_EGL
@@ -199,10 +207,10 @@ config GST_PLUGINS_BASE1_GLX
 	select GST_PLUGINS_BASE1_X11
 	prompt "glx"
 
+endif
+
 config GST_PLUGINS_BASE1_X11
 	bool
-
-endif
 
 config GST_PLUGINS_BASE1_LIBVISUAL
 	bool
@@ -250,6 +258,7 @@ config GST_PLUGINS_BASE1_VORBIS
 
 config GST_PLUGINS_BASE1_X
 	bool
+	select GST_PLUGINS_BASE1_X11
 	prompt "x based plugins"
 	help
 	  X11 ximagesink, xvimagesink plugins and X11 support in libraries

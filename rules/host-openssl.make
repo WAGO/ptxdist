@@ -23,15 +23,13 @@ HOST_OPENSSL_DIR	= $(HOST_BUILDDIR)/$(HOST_OPENSSL)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_OPENSSL_CONF_ENV	:= $(HOST_ENV)
-
 #
 # autoconf
 #
 # no ':=' here
 HOST_OPENSSL_CONF_OPT = \
-	--prefix=/ \
-	--libdir=/lib \
+	--prefix=/usr \
+	--libdir=/usr/lib \
 	shared
 
 HOST_OPENSSL_INSTALL_OPT := \

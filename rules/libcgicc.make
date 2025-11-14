@@ -32,13 +32,11 @@ LIBCGICC_LICENSE_FILES	:= \
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBCGICC_PATH	:= PATH=$(CROSS_PATH)
-LIBCGICC_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBCGICC_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBCGICC_CONF_TOOL	:= autoconf
+LIBCGICC_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

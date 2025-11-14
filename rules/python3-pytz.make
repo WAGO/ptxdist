@@ -11,14 +11,15 @@
 #
 PACKAGES-$(PTXCONF_PYTHON3_PYTZ) += python3-pytz
 
-PYTHON3_PYTZ_VERSION	:= 2018.5
-PYTHON3_PYTZ_MD5	:= 45409cbfa3927bdd2f3ee914dd5b1060
-PYTHON3_PYTZ		:= pytz-$(PYTHON3_PYTZ_VERSION)
-PYTHON3_PYTZ_SUFFIX	:= tar.gz
-PYTHON3_PYTZ_URL	:= https://pypi.python.org/packages/ca/a9/62f96decb1e309d6300ebe7eee9acfd7bccaeedd693794437005b9067b44/$(PYTHON3_PYTZ).$(PYTHON3_PYTZ_SUFFIX)\#md5=$(PYTHON3_PYTZ_MD5)
-PYTHON3_PYTZ_SOURCE	:= $(SRCDIR)/$(PYTHON3_PYTZ).$(PYTHON3_PYTZ_SUFFIX)
-PYTHON3_PYTZ_DIR	:= $(BUILDDIR)/$(PYTHON3_PYTZ)
-PYTHON3_PYTZ_LICENSE	:= MIT
+PYTHON3_PYTZ_VERSION		:= 2023.3
+PYTHON3_PYTZ_MD5		:= fe54c8f8a1544b4e78b523b264ab071b
+PYTHON3_PYTZ			:= pytz-$(PYTHON3_PYTZ_VERSION)
+PYTHON3_PYTZ_SUFFIX		:= tar.gz
+PYTHON3_PYTZ_URL		:= $(call ptx/mirror-pypi, pytz, $(PYTHON3_PYTZ).$(PYTHON3_PYTZ_SUFFIX))
+PYTHON3_PYTZ_SOURCE		:= $(SRCDIR)/$(PYTHON3_PYTZ).$(PYTHON3_PYTZ_SUFFIX)
+PYTHON3_PYTZ_DIR		:= $(BUILDDIR)/$(PYTHON3_PYTZ)
+PYTHON3_PYTZ_LICENSE		:= MIT
+PYTHON3_PYTZ_LICENSE_FILES	:= file://LICENSE.txt;md5=1a67fc46c1b596cce5d21209bbe75999
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,7 +41,7 @@ $(STATEDIR)/python3-pytz.targetinstall:
 	@$(call install_fixup,python3-pytz,DESCRIPTION,missing)
 
 	@$(call install_glob, python3-pytz, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/pytz,, *.py */zoneinfo*)
+		$(PYTHON3_SITEPACKAGES)/pytz,, *.py */zoneinfo*)
 
 	@$(call install_finish,python3-pytz)
 

@@ -14,15 +14,15 @@ PACKAGES-$(PTXCONF_NFTABLES) += nftables
 #
 # Paths and names
 #
-NFTABLES_VERSION	:= 0.8.3
-NFTABLES_MD5		:= a604501c10a302fa417410b16f293d2c
+NFTABLES_VERSION	:= 1.1.0
+NFTABLES_MD5		:= 3082f7c9ad4b8dd1c9fb260ad82d1472
 NFTABLES		:= nftables-$(NFTABLES_VERSION)
-NFTABLES_SUFFIX		:= tar.bz2
+NFTABLES_SUFFIX		:= tar.xz
 NFTABLES_URL		:= http://ftp.netfilter.org/pub/nftables/$(NFTABLES).$(NFTABLES_SUFFIX)
 NFTABLES_SOURCE		:= $(SRCDIR)/$(NFTABLES).$(NFTABLES_SUFFIX)
 NFTABLES_DIR		:= $(BUILDDIR)/$(NFTABLES)
-NFTABLES_LICENSE	:= GPL-2.0-only
-NFTABLES_LICENSE_FILES	:= file://COPYING;md5=d1a78fdd879a263a5e0b42d1fc565e79
+NFTABLES_LICENSE	:= GPL-2.0-only AND GPL-2.0-or-later
+NFTABLES_LICENSE_FILES	:= file://COPYING;md5=81ec33bb3e47b460fc993ac768c74b62
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,10 +36,10 @@ NFTABLES_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--$(call ptx/endis, PTXCONF_NFTABLES_DEBUG)-debug \
 	--disable-man-doc \
-	--disable-pdf-doc \
 	--$(call ptx/wwo, PTXCONF_NFTABLES_MGMP)-mini-gmp \
 	--without-cli \
-	--without-xtables
+	--without-xtables \
+	--without-json
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -56,15 +56,14 @@ $(STATEDIR)/nftables.targetinstall:
 
 	@$(call install_copy, nftables, 0, 0, 0755, -, /usr/sbin/nft)
 	@$(call install_alternative, nftables, 0, 0, 0755, /etc/nftables.conf)
+	@$(call install_lib, nftables, 0, 0, 0644, libnftables)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NFTABLES_STARTSCRIPT
 	@$(call install_alternative, nftables, 0, 0, 0755, /etc/init.d/nftables)
 
 ifneq ($(call remove_quotes,$(PTXCONF_NFTABLES_BBINIT_LINK)),)
 	@$(call install_link, nftables, ../init.d/nftables, \
 		/etc/rc.d/$(PTXCONF_NFTABLES_BBINIT_LINK))
-endif
 endif
 endif
 

@@ -1,10 +1,16 @@
-## SECTION=communication
+## SECTION=staging
+## old section:
+### SECTION=communication
+
 config LRZSZ
 	tristate
 	prompt "lrzsz"
-	select LIBC_NSL
 	help
 	  lrzsz is a unix communication package providing the XMODEM,
 	  YMODEM and ZMODEM file transfer protocols. lrzsz is a heavily
 	  rehacked version of the last public domain release of Omen
 	  Technologies rzsz package.
+
+	  STAGING: remove in PTXdist 2025.07.0
+	  Upstream is dead, unmaintained in ptxdist and fails to build with
+	  gcc 14.

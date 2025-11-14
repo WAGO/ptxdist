@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_LLDPD) += lldpd
 #
 # Paths and names
 #
-LLDPD_VERSION	:= 1.0.4
-LLDPD_MD5	:= 33e8d58623f99184e4e709cbbfe45db3
+LLDPD_VERSION	:= 1.0.13
+LLDPD_MD5	:= 40fab1279e4203191dd32d2057f1c3fe
 LLDPD		:= lldpd-$(LLDPD_VERSION)
 LLDPD_SUFFIX	:= tar.gz
 LLDPD_URL	:= http://media.luffy.cx/files/lldpd//$(LLDPD).$(LLDPD_SUFFIX)
@@ -77,7 +77,6 @@ $(STATEDIR)/lldpd.targetinstall:
 
 	@$(call install_lib, lldpd, 0, 0, 0644, liblldpctl)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_LLDPD_STARTSCRIPT
 	@$(call install_alternative, lldpd, 0, 0, 0755, /etc/init.d/lldpd)
 	@$(call install_replace, lldpd, /etc/init.d/lldpd, \
@@ -88,7 +87,6 @@ ifdef PTXCONF_LLDPD_STARTSCRIPT
 ifneq ($(call remove_quotes,$(PTXCONF_LLDPD_BBINIT_LINK)),)
 	@$(call install_link, lldpd, ../init.d/lldpd, \
 		/etc/rc.d/$(PTXCONF_LLDPD_BBINIT_LINK))
-endif
 endif
 endif
 

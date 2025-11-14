@@ -99,6 +99,7 @@ meson_blacklist = [
 	"b_colorout",
 	"b_coverage",
 	"b_lto",
+	"b_lto_threads",
 	"b_lundef",
 	"b_ndebug",
 	"b_pch",
@@ -135,24 +136,36 @@ meson_blacklist = [
 	"cpp_std",
 	"datadir",
 	"debug",
+	"default_both_libraries",
 	"default_library",
 	"errorlogs",
+	"force_fallback_for",
+	"genvslite",
 	"includedir",
 	"infodir",
 	"install_umask",
 	"layout",
 	"libexecdir",
+	"licensedir",
 	"localedir",
 	"localstatedir",
 	"mandir",
 	"optimization",
 	"pkg_config_path",
+	"prefer_static",
+	"python.allow_limited_api",
+	"python.bytecompile",
+	"python.install_env",
+	"python.platlibdir",
+	"python.purelibdir",
 	"sbindir",
 	"sharedstatedir",
 	"stdsplit",
 	"strip",
 	"sysconfdir",
 	"unity",
+	"unity_size",
+	"vsenv",
 	"warning_level",
 	"werror",
 	"wrap_mode",
@@ -320,6 +333,7 @@ def handle_dir(d, subdir):
 	if not d:
 		return (None, None, None)
 
+	builddir = d + "-build"
 	if subdir:
 		d = os.path.join(d, subdir)
 
@@ -333,9 +347,9 @@ def handle_dir(d, subdir):
 	if os.path.exists(configure) and tool in ("autoconf", ""):
 		return handle_dir_configure(d, configure)
 	elif os.path.exists(meson_build) and tool in ("meson", ""):
-		return handle_dir_meson(d)
+		return handle_dir_meson(d, builddir)
 	elif os.path.exists(cmakelists) and tool in ("cmake", ""):
-		return handle_dir_cmake(d)
+		return handle_dir_cmake(d, builddir)
 	else:
 		abort("not a autoconf/meson/cmake package: configure script / meson.build / CMakeLists.txt file not found in '%s'" % d)
 		exit(1)
@@ -355,7 +369,7 @@ def handle_dir_configure(d, configure):
 			continue
 		if word[:2] == "--":
 			configure_args.append(word)
-		elif ptx_pkg == "host-qemu" and re.match("  [a-z].*", line):
+		elif ptx_pkg in ("host-qemu", "qemu") and re.match("  [a-z].*", line):
 			configure_args.append("--enable-" + word)
 
 	parsed = parse_configure_args(configure_args, configure_blacklist)
@@ -363,8 +377,7 @@ def handle_dir_configure(d, configure):
 	label = os.path.basename(d)
 	return (parsed, args, label)
 
-def handle_dir_meson(d):
-	meson_builddir = d + "-build"
+def handle_dir_meson(d, meson_builddir):
 	if not os.path.exists(meson_builddir):
 		abort("package must be configured")
 		exit(1)
@@ -393,8 +406,7 @@ def handle_dir_meson(d):
 	label = os.path.basename(d)
 	return (options, args, label)
 
-def handle_dir_cmake(d):
-	cmake_builddir = d + "-build"
+def handle_dir_cmake(d, cmake_builddir):
 	if not os.path.exists(cmake_builddir):
 		abort("package must be configured")
 		exit(1)

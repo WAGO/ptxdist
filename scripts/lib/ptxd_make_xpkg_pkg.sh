@@ -22,6 +22,17 @@ ptxd_install_error() {
 }
 export -f ptxd_install_error
 
+mkdir_p() {
+    local d
+    for d in "${@}"; do
+	if [ ! -d "${d}" ]; then
+	    mkdir -p "${@}"
+	    return
+	fi
+    done
+}
+export -f mkdir_p
+
 #
 # ptxd_install_getent_id
 #
@@ -106,9 +117,6 @@ ptxd_install_setup_global() {
     # this goes into the ipkg, thus full file modes here
     pdirs=("${pkg_xpkg_tmp}")
 
-    # strip dirs
-    sdirs=("${nfsroot_dirs[@]}" "${pkg_xpkg_tmp}")
-
     # dirs with separate debug files
     ddirs=()
     if [ "$(ptxd_get_ptxconf PTXCONF_TARGET_DEBUG_OFF)" != "y" ]; then
@@ -122,7 +130,11 @@ export -f ptxd_install_setup_global
 
 ptxd_install_lock() {
     local lockfile
-    mkdir -p "${PTXDIST_TEMPDIR}/locks"
+
+    # locking is only needed if packages are built in parallel
+    if [ "${PTXDIST_PARALLELMFLAGS_EXTERN}" = "-j1" ]; then
+	return
+    fi
 
     if [ -n "${dst}" ]; then
 	lockfile="${PTXDIST_TEMPDIR}/locks/${dst//\//-}"
@@ -139,6 +151,10 @@ export -f ptxd_install_lock
 
 ptxd_install_unlock() {
     local ret=$?
+
+    if [ "${PTXDIST_PARALLELMFLAGS_EXTERN}" = "-j1" ]; then
+	return "${ret}"
+    fi
 
     if [ -z "${dst_lock}" ]; then
 	ptxd_bailout "dst_lock must be set when ptxd_install_unlock() is called"
@@ -209,7 +225,7 @@ ptxd_install_setup_src() {
 
     legacy_src="${src#/usr}"
     if [ \( "${cmd}" = "alternative" -o "${cmd}" = "config" \) -a "${legacy_src}" != "${src}" ]; then
-	ptxd_install_setup_src_list "${legacy_src}"
+	pkg_dir= ptxd_install_setup_src_list "${legacy_src}"
 	if ptxd_get_path "${list[@]}"; then
 	    local tmp
 	    echo -e "\nFound file for '${dst}' in these legacy locations:\n"
@@ -229,13 +245,17 @@ ptxd_install_setup_src() {
     # We depend on the first available file, which is the one that will
     # be used. If one with a higher priority is created, the dependency
     # will cause the package to be recreated.
+    # Make cannot handle filenames that contain a ':'. So don't generate
+    # dependecies for those files.
     local deprule=""
-    for src in "${list[@]}"; do
-	# don't provide dependencies for files in PTXDIST_PLATFORMDIR.
-	if [ "${src}" == "${src#${PTXDIST_PLATFORMDIR}}" -a -n "${src}" ]; then
-		deprule="${deprule} ${src}"
-	fi
-    done
+    if ! [[ "${src}" =~ : ]]; then
+	for src in "${list[@]}"; do
+	    # don't provide dependencies for files in PTXDIST_PLATFORMDIR.
+	    if [ "${src}" == "${src#${PTXDIST_PLATFORMDIR}}" -a -n "${src}" ]; then
+		    deprule="${deprule} ${src}"
+	    fi
+	done
+    fi
     if [ -n "${deprule}" ]; then
 	deprule="${ptx_state_dir}/${pkg_stamp}: \$(firstword \$(wildcard ${deprule}))"
 	# Make the deps rule robust for varying installation paths, and
@@ -270,12 +290,16 @@ ptxd_install_virtfs() {
     for d in "${ndirs[@]/%/${dst}}"; do
 	dir="${d%/*}/.virtfs_metadata"
 	file="${dir}/${d##*/}"&&
-	mkdir -p "${dir}" &&
+	mkdir_p "${dir}" &&
 	cat <<- EOF > "${file}"
 	virtfs.uid=${usr}
 	virtfs.gid=${grp}
 	virtfs.mode=${mod_virtfs}
 	EOF
+	if [ -z "${dst}" ]; then
+		mkdir_p "${d%/*}/root" &&
+		cp $file "${d%/*}/root/.virtfs_metadata_root"
+	fi &&
 	if [ -n "${major}" -a -n "${minor}" ]; then
 	    local rdev=$[ ${major} << 8 | ${minor} ] &&
 	    echo "virtfs.rdev=${rdev}" >> "${file}"
@@ -291,8 +315,13 @@ ptxd_install_dir_impl() {
 	ptxd_ensure_dir "${dst%/*}"
     fi &&
 
-    install -m "${mod_nfs}" -d "${ndirs[@]/%/${dst}}" &&
-    install -m "${mod}" -o "${usr}" -g "${grp}" -d "${pdirs[@]/%/${dst}}" &&
+    if [ "${1}" != "keep" ]; then
+	install -m "${mod_nfs}" -d "${ndirs[@]/%/${dst}}" &&
+	install -m "${mod}" -o "${usr}" -g "${grp}" -d "${pdirs[@]/%/${dst}}"
+    else
+	# don't overwrite existing permissions
+	mkdir_p "${dirs[@]/%/${dst}}"
+    fi &&
 
     ptxd_install_virtfs
 }
@@ -315,11 +344,12 @@ ptxd_ensure_dir() {
     done
     if [ "${no_skip}" != 1 ]; then
 	# just create the rest and continue if virtfs data already exists
-	install -d "${dirs[@]/%/${dst}}" &&
+	#  but don't overwrite existing permissions
+	mkdir_p "${dirs[@]/%/${dst}}" &&
 	return
     fi &&
     ptxd_install_lock &&
-    ptxd_install_dir_impl
+    ptxd_install_dir_impl keep
     ptxd_install_unlock
 }
 export -f ptxd_ensure_dir
@@ -354,7 +384,18 @@ ptxd_extract_build_id() {
 }
 export -f ptxd_extract_build_id
 
-export ptxd_install_file_objcopy_args="--only-keep-debug --compress-debug-sections"
+ptxd_install_compression_format() {
+    local libc
+    local comp
+
+    libc="$(ptxd_cross_cc -print-file-name=libc.so.6 2> /dev/null)"
+    if [ -n "${libc}" ]; then
+	comp="=$(readelf -t "${libc}" | sed -n -e '/COMPRESSED/{N;s/.*\(ZLIB\|ZSTD\).*/\1/p;q}' | tr '[:upper:]' '[:lower:]')"
+    fi
+    export ptxd_install_file_objcopy_args="--only-keep-debug --compress-debug-sections${comp}"
+}
+
+ptxd_install_compression_format
 
 ptxd_install_file_extract_debug() {
     local dst="${1}"
@@ -366,7 +407,7 @@ ptxd_install_file_extract_debug() {
 	return
     fi
 
-    if [ -z "${bid}" ]; then
+    if [ -z "${bid}" -o ${#bid} -ne 40 ]; then
 	dbg="${dst%/*}/.debug/.${dst##*/}.dbg"
     else
 	local path_component=${bid::-38}
@@ -409,28 +450,53 @@ export -f ptxd_install_file_extract_debug
 #
 #
 ptxd_install_file_strip() {
-    local -a strip_cmd files
+    local -a strip_cmd
     local dst="${1}"
-    local i file
+    local file file0 target_mini_debuginfo
 
     case "${strip:-y}" in
 	k) strip_cmd=( "${CROSS_STRIP}" --strip-debug -R .GCC.command.line ) ;;
-	y) strip_cmd=( "${CROSS_STRIP}" -R .note -R .comment -R .GCC.command.line ) ;;
+	y)
+	    strip_cmd=( "${CROSS_STRIP}" -R .note -R .comment -R .GCC.command.line )
+	    target_mini_debuginfo="$(ptxd_get_ptxconf PTXCONF_TARGET_MINI_DEBUGINFO)"
+	;;
     esac
 
-    files=( "${sdirs[@]/%/${dst}}" )
-    install -d "${files[0]%/*}" &&
-    "${strip_cmd[@]}" -o "${files[0]}" "${src}" &&
-    for (( i=1 ; ${i} < ${#files[@]} ; i=$[i+1] )); do
-	install -m "${mod_rw}" -D "${files[0]}" "${files[${i}]}" || return
-    done &&
+    file0="${pkg_xpkg_tmp}/${dst}"
+    if [ ! -d "${pkg_xpkg_tmp}" ]; then
+	install -d "${pkg_xpkg_tmp}"
+    fi &&
+    if [ "${target_mini_debuginfo}" = "y" ]; then
+	local keep_symbols="$(mktemp -u "${PTXDIST_TEMPDIR}/keep_symbols.XXXXX")"
+	local debug="$(mktemp -u "${PTXDIST_TEMPDIR}/debug.XXXXX")"
+	local mini_debug="$(mktemp -u "${PTXDIST_TEMPDIR}/mini_debug.XXXXX")"
 
-    files=( "${dirs[@]/%/${dst}}" ) &&
-    for file in "${files[@]}"; do
-	if [ ! -e "${file}" ]; then
-	    install -m "${mod_rw}" -D "${src}" "${file}" || return
-	fi
+	comm -13 \
+	    <("${CROSS_NM}" -D "${src}" --format=posix --defined-only 2>/dev/null \
+		| awk '{ print $1 }' | sort) \
+	    <("${CROSS_NM}" "${src}" --format=posix --defined-only 2>/dev/null \
+		| awk '{ if ($2 == "T" || $2 == "t" || $2 == "D") print $1 }' | sort) \
+	    > "${keep_symbols}" &&
+	# only create the section if there are symbols to add
+	if [ -s "${keep_symbols}" ]; then
+	    "${CROSS_OBJCOPY}" --only-keep-debug "${src}" "${debug}" &&
+	    "${CROSS_OBJCOPY}" -S --remove-section .gdb_index --remove-section .comment \
+		--keep-symbols="${keep_symbols}" "${debug}" "${mini_debug}" &&
+	    rm "${debug}" &&
+	    xz "${mini_debug}"
+	fi &&
+	rm "${keep_symbols}"
+    fi &&
+    "${strip_cmd[@]}" -o "${file0}" "${src}" &&
+    if [ "${target_mini_debuginfo}" = "y" -a -e "${mini_debug}.xz" ]; then
+	"${CROSS_OBJCOPY}" --add-section .gnu_debugdata="${mini_debug}.xz" "${file0}" &&
+	rm "${mini_debug}.xz"
+    fi &&
+    for file in "${ndirs[@]/%/${dst}}"; do
+	install -m "${mod_nfs}" -o "${usr}" -g "${grp}" -D "${file0}" "${file}" || return
     done &&
+    chmod "${mod}" "${file0}" &&
+    chown "${usr}:${grp}" "${file0}" &&
 
     if [ "${strip}" != "k" ]; then
 	ptxd_install_file_extract_debug "${dst}" || return
@@ -461,7 +527,12 @@ install ${cmd}:
   permissions=${mod}" &&
 
     ptxd_exist "${src}" &&
-    rm -f "${dirs[@]/%/${dst}}" &&
+
+    if [ "${pkg_pkg_dev}" != "NO" -a -n "${pkg_pkg_dir}" -a -d "${pkg_pkg_dir}" -a -n "${pkg_dir}" ]; then
+	if [[ "${src}" =~ "${pkg_dir}" ]] || [[ "${src}" =~ "${pkg_build_dir}" ]]; then
+	    ptxd_bailout "<PKG>_DEVPKG must be set to 'NO' when installing from build or source tree!"
+	fi
+    fi
 
     # check if src is a link
     if [ -L "${src}" ]; then
@@ -488,8 +559,11 @@ install ${cmd}:
 
     case "${strip}" in
 	0|n|no|N|NO)
-	    for d in "${dirs[@]/%/${dst}}"; do
-		install -m "${mod_rw}" -D "${src}" "${d}" || return
+	    for d in "${ndirs[@]/%/${dst}}"; do
+		install -m "${mod_nfs}" -o "${usr}" -g "${grp}" -D "${src}" "${d}" || return
+	    done &&
+	    for d in "${pdirs[@]/%/${dst}}"; do
+		install -m "${mod}" -o "${usr}" -g "${grp}" -D "${src}" "${d}" || return
 	    done
 	    ;;
 	y|k)
@@ -520,13 +594,6 @@ Usually, just remove the 6th parameter and everything works fine.
     fi &&
     echo "" &&
 
-    # now change to requested permissions
-    chmod "${mod_nfs}" "${ndirs[@]/%/${dst}}" &&
-    chmod "${mod}"     "${pdirs[@]/%/${dst}}" &&
-
-    # now change to requested user and group
-    chown "${usr}:${grp}" "${pdirs[@]/%/${dst}}" &&
-
     ptxd_install_virtfs &&
 
     echo "f${sep}${dst}${sep}${usr}${sep}${grp}${sep}${mod}" >> "${pkg_xpkg_perms}"
@@ -553,7 +620,7 @@ install link:
     case "${src}" in
 	/*)
 	    if [ "${PTXCONF_SETUP_NFS_REL_SYMLINK}" = "y" ]; then
-		rel="$(dirname "${dst}" | sed -e 's,/[^/]*,/..,g' -e 's,^/,,')"
+		rel="$(dirname "${dst}" | sed -e 's,/$,,' -e 's,/[^/]*,/..,g' -e 's,^/,,')"
 	    fi
 	    ;;
 	*)  ;;
@@ -720,7 +787,7 @@ install replace figlet:
     ptxd_figlet_helper() {
 	local value="$1"
 	local escapemode="$2"
-	figlet -d "${PTXDIST_SYSROOT_HOST}/share/figlet" -- "${value}" | \
+	figlet -d "${PTXDIST_SYSROOT_HOST}/usr/share/figlet" -- "${value}" | \
 	case "$escapemode" in
 	    # /etc/issue needs each backslash quoted by another backslash. As
 	    # the string is interpreted by the shell once more below, another
@@ -755,13 +822,19 @@ ptxd_install_generic() {
     IFS="${orig_IFS}"
     local usr="${usr:-${stat[0]}}" &&
     local grp="${grp:-${stat[1]}}" &&
-    local mod="${stat[2]}" &&
+    local mod="$(printf "0%o" $(( 0${stat[2]} & ~${umask} )))" &&
     local major="${stat[3]}" &&
     local minor="${stat[4]}" &&
     local type="${stat[5]}" &&
 
     case "${type}" in
 	"directory")
+	    # drop the sticky bits if the group is overwritten. It is probably
+	    # inherited anyways and keeping it for a different group than what
+	    # is was meant for makes no sense
+	    if [ -n "${grp}" ]; then
+		mod="$(printf "0%o" $(( ${mod} & ~02000 )))"
+	    fi &&
 	    ptxd_install_dir "${dst}" "${usr}" "${grp}" "${mod}"
 	    ;;
 	"character special file")
@@ -778,7 +851,7 @@ ptxd_install_generic() {
 	    ptxd_install_file "${file}" "${dst}" "${usr}" "${grp}" "${mod}" "${strip}"
 	    ;;
 	*)
-	    echo "Error: File type '${type}' unkown!"
+	    echo "Error: File type '${type}' unknown!"
 	    return 1
 	    ;;
     esac
@@ -822,6 +895,7 @@ ptxd_install_tree() {
     local cmd="file"
     local src="${1}"
     local dst="${2}"
+    local umask=0000
     shift 2
     ptxd_install_find "${src}" "${dst}" "$@" ||
     ptxd_install_error "install_tree failed!"
@@ -836,6 +910,7 @@ ptxd_install_glob() {
     local yglob=( ${3} )
     local nglob=( ${4} )
     set -B +f
+    local umask=0000
     local -a glob
 
     if [ -n "${3}" ]; then
@@ -863,6 +938,7 @@ ptxd_install_alternative_tree() {
     local cmd="alternative"
     local src="${1}"
     local dst="${2}"
+    local umask=0022
     shift 2
     ptxd_install_find "${src}" "${dst:-${src}}" "$@" ||
     ptxd_install_error "install_alternative_tree failed!"
@@ -871,6 +947,7 @@ export -f ptxd_install_alternative_tree
 
 ptxd_install_archive() {
     local archive="$1"
+    local umask=0000
     shift
 
     if [ -L "${archive}" -a "$(readlink -f "${archive}")" = /dev/null ]; then
@@ -975,7 +1052,7 @@ ptxd_install_spec() {
 export -f ptxd_install_spec
 
 ptxd_install_package() {
-    local lib_dir=$(ptxd_get_lib_dir)
+    local umask=0000
 
     for dir in "${pkg_pkg_dir}/"{,usr/}{bin,sbin,libexec}; do
 	find "${dir}" \( -type f -o -type l \) \
@@ -985,7 +1062,7 @@ ptxd_install_package() {
 	done
     done
 
-    for dir in "${pkg_pkg_dir}/"{,usr/}${lib_dir}; do
+    for dir in "${pkg_pkg_dir}/"{,usr/}lib; do
 	find "${dir}" \( -type f -o -type l \) \
 		    -a -name "*.so*" 2>/dev/null | while read file; do
 	    ptxd_install_generic - "${file#${pkg_pkg_dir}}" ||
@@ -1016,7 +1093,6 @@ ptxd_install_shared() {
 export -f ptxd_install_shared
 
 ptxd_install_lib() {
-    local lib_dir=$(ptxd_get_lib_dir)
     local lib="$1"
     local root_dir="${2}"
     shift 2
@@ -1030,12 +1106,12 @@ ptxd_install_lib() {
     fi
 
     local file="$(
-	for dir in "${pkg_pkg_dir}"${root_dir}{/,/usr/}${lib_dir}; do
+	for dir in "${pkg_pkg_dir}"${root_dir}{/,/usr/}lib; do
 	    if [ -d "${dir}" ]; then
 		find "${dir}" -type f -path "${dir}/${lib}.so*" ! -name "*.debug"
 	    fi
 	done | while read f; do
-		grep -q '^INPUT(' "${f}" || echo "${f}"
+		grep -q '^\(INPUT(\|GROUP(\)' "${f}" || echo "${f}"
 	    done)"
 
     if [ ! -f "${file}" ]; then
@@ -1083,7 +1159,9 @@ ptxd_make_xpkg_pkg() {
     local pkg_xpkg_dbg_tmp="$2"
     local pkg_xpkg_cmds="$3"
     local pkg_xpkg_perms="$4"
-    local -a dirs ndirs pdirs sdirs ddirs
+    local -a dirs ndirs pdirs ddirs
+
+    mkdir_p "${PTXDIST_TEMPDIR}/locks" &&
 
     ptxd_install_setup_global &&
 

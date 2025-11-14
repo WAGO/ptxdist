@@ -1,25 +1,30 @@
 #!/usr/bin/env bash
-
-basedir="$(basename "$(dirname "$(dirname "$0")")")"
+sysroot="$(dirname "$(dirname "$(dirname "$0")")")"
+basedir="$(basename "${sysroot}")"
 
 declare -a prefix
 if [ "${basedir}" = "sysroot-cross" ]; then
-    sysroot="$(dirname "$(dirname "$(dirname "$0")")")/sysroot-target"
+    sysroot="$(dirname "${sysroot}")/sysroot-target"
     prefix="${sysroot}/usr"
     whitelist="${PKGCONFIG_WHITELIST_TARGET}"
 elif [ "${basedir}" = "sysroot-host" ]; then
-    sysroot="$(dirname "$(dirname "$0")")"
-    prefix="${sysroot}"
+    prefix="${sysroot}/usr"
     whitelist="${PKGCONFIG_WHITELIST_HOST}"
 else
     echo "$(basename ${0}): failed to determine prefix" >&2
     exit 1
 fi
 
-declare -a libdir system_path system_incpath
-libdir=( "${prefix/%//lib/pkgconfig}" "${prefix/%//share/pkgconfig}" )
-system_libpath=( "${libdir[@]/%//../../lib}" "${libdir[@]/%//../lib}" "/usr/lib" "/lib" )
-system_incpath=( "${libdir[@]/%//../../include}" "${libdir[@]/%//../include}" "/usr/include" "/include" )
+declare -a libdirs libpaths incpaths
+# try to find all our pkgconfig paths.
+libdirs=( $(find ${prefix} -maxdepth 3 -type d -name pkgconfig) )
+for libdir in "${libdirs[@]}"; do
+    lib="$(basename $(dirname ${libdir}))"
+    libpaths+=( "${libdir[@]/%//../../${lib}}" "${libdir[@]/%//../${lib}}" )
+    incpaths+=( "${libdir[@]/%//../../include}" "${libdir[@]/%//../include}" )
+    libpaths+=( "/usr/${lib}" "/${lib}" )
+done
+incpaths+=( "/usr/include" "/include" )
 
 orig_IFS="${IFS}"
 IFS=":"
@@ -30,12 +35,12 @@ unset PKG_CONFIG_SYSROOT_DIR
 # they may include /usr/{lib,include} which is never correct
 unset PKG_CONFIG_ALLOW_SYSTEM_CFLAGS
 unset PKG_CONFIG_ALLOW_SYSTEM_LIBS
-# default pkg-config searchs
-export PKG_CONFIG_LIBDIR="${libdir[*]}"
+# default pkg-config search path
+export PKG_CONFIG_LIBDIR="${libdirs[*]}"
 # default search path that will be dropped from --libs
-export PKG_CONFIG_SYSTEM_LIBRARY_PATH="${system_libpath[*]}"
+export PKG_CONFIG_SYSTEM_LIBRARY_PATH="${libpaths[*]}"
 # default search path that will be dropped from --cflags
-export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${system_incpath[*]}"
+export PKG_CONFIG_SYSTEM_INCLUDE_PATH="${incpaths[*]}"
 IFS="${orig_IFS}"
 
 for ((i = 1; i <= ${#}; i++)); do
@@ -78,14 +83,48 @@ check_pipe_status() {
 	done
 }
 
-if [ -n "${PKGCONFIG_WHITELIST_SRC}" ]; then
-    pkgs="$(pkg-config.real --print-provides "${@}" 2>/dev/null | awk '{print $1}' && check_pipe_status)" &&
+print_pkg() {
+    args=()
+    while [ $# -gt 0 ]; do
+	case "${1}" in
+	    --variable|--define-variable|--atleast-pkgconfig-version|--*-version)
+		shift
+		;;
+	    --*)
+		;;
+	    *)
+		args[${#args[@]}]="${1}"
+		;;
+	esac
+	shift
+    done
+    if [ ${#args[*]} -ne 0 ]; then
+	pkgconf --print-provides "${args[@]}" 2> "${error}" | awk '{print $1}' &&
+	check_pipe_status
+    fi
+}
+
+if [ -n "${PKGCONFIG_WHITELIST_SRC}" -a "${1}" != "--version" -a "${1}" != "--help" ]; then
+    error="$(mktemp "${PTXDIST_TEMPDIR}/pkg-config.XXXXXX")"
+    pkgs="$(print_pkg "${@}")"
+    if [ $? -ne 0 ]; then
+	# meson suppresses any pkg-config output, so dump it into the logfile instead
+	if [ "${pkg_conf_tool}" = "meson" -a -n "${PTXDIST_LOGFILE_PATH}" ]; then
+	    echo "$(basename ${0}) $*" >>"${PTXDIST_LOGFILE_PATH}"
+	    cat "${error}" >>"${PTXDIST_LOGFILE_PATH}"
+	else
+	    cat "${error}" >&2
+	fi
+	rm "${error}"
+	exit 1
+    fi
+    rm "${error}"
     for pkg in ${pkgs}; do
 	if [[ ! " ${whitelist} " =~ " ${pkg} " && ! "${pkg}" =~ '-uninstalled' ]]; then
-	    echo "$(basename ${0}): warning: blocking '${pkg}': not selected by '${PKGCONFIG_WHITELIST_SRC}'" >&2
+	    echo "$(basename ${0}): warning: blocking '${pkg}': not selected by '${PKGCONFIG_WHITELIST_SRC}'" >&${ERROR_FD}
 	    exit 1
 	fi
     done
 fi
-pkg-config.real "${@}" | sed "${args[@]}"
+pkgconf "${@}" | sed "${args[@]}"
 check_pipe_status

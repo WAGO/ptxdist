@@ -3,4 +3,8 @@
 0001-fix-for-ldconfig-crash-on-make-install.patch
 0002-fix-for-CAN-ID-byteorder.patch
 0003-Makefile.in-fix-suffix-rules.patch
-# dd854f5028c1d8578c6dffd44f0d1f06  - git-ptx-patches magic
+0004-let-canfestival.h-include-config.h.patch
+0005-Use-include-.-instead-of-include-.-for-own-files.patch
+0007-gnosis-port-to-python3.patch
+0008-port-to-python3.patch
+# c4e00d98381c6fe694a31333755e24e4  - git-ptx-patches magic

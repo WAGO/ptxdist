@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_LIGHTTPD) += lighttpd
 #
 # Paths and names
 #
-LIGHTTPD_VERSION	:= 1.4.55
-LIGHTTPD_MD5		:= be4bda2c28bcbdac6eb941528f6edf03
+LIGHTTPD_VERSION	:= 1.4.76
+LIGHTTPD_MD5		:= f9018cda389b1aa6dae4c5f962c20825
 LIGHTTPD		:= lighttpd-$(LIGHTTPD_VERSION)
 LIGHTTPD_SUFFIX		:= tar.xz
 LIGHTTPD_URL		:= http://download.lighttpd.net/lighttpd/releases-1.4.x/$(LIGHTTPD).$(LIGHTTPD_SUFFIX)
@@ -25,51 +25,49 @@ LIGHTTPD_DIR		:= $(BUILDDIR)/$(LIGHTTPD)
 LIGHTTPD_LICENSE	:= BSD-3-Clause AND OML AND RSA-MD
 LIGHTTPD_LICENSE_FILES	:= \
 	file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579 \
-	file://src/fastcgi.h;startline=7;endline=15;md5=fe9ffe753772839aace9c90e814bc356 \
-	file://src/md5.c;startline=6;endline=26;md5=b5be3b6afd4afa7bb89b16361244f9b6
+	file://src/compat/fastcgi.h;startline=7;endline=15;md5=fe9ffe753772839aace9c90e814bc356 \
+	file://src/algo_md5.c;startline=12;endline=32;md5=b5be3b6afd4afa7bb89b16361244f9b6
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 #
-# autoconf
+# meson
 #
-LIGHTTPD_CONF_TOOL	:= autoconf
+LIGHTTPD_CONF_TOOL	:= meson
 LIGHTTPD_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--libdir=/usr/lib/lighttpd \
-	--$(call ptx/endis, PTXCONF_GLOBAL_LARGE_FILE)-lfs \
-	$(GLOBAL_IPV6_OPTION) \
-	--disable-mmap \
-	--enable-extra-warnings \
-	--without-libev \
-	--without-mysql \
-	--without-pgsql \
-	--without-dbi \
-	--without-sasl \
-	--without-ldap \
-	--without-pam \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_ATTR)-attr \
-	--without-valgrind \
-	--without-libunwind \
-	--without-krb5 \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_OPENSSL)-openssl \
-	--without-wolfssl \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_PCRE)-pcre \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_ZLIB)-zlib \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_BZ2LIB)-bzip2 \
-	--without-fam \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-webdav-props \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-libxml \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_PROPS)-sqlite \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_LOCKS)-webdav-locks \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_WEBDAV_LOCKS)-uuid \
-	--without-gdbm \
-	--without-geoip \
-	--without-maxminddb \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_MEMCACHED)-memcached \
-	--$(call ptx/wwo, PTXCONF_LIGHTTPD_LUA)-lua
+	$(CROSS_MESON_USR) \
+	-Dwith_brotli=disabled \
+	-Dwith_bzip=$(call ptx/endis,PTXCONF_LIGHTTPD_BZ2LIB)d \
+	-Dwith_dbi=disabled \
+	-Dwith_libdeflate=disabled \
+	-Dwith_fam=disabled \
+	-Dwith_gnutls=false \
+	-Dwith_krb5=disabled \
+	-Dwith_ldap=disabled \
+	-Dwith_libev=disabled \
+	-Dwith_libunwind=disabled \
+	-Dwith_lua=$(call ptx/truefalse,PTXCONF_LIGHTTPD_LUA) \
+	-Dwith_maxminddb=disabled \
+	-Dwith_mbedtls=false \
+	-Dwith_mysql=disabled \
+	-Dwith_nettle=false \
+	-Dwith_nss=false \
+	-Dwith_openssl=$(call ptx/truefalse,PTXCONF_LIGHTTPD_OPENSSL) \
+	-Dwith_pam=disabled \
+	-Dwith_pcre2=$(call ptx/truefalse,PTXCONF_LIGHTTPD_PCRE2) \
+	-Dwith_pcre=$(call ptx/ifdef,PTXCONF_LIGHTTPD_PCRE2, pcre2, disabled) \
+	-Dwith_pgsql=disabled \
+	-Dwith_sasl=disabled \
+	-Dwith_webdav_locks=disabled \
+	-Dwith_webdav_props=$(call ptx/endis,PTXCONF_LIGHTTPD_WEBDAV_PROPS)d \
+	-Dwith_wolfssl=false \
+	-Dwith_xattr=$(call ptx/truefalse,PTXCONF_LIGHTTPD_ATTR) \
+	-Dwith_xxhash=disabled \
+	-Dwith_zlib=$(call ptx/endis,PTXCONF_LIGHTTPD_ZLIB)d \
+	-Dwith_zstd=$(call ptx/endis,PTXCONF_LIGHTTPD_ZSTD)d
+
 
 # ----------------------------------------------------------------------------
 # Install
@@ -86,25 +84,18 @@ $(STATEDIR)/lighttpd.install:
 # ----------------------------------------------------------------------------
 
 LIGHTTPD_MODULES-y :=
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_ACCESS)		+= mod_access
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_ACCESSLOG)	+= mod_accesslog
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_ALIAS)		+= mod_alias
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_AUTH)		+= mod_auth
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_AUTH)		+= mod_authn_file
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_CML)		+= mod_cml
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_COMPRESS)	+= mod_compress
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_FASTCGI)	+= mod_fastcgi
+LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_DEFLATE)	+= mod_deflate
+LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_DIRLISTING)	+= mod_dirlisting
+LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_H2)		+= mod_h2
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_MAGNET)		+= mod_magnet
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_OPENSSL)		+= mod_openssl
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_REWRITE)	+= mod_rewrite
-LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_TRIGGER_B4_DL)	+= mod_trigger_b4_dl
 LIGHTTPD_MODULES-$(PTXCONF_LIGHTTPD_MOD_WEBDAV)		+= mod_webdav
 LIGHTTPD_MODULES-y += $(call remove_quotes,$(PTXCONF_LIGHTTPD_MOD_EXTRA))
 
 LIGHTTPD_MODULE_STRING := $(subst $(space),$(comma),$(addsuffix \",$(addprefix \",$(LIGHTTPD_MODULES-y))))
-
-# add modules that are always loaded
-LIGHTTPD_MODULES_INSTALL := mod_indexfile mod_dirlisting mod_staticfile $(LIGHTTPD_MODULES-y)
 
 $(STATEDIR)/lighttpd.targetinstall:
 	@$(call targetinfo)
@@ -122,8 +113,8 @@ $(STATEDIR)/lighttpd.targetinstall:
 		/usr/sbin/lighttpd-angel)
 
 ifdef PTXCONF_LIGHTTPD_INSTALL_SELECTED_MODULES
-	@$(foreach mod,$(LIGHTTPD_MODULES_INSTALL), \
-		$(call install_lib, lighttpd, 0, 0, 0644, lighttpd/$(mod));)
+	@$(foreach mod,$(LIGHTTPD_MODULES-y), \
+		$(call install_lib, lighttpd, 0, 0, 0644, lighttpd/$(mod))$(ptx/nl))
 else
 #	# modules
 	@$(call install_tree, lighttpd, 0, 0, -, /usr/lib/lighttpd)
@@ -137,6 +128,8 @@ endif
 	@$(call install_copy, lighttpd, 0, 0, 0755, /etc/lighttpd/conf.d)
 	@$(call install_replace, lighttpd, /etc/lighttpd/lighttpd.conf, \
 		@MODULES@, $(LIGHTTPD_MODULE_STRING))
+	@$(call install_replace, lighttpd, /etc/lighttpd/lighttpd.conf, \
+		@NOH2@, $(call ptx/ifdef, PTXCONF_LIGHTTPD_MOD_H2,"#",))
 	@$(call install_alternative, lighttpd, 0, 0, 0644, \
 		/etc/lighttpd/conf.d/mime.conf)
 
@@ -149,7 +142,6 @@ endif
 #	# busybox init: start script
 #	#
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_LIGHTTPD_STARTSCRIPT
 	@$(call install_alternative, lighttpd, 0, 0, 0755, /etc/init.d/lighttpd)
 
@@ -157,7 +149,6 @@ ifneq ($(call remove_quotes, $(PTXCONF_LIGHTTPD_BBINIT_LINK)),)
 	@$(call install_link, lighttpd, \
 		../init.d/lighttpd, \
 		/etc/rc.d/$(PTXCONF_LIGHTTPD_BBINIT_LINK))
-endif
 endif
 endif
 

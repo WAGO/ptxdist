@@ -16,8 +16,8 @@ endif
 #
 # Paths and names
 #
-OPTEE_TEST_VERSION	:= 3.5.0
-OPTEE_TEST_MD5		:= e75893492a92ea835e8f7e22eaa9697e
+OPTEE_TEST_VERSION	:= 4.0.0
+OPTEE_TEST_MD5		:= d2d1436ce8324ad81b58493dbee13be9
 OPTEE_TEST		:= optee-test-$(OPTEE_TEST_VERSION)
 OPTEE_TEST_SUFFIX	:= tar.gz
 OPTEE_TEST_URL		:= https://github.com/OP-TEE/optee_test/archive/$(OPTEE_TEST_VERSION).$(OPTEE_TEST_SUFFIX)
@@ -37,6 +37,9 @@ OPTEE_TEST_MAKE_ENV	:= \
 	TA_DEV_KIT_DIR=$(PTXDIST_SYSROOT_TARGET)/usr/lib/optee-os \
 	OPTEE_CLIENT_EXPORT=$(PTXDIST_SYSROOT_TARGET)/usr \
 	COMPILE_NS_USER=32 OPTEE_OPENSSL_EXPORT=$(PTXDIST_SYSROOT_TARGET)/usr/lib
+
+OPTEE_TEST_CFLAGS	:= \
+	-Wno-error=deprecated-declarations
 
 # ----------------------------------------------------------------------------
 # Install

@@ -23,14 +23,15 @@ HOST_MTD_UTILS_CONF_TOOL	:= autoconf
 HOST_MTD_UTILS_CONF_OPT		:= \
 	$(HOST_AUTOCONF) \
 	--disable-unit-tests \
-	--disable-tests \
-	--disable-install-tests \
-	--disable-lsmtd \
+	--enable-largefile \
+	--without-tests \
+	--disable-ubihealthd \
+	--without-lsmtd \
 	--without-jffs \
 	--with-ubifs \
 	--with-xattr \
 	--with-lzo \
-	--without-zstd \
+	--with-zstd \
 	--without-selinux \
 	--without-crypto
 

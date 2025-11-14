@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_TRACE_CMD) += trace-cmd
 #
 # Paths and names
 #
-TRACE_CMD_VERSION	:= 2.8.3
-TRACE_CMD_MD5		:= f0e0b7df8e38c1b4842e8037c2292066
+TRACE_CMD_VERSION	:= 2.9.7
+TRACE_CMD_MD5		:= 003988f6dd7cac3bf1da04af03d50b5b
 TRACE_CMD		:= trace-cmd-v$(TRACE_CMD_VERSION)
 TRACE_CMD_SUFFIX	:= tar.gz
 TRACE_CMD_URL		:= https://git.kernel.org/pub/scm/utils/trace-cmd/trace-cmd.git/snapshot/$(TRACE_CMD).$(TRACE_CMD_SUFFIX)
@@ -33,7 +33,8 @@ TRACE_CMD_MAKE_ENV	:= \
 	$(CROSS_ENV) \
 	CROSS_COMPILE=$(COMPILER_PREFIX) \
 	NO_PYTHON=1 \
-	prefix=/usr
+	prefix=/usr \
+	libdir_relative=lib
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -68,7 +69,7 @@ $(STATEDIR)/trace-cmd.targetinstall:
 
 	@$(foreach plugin, $(TRACE_CMD_PLUGINS), \
 		$(call install_lib, trace-cmd, 0, 0, 0644, \
-			trace-cmd/plugins/plugin_$(plugin));)
+			traceevent/plugins/plugin_$(plugin))$(ptx/nl))
 
 	@$(call install_finish, trace-cmd)
 

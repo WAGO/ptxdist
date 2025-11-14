@@ -19,7 +19,7 @@ EFAX_VERSION	:= 0.9
 EFAX_MD5	:= 23bd3767f87c455c58ccae7f88bce725
 EFAX		:= efax-$(EFAX_VERSION)
 EFAX_SUFFIX	:= tar.gz
-EFAX_URL	:= ftp://ftp.metalab.unc.edu/pub/Linux/apps/serialcomm/fax/$(EFAX).$(EFAX_SUFFIX)
+EFAX_URL	:= https://www.ibiblio.org/pub/Linux/apps/serialcomm/fax/$(EFAX).$(EFAX_SUFFIX)
 EFAX_SOURCE	:= $(SRCDIR)/$(EFAX).$(EFAX_SUFFIX)
 EFAX_DIR	:= $(BUILDDIR)/$(EFAX)
 EFAX_LICENSE	:= unknown
@@ -28,7 +28,6 @@ EFAX_LICENSE	:= unknown
 # Compile
 # ----------------------------------------------------------------------------
 
-EFAX_PATH	:= PATH=$(CROSS_PATH)
 EFAX_MAKE_ENV	:= $(CROSS_ENV)
 EFAX_MAKE_OPT	:= CC=$(CROSS_CC)
 

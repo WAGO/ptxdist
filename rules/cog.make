@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_COG) += cog
 #
 # Paths and names
 #
-COG_VERSION		:= 0.7.1
-COG_MD5			:= f2c51cd444ca54d8042e99b3e8a3fa78
+COG_VERSION		:= 0.18.3
+COG_MD5			:= e457de5b5ac8994ae9971c0a5a22b8a2
 COG			:= cog-$(COG_VERSION)
 COG_SUFFIX		:= tar.xz
 COG_URL			:= https://wpewebkit.org/releases/$(COG).$(COG_SUFFIX)
@@ -31,21 +31,21 @@ COG_LICENSE_FILES	:= file://COPYING;md5=bf1229cd7425b302d60cdb641b0ce5fb
 #
 # cmake
 #
-COG_CONF_TOOL	:= cmake
+COG_CONF_TOOL	:= meson
 COG_CONF_OPT	:= \
-	$(CROSS_CMAKE_USR) \
-	-G Ninja \
-	-DCOG_APPID= \
-	-DCOG_BUILD_PROGRAMS=ON \
-	-DCOG_DBUS_OWN_USER= \
-	-DCOG_DBUS_SYSTEM_BUS=OFF \
-	-DCOG_HOME_URI=https://ptxdist.org/ \
-	-DCOG_PLATFORM_DRM=OFF \
-	-DCOG_PLATFORM_FDO=ON \
-	-DCOG_USE_WEBKITGTK=OFF \
-	-DCOG_WESTON_DIRECT_DISPLAY=OFF \
-	-DINSTALL_MAN_PAGES=OFF \
-	-DWAYLAND_PROTOCOLS=$(PTXDIST_SYSROOT_TARGET)/usr/share/wayland-protocols
+	$(CROSS_MESON_USR) \
+	-Dcog_appid=com.igalia.Cog \
+	-Dcog_dbus_control=$(call ptx/ifdef, PTXCONF_COG_REMOTE_DBUS_SYSTEM_BUS,system,user) \
+	-Dcog_dbus_system_owner= \
+	-Dcog_home_uri=https://ptxdist.org/ \
+	-Ddocumentation=false \
+	-Dmanpages=false \
+	-Dplatforms=wayland \
+	-Dplugin_path=/usr/lib/cog/modules \
+	-Dprograms=true \
+	-Dwayland_weston_content_protection=false \
+	-Dwayland_weston_direct_display=false \
+	-Dwpe_api=2.0
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -61,8 +61,17 @@ $(STATEDIR)/cog.targetinstall:
 	@$(call install_fixup, cog,DESCRIPTION,"WPE launcher and webapp container")
 
 	@$(call install_copy, cog, 0, 0, 0755, -, /usr/bin/cog)
-	@$(call install_lib, cog, 0, 0, 644, libcogplatform-fdo)
-	@$(call install_lib, cog, 0, 0, 644, libcogcore)
+	@$(call install_lib, cog, 0, 0, 0644, cog/modules/libcogplatform-wl)
+	@$(call install_lib, cog, 0, 0, 0644, libcogcore)
+
+ifdef PTXCONF_COG_REMOTE_DBUS_SYSTEM_BUS
+	@$(call install_copy, cog, 0, 0, 0644, -, \
+		/usr/share/dbus-1/system.d/com.igalia.Cog.conf)
+endif
+
+ifdef PTXCONF_COG_COGCTL
+	@$(call install_copy, cog, 0, 0, 0755, -, /usr/bin/cogctl)
+endif
 
 	@$(call install_finish, cog)
 

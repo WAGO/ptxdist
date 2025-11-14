@@ -10,19 +10,13 @@
 #
 # ptxd_make_world_extract
 #
-ptxd_make_world_extract() {
+ptxd_make_world_extract_impl() {
     ptxd_make_world_init || return
 
     if [ -z "${pkg_url}" -a -z "${pkg_src}" -o -z "${pkg_dir}" ]; then
 	# no <PKG>_URL and no <PKG>_SOURCE or no <PKG>_DIR -> assume the package has nothing to extract.
 	return
     fi
-
-    if [ "${pkg_dir%/}" = "${pkg_extract_dir}" ]; then
-	ptxd_bailout "<PKG>_DIR cannot be the $(ptxd_print_path ${pkg_extract_dir}). There is something wrong with the package definition."
-    fi
-
-    pkg_extract_dir="${pkg_deprecated_extract_dir:-${pkg_extract_dir}}"
 
     case "${pkg_url}" in
 	lndir://*)
@@ -34,6 +28,7 @@ ptxd_make_world_extract() {
 		echo "local directory using lndir"
 		mkdir -p "${pkg_dir}"
 		lndir "$(ptxd_abspath "${url}")" "${pkg_dir}"
+		rm -f "${pkg_dir}/compile_commands.json"
 		return
 	    else
 		ptxd_bailout "the URL '${pkg_url}' points to non existing directory."
@@ -56,16 +51,16 @@ ptxd_make_world_extract() {
 	    ;;
     esac
 
-    mkdir -p "${pkg_extract_dir}" || return
+    mkdir -p "$(dirname "${pkg_dir}")" || return
 
     ptxd_make_serialize_take
     echo "\
 extract: pkg_src=$(ptxd_print_path ${pkg_src})
-extract: pkg_extract_dir=$(ptxd_print_path ${pkg_dir})"
+extract: pkg_dir=$(ptxd_print_path ${pkg_dir})"
 
     local tmpdir
     tmpdir="$(mktemp -d "${pkg_dir}.XXXXXX")"
-    if ! ptxd_make_extract_archive "${pkg_src}" "${tmpdir}"; then
+    if ! ptxd_make_extract_archive "${pkg_src}" "${tmpdir}" "${pkg_src_filter}"; then
 	rm -rf "${tmpdir}"
 	ptxd_make_serialize_put
 	ptxd_bailout "failed to extract '${pkg_src}'."
@@ -86,5 +81,79 @@ extract: pkg_extract_dir=$(ptxd_print_path ${pkg_dir})"
     ptxd_make_serialize_put
     return ${ret}
 }
+export -f ptxd_make_world_extract_impl
 
+ptxd_make_world_extract_cargo_crate() {
+    local tmp srcdir abs_srcdir dir name
+
+    echo "extract: ${src}"
+    tmp="$(basename ${src%.crate})"
+    srcdir="${tmp%.git}"
+    abs_srcdir="${pkg_cargo_home}/source/${srcdir}"
+    mkdir "${abs_srcdir}" &&
+    tar -C "${abs_srcdir}" --strip-components=1 -xf "${src}" || break
+    if grep -qi '^\[package\]$' "${abs_srcdir}/Cargo.toml"; then
+	if [ "${tmp}" = "${srcdir}" ]; then
+	    # don't set the checksum for crates from git, they would trigger Cargo.lock changes
+	    set -- $(sha256sum "${src}")
+	    printf '{"files": {}, "package": "%s"}' "${1}" > "${abs_srcdir}/.cargo-checksum.json"
+	else
+	    printf '{"files": {}, "package": null}' > "${abs_srcdir}/.cargo-checksum.json"
+	fi
+	return
+    fi
+    mv "${abs_srcdir}" "${pkg_cargo_home}/workspaces/" &&
+    awk '
+/^members = \[$/ {
+    members = 1
+    next
+}
+/\]$/ {
+    members = 0
+}
+{
+    if (members != 1)
+	next
+	dir = gensub(/"(.*)"[,]?/, "\\1", 1, $1)
+	name = gensub(/\//, "-", "g", dir)
+	print dir, name
+}' "${pkg_cargo_home}/workspaces/${srcdir}/Cargo.toml" | while read dir name; do
+	ln -sf "../workspaces/${srcdir}/${dir}" "${pkg_cargo_home}/source/${name}"
+	printf '{"files": {}, "package": null}' > "${pkg_cargo_home}/source/${name}/.cargo-checksum.json"
+	mv "${pkg_cargo_home}/workspaces/${srcdir}/${dir}/Cargo.toml" \
+	    "${pkg_cargo_home}/workspaces/${srcdir}/${dir}/Cargo.toml.orig"
+	"${vendor_cargo_workspace_package}" \
+	    --input "${pkg_cargo_home}/workspaces/${srcdir}/${dir}/Cargo.toml.orig" \
+	    --output "${pkg_cargo_home}/workspaces/${srcdir}/${dir}/Cargo.toml" \
+	    --workspace "${pkg_cargo_home}/workspaces/${srcdir}/Cargo.toml" || return
+    done
+}
+export -f ptxd_make_world_extract_cargo_crate
+
+ptxd_make_world_extract_cargo() {
+    local src vendor_cargo_workspace_package
+    echo "extract: cargo dependencies:"
+    ptxd_in_path PTXDIST_PATH_SCRIPTS vendor-cargo-workspace-package &&
+    vendor_cargo_workspace_package="${ptxd_reply}" &&
+    rm -rf "${pkg_cargo_home}" &&
+    mkdir -p "${pkg_cargo_home}/source" &&
+    mkdir -p "${pkg_cargo_home}/workspaces" &&
+    for src in ${pkg_srcs}; do
+	case "${src}" in
+	*.crate)
+	    ptxd_make_world_extract_cargo_crate || return
+	    ;;
+	*)
+	    ;;
+	esac
+    done
+}
+export -f ptxd_make_world_extract_cargo
+
+ptxd_make_world_extract() {
+    ptxd_make_world_extract_impl &&
+    if [ "${pkg_conf_tool}" = "cargo" -o -n "${pkg_cargo_lock}" ]; then
+	ptxd_make_world_extract_cargo
+    fi
+}
 export -f ptxd_make_world_extract

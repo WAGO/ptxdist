@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_STRONGSWAN) += strongswan
 #
 # Paths and names
 #
-STRONGSWAN_VERSION	:= 5.8.4
-STRONGSWAN_MD5		:= 0634e7f40591bd3f6770e583c3f27d29
+STRONGSWAN_VERSION	:= 5.9.14
+STRONGSWAN_MD5		:= 21ca3fc7c18456405d03b77266ba630a
 STRONGSWAN		:= strongswan-$(STRONGSWAN_VERSION)
 STRONGSWAN_SUFFIX	:= tar.bz2
 STRONGSWAN_URL		:= https://download.strongswan.org/$(STRONGSWAN).$(STRONGSWAN_SUFFIX)
@@ -54,7 +54,7 @@ STRONGSWAN_CONF_OPT	:= \
 	--enable-hmac \
 	--disable-md4 \
 	--disable-md5 \
-	--disable-mgf1 \
+	--enable-mgf1 \
 	--disable-newhope \
 	--enable-nonce \
 	--disable-ntru \
@@ -193,8 +193,7 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-medcli \
 	--disable-medsrv \
 	--disable-nm \
-	--enable-pki \
-	--$(call ptx/disen, PTXCONF_STRONGSWAN_SWANCTL)-scepclient \
+	--disable-pki \
 	--enable-scripts \
 	--disable-svc \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_SYSTEMD_UNIT)-systemd \
@@ -221,8 +220,12 @@ STRONGSWAN_CONF_OPT	:= \
 	--disable-log-thread-ids \
 	--disable-monolithic \
 	--disable-defaults \
+	--enable-kdf \
 	--enable-dependency-tracking \
 	--enable-shared \
+	--disable-warnings \
+	--disable-asan \
+	--$(call ptx/endis, PTXCONF_GLOBAL_SELINUX)-selinux \
 	--$(call ptx/endis, PTXCONF_STRONGSWAN_SWANCTL)-swanctl \
 	--with-ipseclibdir=/usr/lib \
 	--with-systemdsystemunitdir=/usr/lib/systemd/system
@@ -234,6 +237,7 @@ STRONGSWAN_LDFLAGS	:= -Wl,-rpath,/usr/lib/plugins
 # ----------------------------------------------------------------------------
 
 STRONGSWAN_PLUGINS := \
+	libstrongswan-acert.so \
 	libstrongswan-aes.so \
 	libstrongswan-attr.so \
 	libstrongswan-cmac.so \
@@ -243,7 +247,9 @@ STRONGSWAN_PLUGINS := \
 	libstrongswan-gcm.so \
 	libstrongswan-gmp.so \
 	libstrongswan-hmac.so \
+	libstrongswan-kdf.so \
 	libstrongswan-kernel-netlink.so \
+	libstrongswan-mgf1.so \
 	libstrongswan-nonce.so \
 	libstrongswan-pem.so \
 	libstrongswan-pgp.so \
@@ -289,7 +295,6 @@ $(STATEDIR)/strongswan.targetinstall:
 
 	@$(call install_alternative, strongswan, 0, 0, 0644, /etc/strongswan.conf)
 
-	@$(call install_tree, strongswan, 0, 0, -, /usr/bin)
 	@$(call install_tree, strongswan, 0, 0, -, /usr/libexec)
 	@$(call install_tree, strongswan, 0, 0, -, /usr/sbin)
 
@@ -298,7 +303,7 @@ $(STATEDIR)/strongswan.targetinstall:
 
 	@$(foreach plugin, $(STRONGSWAN_PLUGINS), \
 		$(call install_copy, strongswan, 0, 0, 0644, -, \
-			/usr/lib/plugins/$(plugin));)
+			/usr/lib/plugins/$(plugin))$(ptx/nl))
 
 ifdef PTXCONF_STRONGSWAN_SYSTEMD_UNIT
 	@$(call install_alternative, strongswan, 0, 0, 0644, \
@@ -309,23 +314,23 @@ endif
 
 ifdef PTXCONF_STRONGSWAN_SWANCTL
 	@$(call install_lib, strongswan, 0, 0, 0644, libvici)
-	@$(call install_tree, strongswan, 0, 0, -, /etc/strongswan.d)
 	@$(call install_alternative, strongswan, 0, 0, 0644, /etc/swanctl/swanctl.conf)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/bliss)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/ecdsa)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/pkcs12)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/pkcs8)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/private)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/pubkey)
-	@$(call install_copy, strongswan, 0, 0, 750, /etc/swanctl/rsa)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509aa)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ac)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ca)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509crl)
-	@$(call install_copy, strongswan, 0, 0, 755, /etc/swanctl/x509ocsp)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/bliss)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/ecdsa)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/pkcs12)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/pkcs8)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/private)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/pubkey)
+	@$(call install_copy, strongswan, 0, 0, 0750, /etc/swanctl/rsa)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509aa)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509ac)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509ca)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509crl)
+	@$(call install_copy, strongswan, 0, 0, 0755, /etc/swanctl/x509ocsp)
 endif
 
+	@$(call install_tree, strongswan, 0, 0, -, /etc/strongswan.d)
 	@$(call install_copy, strongswan, 0, 0, 0644, /etc/ipsec.d/aacerts)
 	@$(call install_copy, strongswan, 0, 0, 0644, /etc/ipsec.d/acerts)
 	@$(call install_copy, strongswan, 0, 0, 0644, /etc/ipsec.d/cacerts)

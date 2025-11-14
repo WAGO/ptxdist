@@ -4,17 +4,24 @@ menuconfig BLSPEC_ENTRY
 	tristate
 	select KERNEL
 	select KERNEL_INSTALL if !KERNEL_FIT
-	select DTC_INSTALL_OFTREE if DTC
 	prompt "default bootloader spec entry "
 
 if BLSPEC_ENTRY
 
 config BLSPEC_ENTRY_DEVICETREE
 	bool
-	default DTC && !KERNEL_FIT
+	default KERNEL_DTB && !KERNEL_FIT
 
 config BLSPEC_ENTRY_CMDLINE
 	string
 	prompt "kernel command-line"
+
+config BLSPEC_ENTRY_APPENDROOT
+	bool
+	prompt "Add 'linux-appendroot true'"
+	help
+	  If enabled this options adds 'linux-appendroot true' to the blspec
+	  entry. This is a barebox specific blspec option which tells barebox
+	  to add the 'root=' kernel command line automatically if set.
 
 endif

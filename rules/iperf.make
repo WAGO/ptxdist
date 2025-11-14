@@ -27,13 +27,11 @@ IPERF_LICENSE	:= BSD
 # Prepare
 # ----------------------------------------------------------------------------
 
-IPERF_PATH	:= PATH=$(CROSS_PATH)
-IPERF_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-IPERF_AUTOCONF := \
+IPERF_CONF_TOOL := autoconf
+IPERF_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_IPV6_OPTION) \
 	--enable-multicast \

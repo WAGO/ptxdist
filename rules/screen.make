@@ -14,29 +14,31 @@ PACKAGES-$(PTXCONF_SCREEN) += screen
 #
 # Paths and names
 #
-SCREEN_VERSION	:= 4.5.0
-SCREEN_MD5	:= a32105a91359afab1a4349209a028e31
-SCREEN		:= screen-$(SCREEN_VERSION)
-SCREEN_SUFFIX	:= tar.gz
-SCREEN_URL	:= $(call ptx/mirror, GNU, screen/$(SCREEN).$(SCREEN_SUFFIX))
-SCREEN_SOURCE	:= $(SRCDIR)/$(SCREEN).$(SCREEN_SUFFIX)
-SCREEN_DIR	:= $(BUILDDIR)/$(SCREEN)
-SCREEN_LICENSE	:= GPL-2.0-or-later
+SCREEN_VERSION		:= 5.0.0
+SCREEN_MD5		:= befc115989242ed4bceeff8d8bfeb4e6
+SCREEN			:= screen-$(SCREEN_VERSION)
+SCREEN_SUFFIX		:= tar.gz
+SCREEN_URL		:= $(call ptx/mirror, GNU, screen/$(SCREEN).$(SCREEN_SUFFIX))
+SCREEN_SOURCE		:= $(SRCDIR)/$(SCREEN).$(SCREEN_SUFFIX)
+SCREEN_DIR		:= $(BUILDDIR)/$(SCREEN)
+SCREEN_LICENSE		:= GPL-2.0-or-later
+SCREEN_LICENSE_FILES	:= \
+	file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-SCREEN_PATH	:= PATH=$(CROSS_PATH)
-SCREEN_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SCREEN_AUTOCONF := \
+SCREEN_CONF_TOOL := autoconf
+SCREEN_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-use-locale \
-	--with-sys-screenrc=/etc/screenrc
+	--$(call ptx/endis, PTXCONF_GLOBAL_PAM)-pam \
+	--enable-utmp \
+	--disable-telnet \
+	--with-system_screenrc=/etc/screenrc
 
 # ----------------------------------------------------------------------------
 # Target-Install

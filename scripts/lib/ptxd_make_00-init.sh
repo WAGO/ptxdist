@@ -118,6 +118,16 @@ ptxd_init_sysroot_toolchain() {
     export PTXDIST_SYSROOT_TOOLCHAIN
 }
 
+#
+# init Y2038 support
+#
+# out:
+# PTXDIST_Y2038
+#
+ptxd_init_y2028() {
+    PTXDIST_Y2038="$(ptxd_get_ptxconf PTXCONF_GLIBC_Y2038)"
+    export PTXDIST_Y2038
+}
 
 #
 # gather all sysroots
@@ -133,7 +143,7 @@ ptxd_init_sysroot_toolchain() {
 #
 ptxd_init_ptxdist_path_sysroot() {
     local sysroot="$(ptxd_get_ptxconf PTXCONF_SYSROOT_TARGET)"
-    local sysroot_prefix="${sysroot}:${sysroot}/usr"
+    local sysroot_prefix="${sysroot}/usr"
 
     local sysroot_all="${sysroot}"
     local sysroot_prefix_all="${sysroot_prefix}"
@@ -162,7 +172,7 @@ ptxd_init_ptxdist_path_sysroot_host() {
 
     export \
 	PTXDIST_PATH_SYSROOT_HOST="${sysroot}" \
-	PTXDIST_PATH_SYSROOT_HOST_PREFIX="${sysroot}"
+	PTXDIST_PATH_SYSROOT_HOST_PREFIX="${sysroot}/usr"
 }
 
 
@@ -200,9 +210,6 @@ ptxd_init_cross_env() {
     prefix=( ${PTXDIST_PATH_SYSROOT_PREFIX} )
     IFS="${orig_IFS}"
 
-    local -a lib_dir
-    lib_dir=$(ptxd_get_lib_dir)
-
     # add "-isystem <DIR>/include"
     local -a cppflags
     cppflags=( "${prefix[@]/%//include}" )
@@ -210,7 +217,7 @@ ptxd_init_cross_env() {
 
     # add "-L<DIR>/lib -Wl,-rpath-link -Wl,<DIR>"
     local -a ldflags
-    ldflags=( "${prefix[@]/%//${lib_dir}}" )
+    ldflags=( "${prefix[@]/%//lib}" )
     ldflags=( "${ldflags[@]/#/-B}" "${ldflags[@]/#/-L}" "${ldflags[@]/#/-Wl,-rpath-link -Wl,}" )
 
     export \
@@ -250,6 +257,7 @@ ptxd_init_host_env() {
     ldflags=( "${prefix[@]/%//${lib_dir}}" )
     ldflags=( \
 	"${ldflags[@]/#/-B}" \
+	"${ldflags[@]/#/-L}" \
 	"${ldflags[@]/#/-Wl,-rpath -Wl,}" \
 	'-Wl,-rpath,$ORIGIN/../lib:/with/some/extra/space'
     )
@@ -257,6 +265,52 @@ ptxd_init_host_env() {
     export \
 	PTXDIST_HOST_CPPFLAGS="${cppflags[*]}" \
 	PTXDIST_HOST_LDFLAGS="${ldflags[*]}"
+}
+
+ptxd_partial_readlink() {
+    local last_path last_other
+    local original="${1}"
+    local path="${original}"
+    local other="$(realpath "${path}")"
+    local path_real="${other}"
+    local path_real_saved="${other}"
+
+    if [ "${path}" = "${other}" ]; then
+	return
+    fi
+
+    while [ "${other}" = "${path_real}" -a "${path}" != "${other}" ]; do
+	last_path="${path}"
+	last_other="${other}"
+	path="${path%/*}"
+	other="${other%/*}"
+	path_real="$(realpath "${path}")"
+    done
+    path="${last_path}${path_real_saved#${last_other}}"
+    if [ "${path}" != "${original}" ]; then
+	echo "${path}"
+    fi
+}
+
+ptxd_init_readlink() {
+    local delim="$(printf "\037")"
+    local tmp
+
+    # guess possible variants of the platformdir depending on how symlinks are resolved
+    # cmake has its own magic that is recreated in ptxd_partial_readlink
+    PTXDIST_REAL_PLATFORMDIR="$(readlink -f "${PTXDIST_PLATFORMDIR}")"
+    tmp="$(ptxd_partial_readlink "${PTXDIST_PLATFORMDIR}")"
+    if [ -n "${tmp}" ]; then
+	PTXDIST_REAL_PLATFORMDIR="${PTXDIST_REAL_PLATFORMDIR}${delim}${tmp}"
+    fi
+    PTXDIST_REAL_SYSROOT_TOOLCHAIN="$(readlink -f "${PTXDIST_SYSROOT_TOOLCHAIN}")"
+    if [ -n "${PTXDIST_SYSROOT_TOOLCHAIN}" ]; then
+	tmp="$(ptxd_partial_readlink "${PTXDIST_SYSROOT_TOOLCHAIN}")"
+	if [ -n "${tmp}" ]; then
+	    PTXDIST_REAL_SYSROOT_TOOLCHAIN="${PTXDIST_REAL_SYSROOT_TOOLCHAIN}${delim}${tmp}"
+	fi
+    fi
+    export PTXDIST_REAL_PLATFORMDIR PTXDIST_REAL_SYSROOT_TOOLCHAIN
 }
 
 ptxd_init_devpkg()
@@ -303,6 +357,7 @@ ptxd_init_save_wrapper_env() {
 	PTXDIST_HOST_LDFLAGS="${PTXDIST_HOST_LDFLAGS}"
 	PTXDIST_PLATFORMDIR="${PTXDIST_PLATFORMDIR}"
 	PTXDIST_SYSROOT_TOOLCHAIN="${PTXDIST_SYSROOT_TOOLCHAIN}"
+	PTXDIST_Y2038="${PTXDIST_Y2038}"
 	PTXDIST_ICECC_DIR="${PTXDIST_ICECC_DIR}"
 	PTXDIST_ICECC_REMOTE_CPP="${PTXDIST_ICECC_REMOTE_CPP}"
 	PTXDIST_ICECC_CLANG="${PTXDIST_ICECC_CLANG}"
@@ -320,8 +375,12 @@ ptxd_make_init() {
 	ptxd_init_sysroot_toolchain || return
     fi &&
 
+    ptxd_init_y2028 &&
+
     ptxd_init_ptxdist_path_sysroot &&
     ptxd_init_ptxdist_path_sysroot_host &&
+
+    ptxd_init_readlink &&
 
     ptxd_init_devpkg &&
 

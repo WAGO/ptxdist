@@ -2,11 +2,10 @@
 
 menuconfig DBENCH
 	tristate
-	select ATTR
 	prompt "dbench                        "
 	help
 	  The dbench (disk) and tbench (TCP) benchmarks
- 	  dbench and tbench simulate the load of the
+	  dbench and tbench simulate the load of the
 	  netbench "industry standard" benchmark used
 	  to rate (windows) file servers.  Unlike netbench,
 	  they do not require a lab of Microsoft Windows
@@ -17,7 +16,7 @@ menuconfig DBENCH
 	  Note that this benchmark is *not* a realistic
 	  reflection of normal server load.
 
-	  http://samba.org/ftp/tridge/dbench/
+	  https://www.samba.org/ftp/tridge/dbench/
 
 if DBENCH
 

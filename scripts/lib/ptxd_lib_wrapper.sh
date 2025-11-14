@@ -62,7 +62,7 @@ ptxd_lib_setup_host_wrapper() {
 
 	if [ -n "${cc_alternate}" ]; then
 	    ptxd_replace_link "${cc_default}" "${wrapper_dir}/${cc_alternate}" &&
-	    ptxd_replace_link "${cc_default}" "${wrapper_dir}/real/${cc_alternate}"
+	    ptxd_replace_link "${wrapper_dir}/real/${cc_default}" "${wrapper_dir}/real/${cc_alternate}"
 	fi || {
 	    rm -rf "${wrapper_dir}"
 	    ptxd_bailout "unable to create compiler wrapper link"
@@ -77,6 +77,12 @@ ptxd_lib_setup_host_wrapper() {
 		ptxd_bailout "Unable to create ${python} wrapper link"
 	    ptxd_replace_link "python-wrapper" "${wrapper_dir}/${python/[23]}" || \
 		ptxd_bailout "Unable to create ${python/[23]} wrapper link"
+	fi
+    done &&
+    for python in python2.7{,-config} python3.{1..20}{,-config}; do
+	if type -P "${python}" > /dev/null; then
+	    ptxd_replace_link "python-wrapper" "${wrapper_dir}/${python}" || \
+		ptxd_bailout "Unable to create ${python} wrapper link"
 	fi
     done &&
 
@@ -186,7 +192,7 @@ ptxd_lib_setup_toolchain() {
 export -f ptxd_lib_setup_toolchain
 
 ptxd_lib_setup_target_wrapper() {
-    for cc in gcc g++ cpp ld gdb; do
+    for cc in gcc g++ cpp gfortran ld gdb; do
 	if [ ! -e "${toolchain}/${compiler_prefix}${cc}" ]; then
 	    rm -f "${wrapper_dir}/real/${compiler_prefix}${cc}" \
 		"${wrapper_dir}/${compiler_prefix}${cc}"
@@ -196,6 +202,8 @@ ptxd_lib_setup_target_wrapper() {
 	ptxd_replace_copy_from_path PTXDIST_PATH "scripts/wrapper/${cc}-wrapper" \
 	    "${wrapper_dir}/${compiler_prefix}${cc}"
     done &&
+    ptxd_replace_link "${compiler_prefix}g++" "${wrapper_dir}/${compiler_prefix}c++" &&
+    ptxd_replace_link "${wrapper_dir}/real/${compiler_prefix}g++" "${wrapper_dir}/real/${compiler_prefix}c++" &&
     for cc in clang clang++; do
 	if [ ! -e "${toolchain}/${cc}" ]; then
 	    rm -f "${wrapper_dir}/real/${compiler_prefix}${cc}" \
@@ -205,15 +213,18 @@ ptxd_lib_setup_target_wrapper() {
 	ptxd_replace_link "${toolchain}/${cc}" "${wrapper_dir}/real/${compiler_prefix}${cc}" &&
 	ptxd_replace_copy_from_path PTXDIST_PATH "scripts/wrapper/${cc}-wrapper" \
 	    "${wrapper_dir}/${compiler_prefix}${cc}"
+	ptxd_replace_link "${toolchain}/${cc}" "${wrapper_dir}/real/${cc}" &&
+	ptxd_replace_copy_from_path PTXDIST_PATH "scripts/wrapper/host-${cc}-wrapper" \
+	    "${wrapper_dir}/${cc}"
     done
     for tool in "${toolchain}/${compiler_prefix}"* ; do
-	local toolname="$(basename "${tool}")"
-	if [ ! -e "${wrapper_dir}/${toolname}" -o -h "${wrapper_dir}/${toolname}" ]; then
+	local toolname="${tool#${toolchain}/}"
+	if [ ! -e "${wrapper_dir}/${toolname}" -o ! -e "${wrapper_dir}/real/${toolname}" ]; then
 	    ptxd_replace_link "${tool}"  "${wrapper_dir}/${toolname}"
 	fi
     done &&
     for tool in "${wrapper_dir}/${compiler_prefix}"* ; do
-	local toolname="$(basename "${tool}")"
+	local toolname="${tool#${wrapper_dir}/}"
 	if [ -e "${tool}" -a ! -e "${toolchain}/${toolname}" ]; then
 	    rm -f "${tool}"
 	fi

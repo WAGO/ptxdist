@@ -13,16 +13,21 @@
 ptxd_make_world_init_deprecation_check() {
     local -a dep
     dep=(
-	pkg_deprecated_install_builddir
-	pkg_deprecated_install_hosttool
-	pkg_deprecated_install_opt
-
 	pkg_deprecated_builddir
 	pkg_deprecated_env
 	pkg_deprecated_autoconf
 	pkg_deprecated_cmake
 	pkg_deprecated_compile_env
 	pkg_deprecated_makevars
+	)
+    local -a depname
+    depname=(
+	BUILDDIR
+	ENV
+	AUTOCONF
+	CMAKE
+	COMPILE_ENV
+	MAKEVARS
 	)
     local i
 
@@ -32,8 +37,12 @@ ptxd_make_world_init_deprecation_check() {
 
 	[ -z "${val}" ] && continue
 
-	echo "${var}=\"${val}\""
+	echo "<PKG>_${depname[i]}: ${var}=\"${val}\""
 	echo
+
+	if [ "${PTXCONF_SETUP_DEPRECATED_FATAL}" = "y" ]; then
+	    ptxd_bailout "${FUNCNAME}: deprecated variable <PKG>_${depname[i]} detected!"
+	fi
     done
 
 }
@@ -42,8 +51,8 @@ export -f ptxd_make_world_init_deprecation_check
 
 
 #
-# initialize deprecated variables to work with the new sheme
-# (wich is still WIP)
+# initialize deprecated variables to work with the new scheme
+# (which is still WIP)
 #
 ptxd_make_world_init_compat() {
     if [ "${pkg_stage}" = "prepare" ]; then
@@ -51,13 +60,10 @@ ptxd_make_world_init_compat() {
     fi
 
     # build_dir
-    if [ -n "${pkg_deprecated_install_builddir}" -a -n "${pkg_deprecated_builddir}" -a \
-	"${pkg_deprecated_install_builddir}" != "${pkg_deprecated_builddir}" -o \
-	-n "${pkg_build_dir}" -a -n "${pkg_deprecated_builddir}" -a \
+    if [ -n "${pkg_build_dir}" -a -n "${pkg_deprecated_builddir}" -a \
 	"${pkg_build_dir}" != "${pkg_deprecated_builddir}" ]; then
 	ptxd_bailout "${FUNCNAME}: build dir inconsistency detected!"
     fi
-    pkg_build_dir="${pkg_deprecated_install_builddir}"
     pkg_build_dir="${pkg_build_dir:-${pkg_deprecated_builddir}}"
 
 
@@ -105,13 +111,19 @@ ptxd_make_world_init_compat() {
 	if [ -n "${pkg_make_opt}" ]; then
 	    ptxd_bailout "${FUNCNAME}: <PKG>_MAKEVARS is incompatible with <PKG>_MAKE_OPT"
 	fi
+	if [ -n "${pkg_install_opt}" ]; then
+	    ptxd_bailout "${FUNCNAME}: <PKG>_MAKEVARS is incompatible with <PKG>_INSTALL_OPT"
+	fi
 	pkg_make_opt="${pkg_deprecated_makevars}"
     fi
 
-
     # install_opt
     if [[ -z "${pkg_install_opt}" && "${pkg_conf_tool}" =~ "python" ]]; then
-	local install_opt_ptr="ptx_install_opt_python_${pkg_type}"
+	local suffix=""
+	if [[ " ${pkg_build_deps} " =~ ' host-system-python3 ' ]]; then
+	    suffix="_system"
+	fi
+	local install_opt_ptr="ptx_install_opt_python_${pkg_type}${suffix}"
 	pkg_install_opt="${!install_opt_ptr}"
     fi
     if [ -z "${pkg_install_opt}" ]; then
@@ -119,14 +131,8 @@ ptxd_make_world_init_compat() {
 
 	# deprecared_makevars
 	pkg_install_opt="${pkg_install_opt}${pkg_deprecated_makevars:+ }${pkg_deprecated_makevars}"
-
-	# deprecared_install_opt
-	pkg_install_opt="${pkg_install_opt}${pkg_deprecated_install_opt:+ }${pkg_deprecated_install_opt}"
-    else
-	if [ -n "${pkg_deprecated_makevars}" -o -n "${pkg_deprecated_install_opt}" ]; then
-	    ptxd_bailout "${FUNCNAME}: <PKG>_MAKEVARS is incompatible with <PKG>_INSTALL_OPT"
-	fi
     fi
+
 
     #
     # pkg_binconfig_glob
@@ -178,11 +184,23 @@ export -f ptxd_make_world_init_sanity_check
 
 ptxd_make_world_env_init() {
     ptx_packages_all="${PTX_PACKAGES_ALL}"
+    ptx_packages_virtual="${PTX_PACKAGES_VIRTUAL}"
     ptx_packages_selected="${PTX_PACKAGES_SELECTED}"
     ptx_packages_disabled="${PTX_PACKAGES_DISABLED}"
     image_pkgs_selected_target="${PTX_PACKAGES_INSTALL}"
 }
 export -f ptxd_make_world_env_init
+
+ptxd_make_layer_init() {
+    # PTXDIST_LAYERS gets lost in 'make' so redefine it here
+    local orig_IFS="${IFS}"
+    IFS=:
+    PTXDIST_LAYERS=( ${PTXDIST_PATH_LAYERS} )
+    IFS="${orig_IFS}"
+    export PTXDIST_LAYERS
+}
+export -f ptxd_make_layer_init
+
 
 #
 # ptxd_make_world_init()
@@ -198,14 +216,8 @@ export -f ptxd_make_world_env_init
 #
 ptxd_make_world_init() {
     ptxd_make_world_env_init &&
-    ptxd_make_world_init_sanity_check || return
-
-    # PTXDIST_LAYERS gets lost in 'make' so redefine it here
-    local orig_IFS="${IFS}"
-    IFS=:
-    PTXDIST_LAYERS=( ${PTXDIST_PATH_LAYERS} )
-    IFS="${orig_IFS}"
-    export PTXDIST_LAYERS
+    ptxd_make_world_init_sanity_check &&
+    ptxd_make_layer_init || return
 
     # make sure any make calls appear to be the toplevel make
     unset MAKELEVEL
@@ -253,8 +265,8 @@ ptxd_make_world_init() {
     #
     # ensure that the package is actually selected
     #
-    case "${pkg_stage}" in
-    ${ptx_state_dir}/${pkg_label}.*)
+    case "${pkg_stamp}" in
+    ${pkg_label}.${pkg_stage})
 	# this is only relevant for package stages, not any other targets
 	if ! [[ " ${ptx_packages_selected} " =~ " ${pkg_label} " ]]; then
 	    ptxd_bailout "'${pkg_label}' is not selected." \
@@ -279,13 +291,6 @@ ptxd_make_world_init() {
 	SOURCE_DATE_EPOCH="$(echo $(date "+%s"))"
     fi
     unset wip_sources
-
-    #
-    # extract dir
-    #
-    local extract_ptr="ptx_extract_dir_${pkg_type}"
-    pkg_extract_dir="${!extract_ptr}"
-    unset extract_ptr
 
     #
     # conf dir
@@ -317,6 +322,19 @@ ptxd_make_world_init() {
 	if [ -e "${pkg_conf_dir}/meson.build" ]; then
 	    pkg_conf_tool=${pkg_conf_tool}meson
 	fi
+	if [ -e "${pkg_conf_dir}/Cargo.toml" ]; then
+	    pkg_conf_tool=${pkg_conf_tool}cargo
+	fi
+    fi
+
+    if [ "${pkg_conf_tool}" = "cargo" -o -n "${pkg_cargo_lock}" ]; then
+	local make_env_ptr="ptx_make_env_cargo_${pkg_type}"
+	pkg_cargo_home="${pkg_dir}/ptxdist-cargo-home"
+	pkg_make_env_cargo="CARGO_HOME='${pkg_cargo_home}' ${pkg_make_env:-${!make_env_ptr}}"
+	pkg_cargo_lock="${pkg_cargo_lock:-Cargo.lock}"
+	if [[ " ${pkg_build_deps} " =~ " host-cargo-c " ]]; then
+	    pkg_make_env_cargo="${ptx_conf_env_target} ${pkg_make_env_cargo}"
+	fi
     fi
 
     case "${pkg_conf_tool}" in
@@ -328,6 +346,9 @@ ptxd_make_world_init() {
 	    pkg_conf_env="PTXDIST_ICECC= ${pkg_conf_env:-${!conf_env_ptr}}"
 
 	    unset conf_opt_ptr conf_env_ptr
+	    if [ -n "${pkg_cargo_lock}" ]; then
+		pkg_make_env="${pkg_make_env_cargo} ${pkg_make_env}"
+	    fi
 	    ;;
 	python|python3)
 	    local build_python_ptr="ptx_${pkg_conf_tool}_${pkg_type}"
@@ -342,6 +363,10 @@ ptxd_make_world_init() {
 	    fi
 	    pkg_make_env="${pkg_conf_env:-${!env_ptr}}"
 	    pkg_make_opt="${pkg_make_opt:-build}"
+
+	    if [ -n "${pkg_cargo_lock}" ]; then
+		pkg_make_env="${pkg_make_env_cargo} ${pkg_make_env}"
+	    fi
 	    ;;
 	scons)
 	    local env_ptr="ptx_conf_env_${pkg_type}"
@@ -353,8 +378,27 @@ ptxd_make_world_init() {
 	    local conf_env_ptr="ptx_conf_env_${pkg_conf_tool}_${pkg_type}"
 
 	    pkg_conf_opt="${pkg_conf_opt:-${!conf_opt_ptr}}"
-	    pkg_conf_env="PTXDIST_ICECC= CMAKE=false ${pkg_conf_env:-${!conf_env_ptr}}"
+	    pkg_conf_env="PTXDIST_ICECC= CMAKE=false CMAKE_FOR_BUILD=false ${pkg_conf_env:-${!conf_env_ptr}}"
+	    if [ -n "${pkg_cargo_lock}" ]; then
+		pkg_make_env="${pkg_make_env_cargo} ${pkg_make_env}"
+		pkg_conf_env="${pkg_make_env_cargo} ${pkg_conf_env}"
+	    fi
+	    ;;
+	cargo)
+	    local make_opt_ptr="ptx_make_opt_${pkg_conf_tool}_${pkg_type}"
 
+	    pkg_make_opt="${pkg_make_opt:-${!make_opt_ptr}}"
+	    pkg_make_env="${pkg_make_env_cargo}"
+	    ;;
+	*)
+	    local conf_env_ptr="ptx_conf_env_${pkg_type}"
+	    pkg_conf_env="PTXDIST_ICECC= ${pkg_conf_env:-${!conf_env_ptr}}"
+
+	    unset conf_env_ptr
+	    ;;
+    esac
+    case "${pkg_conf_tool}" in
+	scons|meson)
 	    # Try to find a suitable UTF-8 locale on all distros
 	    local c_locale
 	    if c_locale=$(locale -a | grep -i -m 1 "^C\.utf[-]\?8$") || \
@@ -367,12 +411,6 @@ ptxd_make_world_init() {
 	    fi
 	    unset c_locale
 	    unset conf_opt_ptr
-	    ;;
-	*)
-	    local conf_env_ptr="ptx_conf_env_${pkg_type}"
-	    pkg_conf_env="PTXDIST_ICECC= ${pkg_conf_env:-${!conf_env_ptr}}"
-
-	    unset conf_env_ptr
 	    ;;
     esac
     local -a deps_host deps_target
@@ -387,10 +425,17 @@ ptxd_make_world_init() {
 		;;
 	esac
     done
-    whitelist_host="$(echo $(cat "${deps_host[@]}" /dev/null 2>/dev/null))"
-    whitelist_target="$(echo $(cat "${deps_target[@]}" /dev/null 2>/dev/null))"
+    whitelist_host="$(echo $(cat "${deps_host[@]}" /dev/null 2>/dev/null | sort -u))"
+    whitelist_target="$(echo $(cat "${deps_target[@]}" /dev/null 2>/dev/null | sort -u))"
     pkg_env="PKGCONFIG_WHITELIST_HOST='${whitelist_host}' PKGCONFIG_WHITELIST_TARGET='${whitelist_target}' PKGCONFIG_WHITELIST_SRC='${pkg_label}' ${pkg_env}"
 
+    #
+    # try to prevent downloads outside the get stage
+    #
+    if [ "${pkg_stage}" != "get" ]; then
+	local invalid_proxy="PTXDIST-UNALLOWED-DOWNLOAD"
+	pkg_env="HTTPS_PROXY=$invalid_proxy HTTP_PROXY=$invalid_proxy https_proxy=$invalid_proxy http_proxy=$invalid_proxy ${pkg_env}"
+    fi
 
     #
     # build dir
@@ -440,25 +485,29 @@ ptxd_make_world_init() {
 		pkg_build_tool=ninja
 	    fi
     esac
-    if [ "${pkg_build_tool}" = "ninja" ]; then
-	if [ "${PTXDIST_VERBOSE}" = "1" ]; then
-	    pkg_make_opt="-v ${pkg_make_opt}"
-	    pkg_install_opt="-v ${pkg_install_opt}"
-	fi
-    fi
-
-    # DESTDIR
     case "${pkg_build_tool}" in
-	python*)
-	    pkg_install_opt="${pkg_install_opt} --root=${pkg_pkg_dir}"
-	    ;;
-	ninja|scons)
-	    pkg_env="DESTDIR=\"${pkg_pkg_dir}\" ${pkg_env}"
-	    ;;
-	*)
-	    pkg_install_opt="DESTDIR=\"${pkg_pkg_dir}\" INSTALL_ROOT=\"${pkg_pkg_dir}\" ${pkg_install_opt}"
+	ninja|cargo)
+	    if [ "${PTXDIST_VERBOSE}" = "1" ]; then
+		pkg_make_opt="-v ${pkg_make_opt}"
+		pkg_install_opt="-v ${pkg_install_opt}"
+	    fi
 	    ;;
     esac
+
+    # DESTDIR
+    if [[ "${pkg_stage}" =~ "install" ]]; then
+	case "${pkg_build_tool}" in
+	    python*)
+		pkg_install_opt="${pkg_install_opt} --root=${pkg_pkg_dir}"
+		;;
+	    ninja|scons)
+		pkg_env="DESTDIR=\"${pkg_pkg_dir}\" ${pkg_env}"
+		;;
+	    *)
+		pkg_install_opt="DESTDIR=\"${pkg_pkg_dir}\" INSTALL_ROOT=\"${pkg_pkg_dir}\" ${pkg_install_opt}"
+		;;
+	esac
+    fi
 
     #
     # parallelmake
@@ -488,10 +537,10 @@ ptxd_make_world_init() {
 	    pkg_make_par="${PTXDIST_PARALLEL_FLAGS} ${PTXDIST_LOADMFLAGS}"
 	    ;;
 	python*)
-	    # no consistant support for parallel building
+	    # no consistent support for parallel building
 	    pkg_make_par="${python_pkg_make_par}"
 	    ;;
-	scons)
+	scons|cargo)
 	    # only -jX is supported not other options
 	    pkg_make_par="${PTXDIST_PARALLEL_FLAGS}"
 	    ;;
@@ -507,9 +556,36 @@ ptxd_make_world_init() {
     local kbuild_date="$(date --utc --date=@${SOURCE_DATE_EPOCH} -Iseconds)"
     pkg_env="${pkg_env} KBUILD_BUILD_TIMESTAMP=${kbuild_date} KBUILD_BUILD_USER=ptxdist KBUILD_BUILD_HOST=ptxdist"
 
+    #
+    # ignore git from 'ptxdist --git extract ...'
+    #
+    if grep -q git-ptx-patches "${pkg_dir}/.git/config" &> /dev/null; then
+	pkg_env="${pkg_env} GIT_DIR=${pkg_dir}/.git-disabled"
+    fi
+
     exec 2>&${PTXDIST_FD_LOGERR}
     if [ -n "${PTXDIST_QUIET}" ]; then
 	exec 9>&1
     fi
+
+    local path real_path
+    local -a paths
+    for path in ${pkg_wrapper_accept_paths}; do
+	if [ ! -d "${path}" ]; then
+	    continue
+	fi
+	paths[${#paths[*]}]="${path}"
+	real_path="$(readlink -f "${path}")"
+	if [ "${path}" != "${real_path}" ]; then
+	    paths[${#paths[*]}]="${real_path}"
+	fi
+    done
+    if [ -h "${pkg_dir}" ]; then
+	    paths[${#paths[*]}]="$(readlink -f "${pkg_dir}")"
+    fi
+    local orig_IFS="${IFS}"
+    IFS="$(printf "\037")"
+    pkg_wrapper_accept_paths="${paths[*]}"
+    IFS="${orig_IFS}"
 }
 export -f ptxd_make_world_init

@@ -7,7 +7,7 @@ menuconfig AVAHI
 	select EXPAT
 	select LIBCAP
 	select GLIB	if AVAHI_GLIB
-	select QT4	if AVAHI_QT4
+	select QT5	if AVAHI_QT5
 	select DBUS	if AVAHI_DBUS
 	select GTK	if AVAHI_GTK
 	prompt "avahi                         "
@@ -35,11 +35,11 @@ config AVAHI_GOBJECT
 	help
 	  --enable-gobject
 
-config AVAHI_QT4
+config AVAHI_QT5
 	bool
-	prompt "enable qt4 support"
+	prompt "enable qt5 support"
 	help
-	  --enable-qt4
+	  --enable-qt5
 
 config AVAHI_GTK
 	bool

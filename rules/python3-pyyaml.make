@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_PYTHON3_PYYAML) += python3-pyyaml
 #
 # Paths and names
 #
-PYTHON3_PYYAML_VERSION	:= 3.12
-PYTHON3_PYYAML_MD5	:= 5c41a91fae3da4f5302e25e5d8f4deeb
+PYTHON3_PYYAML_VERSION	:= 6.0
+PYTHON3_PYYAML_MD5	:= 7e2a4c6deb449dbe33c521a1871333a0
 PYTHON3_PYYAML		:= pyyaml-$(PYTHON3_PYYAML_VERSION)
 PYTHON3_PYYAML_SUFFIX	:= tar.gz
 PYTHON3_PYYAML_URL	:= https://github.com/yaml/pyyaml/archive/$(PYTHON3_PYYAML_VERSION).$(PYTHON3_PYYAML_SUFFIX)
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-pyyaml.targetinstall:
 	@$(call install_fixup, python3-pyyaml, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-pyyaml, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/yaml,, *.py)
+		$(PYTHON3_SITEPACKAGES), *.pyc *.so,)
 
 	@$(call install_finish, python3-pyyaml)
 

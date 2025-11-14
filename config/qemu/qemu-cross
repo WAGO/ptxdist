@@ -6,11 +6,17 @@
 # see the README file.
 #
 
+
+QEMU_LD_LIBRARY_PATH="@QEMU_LD_LIBRARY_PATH@"
+if [ -n "${CROSS_LD_LIBRARY_PATH}" ]; then
+	QEMU_LD_LIBRARY_PATH="${CROSS_LD_LIBRARY_PATH}:${QEMU_LD_LIBRARY_PATH}"
+fi
+
 args=(
 	"@QEMU@" \
 	-r "@KERNEL_VERSION@" \
 	-L "@QEMU_LD_PREFIX@" \
-	-E LD_LIBRARY_PATH="@QEMU_LD_LIBRARY_PATH@" \
+	-E LD_LIBRARY_PATH="${QEMU_LD_LIBRARY_PATH}" \
 )
 linker="@LINKER@"
 
@@ -30,7 +36,8 @@ while [ ${#} -gt 0 ]; do
 		;;
 	esac
 done
-
+args[${#args[@]}]="-0"
+args[${#args[@]}]="${1}"
 args[${#args[@]}]="${linker}"
 args[${#args[@]}]="--inhibit-cache"
 case "${1}" in
@@ -41,7 +48,7 @@ if [ "${cmd}" != "${linker}" ]; then
 	args[${#args[@]}]="${cmd}"
 fi
 shift
-if [ "${PTXDIST_VERBOSE}" = 1 -a -n "${PTXDIST_FD_LOGFILE}" ]; then
-	echo "qemu: ${args[@]} ${@}" >&${PTXDIST_FD_LOGFILE}
+if [ "${PTXDIST_VERBOSE}" = 1 -a -n "${PTXDIST_LOGFILE_PATH}" ]; then
+	echo "qemu: ${args[*]} ${*}" >>"${PTXDIST_LOGFILE_PATH}"
 fi
 exec "${args[@]}" "${@}"

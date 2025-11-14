@@ -1,0 +1,8 @@
+## SECTION=multimedia_libs
+
+config SPIRV_HEADERS
+	tristate
+	prompt "spirv-headers"
+	select HOST_CMAKE
+	help
+	  SPIR-V Headers

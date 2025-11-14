@@ -3,47 +3,33 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 get_hostkeys() {
-	[ -f /etc/ssh/sshd_config ] || return
-	sed -n 's/^HostKey[ \t][ \t]*\(.*\)/\1/p' /etc/ssh/sshd_config
-}
-
-host_keys_required() {
-	hostkeys="$(get_hostkeys)"
-	if [ "$hostkeys" ]; then
-		echo "$hostkeys"
-	else
-		# No HostKey directives found, so we pick secure defaults
-		echo /etc/ssh/ssh_host_ed25519_key
-	fi
+	hostkeys="$(sed -E -n -e 's/^HostKey[[:space:]]+(.*)/\1/p' /etc/ssh/sshd_config)" || return
+	# pick secure defaults if no HostKey directives are found
+	echo "${hostkeys:-/etc/ssh/ssh_host_ed25519_key}"
 }
 
 create_key() {
-	msg="$1"
-	shift
-	hostkeys="$1"
-	shift
-	file="$1"
-	shift
+	keyfile="$1"
+	keytype="$(echo "$keyfile" | sed -E -e 's/.*ssh_host_(.*)_key$/\1/')"
 
-	if echo "$hostkeys" | grep -x "$file" >/dev/null; then
-		echo "$msg; this may take some time ..."
-		rm -f $file &&
-		ssh-keygen -q -f "$file" -N '' "$@" || return
-		echo "$msg; done."
-	fi
+	keygen_args=
+	case "$keytype" in
+		rsa) keygen_args="-b 4096" ;;
+	esac
+
+	echo "Create $keytype key; this may take some time ..."
+	rm -f "$keyfile" &&
+	ssh-keygen -q -f "$keyfile" -N '' -t "$keytype" $keygen_args || return
+	echo "Created $keytype key."
 }
 
 create_keys() {
-	hostkeys="$(host_keys_required)"
+	hostkeys="$(get_hostkeys)" || return
 
-	create_key "Creating DSA key" \
-		"$hostkeys" /etc/ssh/ssh_host_dsa_key -t dsa &&
-	create_key "Creating ECDSA key" \
-		"$hostkeys" /etc/ssh/ssh_host_ecdsa_key -t ecdsa &&
-	create_key "Creating ED25519 key" \
-		"$hostkeys" /etc/ssh/ssh_host_ed25519_key -t ed25519 &&
-	create_key "Creating RSA key" \
-		"$hostkeys" /etc/ssh/ssh_host_rsa_key -t rsa -b 4096
+	for keyfile in $hostkeys; do
+		[ -s "$keyfile" ] && ssh-keygen -l -f "${keyfile}.pub" > /dev/null && continue
+		create_key "$keyfile" || return
+	done
 }
 
 if ! create_keys; then

@@ -2,6 +2,7 @@
 config LIBSIGCPP
 	tristate
 	prompt "libsigc++"
+	select HOST_MESON
 	select LIBC_M
 	select GCCLIBS_CXX
 	select GCCLIBS_GCC_S

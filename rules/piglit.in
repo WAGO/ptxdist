@@ -4,6 +4,7 @@ menuconfig PIGLIT
 	tristate
 	prompt "piglit                        "
 	select HOST_CMAKE
+	select HOST_NINJA
 	select HOST_SYSTEM_PYTHON3
 	select HOST_SYSTEM_PYTHON3_MAKO
 	select HOST_SYSTEM_PYTHON3_NUMPY
@@ -14,15 +15,17 @@ menuconfig PIGLIT
 	select PYTHON3_LZMA
 	select PYTHON3_MAKO
 	select PYTHON3_SIX
+	select PYTHON3_SSL
 	select WAFFLE
 	select WAYLAND if PIGLIT_WAYLAND
 	select LIBXKBCOMMON if PIGLIT_WAYLAND
-	select FREEGLUT if PIGLIT_TESTS_OPENGL
 	select MESALIB_GLX if PIGLIT_TESTS_OPENGL
 	select MESALIB_OPENGL if PIGLIT_TESTS_OPENGL
 	select XORG if PIGLIT_TESTS_OPENGL
 	select MESALIB_GLES1 if PIGLIT_TESTS_OPENGLES1
 	select MESALIB_GLES2 if PIGLIT_TESTS_OPENGLES2 || PIGLIT_TESTS_OPENGLES3
+	select VULKAN_LOADER if PIGLIT_TESTS_VULKAN
+	select VKRUNNER if PIGLIT_TESTS_VULKAN && RUNTIME
 	help
 	  Piglit is the opensource OpenGL/OpenCL test suite.
 
@@ -49,5 +52,9 @@ config PIGLIT_TESTS_OPENGLES2
 config PIGLIT_TESTS_OPENGLES3
 	bool
 	prompt "build OpenGL ES3 tests"
+
+config PIGLIT_TESTS_VULKAN
+	bool
+	prompt "build Vulkan tests"
 
 endif

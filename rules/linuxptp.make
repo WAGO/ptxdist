@@ -15,14 +15,17 @@ PACKAGES-$(PTXCONF_LINUXPTP) += linuxptp
 #
 # Paths and names
 #
-LINUXPTP_VERSION	:= 2.0
-LINUXPTP_MD5		:= d8bb7374943bb747db7786ac26f17f11
+LINUXPTP_VERSION	:= 3.1.1
+LINUXPTP_MD5		:= 3b79ab5e77c5b5cf06bc1c8350d405bb
 LINUXPTP		:= linuxptp-$(LINUXPTP_VERSION)
 LINUXPTP_SUFFIX		:= tgz
 LINUXPTP_URL		:= $(call ptx/mirror, SF, linuxptp/$(LINUXPTP).$(LINUXPTP_SUFFIX))
 LINUXPTP_SOURCE		:= $(SRCDIR)/$(LINUXPTP).$(LINUXPTP_SUFFIX)
 LINUXPTP_DIR		:= $(BUILDDIR)/$(LINUXPTP)
 LINUXPTP_LICENSE	:= GPL-2.0-or-later
+LINUXPTP_LICENSE_FILES	:= \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://version.c;startline=6;endline=14;md5=89ff91d940b4bc09b6de0300b34a888f
 
 # ----------------------------------------------------------------------------
 # Prepare

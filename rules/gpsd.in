@@ -3,7 +3,6 @@ menuconfig GPSD
 	tristate
 	select HOST_PYTHON3_SCONS
 	select LIBC_M
-	select LIBC_NSL
 	select LIBC_PTHREAD
 	select GCCLIBS_CXX
 	select GCCLIBS_GCC_S
@@ -13,6 +12,7 @@ menuconfig GPSD
 	select NCURSES			if GPSD_NCURSES
 	select DBUS_GLIB		if GPSD_DBUS
 	select PYTHON3			if GPSD_PYTHON
+	select PYTHON3_SSL		if GPSD_PYTHON
 	select PYSERIAL3		if GPSD_PYSERIAL
 	select SYSTEMD			if GPSD_SYSTEMD
 	prompt "gpsd                          "
@@ -68,17 +68,24 @@ config GPSD_USB
 
 comment "Other options    ---"
 
-config GPSD_RECONFIGURE
+config GPSD_DEBUG
 	bool
-	prompt "enable reconfigure"
+	prompt "debug support"
 	help
-	  allow gpsd to change device settings
+	  Client debug support, debug information in build, install
+	  gpsdebuginfo.
 
-config GPSD_CONTROLSEND
+config GPSD_LOGGING
 	bool
-	prompt "enable controlsend"
+	prompt "log/hexdump"
 	help
-	  allow gpsctl/gpsmon to change device settings
+	  If unset: squelch gpsd_log/gpsd_hexdump to save cpu.
+
+config GPSD_LIBGPSMM
+	bool
+	prompt "C++ class wrappers"
+	help
+	  Enables libgpsmm, a C++ class wrapper for libgps.
 
 config GPSD_PYTHON
 	bool

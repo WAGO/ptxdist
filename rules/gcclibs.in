@@ -11,7 +11,7 @@ config GCCLIBS_GCC_S
 	select GCCLIBS
 	help
 	  Installs the libgcc_s Library
-	  
+
 
 config GCCLIBS_CXX
 	bool "libstdc++"
@@ -41,6 +41,30 @@ config GCCLIBS_GCJ
 	help
 	  Installs the GNU Java Library
 	  libgcj
+
+config GCCLIBS_GFORTRAN
+	bool "libgfortran"
+	select GCCLIBS_QUADMATH
+	help
+	  Installs the libgfortran Library
+
+config GCCLIBS_GOMP
+	bool "libgomp"
+	help
+	  Installs the libgomp Library
+	  GOMP is an implementation of OpenMP for the C, C++, and Fortran
+	  compilers in the GNU Compiler Collection.
+
+config GCCLIBS_QUADMATH
+	bool "libquadmath"
+	help
+	  GCC Quad-Precision Math Library
+	  A library, which provides quad-precision mathematical functions on
+	  targets supporting the __float128 datatype. The library is used to
+	  provide on such targets the REAL(16) type in the GNU Fortran
+	  compiler.
+
+
 
 config GCCLIBS_LIBASAN
 	bool "libasan"

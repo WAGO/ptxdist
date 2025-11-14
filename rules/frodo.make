@@ -21,24 +21,25 @@ FRODO_SUFFIX	:= Src.tar.gz
 FRODO_URL	:= http://frodo.cebix.net/downloads/FrodoV4_1b.$(FRODO_SUFFIX)
 FRODO_SOURCE	:= $(SRCDIR)/FrodoV4_1b.$(FRODO_SUFFIX)
 FRODO_DIR	:= $(BUILDDIR)/$(FRODO)
+FRODO_LICENSE	:= custom
+FRODO_LICENSE_FILES	:= file://Docs/legalmush.html;md5=108f0874f3c2ef9b625501635c933d92
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-FRODO_PATH	:= PATH=$(CROSS_PATH)
 FRODO_CONF_ENV	:= $(CROSS_ENV)
 ifdef PTXCONF_FRODO_SVGALIB
 FRODO_CONF_ENV	+= ac_cv_lib_vga_vga_setmode=yes SDL_CONFIG=no
 endif
 FRODO_MAKE_ENV	:= $(CROSS_ENV)
 FRODO_SUBDIR	:= Src
-FRODO_CONF_TOOL	:= autoconf
 
 #
 # autoconf
 #
-FRODO_AUTOCONF := \
+FRODO_CONF_TOOL	:= autoconf
+FRODO_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--without-x
 

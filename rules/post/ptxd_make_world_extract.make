@@ -23,12 +23,14 @@ $(STATEDIR)/%.srchash:
 # an archive or online URL.
 #
 # $1: Packet label; we extract $1_SOURCE
-# $2: dir to extract into; if $2 is not given we extract to $(BUILDDIR)
 #
 extract = \
 	$(call world/env, $(1)) \
-	pkg_deprecated_extract_dir="$(call ptx/escape, $(strip $(2)))" \
 	ptxd_make_world_extract
+
+extract-all = \
+	$(foreach part, $($(strip $(1))_PARTS), \
+		$(call extract, $(part))$(ptx/nl))
 
 world/patchin/post = \
 	$(call world/env, $(1)) \
@@ -37,7 +39,7 @@ world/patchin/post = \
 $(STATEDIR)/%.extract:
 	@$(call targetinfo)
 	@$(call clean, $($(PTX_MAP_TO_PACKAGE_$(*))_DIR))
-	@$(call extract, $(PTX_MAP_TO_PACKAGE_$(*)))
+	@$(call extract-all, $(PTX_MAP_TO_PACKAGE_$(*)))
 	@$(call patchin, $(PTX_MAP_TO_PACKAGE_$(*)), $($(PTX_MAP_TO_PACKAGE_$(*))_DIR))
 	@$(call touch)
 

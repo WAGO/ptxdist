@@ -28,24 +28,22 @@ LIBFTDI_LICENSE	:= LGPL-2.1-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBFTDI_PATH	:= PATH=$(CROSS_PATH)
-LIBFTDI_ENV	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBFTDI_AUTOCONF := \
+LIBFTDI_CONF_TOOL := autoconf
+LIBFTDI_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-shared \
 	--disable-static \
 	--disable-python-binding
 
 ifdef PTXCONF_LIBFTDI_CPP_WRAPPER
-LIBFTDI_AUTOCONF += \
+LIBFTDI_CONF_OPT += \
 	--enable-libftdipp \
 	--with-boost=$(SYSROOT)/usr
 else
-LIBFTDI_AUTOCONF += \
+LIBFTDI_CONF_OPT += \
 	--disable-libftdipp \
 	--without-boost
 endif

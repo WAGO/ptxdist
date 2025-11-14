@@ -26,13 +26,11 @@ LIBSSH2_DIR	:= $(BUILDDIR)/$(LIBSSH2)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBSSH2_PATH	:= PATH=$(CROSS_PATH)
-LIBSSH2_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBSSH2_AUTOCONF := \
+LIBSSH2_CONF_TOOL := autoconf
+LIBSSH2_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-rpath \
@@ -48,7 +46,6 @@ LIBSSH2_AUTOCONF := \
 	--with-libz \
 	--with-libssl-prefix=$(SYSROOT)/usr \
 	--with-libz-prefix=$(SYSROOT)/usr
-
 
 # ----------------------------------------------------------------------------
 # Target-Install

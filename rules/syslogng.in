@@ -10,23 +10,14 @@ menuconfig SYSLOGNG
 	select LIBCURL		if SYSLOGNG_HTTP
 	select JSON_C		if SYSLOGNG_JSON
 	select PYTHON3		if SYSLOGNG_PYTHON_DESTINATION
-	select LIBC_NSL
 	select LIBC_RT
 	select LIBNET		if SYSLOGNG_SPOOF_SOURCE
 	select LIBPCRE
-	select TCPWRAPPER	if SYSLOGNG_TCP_WRAPPER
 	select SYSTEMD		if SYSLOGNG_SYSTEMD
 	help
 	  The next generation syslog daemon.
 
 if SYSLOGNG
-
-config SYSLOGNG_TCP_WRAPPER
-	bool
-	depends on STAGING
-	prompt "tcpwrapper support"
-	help
-	  Support /etc/hosts.deny and /etc/hosts.allow.
 
 config SYSLOGNG_SPOOF_SOURCE
 	bool
@@ -94,6 +85,7 @@ config SYSLOGNG_SYSTEMD
 config SYSLOGNG_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	help
 	  Installs (if present) the
 	  "./projectroot/etc/init.d/syslog-ng" startscript from your

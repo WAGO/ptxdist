@@ -12,16 +12,17 @@ PACKAGES-$(PTXCONF_LIBMXML) += libmxml
 #
 # Paths and names
 #
-LIBMXML_VERSION	:= 2.12
-LIBMXML_MD5	:= 35f8416ee2d27ceab653ea2ff64c794c
+LIBMXML_VERSION	:= 3.3.1
+LIBMXML_MD5	:= 078dc38807d4f1b9e92c95515ff2aec3
 LIBMXML		:= mxml-$(LIBMXML_VERSION)
 LIBMXML_SUFFIX	:= tar.gz
 LIBMXML_URL	:= https://github.com/michaelrsweet/mxml/releases/download/v$(LIBMXML_VERSION)/$(LIBMXML).$(LIBMXML_SUFFIX)
-# TODO: remove 'v2' with next version bump
-# needed for 2.12 because of incompatible tarball changes
-LIBMXML_SOURCE	:= $(SRCDIR)/$(LIBMXML)v2.$(LIBMXML_SUFFIX)
+LIBMXML_SOURCE	:= $(SRCDIR)/$(LIBMXML).$(LIBMXML_SUFFIX)
 LIBMXML_DIR	:= $(BUILDDIR)/mxml-$(LIBMXML_VERSION)
-LIBMXML_LICENSE	:= LGPL-2.0-only
+LIBMXML_LICENSE	:= Apache-2.0 WITH custom-exception
+LIBMXML_LICENSE_FILES := \
+	file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327 \
+	file://NOTICE;md5=6fe66de3d1a8a73def255cf8944376f0
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,7 +33,9 @@ LIBMXML_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-debug \
 	--enable-threads \
-	--enable-shared
+	--enable-shared \
+	--without-ansi \
+	--without-vsnprintf
 
 # build static lib, too. make install will fail otherwise
 LIBMXML_MAKE_OPT := \

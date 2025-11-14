@@ -14,8 +14,8 @@ LAZY_PACKAGES-$(PTXCONF_HOST_AUTOTOOLS_AUTOMAKE) += host-autotools-automake
 #
 # Paths and names
 #
-HOST_AUTOTOOLS_AUTOMAKE_VERSION	:= 1.16.1
-HOST_AUTOTOOLS_AUTOMAKE_MD5	:= 53f38e7591fa57c3d2cee682be668e5b
+HOST_AUTOTOOLS_AUTOMAKE_VERSION	:= 1.17
+HOST_AUTOTOOLS_AUTOMAKE_MD5	:= 7ab3a02318fee6f5bd42adfc369abf10
 HOST_AUTOTOOLS_AUTOMAKE		:= automake-$(HOST_AUTOTOOLS_AUTOMAKE_VERSION)
 HOST_AUTOTOOLS_AUTOMAKE_SUFFIX	:= tar.xz
 HOST_AUTOTOOLS_AUTOMAKE_URL	:= $(call ptx/mirror, GNU, automake/$(HOST_AUTOTOOLS_AUTOMAKE).$(HOST_AUTOTOOLS_AUTOMAKE_SUFFIX))
@@ -44,11 +44,11 @@ HOST_AUTOTOOLS_AUTOMAKE_MAKE_OPT	:= MANS=
 $(STATEDIR)/host-autotools-automake.install.post:
 	@$(call targetinfo)
 	@sed -i \
-		-e "s;'\(/share/automake-[^']*\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
-		-e "s;'\(/share/aclocal[^']*\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
-		-e "s;'\(/bin/m4\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
-		$(HOST_AUTOTOOLS_AUTOMAKE_PKGDIR)/bin/* \
-		$(HOST_AUTOTOOLS_AUTOMAKE_PKGDIR)/share/automake-*/Automake/Config.pm
+		-e "s;'\(/usr/share/automake-[^']*\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
+		-e "s;'\(/usr/share/aclocal[^']*\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
+		-e "s;'\(/usr/bin/m4\)';'$(PTXDIST_SYSROOT_HOST)\1';g" \
+		$(HOST_AUTOTOOLS_AUTOMAKE_PKGDIR)/usr/bin/* \
+		$(HOST_AUTOTOOLS_AUTOMAKE_PKGDIR)/usr/share/automake-*/Automake/Config.pm
 	@$(call world/install.post, HOST_AUTOTOOLS_AUTOMAKE)
 	@$(call touch)
 

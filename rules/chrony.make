@@ -15,11 +15,11 @@ PACKAGES-$(PTXCONF_CHRONY) += chrony
 #
 # Paths and names
 #
-CHRONY_VERSION	:= 3.5
-CHRONY_MD5	:= 5f66338bc940a9b51eede8f391e7bed3
+CHRONY_VERSION	:= 4.6.1
+CHRONY_MD5	:= 81a83f54d5f8e1d5fd9afcf8a40c493d
 CHRONY		:= chrony-$(CHRONY_VERSION)
 CHRONY_SUFFIX	:= tar.gz
-CHRONY_URL	:= http://download.tuxfamily.org/chrony/$(CHRONY).$(CHRONY_SUFFIX)
+CHRONY_URL	:= https://chrony-project.org/releases/$(CHRONY).$(CHRONY_SUFFIX)
 CHRONY_SOURCE	:= $(SRCDIR)/$(CHRONY).$(CHRONY_SUFFIX)
 CHRONY_DIR	:= $(BUILDDIR)/$(CHRONY)
 CHRONY_LICENSE	:= GPL-2.0-only AND RSA-MD
@@ -32,7 +32,7 @@ CHRONY_LICENSE_FILES	:= \
 # ----------------------------------------------------------------------------
 
 #
-# Chony is using a handcrafted configure script so normal ptx/endis
+# Chrony is using a handcrafted configure script so normal ptx/endis
 # and ptx/wwo are broken and causes "Unrecognized option".
 # CROSS_AUTOCONF_USR is not used as that adds 3 unrecognized options:
 # --libdir=, --build=, --host=
@@ -50,11 +50,11 @@ CHRONY_CONF_OPT		:= \
 	--without-tomcrypt \
 	$(call ptx/ifdef, PTXCONF_CHRONY_ADVANCED_COMMAND,,--disable-cmdmon) \
 	$(call ptx/ifdef, PTXCONF_CHRONY_ADVANCED_COMMAND,--enable-debug,) \
-	--disable-refclock \
-	--disable-phc \
-	--disable-pps \
+	$(call ptx/ifdef, PTXCONF_CHRONY_REFCLK,,--disable-refclock) \
+	$(call ptx/ifdef, PTXCONF_CHRONY_PHC_REFCLK,,--disable-phc) \
+	$(call ptx/ifdef, PTXCONF_CHRONY_PPS_REFCLK,,--disable-pps) \
 	$(call ptx/ifdef, PTXCONF_GLOBAL_IPV6,,--disable-ipv6) \
-	--with-user=chrony \
+	--with-user=$(call ptx/ifdef, PTXCONF_INITMETHOD_SYSTEMD,chrony,root) \
 	$(call ptx/ifdef, PTXCONF_CHRONY_SECCOMP,--enable-scfilter,) \
 	$(call ptx/ifdef, PTXCONF_CHRONY_SECCOMP,,--without-seccomp)
 
@@ -114,7 +114,6 @@ endif
 #	#
 #	# busybox init: startscripts
 #	#
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_CHRONY_STARTSCRIPT
 	@$(call install_alternative, chrony, 0, 0, 0755, /etc/init.d/chrony)
 
@@ -122,7 +121,6 @@ ifneq ($(call remove_quotes, $(PTXCONF_CHRONY_BBINIT_LINK)),)
 	@$(call install_link, chrony, \
 		../init.d/chrony, \
 		/etc/rc.d/$(PTXCONF_CHRONY_BBINIT_LINK))
-endif
 endif
 endif
 

@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_PYTHON3_PEXPECT) += python3-pexpect
 #
 # Paths and names
 #
-PYTHON3_PEXPECT_VERSION	:= 4.6.0
-PYTHON3_PEXPECT_MD5	:= d4f3372965a996238d57d19b95d2e03a
+PYTHON3_PEXPECT_VERSION	:= 4.8.0
+PYTHON3_PEXPECT_MD5	:= 153eb25184249d6a85fde9acf4804085
 PYTHON3_PEXPECT		:= pexpect-$(PYTHON3_PEXPECT_VERSION)
 PYTHON3_PEXPECT_SUFFIX	:= tar.gz
-PYTHON3_PEXPECT_URL	:= https://pypi.io/packages/source/p/pexpect/$(PYTHON3_PEXPECT).$(PYTHON3_PEXPECT_SUFFIX)
+PYTHON3_PEXPECT_URL	:= $(call ptx/mirror-pypi, pexpect, $(PYTHON3_PEXPECT).$(PYTHON3_PEXPECT_SUFFIX))
 PYTHON3_PEXPECT_SOURCE	:= $(SRCDIR)/$(PYTHON3_PEXPECT).$(PYTHON3_PEXPECT_SUFFIX)
 PYTHON3_PEXPECT_DIR	:= $(BUILDDIR)/$(PYTHON3_PEXPECT)
 PYTHON3_PEXPECT_LICENSE	:= ISC
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-pexpect.targetinstall:
 	@$(call install_fixup, python3-pexpect, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-pexpect, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/pexpect,, *.py)
+		$(PYTHON3_SITEPACKAGES)/pexpect,, *.py)
 
 	@$(call install_finish, python3-pexpect)
 

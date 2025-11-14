@@ -18,7 +18,7 @@ PYTHON3_IPYTHON_GENUTILS_VERSION	:= 0.1.0
 PYTHON3_IPYTHON_GENUTILS_MD5		:= 9a8afbe0978adbcbfcb3b35b2d015a56
 PYTHON3_IPYTHON_GENUTILS		:= ipython_genutils-$(PYTHON3_IPYTHON_GENUTILS_VERSION)
 PYTHON3_IPYTHON_GENUTILS_SUFFIX		:= tar.gz
-PYTHON3_IPYTHON_GENUTILS_URL		:= https://pypi.python.org/packages/source/i/ipython_genutils/$(PYTHON3_IPYTHON_GENUTILS).$(PYTHON3_IPYTHON_GENUTILS_SUFFIX)\#md5=$(PYTHON3_IPYTHON_GENUTILS_MD5)
+PYTHON3_IPYTHON_GENUTILS_URL		:= $(call ptx/mirror-pypi, ipython_genutils, $(PYTHON3_IPYTHON_GENUTILS).$(PYTHON3_IPYTHON_GENUTILS_SUFFIX))
 PYTHON3_IPYTHON_GENUTILS_SOURCE		:= $(SRCDIR)/$(PYTHON3_IPYTHON_GENUTILS).$(PYTHON3_IPYTHON_GENUTILS_SUFFIX)
 PYTHON3_IPYTHON_GENUTILS_DIR		:= $(BUILDDIR)/$(PYTHON3_IPYTHON_GENUTILS)
 PYTHON3_IPYTHON_GENUTILS_LICENSE	:= BSD-3-Clause
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-ipython-genutils.targetinstall:
 	@$(call install_fixup, python3-ipython-genutils, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-ipython-genutils, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/ipython_genutils,, *.py)
+		$(PYTHON3_SITEPACKAGES)/ipython_genutils,, *.py)
 
 	@$(call install_finish, python3-ipython-genutils)
 

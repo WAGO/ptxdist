@@ -15,17 +15,19 @@ PACKAGES-$(PTXCONF_ZLIB) += zlib
 #
 # Paths and names
 #
-ZLIB_VERSION	:= 1.2.11
-ZLIB_MD5	:= 85adef240c5f370b308da8c938951a68
+
+ZLIB_VERSION	:= 1.3.1
+ZLIB_MD5	:= 5e6af153311327e516690d300527ec9e
 ZLIB		:= zlib-$(ZLIB_VERSION)
 ZLIB_SUFFIX	:= tar.xz
 ZLIB_URL	:= \
-	http://zlib.net/$(ZLIB).$(ZLIB_SUFFIX) \
-	$(call ptx/mirror, SF, libpng/$(ZLIB).$(ZLIB_SUFFIX))
+	http://zlib.net/fossils/$(ZLIB).$(ZLIB_SUFFIX) \
+	https://github.com/madler/zlib/releases/download/v$(ZLIB_VERSION)/$(ZLIB).$(ZLIB_SUFFIX)
 ZLIB_SOURCE	:= $(SRCDIR)/$(ZLIB).$(ZLIB_SUFFIX)
 ZLIB_DIR	:= $(BUILDDIR)/$(ZLIB)
 ZLIB_LICENSE	:= Zlib
-ZLIB_LICENSE_FILES := file://README;md5=0ff45db88393c3152e458a047bba0ff1
+ZLIB_LICENSE_FILES := \
+	file://LICENSE;md5=b51a40671bc46e961c0498897742c0b8
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -42,7 +44,7 @@ ZLIB_CONF_TOOL := autoconf
 ZLIB_CONF_OPT := \
 	--prefix=/usr \
 	--uname=Linux \
-	--libdir=/usr/$(CROSS_LIB_DIR)
+	--libdir=/usr/lib
 
 # ----------------------------------------------------------------------------
 # Target-Install

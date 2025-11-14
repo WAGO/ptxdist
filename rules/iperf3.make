@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_IPERF3) += iperf3
 #
 # Paths and names
 #
-IPERF3_VERSION	:= 3.6
-IPERF3_MD5	:= 6114c34ef6c3a69bc75de12e5366789b
+IPERF3_VERSION	:= 3.16
+IPERF3_MD5	:= cbcdeae143cbd82a1f41a80ed01ede6c
 IPERF3		:= iperf-$(IPERF3_VERSION)
 IPERF3_SUFFIX	:= tar.gz
-IPERF3_URL	:= http://downloads.es.net/pub/iperf/$(IPERF3).$(IPERF3_SUFFIX)
+IPERF3_URL	:= https://downloads.es.net/pub/iperf/$(IPERF3).$(IPERF3_SUFFIX)
 IPERF3_SOURCE	:= $(SRCDIR)/$(IPERF3).$(IPERF3_SUFFIX)
 IPERF3_DIR	:= $(BUILDDIR)/$(IPERF3)
 IPERF3_LICENSE	:= BSD
@@ -30,8 +30,10 @@ IPERF3_LICENSE	:= BSD
 #
 # autoconf
 #
-IPERF3_AUTOCONF := \
+IPERF3_CONF_TOOL := autoconf
+IPERF3_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-profiling \
 	--with-openssl=$(PTXDIST_SYSROOT_TARGET)/usr
 
 # ----------------------------------------------------------------------------

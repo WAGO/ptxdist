@@ -27,13 +27,11 @@ XORG_APP_XVINFO_DIR	:= $(BUILDDIR)/$(XORG_APP_XVINFO)
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_APP_XVINFO_PATH	:= PATH=$(CROSS_PATH)
-XORG_APP_XVINFO_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_APP_XVINFO_AUTOCONF := \
+XORG_APP_XVINFO_CONF_TOOL	:= autoconf
+XORG_APP_XVINFO_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--datadir=$(XORG_DATADIR)
 

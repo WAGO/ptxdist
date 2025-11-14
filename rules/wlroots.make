@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_WLROOTS) += wlroots
 #
 # Paths and names
 #
-WLROOTS_VERSION	:= 0.10.0
-WLROOTS_MD5	:= 758fa2f41ea888572db8052897b4482f
+WLROOTS_VERSION	:= 0.16.0
+WLROOTS_MD5	:= 2f9263c6ed2f2da2957988ee3f7bde1f
 WLROOTS		:= wlroots-$(WLROOTS_VERSION)
-WLROOTS_SUFFIX	:= tar.gz
-WLROOTS_URL	:= https://github.com/swaywm/wlroots/archive/$(WLROOTS_VERSION).$(WLROOTS_SUFFIX)
+WLROOTS_SUFFIX	:= tar.bz2
+WLROOTS_URL	:= https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/$(WLROOTS_VERSION)/$(WLROOTS).$(WLROOTS_SUFFIX)
 WLROOTS_SOURCE	:= $(SRCDIR)/$(WLROOTS).$(WLROOTS_SUFFIX)
 WLROOTS_DIR	:= $(BUILDDIR)/$(WLROOTS)
 WLROOTS_LICENSE	:= MIT
@@ -30,15 +30,14 @@ WLROOTS_LICENSE	:= MIT
 WLROOTS_CONF_TOOL := meson
 WLROOTS_CONF_OPT := \
 	$(CROSS_MESON_USR) \
-	-Dlibcap=$(call ptx/endis, PTXCONF_WLROOTS_LIBCAP)d \
-	-Dlogind=$(call ptx/endis, PTXCONF_WLROOTS_SYSTEMD_LOGIND)d \
-	-Dlogind-provider=systemd \
-	-Dxcb-errors=disabled \
-	-Dxcb-icccm=disabled \
-	-Dxwayland=disabled \
-	-Dx11-backend=disabled \
+	-Dwerror=false \
+	-Dallocators=gbm \
+	-Dbackends=drm,libinput \
 	-Dexamples=false \
-	-Dwerror=false
+	-Dicon_directory= \
+	-Drenderers=gles2 \
+	-Dxcb-errors=disabled \
+	-Dxwayland=$(call ptx/endis,PTXCONF_WLROOTS_XWAYLAND)d
 
 # ----------------------------------------------------------------------------
 # Target-Install

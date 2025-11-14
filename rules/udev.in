@@ -3,14 +3,14 @@
 config UDEV
 	tristate
 	select VIRTUAL
-	select SYSTEMD		if INITMETHOD_SYSTEMD
-	select UDEV_LEGACY	if !INITMETHOD_SYSTEMD
+	select SYSTEMD			if INITMETHOD_SYSTEMD
+	select UDEV_LEGACY		if !INITMETHOD_SYSTEMD
+	select UDEV_LEGACY_LIBUDEV	if !INITMETHOD_SYSTEMD && UDEV_LIBUDEV
 
 if UDEV
 
 config UDEV_LIBUDEV
 	bool
-	select UDEV_LEGACY_LIBUDEV	if UDEV_LEGACY
 
 endif
 
@@ -96,7 +96,7 @@ config UDEV_LEGACY_CUST_RULES
 	prompt "install customized udev rules"
 	help
 	  This will install the customized udev rules files from
-	  projectroot/usr/usr/lib/udev/rules.d into /lib/udev/rules.d
+	  projectroot/usr/lib/udev/rules.d into /usr/lib/udev/rules.d
 
 config UDEV_LEGACY_LIBUDEV
 	bool
@@ -149,7 +149,7 @@ config UDEV_LEGACY_ACCELEROMETER
 	depends on SYSTEMD = n
 	prompt "accelerometer"
 	help
-	  When an "change" event is received on an accelerometer,
+	  When a "change" event is received on an accelerometer,
 	  open its device node, and from the value, as well as the previous
 	  value of the property, calculate the device's new orientation,
 	  and export it as ID_INPUT_ACCELEROMETER_ORIENTATION.

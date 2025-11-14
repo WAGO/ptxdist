@@ -18,7 +18,7 @@ PYTHON3_PYPARSING_VERSION	:= 2.4.7
 PYTHON3_PYPARSING_MD5		:= f0953e47a0112f7a65aec2305ffdf7b4
 PYTHON3_PYPARSING		:= pyparsing-$(PYTHON3_PYPARSING_VERSION)
 PYTHON3_PYPARSING_SUFFIX	:= tar.gz
-PYTHON3_PYPARSING_URL		:= https://pypi.python.org/packages/source/p/pyparsing/$(PYTHON3_PYPARSING).$(PYTHON3_PYPARSING_SUFFIX)
+PYTHON3_PYPARSING_URL		:= $(call ptx/mirror-pypi, pyparsing, $(PYTHON3_PYPARSING).$(PYTHON3_PYPARSING_SUFFIX))
 PYTHON3_PYPARSING_SOURCE	:= $(SRCDIR)/$(PYTHON3_PYPARSING).$(PYTHON3_PYPARSING_SUFFIX)
 PYTHON3_PYPARSING_DIR		:= $(BUILDDIR)/$(PYTHON3_PYPARSING)
 PYTHON3_PYPARSING_LICENSE	:= MIT
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-pyparsing.targetinstall:
 	@$(call install_fixup, python3-pyparsing, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-pyparsing, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-pyparsing)
 

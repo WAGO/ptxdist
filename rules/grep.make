@@ -15,13 +15,16 @@ PACKAGES-$(PTXCONF_GREP) += grep
 #
 # Paths and names
 #
-GREP_VERSION	:= 3.3
-GREP_MD5	:= 05d0718a1b7cc706a4bdf8115363f1ed
-GREP		:= grep-$(GREP_VERSION)
-GREP_SUFFIX	:= tar.xz
-GREP_URL	:= $(call ptx/mirror, GNU, grep/$(GREP).$(GREP_SUFFIX))
-GREP_SOURCE	:= $(SRCDIR)/$(GREP).$(GREP_SUFFIX)
-GREP_DIR	:= $(BUILDDIR)/$(GREP)
+GREP_VERSION		:= 3.11
+GREP_MD5		:= 7c9bbd74492131245f7cdb291fa142c0
+GREP			:= grep-$(GREP_VERSION)
+GREP_SUFFIX		:= tar.xz
+GREP_URL		:= $(call ptx/mirror, GNU, grep/$(GREP).$(GREP_SUFFIX))
+GREP_SOURCE		:= $(SRCDIR)/$(GREP).$(GREP_SUFFIX)
+GREP_DIR		:= $(BUILDDIR)/$(GREP)
+GREP_LICENSE		:= GPL-3.0-or-later
+GREP_LICENSE_FILES	:= \
+	file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -44,7 +47,14 @@ GREP_CONF_OPT	:= \
 	--disable-assert \
 	--disable-rpath \
 	--disable-nls \
-	--$(call ptx/endis, PTXCONF_GREP_PCRE)-perl-regexp
+	--$(call ptx/endis, PTXCONF_GREP_PCRE)-perl-regexp \
+	--$(call ptx/endis, PTXDIST_Y2038)-year2038 \
+	--with-libsigsegv \
+	--without-included-regex \
+	--with-packager \
+	--with-packager-version \
+	--with-packager-bug-reports
+
 
 # ----------------------------------------------------------------------------
 # Target-Install

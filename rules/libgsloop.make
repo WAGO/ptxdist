@@ -26,13 +26,11 @@ LIBGSLOOP_DIR		:= $(BUILDDIR)/$(LIBGSLOOP)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBGSLOOP_PATH	:= PATH=$(CROSS_PATH)
-LIBGSLOOP_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBGSLOOP_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBGSLOOP_CONF_TOOL	:= autoconf
+LIBGSLOOP_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

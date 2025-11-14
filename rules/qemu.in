@@ -1,0 +1,90 @@
+## SECTION=bytecode_engines
+
+menuconfig QEMU
+	tristate
+	prompt "qemu                          "
+	select HOST_MESON
+	select HOST_NINJA
+	select HOST_SYSTEM_PYTHON3
+	select GCCLIBS_CXX
+	select DTC
+	select GLIB
+	select LIBCAP_NG
+	select LIBSLIRP
+	select ZLIB
+	select SDL2		if QEMU_SDL
+	select GTK		if QEMU_GTK
+	select LIBUSB		if QEMU_SYS
+	select PIXMAN		if QEMU_SYS
+	select PULSEAUDIO	if QEMU_PULSEAUDIO
+	select ALSA_LIB 	if QEMU_ALSA
+	select PIPEWIRE		if QEMU_PIPEWIRE
+	help
+	  QEMU is a generic and open source machine emulator and
+	  virtualizer.
+
+if QEMU
+
+config QEMU_TARGETS
+	string
+	prompt "QEMU targets"
+	default "i386 x86_64 arm aarch64"
+	help
+	  The list of QEMU user and system targets you want to build.
+	  Only use the prefixes.
+
+config QEMU_SDL
+	bool
+	prompt "Enable SDL graphical output support."
+	default y
+	help
+	  Say y to build with SDL support.
+
+config QEMU_GTK
+	bool
+	prompt "Enable GTK graphical output support."
+	help
+	  Say y to build with GTK support.
+
+config QEMU_PULSEAUDIO
+	bool
+	prompt "Enable pulseaudio output support."
+	help
+	  Say y to build with pa support.
+
+config QEMU_ALSA
+	bool
+	prompt "Enable alsa audio output support."
+	help
+	  Say y to build with alsa support.
+
+config QEMU_PIPEWIRE
+	bool
+	prompt "Enable pipewire audio output support."
+	help
+	  Say y to build with pipewire support.
+
+config QEMU_TOOLS
+	bool
+	prompt "Enable tools"
+	default y
+	help
+	  Say y here to include tools.
+
+config QEMU_EDK2_FIRMWARE
+	bool
+	prompt "Enable edk2 firmware"
+	default y
+	help
+	  Say n here to drop the edk2 (UEFI) firmware files.
+	  They can be substantial in size (> 100M).
+
+config QEMU_SYS
+	bool
+	prompt "system emulation"
+
+config QEMU_USR
+	bool
+	prompt "user-space emulation"
+
+endif

@@ -8,6 +8,7 @@ menuconfig GST_PLUGINS_UGLY1
 	select GSTREAMER1
 	select GST_PLUGINS_BASE1
 	select ORC			if GST_PLUGINS_UGLY1_A52DEC
+	select LIBCDIO			if GST_PLUGINS_UGLY1_CDIO
 	select LIBMPEG2			if GST_PLUGINS_UGLY1_MPEG2DEC
 	prompt "gst-plugins-ugly              "
 	help
@@ -38,10 +39,6 @@ config GST_PLUGINS_UGLY1_REALMEDIA
 	bool
 	prompt "realmedia"
 
-config GST_PLUGINS_UGLY1_XINGMUX
-	bool
-	prompt "xingmux"
-
 comment "plugins with dependencies"
 
 config GST_PLUGINS_UGLY1_A52DEC
@@ -52,26 +49,8 @@ config GST_PLUGINS_UGLY1_A52DEC
 	help
 	  Dolby Digital (AC-3) audio decoder plugin
 
-config GST_PLUGINS_UGLY1_AMRNB
-	bool
-	# needs opencore-amrnb
-	depends on BROKEN
-	prompt "amrnb"
-	help
-	  Adaptive Multi-Rate Narrow-Band audio codec plugin
-
-config GST_PLUGINS_UGLY1_AMRWBDEC
-	bool
-	# needs opencore-amrwb
-	depends on BROKEN
-	prompt "amrwbdec"
-	help
-	  Adaptive Multi-Rate Wide-Band audio decoder plugin
-
 config GST_PLUGINS_UGLY1_CDIO
 	bool
-	# needs libcdio
-	depends on BROKEN
 	prompt "cdio"
 	help
 	  CD audio source plugin

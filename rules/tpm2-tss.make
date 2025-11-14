@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_TPM2_TSS) += tpm2-tss
 #
 # Paths and names
 #
-TPM2_TSS_VERSION	:= 2.3.1
-TPM2_TSS_MD5		:= 5744b10e3cef56df5d65b50f51fb3fe9
+TPM2_TSS_VERSION	:= 4.1.3
+TPM2_TSS_MD5		:= 018e7f53a7c2d6385c7a76cf7699019c
 TPM2_TSS		:= tpm2-tss-$(TPM2_TSS_VERSION)
 TPM2_TSS_SUFFIX		:= tar.gz
 TPM2_TSS_URL		:= https://github.com/tpm2-software/tpm2-tss/releases/download/$(TPM2_TSS_VERSION)/$(TPM2_TSS).$(TPM2_TSS_SUFFIX)
@@ -32,13 +32,18 @@ TPM2_TSS_LICENSE_FILES	:= file://LICENSE;md5=500b2e742befc3da00684d8a1d5fd9da
 # autoconf
 #
 TPM2_TSS_CONF_TOOL	:= autoconf
+TPM2_TSS_CONF_ENV := \
+	$(CROSS_ENV) \
+	ac_cv_prog_groupadd=yes \
+	ac_cv_prog_useradd=yes \
+	ac_cv_prog_addgroup=yes \
+	ac_cv_prog_adduser=yes
+
 TPM2_TSS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-debug=info \
 	--disable-unit \
-	--enable-esapi \
-	--disable-tcti-device-async \
-	--disable-tcti-partial-reads \
+	--enable-fapi \
 	--enable-tcti-device \
 	--enable-tcti-mssim \
 	--disable-tcti-fuzzing \
@@ -83,6 +88,7 @@ $(STATEDIR)/tpm2-tss.targetinstall:
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-esys)
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-mu)
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-sys)
+	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-fapi)
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-tcti-device)
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-tcti-mssim)
 	@$(call install_lib, tpm2-tss, 0, 0, 0644, libtss2-tctildr)

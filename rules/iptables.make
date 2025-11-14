@@ -19,14 +19,16 @@ PACKAGES-$(PTXCONF_IPTABLES) += iptables
 #
 # Paths and names
 #
-IPTABLES_VERSION	:= 1.8.3
-IPTABLES_MD5		:= 29de711d15c040c402cf3038c69ff513
+IPTABLES_VERSION	:= 1.8.11
+IPTABLES_MD5		:= 44191ce12055da9790a92429c771ba50
 IPTABLES		:= iptables-$(IPTABLES_VERSION)
-IPTABLES_SUFFIX		:= tar.bz2
+IPTABLES_SUFFIX		:= tar.xz
 IPTABLES_URL		:= http://ftp.netfilter.org/pub/iptables/$(IPTABLES).$(IPTABLES_SUFFIX)
 IPTABLES_SOURCE		:= $(SRCDIR)/$(IPTABLES).$(IPTABLES_SUFFIX)
 IPTABLES_DIR		:= $(BUILDDIR)/$(IPTABLES)
 IPTABLES_LICENSE	:= GPL-2.0-only
+IPTABLES_LICENSE_FILES	:= \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -46,7 +48,9 @@ IPTABLES_CONF_OPT	:= \
 	--disable-bpf-compiler \
 	--disable-nfsynproxy \
 	--$(call ptx/endis, PTXCONF_IPTABLES_NFTABLES_COMPAT)-nftables \
+	--$(call ptx/endis, PTXCONF_IPTABLES_LIBNFNETLINK)-libnfnetlink \
 	--disable-connlabel \
+	--disable-profiling \
 	--with-kernel=$(KERNEL_HEADERS_DIR) \
 	--with-xtlibdir=/usr/lib
 
@@ -56,7 +60,7 @@ IPTABLES_CONF_OPT	:= \
 
 $(STATEDIR)/iptables.install:
 	@$(call targetinfo)
-	@$(call install, IPTABLES)
+	@$(call world/install, IPTABLES)
 	install $(IPTABLES_DIR)/iptables/iptables-apply $(IPTABLES_PKGDIR)/usr/sbin
 	@$(touch)
 
@@ -74,61 +78,44 @@ $(STATEDIR)/iptables.targetinstall:
 	@$(call install_fixup, iptables,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
 	@$(call install_fixup, iptables,DESCRIPTION,missing)
 
-# 	# install the basic libraries
 	@$(call install_lib, iptables, 0, 0, 0644, libxtables)
 
 ifdef PTXCONF_IPTABLES_LIBIPQ
 	@$(call install_lib, iptables, 0, 0, 0644, libipq)
 endif
-
-	@cd $(IPTABLES_PKGDIR)/usr/lib && \
-		for file in libxt_*.so; do \
-			$(call install_copy, iptables, 0, 0, 0644, -,\
-				/usr/lib/$$file); \
-		done
+	@$(call install_glob, iptables, 0, 0, -, /usr/lib, */libxt_*.so,)
 
 ifdef PTXCONF_IPTABLES_IPV6
-#	# install the IPv6 relevant shared libraries
-	@cd $(IPTABLES_PKGDIR)/usr/lib && \
-		for file in libip6t_*.so; do \
-			$(call install_copy, iptables, 0, 0, 0644, -, \
-				/usr/lib/$$file); \
-		done
+	@$(call install_glob, iptables, 0, 0, -, /usr/lib, */libip6t_*.so,)
 	@$(call install_lib, iptables, 0, 0, 0644, libip6tc)
 endif
 
 ifdef PTXCONF_IPTABLES_IPV4
-#	# install the IPv4 relevant shared libraries
-	@cd $(IPTABLES_PKGDIR)/usr/lib && \
-		for file in libipt_*.so; do \
-			$(call install_copy, iptables, 0, 0, 0644, -,\
-				/usr/lib/$$file); \
-		done
+	@$(call install_glob, iptables, 0, 0, -, /usr/lib, */libipt_*.so,)
 	@$(call install_lib, iptables, 0, 0, 0644, libip4tc)
 endif
 
 ifdef PTXCONF_IPTABLES_INSTALL_TOOLS
 	@$(call install_copy, iptables, 0, 0, 0755, -, /usr/sbin/xtables-legacy-multi)
 	@$(call install_link, iptables, ../sbin/xtables-legacy-multi, /usr/bin/iptables-xml)
+
 ifdef PTXCONF_IPTABLES_LIBNFNETLINK
 	@$(call install_copy, iptables, 0, 0, 0755, -, /usr/sbin/nfnl_osf)
 endif
+
 ifdef PTXCONF_IPTABLES_IPV6
-# 	# IPv6 part
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/ip6tables)
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/ip6tables-restore)
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/ip6tables-save)
 endif
 
 ifdef PTXCONF_IPTABLES_IPV4
-# 	# IPv4 part
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/iptables)
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/iptables-restore)
 	@$(call install_link, iptables, xtables-legacy-multi, /usr/sbin/iptables-save)
 endif
 
 ifdef PTXCONF_IPTABLES_IPV6_SYSTEMD_UNIT
-# 	# IPv6 systemd service unit part
 	@$(call install_alternative, iptables, 0, 0, 0644, /etc/iptables/rules.v6)
 	@$(call install_alternative, iptables, 0, 0, 0755, /usr/sbin/ip6tables-flush)
 	@$(call install_alternative, iptables, 0, 0, 0644, \
@@ -138,7 +125,6 @@ ifdef PTXCONF_IPTABLES_IPV6_SYSTEMD_UNIT
 endif
 
 ifdef PTXCONF_IPTABLES_IPV4_SYSTEMD_UNIT
-# 	# IPv4 systemd service unit part
 	@$(call install_alternative, iptables, 0, 0, 0644, /etc/iptables/rules.v4)
 	@$(call install_alternative, iptables, 0, 0, 0755, /usr/sbin/iptables-flush)
 	@$(call install_alternative, iptables, 0, 0, 0644, \
@@ -147,25 +133,22 @@ ifdef PTXCONF_IPTABLES_IPV4_SYSTEMD_UNIT
 		/usr/lib/systemd/system/multi-user.target.wants/iptables.service)
 endif
 
-endif
+endif # PTXCONF_IPTABLES_INSTALL_TOOLS
 
 ifdef PTXCONF_IPTABLES_INSTALL_IPTABLES_APPLY
 	@$(call install_copy, iptables, 0, 0, 0755, -, /usr/sbin/iptables-apply)
 endif
 
-#	#  compability layer for nftables
 ifdef PTXCONF_IPTABLES_NFTABLES_COMPAT
 	@$(call install_copy, iptables, 0, 0, 0755, -, /usr/sbin/xtables-nft-multi)
 
 ifdef PTXCONF_IPTABLES_IPV4
-# 	# IPv4 part
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/iptables-nft)
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/iptables-nft-save)
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/iptables-nft-restore)
 endif
 
 ifdef PTXCONF_IPTABLES_IPV6
-# 	# IPv6 part
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/ip6tables-nft)
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/ip6tables-nft-save)
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/ip6tables-nft-restore)
@@ -173,7 +156,7 @@ endif
 
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/arptables-nft)
 	@$(call install_link, iptables, xtables-nft-multi, /usr/sbin/ebtables-nft)
-endif
+endif # PTXCONF_IPTABLES_NFTABLES_COMPAT
 
 	@$(call install_finish, iptables)
 

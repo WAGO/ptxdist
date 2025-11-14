@@ -14,16 +14,16 @@ PACKAGES-$(PTXCONF_LIBCAP) += libcap
 #
 # Paths and names
 #
-LIBCAP_VERSION	:= 2.41
-LIBCAP_MD5	:= 1da3bac88e17186b78d1ca59f154c53a
+LIBCAP_VERSION	:= 2.72
+LIBCAP_MD5	:= 0d9dd20dbdc7a94942f0c43ae706e5ac
 LIBCAP		:= libcap-$(LIBCAP_VERSION)
 LIBCAP_SUFFIX	:= tar.xz
 LIBCAP_URL	:= \
 	$(call ptx/mirror, KERNEL, libs/security/linux-privs/libcap2/$(LIBCAP).$(LIBCAP_SUFFIX))
 LIBCAP_SOURCE	:= $(SRCDIR)/$(LIBCAP).$(LIBCAP_SUFFIX)
 LIBCAP_DIR	:= $(BUILDDIR)/$(LIBCAP)
-LIBCAP_LICENSE	:= BSD-3-Clause AND GPL-2.0-only
-LIBCAP_LICENSE_FILES := file://License;md5=3f84fd6f29d453a56514cb7e4ead25f1
+LIBCAP_LICENSE	:= BSD-3-Clause OR GPL-2.0-only
+LIBCAP_LICENSE_FILES := file://License;md5=2965a646645b72ecee859b43c592dcaa
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -31,7 +31,7 @@ LIBCAP_LICENSE_FILES := file://License;md5=3f84fd6f29d453a56514cb7e4ead25f1
 
 LIBCAP_MAKE_OPT	:= \
 	prefix=/usr lib=lib \
-	CC=$(CROSS_CC) \
+	CROSS_COMPILE=$(COMPILER_PREFIX) \
 	BUILD_CC=$(HOSTCC) \
 	DYNAMIC=yes \
 	GOLANG=no \

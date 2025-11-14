@@ -26,18 +26,16 @@ SUPERTUX_DIR		:= $(BUILDDIR)/$(SUPERTUX)
 # Prepare
 # ----------------------------------------------------------------------------
 
-SUPERTUX_PATH	:= PATH=$(CROSS_PATH)
-SUPERTUX_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-SUPERTUX_AUTOCONF := \
+SUPERTUX_CONF_TOOL	:= autoconf
+SUPERTUX_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-opengl \
 	--with-sdl-prefix=$(SYSROOT)/usr
 
-SUPERTUX_CXXFLAGS := -std=c++98
+SUPERTUX_CXXFLAGS	:= -std=c++98
 
 # ----------------------------------------------------------------------------
 # Target-Install

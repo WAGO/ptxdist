@@ -15,18 +15,19 @@ PACKAGES-$(PTXCONF_OPENSSH) += openssh
 #
 # Paths and names
 #
-OPENSSH_VERSION	:= 8.3p1
-OPENSSH_MD5	:= 68d7527bf2672153ca47402f6489a1af
+OPENSSH_VERSION	:= 9.9p1
+OPENSSH_MD5	:= 1893c9b712eb8c55ec2d5146e7323b92
 OPENSSH		:= openssh-$(OPENSSH_VERSION)
 OPENSSH_SUFFIX	:= tar.gz
 OPENSSH_URL	:= \
 	https://ftp.halifax.rwth-aachen.de/openbsd/OpenSSH/portable/$(OPENSSH).$(OPENSSH_SUFFIX) \
-	https://mirror.hs-esslingen.de/pub/OpenBSD/OpenSSH/portable/$(OPENSSH).$(OPENSSH_SUFFIX)
+	https://mirror.hs-esslingen.de/pub/OpenBSD/OpenSSH/portable/$(OPENSSH).$(OPENSSH_SUFFIX) \
+	https://ftp.lysator.liu.se/pub/OpenBSD/OpenSSH/portable/$(OPENSSH).$(OPENSSH_SUFFIX)
 
 OPENSSH_SOURCE	:= $(SRCDIR)/$(OPENSSH).$(OPENSSH_SUFFIX)
 OPENSSH_DIR	:= $(BUILDDIR)/$(OPENSSH)
 OPENSSH_LICENSE	:= BSD AND BSD-2-Clause AND BSD-3-Clause AND MIT AND Beerware AND ISC
-OPENSSH_LICENSE_FILES := file://LICENCE;encoding=ISO-8859-1;md5=18d9e5a8b3dd1790d73502f50426d4d3
+OPENSSH_LICENSE_FILES := file://LICENCE;md5=78ffb36e5a48c0d8c5648603a3b6c8eb
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -34,12 +35,12 @@ OPENSSH_LICENSE_FILES := file://LICENCE;encoding=ISO-8859-1;md5=18d9e5a8b3dd1790
 
 OPENSSH_CONF_ENV	:= \
 	$(CROSS_ENV) \
-	select_works_with_rlimit=yes \
+	ac_cv_search_SHA256Update=no \
 	LD=$(COMPILER_PREFIX)gcc
 
 OPENSSH_SANDBOX-y			:= seccomp_filter
 # seccomp_filter sandbox is not supported for ppc
-OPENSSH_SANDBOX-$(PTXCONF_ARCH_PPC)	:= rlimit
+OPENSSH_SANDBOX-$(PTXCONF_ARCH_PPC)	:= no
 
 #
 # autoconf
@@ -77,8 +78,7 @@ OPENSSH_CONF_OPT	:= \
 	--with-privsep-user=sshd \
 	--with-sandbox=$(OPENSSH_SANDBOX-y) \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_SELINUX)-selinux \
-	--with-privsep-path=/var/run/sshd \
-	--without-md5-passwords
+	--with-privsep-path=/var/run/sshd
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -105,10 +105,13 @@ ifdef PTXCONF_OPENSSH_SSHD
 		/etc/ssh/moduli)
 	@$(call install_copy, openssh, 0, 0, 0755, -, \
 		/usr/sbin/sshd)
+	@$(call install_copy, openssh, 0, 0, 0755, -, \
+		/usr/sbin/sshd-session)
+ifdef PTXCONF_OPENSSH_SSHD_GENKEYS
 	@$(call install_alternative, openssh, 0, 0, 0755, /etc/rc.once.d/openssh)
 endif
+endif
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_OPENSSH_SSHD_STARTSCRIPT
 	@$(call install_alternative, openssh, 0, 0, 0755, /etc/init.d/openssh)
 
@@ -116,7 +119,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_OPENSSH_BBINIT_LINK)),)
 	@$(call install_link, openssh, \
 		../init.d/openssh, \
 		/etc/rc.d/$(PTXCONF_OPENSSH_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_INITMETHOD_SYSTEMD
@@ -127,8 +129,6 @@ ifdef PTXCONF_OPENSSH_SSHD_SYSTEMD_UNIT
 		/usr/lib/systemd/system/sshd@.service)
 	@$(call install_link, openssh, ../sshd.socket, \
 		/usr/lib/systemd/system/sockets.target.wants/sshd.socket)
-	@$(call install_alternative, openssh, 0, 0, 0644, \
-		/usr/lib/tmpfiles.d/ssh.conf)
 endif
 endif
 

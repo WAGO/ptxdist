@@ -188,89 +188,35 @@ ptxd_make_world_license_write() {
 	    continue
 	fi
 	title="$(basename "${license}")"
-	cat <<- EOF
-		\section{$(ptxd_make_latex_escape "${title}")${guess}}
-		\begin{small}
-		\begin{spverbatim}
-	EOF
-	if [ -f "${license}.utf-8" ]; then
-	    cat "${license}.utf-8"
-	else
-	    cat "${license}"
-	fi | sed -e 's/\f/\n/g'
-	check_pipe_status || return
-	cat <<- EOF
-		\end{spverbatim}
-		\end{small}
-	EOF
+	case "${license}" in
+	    *.pdf)
+		cat <<- EOF
+			\section{$(ptxd_make_latex_escape "${title}")${guess}}
+			\includepdf[pages=-]{${license}}
+		EOF
+		;;
+	    *)
+		cat <<- EOF
+			\section{$(ptxd_make_latex_escape "${title}")${guess}}
+			\begin{small}
+			\begin{spverbatim}
+		EOF
+
+		if [ -f "${license}.utf-8" ]; then
+		    cat "${license}.utf-8"
+		else
+		    cat "${license}"
+		fi | sed -e 's/\f/\n/g'
+		check_pipe_status || return
+		cat <<- EOF
+			\end{spverbatim}
+			\end{small}
+		EOF
+		;;
+	esac
     done
 }
 export -f ptxd_make_world_license_write
-
-ptxd_make_world_license_yaml() {
-    do_echo() {
-	if [ -n "${2}" ]; then
-	    echo "${1} '${2}'"
-	fi
-    }
-    do_list() {
-	if [ -n "${2}" ]; then
-	    echo "${1}"
-	    awk "BEGIN { RS=\" \" } { if (\$1) print \"- '\" \$1 \"'\" }" <<<"${2}"
-	fi
-    }
-    do_echo "name:" "${pkg_label}"
-    do_echo "rulefile:" "${pkg_makefile}"
-    do_echo "menufile:" "${pkg_infile}"
-    do_list "builddeps:" "${pkg_build_deps}"
-    do_list "rundeps:" "${pkg_run_deps}"
-    do_echo "config:" "${pkg_config}"
-    do_echo "version:" "${pkg_version}"
-    do_list "url:" "${pkg_url}"
-    do_echo "md5:" "${pkg_md5}"
-    do_echo "source:" "${pkg_src}"
-    if [ -n "${pkg_md5s}" ]; then
-	echo "md5s:"
-	awk "BEGIN { RS=\" *:\\\\s*\"; FS=\":\" } { if (\$1) print \"- '\" \$1 \"'\" }" <<<"${pkg_md5s}"
-    fi
-    do_list "sources:" "${pkg_srcs}"
-    do_echo "patches:" "${pkg_patch_dir}"
-    if [ "${pkg_patch_series}" != "series" -a -n "${pkg_patch_dir}" ]; then
-	do_echo "series:" "${pkg_patch_series}"
-    fi
-    do_echo "srcdir:" "${pkg_dir}"
-    do_echo "builddir:" "${pkg_build_dir}"
-    do_echo "pkgdir:" "${pkg_pkg_dir}"
-    do_echo "section:" "${pkg_section}"
-    do_echo "licenses:" "${pkg_license}"
-    do_list "license-flags:" "${!pkg_license_flags[*]}"
-    if [ ${#pkg_license_texts[@]} -gt 0 -o ${#pkg_license_texts_guessed[@]} -gt 0 ]; then
-	echo "license-files:"
-    fi
-    local guess="false"
-    for license in "${pkg_license_texts[@]}" - "${pkg_license_texts_guessed[@]}"; do
-	if [ "${license}" = "-" ]; then
-	    guess="true"
-	    continue
-	fi
-	cat << EOF
-  $(basename "${license}"):
-    guessed: ${guess}
-    file: '${license}'
-    md5: '$(sed -n "s/\(.*\)  $(basename "${license}")\$/\1/p" "${pkg_license_dir}/license/MD5SUM")'
-EOF
-    done
-    if [ -e "${pkg_xpkg_map}" ]; then
-	echo "ipkgs:"
-	for xpkg in $(< "${pkg_xpkg_map}"); do
-	    echo "- '${ptx_pkg_dir}/${xpkg}_${pkg_version}_${PTXDIST_IPKG_ARCH_STRING}.ipk'"
-	done
-    fi
-    do_echo "image:" "${image_image}"
-    do_list "pkgs:" "${image_pkgs}"
-    do_list "files:" "${image_files}"
-}
-export -f ptxd_make_world_license_yaml
 
 # Copy all patches according to the series file
 # $1 full path to the series file
@@ -310,7 +256,7 @@ export -f ptxd_make_world_copy_patch_files
 # $1 path to the extracted and patched sources [1]
 # $2 base directory where to copy the patches to (without the trailing 'patches')
 #
-# [1] assumed here is the existance of the '.ptxdist' directory which contains
+# [1] assumed here is the existence of the '.ptxdist' directory which contains
 #     the selected patch stack if any
 ptxd_make_world_copy_patches() {
    local patches_directory=""
@@ -445,16 +391,9 @@ ptxd_make_world_license_flags() {
 export -f ptxd_make_world_license_flags
 
 ptxd_make_world_license_init() {
-    # use patchin_init for  pkg_patch_dir
-    ptxd_make_world_patchin_init || return
-
     local name
 
-    pkg_license="${pkg_license:-unknown}"
-
-    ptxd_make_world_license_flags || return
-
-    pkg_section="$(ptxd_create_section_from_license "${pkg_license}")"
+    ptxd_make_world_report_init || return
 
     name="${pkg_label#host-}"
     name="${name#cross-}"
@@ -463,6 +402,7 @@ ptxd_make_world_license_init() {
     pkg_release_dir="${ptx_release_dir}/${pkg_section}/${name}"
 }
 export -f ptxd_make_world_license_init
+
 #
 # extract and process all available license information
 #
@@ -480,11 +420,6 @@ ptxd_make_world_license() {
 
     rm -rf "${pkg_license_dir}" || return
 
-    if [ "${pkg_section}" == "ignore" ]; then
-	echo "Package to be ignored: metapackage for example"
-	return 0
-    fi
-
     mkdir -p ${pkg_license_dir} &&
     echo ${pkg_section}/${pkg_label} >> "${ptx_report_dir}/package.list" &&
 
@@ -501,6 +436,7 @@ ptxd_make_world_license() {
 	ptxd_make_world_parse_license_files "${arg}" &&
 
 	local lic="${pkg_license_dir}/license/${filename//\//_}" &&
+	echo " $(ptxd_print_path "${file}")${guess:+ (guessed)}" &&
 	sed -n "${startline},${endline}p" "${file}" > "${lic}" &&
 	if [ -n "${encoding}" ]; then
 	    iconv -f "${encoding}" -t "utf-8"  -o "${lic}.utf-8" "${lic}"
@@ -521,12 +457,15 @@ changed: ${md5} -> $(md5sum "${lic}" | sed 's/ .*//')
 	fi ||
 	ptxd_bailout "Failed to copy '$(ptxd_print_path "${file}")'"
     done &&
+    echo &&
 
-    ptxd_make_world_license_write | \
-	sed -e 's/%/\\%/g' > "${pkg_license_dir}/license-report.tex" &&
-    check_pipe_status &&
+    if [ "${pkg_section}" != "ignore" ]; then
+	ptxd_make_world_license_write | \
+	    sed -e 's/%/\\%/g' > "${pkg_license_dir}/license-report.tex" &&
+	check_pipe_status
+    fi &&
 
-    ptxd_make_world_license_yaml > "${pkg_license_dir}/license-report.yaml" &&
+    ptxd_make_world_report_yaml > "${pkg_license_dir}/license-report.yaml" &&
 
     echo "${pkg_license}" > "${pkg_license_dir}/license-name" &&
     if [ "${#pkg_license_flags[@]}" -gt 0 ]; then

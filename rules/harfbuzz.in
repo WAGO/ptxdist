@@ -3,14 +3,20 @@
 menuconfig HARFBUZZ
 	tristate
 	prompt "harfbuzz                      "
+	select HOST_MESON
 	select FREETYPE
 	select GLIB
-	select GRAPHITE2	if HARFBUZZ_GRAPHITE
-	select ICU		if HARFBUZZ_ICU
+	select GRAPHITE2		if HARFBUZZ_GRAPHITE
+	select ICU			if HARFBUZZ_ICU
+	select GOBJECT_INTROSPECTION	if HARFBUZZ_INTROSPECTION
 	help
 	  HarfBuzz is an OpenType text shaping engine.
 
 if HARFBUZZ
+
+config HARFBUZZ_INTROSPECTION
+	bool
+	default GOBJECT_INTROSPECTION_HELPER
 
 config HARFBUZZ_GRAPHITE
 	bool
@@ -19,5 +25,9 @@ config HARFBUZZ_GRAPHITE
 config HARFBUZZ_ICU
 	bool
 	prompt "ICU support"
+
+config HARFBUZZ_SUBSET
+	bool
+	prompt "install harfbuzz subset library"
 
 endif

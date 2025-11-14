@@ -15,29 +15,39 @@ PACKAGES-$(PTXCONF_GNUPG) += gnupg
 #
 # Paths and names
 #
-GNUPG_VERSION	:= 2.2.9
-GNUPG_MD5	:= 52c895a81f514a65e08923736c38654a
+GNUPG_VERSION	:= 2.4.5
+GNUPG_MD5	:= 49c3534e87744e994250d37c1b43f928
 GNUPG		:= gnupg-$(GNUPG_VERSION)
 GNUPG_SUFFIX	:= tar.bz2
-GNUPG_URL	:= ftp://ftp.gnupg.org/gcrypt/gnupg/$(GNUPG).$(GNUPG_SUFFIX)
+GNUPG_URL	:= https://www.gnupg.org/ftp/gcrypt/gnupg/$(GNUPG).$(GNUPG_SUFFIX)
 GNUPG_SOURCE	:= $(SRCDIR)/$(GNUPG).$(GNUPG_SUFFIX)
 GNUPG_DIR	:= $(BUILDDIR)/$(GNUPG)
-GNUPG_LICENSE	:= GPL-3.0-or-later
+GNUPG_LICENSE	:= GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND MIT AND Spencer-86 AND BSD-2-Clause-Views AND Unicode-DFS-2016
+GNUPG_LICENSE_FILES := \
+	file://COPYING;md5=189af8afca6d6075ba6c9e0aa8077626 \
+	file://COPYING.GPL2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://COPYING.LGPL21;md5=3c9636424f4ef15d6cb24f934190cfb0 \
+	file://COPYING.LGPL3;md5=a2b6bf2cb38ee52619e60f30a1fc7257 \
+	file://COPYING.other;md5=a231ccb4bb5b0651e08464e4e6f846d3
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-GNUPG_CONF_TOOL := autoconf
-GNUPG_CONF_OPT := $(CROSS_AUTOCONF_USR) \
-	--enable-gpg \
+GNUPG_CONF_ENV	:= \
+	$(CROSS_ENV) \
+	ac_cv_path_GPGRT_CONFIG=$(PTXDIST_SYSROOT_CROSS)/usr/bin/gpgrt-config
+
+GNUPG_CONF_TOOL	:= autoconf
+GNUPG_CONF_OPT	:= $(CROSS_AUTOCONF_USR) \
 	--disable-gpgsm \
 	--disable-scdaemon \
 	--disable-g13 \
 	--disable-dirmngr \
+	--disable-keyboxd \
+	--disable-tpm2d \
 	--disable-doc \
-	--disable-symcryptrun \
-	--disable-gpgtar \
+	--$(call ptx/endis, PTXCONF_GNUPG_GPGTAR)-gpgtar \
 	--disable-wks-tools \
 	--disable-gpg-is-gpg2 \
 	--$(call ptx/endis, PTXCONF_GLOBAL_SELINUX)-selinux-support \
@@ -80,8 +90,8 @@ GNUPG_CONF_OPT := $(CROSS_AUTOCONF_USR) \
 	--disable-rpath \
 	--disable-nls \
 	--enable-endian-check \
-	--disable-regex \
 	--enable-optimization \
+	--disable-log-clock \
 	--disable-werror \
 	--disable-all-tests \
 	--disable-run-gnupg-user-socket \
@@ -114,6 +124,9 @@ ifdef PTXCONF_GNUPG_GPGV
 endif
 ifdef PTXCONF_GNUPG_GPG_AGENT
 	@$(call install_copy, gnupg, 0, 0, 0755, -, /usr/bin/gpg-agent)
+endif
+ifdef PTXCONF_GNUPG_GPGTAR
+	@$(call install_copy, gnupg, 0, 0, 0755, -, /usr/bin/gpgtar)
 endif
 
 	@$(call install_finish, gnupg)

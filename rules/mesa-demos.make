@@ -18,7 +18,7 @@ MESA_DEMOS_VERSION	:= 8.3.0
 MESA_DEMOS_MD5		:= 628e75c23c17394f11a316c36f8e4164
 MESA_DEMOS		:= mesa-demos-$(MESA_DEMOS_VERSION)
 MESA_DEMOS_SUFFIX	:= tar.bz2
-MESA_DEMOS_URL		:= ftp://ftp.freedesktop.org/pub/mesa/demos/$(MESA_DEMOS_VERSION)/$(MESA_DEMOS).$(MESA_DEMOS_SUFFIX)
+MESA_DEMOS_URL		:= https://mesa.freedesktop.org/archive/demos/$(MESA_DEMOS_VERSION)/$(MESA_DEMOS).$(MESA_DEMOS_SUFFIX)
 MESA_DEMOS_SOURCE	:= $(SRCDIR)/$(MESA_DEMOS).$(MESA_DEMOS_SUFFIX)
 MESA_DEMOS_DIR		:= $(BUILDDIR)/$(MESA_DEMOS)
 MESA_DEMOS_LICENSE	:= unknown
@@ -93,7 +93,8 @@ $(STATEDIR)/mesa-demos.targetinstall:
 	@$(call install_fixup, mesa-demos,DESCRIPTION,missing)
 
 	@$(foreach bin, $(MESA_DEMOS_BIN-y), \
-		$(call install_copy, mesa-demos, 0, 0, 0755, -, /usr/bin/$(bin));)
+		$(call install_copy, mesa-demos, 0, 0, 0755, -, \
+			/usr/bin/$(bin))$(ptx/nl))
 
 	@$(call install_finish, mesa-demos)
 

@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBSNDFILE) += libsndfile
 #
 # Paths and names
 #
-LIBSNDFILE_VERSION	:= 1.0.25
-LIBSNDFILE_MD5		:= e2b7bb637e01022c7d20f95f9c3990a2
+LIBSNDFILE_VERSION	:= 1.2.2
+LIBSNDFILE_MD5		:= 04e2e6f726da7c5dc87f8cf72f250d04
 LIBSNDFILE		:= libsndfile-$(LIBSNDFILE_VERSION)
-LIBSNDFILE_SUFFIX	:= tar.gz
-LIBSNDFILE_URL		:= http://www.mega-nerd.com/libsndfile/files/$(LIBSNDFILE).$(LIBSNDFILE_SUFFIX)
+LIBSNDFILE_SUFFIX	:= tar.xz
+LIBSNDFILE_URL		:= https://github.com/libsndfile/libsndfile/releases/download/$(LIBSNDFILE_VERSION)/$(LIBSNDFILE).$(LIBSNDFILE_SUFFIX)
 LIBSNDFILE_SOURCE	:= $(SRCDIR)/$(LIBSNDFILE).$(LIBSNDFILE_SUFFIX)
 LIBSNDFILE_DIR		:= $(BUILDDIR)/$(LIBSNDFILE)
 LIBSNDFILE_LICENSE	:= LGPL-2.1-only
@@ -33,10 +33,21 @@ LIBSNDFILE_LICENSE	:= LGPL-2.1-only
 LIBSNDFILE_CONF_TOOL := autoconf
 LIBSNDFILE_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
-	$(GLOBAL_LARGE_FILE_OPTION) \
-	--disable-octave \
+	--disable-experimental \
+	--disable-werror \
+	--disable-cpu-clip \
+	--disable-bow-docs \
+	--disable-sqlite \
 	--disable-alsa \
-	--$(call ptx/endis,PTXCONF_LIBSNDFILE_EXT_LIBS)-external-libs
+	--$(call ptx/endis,PTXCONF_LIBSNDFILE_EXT_LIBS)-external-libs \
+	--disable-mpeg \
+	--disable-octave \
+	--enable-full-suite \
+	--disable-test-coverage \
+	--disable-ossfuzzers \
+	$(GLOBAL_LARGE_FILE_OPTION) \
+	--without-mkoctfile \
+	--without-octave-config
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -52,7 +63,6 @@ LIBSNDFILE_PROGS := \
 	sndfile-metadata-get \
 	sndfile-metadata-set \
 	sndfile-play \
-	sndfile-regtest \
 	sndfile-salvage
 
 $(STATEDIR)/libsndfile.targetinstall:
@@ -68,7 +78,8 @@ $(STATEDIR)/libsndfile.targetinstall:
 
 ifdef PTXCONF_LIBSNDFILE_TOOLS
 	@$(foreach prog, $(LIBSNDFILE_PROGS), \
-		$(call install_copy, libsndfile, 0, 0, 0755, -, /usr/bin/$(prog));)
+		$(call install_copy, libsndfile, 0, 0, 0755, -, \
+			/usr/bin/$(prog))$(ptx/nl))
 endif
 
 	@$(call install_finish, libsndfile)

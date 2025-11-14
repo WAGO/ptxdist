@@ -15,11 +15,11 @@ PACKAGES-$(PTXCONF_LIBSIGCPP) += libsigcpp
 #
 # Paths and names
 #
-LIBSIGCPP_VERSION	:= 2.2.10
-LIBSIGCPP_MD5		:= 6d350ae0bc17b8915a06ce6b7e4240e8
+LIBSIGCPP_VERSION	:= 3.6.0
+LIBSIGCPP_MD5		:= b7205d5465ac15fbc0c781d39b4011be
 LIBSIGCPP		:= libsigc++-$(LIBSIGCPP_VERSION)
-LIBSIGCPP_SUFFIX	:= tar.bz2
-LIBSIGCPP_URL		:= http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.2/$(LIBSIGCPP).$(LIBSIGCPP_SUFFIX)
+LIBSIGCPP_SUFFIX	:= tar.xz
+LIBSIGCPP_URL		:= $(call ptx/mirror, GNOME, libsigc++/$(basename $(LIBSIGCPP_VERSION))/$(LIBSIGCPP).$(LIBSIGCPP_SUFFIX))
 LIBSIGCPP_SOURCE	:= $(SRCDIR)/$(LIBSIGCPP).$(LIBSIGCPP_SUFFIX)
 LIBSIGCPP_DIR		:= $(BUILDDIR)/$(LIBSIGCPP)
 
@@ -27,15 +27,22 @@ LIBSIGCPP_DIR		:= $(BUILDDIR)/$(LIBSIGCPP)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBSIGCPP_PATH	:= PATH=$(CROSS_PATH)
-LIBSIGCPP_ENV 	:= $(CROSS_ENV)
-
 #
-# autoconf
+# meson
 #
-LIBSIGCPP_AUTOCONF := \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-documentation
+LIBSIGCPP_CONF_TOOL	:= meson
+LIBSIGCPP_CONF_OPT	:= \
+	$(CROSS_MESON_USR) \
+	-Dbenchmark=false \
+	-Dbuild-deprecated-api=false \
+	-Dbuild-documentation=false \
+	-Dbuild-examples=false \
+	-Dbuild-pdf=false \
+	-Dbuild-tests=false \
+	-Ddist-warnings=fatal \
+	-Dmaintainer-mode=false \
+	-Dvalidation=false \
+	-Dwarnings=min
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -50,7 +57,7 @@ $(STATEDIR)/libsigcpp.targetinstall:
 	@$(call install_fixup, libsigcpp,AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
 	@$(call install_fixup, libsigcpp,DESCRIPTION,missing)
 
-	@$(call install_lib, libsigcpp, 0, 0, 0644, libsigc-2.0)
+	@$(call install_lib, libsigcpp, 0, 0, 0644, libsigc-3.0)
 
 	@$(call install_finish, libsigcpp)
 

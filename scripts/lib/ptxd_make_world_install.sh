@@ -16,14 +16,24 @@ ptxd_make_world_install_prepare() {
     fi &&
     ptxd_make_world_clean_sysroot &&
     rm -rf -- "${pkg_pkg_dir}" &&
-    mkdir -p -- "${pkg_pkg_dir}"/{etc,{,usr/}{lib,{,s}bin,include,{,share/}{man/man{1,2,3,4,5,6,7,8,9},misc}}} &&
-    if [ "${pkg_type}" != "target" ]; then
+    mkdir -p -- "${pkg_pkg_dir}"/{etc,usr/{lib,{,s}bin,include,{,share/}{man/man{1,2,3,4,5,6,7,8,9},misc}}}
+    if [ "${pkg_type}" = "target" ]; then
+	mkdir -p -- "${pkg_pkg_dir}"/{lib,{,s}bin,include,{,share/}man/man{1,2,3,4,5,6,7,8,9}}
+    else
+	for link in bin sbin lib; do
+	    ln -s "usr/${link}" "${pkg_pkg_dir}/${link}"
+	done
 	ln -s "lib" "${pkg_pkg_dir}/lib64"
+	ln -s "lib" "${pkg_pkg_dir}/usr/lib64"
     fi
 }
 export -f ptxd_make_world_install_prepare
 
 ptxd_make_world_install_python_cleanup() {
+    # The full path to the host-python is used as shebang in generated
+    # executables, so replace it with the correct path.
+    find "${pkg_pkg_dir}"/usr/{bin,sbin}/ -mindepth 1 -maxdepth 1 -print0 | xargs -r -0 \
+	sed -i "1s;^#!/.*/\(python[0-9\.]*\);#!/usr/bin/\1;"
     find "${pkg_pkg_dir}" -type f -name "*.so" -print | while read file; do
 	# Python installs shared libraries with executable flags
 	chmod -x "${file}"
@@ -33,7 +43,7 @@ ptxd_make_world_install_python_cleanup() {
 	    # not python3 or already handled
 	    continue
 	fi
-	cp -v "$(dirname "${file}")/__pycache__/$(basename "${file%py}")"cpython-??.pyc "${file}c" || return
+	cp -v "$(dirname "${file}")/__pycache__/$(basename "${file%py}")"cpython-???.pyc "${file}c" || return
     done &&
     check_pipe_status &&
     find "${pkg_pkg_dir}" -type d -name __pycache__  -print0 | xargs -0 rm -rf &&
@@ -41,6 +51,86 @@ ptxd_make_world_install_python_cleanup() {
     ptxd_bailout "Cache cleanup for Python3 packages failed!"
 }
 export -f ptxd_make_world_install_python_cleanup
+
+ptxd_make_world_install_python_cleanup_host() {
+    # change shebang to ensure that the python wrapper is used
+    if [[ " ${pkg_build_deps_all} " =~ ' host-python3 ' ]]; then
+	python="$(basename "${ptx_python3_host}")"
+	find "${pkg_pkg_dir}"/usr/{bin,sbin}/ -mindepth 1 -maxdepth 1 -print0 | xargs -0 -r \
+	    sed -i "1s;^#!/.*/\(python[0-9\.]*\);#!/usr/bin/env ${python};"
+    fi
+    if ! [[ " ${pkg_build_deps_all} " =~ ' host-python3 ' ]] && ls "${pkg_pkg_dir}"/usr/lib/system-python3/bin/* &> /dev/null; then
+	mv "${pkg_pkg_dir}"/usr/lib/system-python3/bin/* \
+	    "${pkg_pkg_dir}/usr/bin/"
+    fi
+}
+export -f ptxd_make_world_install_python_cleanup_host
+
+ptxd_make_world_install_python() {
+    local sitepackages python_prefix
+
+    if [[ " ${pkg_build_deps} " =~ ' host-system-python3 ' ]]; then
+	mkdir -p "${pkg_pkg_dir}/usr/lib/system-python3/lib"
+	ln -s lib "${pkg_pkg_dir}/usr/lib/system-python3/lib64"
+    fi
+    if [ -e "${pkg_dir}/pyproject.toml" -a ! -e "${pkg_dir}/setup.py" ] && \
+	    ! [[ " ${pkg_build_deps_all} " =~ ' host-python3-pybuild ' ]]; then
+	if [[ " ${pkg_build_deps_all} " =~ ' host-python3 ' ]]; then
+	    sitepackages="${ptx_python3_sitepackages}"
+	else
+	    # separate path for system Python packages
+	    system_python_major_minor="$(python3 -c 'import sys; print("{}.{}".format(sys.version_info.major, sys.version_info.minor))')"
+	    sitepackages="/usr/lib/system-python3/lib/python${system_python_major_minor}/site-packages"
+	fi
+	cmd=( \
+	    mkdir -p "${pkg_pkg_dir}${sitepackages}" '&&' \
+	    unzip -d "${pkg_pkg_dir}${sitepackages}" \
+	    "${pkg_build_dir}/*.whl"
+	)
+    elif [ -e "${pkg_dir}/pyproject.toml" ] &&
+	    ( [[ " ${pkg_build_deps} " =~ ' host-python3-pybuild ' ]] ||
+	    [[ " ${pkg_build_deps} " =~ ' host-system-python3-pybuild ' ]] ) ; then
+	if [[ " ${pkg_build_deps} " =~ ' host-system-python3 ' ]]; then
+	    python_prefix=/usr/lib/system-python3
+	else
+	    python_prefix=/usr
+	fi
+	cmd=( \
+	    "${pkg_path}" \
+	    "${pkg_env}" \
+	    "${pkg_make_env}" \
+	    "${pkg_install_env}" \
+	    "${ptx_build_python}" \
+	    -m installer \
+	    --prefix="${python_prefix}" \
+	    "--destdir=${pkg_pkg_dir}" \
+	    "${pkg_build_dir}/*.whl"
+	)
+    else
+	cmd=( \
+	    cd "${pkg_build_dir}" '&&' \
+	    "${pkg_path}" \
+	    "${pkg_env}" \
+	    "${pkg_make_env}" \
+	    "${pkg_install_env}" \
+	    "${ptx_build_python}" \
+	    setup.py \
+	    "${pkg_install_opt}" \
+	)
+    fi
+    if [ "${pkg_type}" = target ]; then
+	cmd+=( \
+	    '&&' \
+	    ptxd_make_world_install_python_cleanup \
+	)
+    else
+	cmd+=( \
+	    '&&' \
+	    ptxd_make_world_install_python_cleanup_host \
+	)
+    fi
+}
+export -f ptxd_make_world_install_python
 
 #
 # FIXME: kick ${pkg_install_env}
@@ -71,20 +161,7 @@ ptxd_make_world_install() {
 
     case "${pkg_build_tool}" in
 	python*)
-	cmd=( \
-	    cd "${pkg_build_dir}" '&&' \
-	    "${pkg_path}" \
-	    "${pkg_env}" \
-	    "${pkg_make_env}" \
-	    "${pkg_install_env}" \
-	    "${ptx_build_python}" \
-	    setup.py \
-	    "${pkg_install_opt}" \
-	)
-	if [ "${pkg_type}" = target ]; then
-	    cmd[${#cmd[@]}]='&&'
-	    cmd[${#cmd[@]}]=ptxd_make_world_install_python_cleanup
-	fi
+	ptxd_make_world_install_python
 	;;
 	ninja)
 	cmd=( \
@@ -108,6 +185,9 @@ ptxd_make_world_install() {
 	    "${pkg_make_opt}" \
 	    "${pkg_install_opt}" \
 	)
+	;;
+	cargo)
+	ptxd_bailout "Packages that use cargo require a custom install stage"
 	;;
 	*)
 	cmd=( \
@@ -191,7 +271,7 @@ ptxd_make_world_install_pack() {
     if [ "${pkg_type}" != "target" ]; then
 	find "${pkg_pkg_dir}" -type f -print | while read file; do
 	    if chrpath "${file}" >& /dev/null; then
-		local rel="$(ptxd_abs2rel "$(dirname "${file}")" "${pkg_pkg_dir}/lib")"
+		local rel="$(ptxd_abs2rel "$(dirname "${file}")" "${pkg_pkg_dir}/usr/lib")"
 		chmod +w "${file}" &&
 		if ! chrpath --replace "\${ORIGIN}/${rel}" "${file}" > /dev/null; then
 		    ptxd_bailout "Failed to adjust rpath for '${file}'"
@@ -264,7 +344,7 @@ ptxd_make_world_install_post() {
     find "${pkg_pkg_dir}" ! -type d -name "${pkg_binconfig_glob}" | while read config; do
 	sed -i -e "s:@SYSROOT@:${pkg_sysroot_dir}:g" "${config}" &&
 	if [ "${pkg_type}" = "target" ]; then
-	    cp -P -- "${config}" "${PTXDIST_SYSROOT_CROSS}/bin" || return
+	    cp -P -- "${config}" "${PTXDIST_SYSROOT_CROSS}/usr/bin" || return
 	fi
     done &&
 

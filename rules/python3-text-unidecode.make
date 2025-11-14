@@ -18,7 +18,7 @@ PYTHON3_TEXT_UNIDECODE_VERSION	:= 1.3
 PYTHON3_TEXT_UNIDECODE_MD5	:= 53a0a6c5aef8f5eb5834e78e0fdf0499
 PYTHON3_TEXT_UNIDECODE		:= text-unidecode-$(PYTHON3_TEXT_UNIDECODE_VERSION)
 PYTHON3_TEXT_UNIDECODE_SUFFIX	:= tar.gz
-PYTHON3_TEXT_UNIDECODE_URL	:= https://files.pythonhosted.org/packages/source/t/text-unidecode/$(PYTHON3_TEXT_UNIDECODE).$(PYTHON3_TEXT_UNIDECODE_SUFFIX)
+PYTHON3_TEXT_UNIDECODE_URL	:= $(call ptx/mirror-pypi, text-unidecode, $(PYTHON3_TEXT_UNIDECODE).$(PYTHON3_TEXT_UNIDECODE_SUFFIX))
 PYTHON3_TEXT_UNIDECODE_SOURCE	:= $(SRCDIR)/$(PYTHON3_TEXT_UNIDECODE).$(PYTHON3_TEXT_UNIDECODE_SUFFIX)
 PYTHON3_TEXT_UNIDECODE_DIR	:= $(BUILDDIR)/$(PYTHON3_TEXT_UNIDECODE)
 PYTHON3_TEXT_UNIDECODE_LICENSE	:= ClArtistic
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-text-unidecode.targetinstall:
 	@$(call install_fixup, python3-text-unidecode,DESCRIPTION,missing)
 
 	@$(call install_glob,python3-text-unidecode, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,*.pyc *.bin, )
+		$(PYTHON3_SITEPACKAGES),*.pyc *.bin, )
 
 	@$(call install_finish, python3-text-unidecode)
 

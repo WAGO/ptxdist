@@ -1,0 +1,45 @@
+## SECTION=system_libraries
+
+menuconfig NEATVNC
+	tristate
+	select HOST_MESON
+	select PIXMAN
+	select ZLIB
+	select AML
+	select LIBJPEG		if NEATVNC_JPEG
+	select LIBJPEG_TURBO	if NEATVNC_JPEG
+	select LIBDRM		if BUILDTIME
+	select MESALIB		if NEATVNC_GBM
+	select MESALIB_GBM	if NEATVNC_GBM
+	select GNUTLS		if NEATVNC_TLS
+	select NETTLE		if NEATVNC_NETTLE
+	select NETTLE_GMP	if NEATVNC_NETTLE
+	prompt "neatvnc                       "
+	help
+	  VNC Server library
+
+if NEATVNC
+
+config NEATVNC_GBM
+	bool
+	prompt "enable gbm integration"
+
+config NEATVNC_JPEG
+	bool
+	prompt "enable jpeg compression"
+
+config NEATVNC_OPENH264
+	bool
+	# needs openh264
+	depends on BROKEN
+	prompt "enable open h264 encoding"
+
+config NEATVNC_TLS
+	bool
+	prompt "enable encryption and authentication"
+
+config NEATVNC_NETTLE
+	bool
+	prompt "use nettle low level encryption library"
+
+endif

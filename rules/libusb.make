@@ -14,23 +14,32 @@ PACKAGES-$(PTXCONF_LIBUSB) += libusb
 #
 # Paths and names
 #
-LIBUSB_VERSION	:= 1.0.23
-LIBUSB_MD5	:= be79ed4a4a440169deec8beaac6aae33
+LIBUSB_VERSION	:= 1.0.27
+LIBUSB_MD5	:= 1fb61afe370e94f902a67e03eb39c51f
 LIBUSB		:= libusb-$(LIBUSB_VERSION)
 LIBUSB_SUFFIX	:= tar.bz2
 LIBUSB_URL	:= $(call ptx/mirror, SF, libusb/$(LIBUSB).$(LIBUSB_SUFFIX))
 LIBUSB_SOURCE	:= $(SRCDIR)/$(LIBUSB).$(LIBUSB_SUFFIX)
 LIBUSB_DIR	:= $(BUILDDIR)/$(LIBUSB)
-LIBUSB_LICENSE	:= LGPL-2.1-only
+LIBUSB_LICENSE	:= LGPL-2.1-or-later
+LIBUSB_LICENSE_FILES := \
+	file://libusb/core.c;startline=2;endline=21;md5=e2bc3b2209f8457532820f1fc033ebec \
+	file://COPYING;md5=fbc093901857fcd118f065f900982c24
+
+# ----------------------------------------------------------------------------
+# Prepare
+# ----------------------------------------------------------------------------
 
 #
 # autoconf
 #
-LIBUSB_AUTOCONF := \
+LIBUSB_CONF_TOOL := autoconf
+LIBUSB_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-shared \
 	--disable-static \
 	--disable-udev \
+	--enable-eventfd \
 	--enable-timerfd \
 	--$(call ptx/endis, PTXCONF_LIBUSB_LOG)-log \
 	--$(call ptx/endis, PTXCONF_LIBUSB_DEBUG_LOG)-debug-log \

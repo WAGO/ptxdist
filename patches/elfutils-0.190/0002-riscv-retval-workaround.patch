@@ -1,0 +1,24 @@
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Wed, 15 Nov 2023 13:00:19 +0100
+Subject: [PATCH] riscv-retval-workaround
+
+Imported from elfutils_0.189-4.debian.tar.xz
+
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+---
+ backends/riscv_retval.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backends/riscv_retval.c b/backends/riscv_retval.c
+index 0a1e02f81cd2..95bfdc3cd019 100644
+--- a/backends/riscv_retval.c
++++ b/backends/riscv_retval.c
+@@ -111,7 +111,7 @@ flatten_aggregate_arg (Dwarf_Die *typedie __attribute__ ((unused)),
+ 		       Dwarf_Die *arg1 __attribute__ ((unused)))
+ {
+   /* ??? */
+-  return 1;
++  return 0;
+ }
+ 
+ static int

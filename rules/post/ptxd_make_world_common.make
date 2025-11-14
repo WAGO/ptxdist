@@ -37,22 +37,30 @@ ptx/env = \
 										\
 	ptx_path_cross="$(call ptx/escape,$(HOST_CROSS_PATH))"			\
 	ptx_conf_env_cross="$(call ptx/escape,$(HOST_CROSS_ENV))"		\
+	ptx_conf_opt_cmake_cross="$(call ptx/escape,$(HOST_CROSS_CMAKE_OPT))"	\
 	ptx_conf_opt_autoconf_cross="$(call ptx/escape,$(HOST_CROSS_AUTOCONF))"	\
 	ptx_conf_opt_autoconf_cross_sysroot="$(call ptx/escape,$(HOST_CROSS_AUTOCONF_SYSROOT))"\
 										\
 	ptx_python_target="$(call ptx/escape,$(CROSS_PYTHON))"			\
 	ptx_python3_target="$(call ptx/escape,$(CROSS_PYTHON3))"		\
 	ptx_install_opt_python_target="$(call ptx/escape,$(CROSS_PYTHON_INSTALL))"\
+	ptx_python3_sitepackages="$(call ptx/escape,$(PYTHON3_SITEPACKAGES))"	\
 										\
 	ptx_python_host="$(call ptx/escape,$(HOSTPYTHON))"			\
 	ptx_python3_host="$(call ptx/escape,$(HOSTPYTHON3))"			\
 	ptx_install_opt_python_host="$(call ptx/escape,$(HOST_PYTHON_INSTALL))"	\
+	ptx_install_opt_python_host_system="$(call ptx/escape,$(HOST_SYSTEM_PYTHON_INSTALL))"\
 										\
 	ptx_conf_opt_meson_target="$(call ptx/escape,$(CROSS_MESON_USR))"	\
 	ptx_conf_env_meson_target="$(call ptx/escape,$(CROSS_MESON_ENV))"	\
 										\
 	ptx_conf_opt_meson_host="$(call ptx/escape,$(HOST_MESON_OPT))"		\
 	ptx_conf_env_meson_host="$(call ptx/escape,$(HOST_ENV))"		\
+										\
+	ptx_make_opt_cargo_target="$(call ptx/escape,$(CROSS_CARGO_OPT))"	\
+	ptx_make_env_cargo_target="$(call ptx/escape,$(CROSS_CARGO_ENV))"	\
+										\
+	ptx_make_opt_cargo_host="$(call ptx/escape,$(HOST_CARGO_OPT))"		\
 										\
 	ptx_xpkg_extra_args=$(PTXCONF_IMAGE_XPKG_EXTRA_ARGS)
 
@@ -67,18 +75,23 @@ world/env/impl = \
 	pkg_run_deps_all="$(call ptx/escape,$(PTX_MAP_R_dep_all_$(1)))"		\
 	pkg_license_files="$(call ptx/escape,$($(1)_LICENSE_FILES))"		\
 	pkg_makefile="$(call ptx/escape,$($(1)_MAKEFILE))"			\
+	pkg_extra_makefiles="$(call ptx/escape,$($(1)_EXTRA_MAKEFILES))"	\
 	pkg_infile="$(call ptx/escape,$($(1)_INFILE))"				\
 										\
+	pkg_PKG="$(call ptx/escape,$(1))"					\
 	pkg_pkg="$(call ptx/escape,$($(1)))"					\
 	pkg_version="$(call ptx/escape,$($(1)_VERSION))"			\
 	pkg_config="$(call ptx/escape,$($(1)_CONFIG))"				\
 	pkg_ref_config="$(call ptx/escape,$($(1)_REF_CONFIG))"			\
+	pkg_cargo_lock="$(call ptx/escape,$($(1)_CARGO_LOCK))"			\
+	pkg_cargo_lock_md5="$(call ptx/escape,$($(1)_CARGO_LOCK_MD5))"		\
 	pkg_path="$(call ptx/escape,$($(1)_PATH))"				\
 	pkg_patch_series="$(call ptx/escape,$(call remove_quotes, $(PTXCONF_$(strip $(1))_SERIES)))"\
 	pkg_patch_dir="$(call ptx/escape,$($(1)_PATCH_DIR))"			\
+	pkg_parts="$(call ptx/escape,$($(1)_PARTS))"				\
 	pkg_src="$(call ptx/escape,$($(1)_SOURCE))"				\
 	pkg_srcs="$(call ptx/escape,$($(1)_SOURCES))"				\
-	pkg_md5s="$(call ptx/escape,$(foreach s,$($(1)_SOURCES),$($($(s))_MD5):))"\
+	pkg_md5s="$(call ptx/escape,$(foreach s,$($(1)_PARTS),$($(s)_MD5):))"	\
 	pkg_md5="$(call ptx/escape,$($(1)_MD5))"				\
 	pkg_url="$(call ptx/escape,$($(1)_URL))"				\
 	pkg_cfghash="$(call ptx/escape,$($(1)_CFGHASH))"			\
@@ -87,6 +100,7 @@ world/env/impl = \
 	pkg_dir="$(call ptx/escape,$($(1)_DIR))"				\
 	pkg_subdir="$(call ptx/escape,$($(1)_SUBDIR))"				\
 	pkg_strip_level="$(call ptx/escape,$($(1)_STRIP_LEVEL))"		\
+	pkg_src_filter="$(call ptx/escape,$($(1)_SRC_FILTER))"			\
 										\
 	pkg_tags_opt="$(call ptx/escape,$($(1)_TAGS_OPT))"			\
 										\
@@ -94,6 +108,8 @@ world/env/impl = \
 	pkg_build_dir="$(call ptx/escape,$($(1)_BUILD_DIR))"			\
 										\
 	pkg_wrapper_blacklist="$(call ptx/escape,$($(1)_WRAPPER_BLACKLIST))"	\
+	pkg_flags_blacklist="$(call ptx/escape,$($(1)_FLAGS_BLACKLIST))"	\
+	pkg_wrapper_accept_paths="$(call ptx/escape,$($(1)_WRAPPER_ACCEPT_PATHS))"\
 										\
 	pkg_cppflags="$(call ptx/escape,$($(1)_CPPFLAGS))"			\
 	pkg_cflags="$(call ptx/escape,$($(1)_CFLAGS))"				\

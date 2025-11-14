@@ -15,34 +15,35 @@ PACKAGES-$(PTXCONF_SUDO) += sudo
 #
 # Paths and names
 #
-SUDO_VERSION	:= 1.8.28
-SUDO_MD5	:= 5afa5acd0c55b40916e4ad864607edfe
+SUDO_VERSION	:= 1.9.15p5
+SUDO_MD5	:= 4166279cb188ecb6641c7a2ba5f68270
 SUDO		:= sudo-$(SUDO_VERSION)
 SUDO_SUFFIX	:= tar.gz
 SUDO_URL	:= \
-	http://www.sudo.ws/sudo/dist/$(SUDO).$(SUDO_SUFFIX) \
-	http://www.sudo.ws/sudo/dist/OLD/$(SUDO).$(SUDO_SUFFIX)
+	https://www.sudo.ws/sudo/dist/$(SUDO).$(SUDO_SUFFIX) \
+	https://www.sudo.ws/sudo/dist/OLD/$(SUDO).$(SUDO_SUFFIX)
 SUDO_SOURCE	:= $(SRCDIR)/$(SUDO).$(SUDO_SUFFIX)
 SUDO_DIR	:= $(BUILDDIR)/$(SUDO)
 SUDO_LICENSE	:= ISC AND BSD-3-Clause AND BSD-2-Clause-NetBSD AND Zlib
-SUDO_LICENSE_FILES := file://doc/LICENSE;md5=6c76b73603ac7763ab0516ebfbe67b42
+SUDO_LICENSE_FILES := file://LICENSE.md;md5=5100e20d35f9015f9eef6bdb27ba194f
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-SUDO_PATH	:= PATH=$(CROSS_PATH)
-SUDO_ENV 	:= \
+SUDO_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	sudo_cv_func_fnmatch=yes \
 	sudo_cv_func_unsetenv_void=no \
 	ac_cv_have_working_snprintf=yes \
-	ac_cv_have_working_vsnprintf=yes
+	ac_cv_have_working_vsnprintf=yes \
+	ac_cv_lib_md_SHA224Update=no
 
 #
 # autoconf
 #
-SUDO_AUTOCONF = \
+SUDO_CONF_TOOL	:= autoconf
+SUDO_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--enable-authentication \
 	--disable-root-mailer \
@@ -63,7 +64,6 @@ SUDO_AUTOCONF = \
 	--disable-gcrypt \
 	--enable-hardening \
 	--enable-pie \
-	--disable-asan \
 	--enable-poll \
 	--disable-admin-flag \
 	--disable-nls \
@@ -77,8 +77,11 @@ SUDO_AUTOCONF = \
 	--disable-package-build \
 	--disable-gss-krb5-ccache-name \
 	--disable-pvs-studio \
+	--disable-log-server \
+	--enable-log-client \
 	--disable-sia \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-python \
 	--disable-pam-session \
 	--disable-kerb5-instance \
 	--without-AFS \
@@ -91,21 +94,21 @@ SUDO_AUTOCONF = \
 	--without-pam
 
 ifdef PTXCONF_SUDO_USE_SENDMAIL
-SUDO_AUTOCONF += --with-sendmail
+SUDO_CONF_OPT += --with-sendmail
 else
-SUDO_AUTOCONF += --without-sendmail
+SUDO_CONF_OPT += --without-sendmail
 endif
 
 ifdef PTXCONF_SUDO_INSTALL_VISUDO
 ifneq ($(PTXCONF_SUDO_DEFAULT_EDITOR),"")
-SUDO_AUTOCONF += --with-editor=$(PTXCONF_SUDO_DEFAULT_EDITOR)
+SUDO_CONF_OPT += --with-editor=$(PTXCONF_SUDO_DEFAULT_EDITOR)
 endif
 endif
 
 ifdef PTXCONF_SUDO_USE_ENV_EDITOR
-SUDO_AUTOCONF += --with-env-editor
+SUDO_CONF_OPT += --with-env-editor
 else
-SUDO_AUTOCONF += --without-env-editor
+SUDO_CONF_OPT += --without-env-editor
 endif
 
 # ----------------------------------------------------------------------------
@@ -133,11 +136,11 @@ $(STATEDIR)/sudo.targetinstall:
 
 ifdef PTXCONF_SUDO_INSTALL_ETC_SUDOERS
 	@$(call install_alternative, sudo, 0, 0, 0440, /etc/sudoers, n)
-	@$(call install_copy, sudo, 0, 0, 755, /etc/sudoers.d)
+	@$(call install_copy, sudo, 0, 0, 0755, /etc/sudoers.d)
 endif
 
 ifdef PTXCONF_SUDO_INSTALL_VISUDO
-	@$(call install_copy, sudo, 0, 0, 755, -, /usr/sbin/visudo)
+	@$(call install_copy, sudo, 0, 0, 0755, -, /usr/sbin/visudo)
 endif
 
 	@$(call install_finish, sudo)

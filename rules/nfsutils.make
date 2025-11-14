@@ -14,14 +14,21 @@ PACKAGES-$(PTXCONF_NFSUTILS) += nfsutils
 #
 # Paths and names
 #
-NFSUTILS_VERSION	:= 1.3.3
-NFSUTILS_MD5		:= 9b87d890669eaaec8e97a2b0a35b2665
+NFSUTILS_VERSION	:= 2.6.2
+NFSUTILS_MD5		:= 36cbb17ca1f27d6d351a4f20ad25ba23
 NFSUTILS		:= nfs-utils-$(NFSUTILS_VERSION)
-NFSUTILS_SUFFIX		:= tar.bz2
-NFSUTILS_URL		:= $(call ptx/mirror, SF, nfs/$(NFSUTILS).$(NFSUTILS_SUFFIX))
+NFSUTILS_SUFFIX		:= tar.gz
+NFSUTILS_URL		:= $(call ptx/mirror, KERNEL, utils/nfs-utils/$(NFSUTILS_VERSION)/$(NFSUTILS).$(NFSUTILS_SUFFIX))
 NFSUTILS_SOURCE		:= $(SRCDIR)/$(NFSUTILS).$(NFSUTILS_SUFFIX)
 NFSUTILS_DIR		:= $(BUILDDIR)/$(NFSUTILS)
-NFSUTILS_LICENSE	:= GPL-2.0-or-later
+NFSUTILS_LICENSE	:= GPL-2.0-or-later AND BSD-3-Clause
+NFSUTILS_LICENSE_FILES	:= \
+	file://COPYING;md5=95f3a93a5c3c7888de623b46ea085a84 \
+	file://utils/showmount/showmount.c;startline=5;endline=13;md5=d3811a49409f2f42614bb59fd6d68bb4 \
+	file://utils/statd/COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
+	file://utils/statd/hostname.c;startline=6;endline=14;md5=3607f10ab196fbbf8bacb79042f718e7 \
+	file://utils/statd/svc_run.c;startline=13;endline=34;md5=78baf6ac3cfbb3cb057a7668cb93f64b \
+	file://utils/mount/mount.c;startline=9;endline=17;md5=d3811a49409f2f42614bb59fd6d68bb4 \
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -46,18 +53,23 @@ NFSUTILS_CONF_OPT	:= \
 	--disable-uuid \
 	--$(call ptx/endis, PTXCONF_NFSUTILS_CLIENT)-mount \
 	--$(call ptx/endis, PTXCONF_NFSUTILS_CLIENT)-libmount-mount \
-	--$(call ptx/endis, PTXCONF_GLOBAL_IPV6)-tirpc \
+	--disable-sbin-override \
+	--disable-junction \
+	--enable-tirpc \
 	$(GLOBAL_IPV6_OPTION) \
 	--disable-mountconfig \
+	--disable-nfsdcld \
 	--disable-nfsdcltrack \
-	--enable-osdlogin \
+	--disable-nfsv4server \
 	--disable-caps \
 	$(GLOBAL_LARGE_FILE_OPTION) \
+	--disable-ldap \
+	--disable-gums \
 	--with-statedir=/var/lib/nfs \
 	--with-statdpath=/var/lib/nfs \
 	--with-statduser=rpcuser \
 	--with-systemd=/usr/lib/systemd/system \
-	--with-rpcgen=internal \
+	--with-rpcgen=$(PTXDIST_SYSROOT_HOST)/usr/bin/rpcgen \
 	--without-mountfile \
 	--without-tcp-wrappers \
 	--without-krb5 \
@@ -78,6 +90,7 @@ $(STATEDIR)/nfsutils.targetinstall:
 
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/nfsstat)
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/showmount)
+	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/rpcdebug)
 
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/rpc.statd)
 	@$(call install_copy, nfsutils, 0, 0, 0755, -, /usr/sbin/start-statd)
@@ -94,8 +107,6 @@ else
 		/var/lib/nfs/etab)
 	@$(call install_copy, nfsutils, rpcuser, 0, 0644, -, \
 		/var/lib/nfs/rmtab)
-	@$(call install_copy, nfsutils, rpcuser, 0, 0644, -, \
-		/var/lib/nfs/xtab)
 	@$(call install_copy, nfsutils, rpcuser, 0, 0644, -, \
 		/var/lib/nfs/state)
 	@$(call install_copy, nfsutils, rpcuser, 0, 0755, \
@@ -125,7 +136,6 @@ endif
 #	#
 #	# busybox init: start scripts
 #	#
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NFSUTILS_NFSD_STARTSCRIPT
 	@$(call install_alternative, nfsutils, 0, 0, 0755, /etc/init.d/nfsd)
 
@@ -133,7 +143,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_NFSUTILS_NFSD_BBINIT_LINK)),)
 	@$(call install_link, nfsutils, \
 		../init.d/nfsd, \
 		/etc/rc.d/$(PTXCONF_NFSUTILS_NFSD_BBINIT_LINK))
-endif
 endif
 endif
 

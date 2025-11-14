@@ -27,13 +27,11 @@ URSHD_LICENSE	:= BSD-4-Clause
 # Prepare
 # ----------------------------------------------------------------------------
 
-URSHD_PATH	:= PATH=$(CROSS_PATH)
-URSHD_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-URSHD_AUTOCONF := $(CROSS_AUTOCONF_USR)
+URSHD_CONF_TOOL	:= autoconf
+URSHD_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -51,11 +49,9 @@ $(STATEDIR)/urshd.targetinstall:
 	@$(call install_copy, urshd, 0, 0, 0755, -, \
 		/usr/bin/urshd)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_URSHD_STARSCRIPT
 	@$(call install_copy, urshd, 0, 0, 0755, /etc/init.d)
 	@$(call install_alternative, urshd, 0, 0, 0755, /etc/init.d/urshd)
-endif
 endif
 ifdef PTXCONF_URSHD_SYSTEMD_UNIT
 	@$(call install_alternative, urshd, 0, 0, 0644, \

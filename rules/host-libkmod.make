@@ -28,10 +28,11 @@ HOST_LIBKMOD_CONF_OPT	:= \
 	--disable-test-modules \
 	--disable-logging \
 	--disable-debug \
-	--disable-python \
 	--disable-coverage \
+	--enable-year2038 \
+	--$(call ptx/wwo, PTXCONF_HOST_LIBKMOD_ZSTD)-zstd \
 	--without-xz \
-	--without-zlib \
+	--$(call ptx/wwo, PTXCONF_HOST_LIBKMOD_ZLIB)-zlib \
 	--without-openssl
 
 # ----------------------------------------------------------------------------
@@ -41,7 +42,7 @@ HOST_LIBKMOD_CONF_OPT	:= \
 $(STATEDIR)/host-libkmod.install:
 	@$(call targetinfo)
 	@$(call world/install, HOST_LIBKMOD)
-	@ln -s ../bin/kmod $(HOST_LIBKMOD_PKGDIR)/sbin/depmod
+	@ln -s ../bin/kmod $(HOST_LIBKMOD_PKGDIR)/usr/sbin/depmod
 	@$(call touch)
 
 # vim: syntax=make

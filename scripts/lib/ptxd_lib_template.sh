@@ -85,11 +85,16 @@ ptxd_template_read_version() {
     fi
 }
 export -f ptxd_template_read_version
-
+#
+# Read URL of basedir and suffix from user input
+#
+# $1 default URL of basedir (optional)
+# $2 default suffix (optional)
+#
 ptxd_template_read_url() {
     if [ -z "${ptxd_template_have_existing}" ]; then
-	ptxd_template_read "enter URL of basedir" URL
-	ptxd_template_read "enter suffix" SUFFIX
+	ptxd_template_read "enter URL of basedir" URL "${1}"
+	ptxd_template_read "enter suffix" SUFFIX "${2}"
     fi
 }
 export -f ptxd_template_read_url
@@ -101,8 +106,21 @@ ptxd_template_read_author() {
 export -f ptxd_template_read_author
 
 ptxd_template_read_section() {
-    local section_name="${1:-project_specific}"
+    local section_name
+    if [ "${action}" = "host" -o "${action}" = "host-existing-target" ]; then
+	section_name="${1:-hosttools_noprompt}"
+    else
+	section_name="${1:-project_specific}"
+    fi
     ptxd_template_read "enter package section" section "${section_name}"
+
+    export PROMPT='	prompt "'${package}'"
+	help
+	  FIXME
+'
+    case "${section}" in
+	hosttools_noprompt*) PROMPT="";;
+    esac
 }
 export -f ptxd_template_read_section
 
@@ -112,7 +130,7 @@ ptxd_template_read_conf_tool() {
 	    export conf_tool="autoconf"
 	else
 		supported=("autoconf" "cmake" "kconfig" "meson" "perl"
-		    "python3" )
+		    "python3" "cargo" )
 	    if [ -z "${AUTOCONF_CLASS}" ]; then
 		supported[${#supported[*]}]="qmake"
 	    fi
@@ -141,6 +159,7 @@ ptxd_template_read_conf_tool() {
     qmake)
 	CONF_OPT="\$(CROSS_QMAKE_OPT)"
 	SELECT="QT5"
+	ptxd_template_read_qt_version
 	;;
     perl)
 	SELECT="PERL"
@@ -151,6 +170,8 @@ ptxd_template_read_conf_tool() {
 	else
 	    SELECT="HOST_SYSTEM_PYTHON3"
 	fi
+	;;
+    cargo)
 	;;
     esac
     if [ -n "${CONF_OPT}" ]; then
@@ -163,6 +184,15 @@ ptxd_template_read_conf_tool() {
     fi
 }
 export -f ptxd_template_read_conf_tool
+
+ptxd_template_read_qt_version() {
+    local qt_version
+    ptxd_template_read_options "Qt version" qt_version "Qt 5" "Qt 6"
+    export QT_VERSION="${qt_version#Qt }"
+    PACKAGE_PATH="${PACKAGE}_PATH		:= PATH=\$(PTXDIST_SYSROOT_CROSS)/bin/qt${qt_version}:\$(CROSS_PATH)
+"
+}
+export -f ptxd_template_read_qt_version
 
 ptxd_template_read_basic() {
     ptxd_template_read_name &&
@@ -342,6 +372,7 @@ ptxd_template_new() {
     export action="${1}"
     export template="template-${action}"
     export YEAR="$(date +%Y)"
+    export PACKAGE_PATH=""
 
     local func="ptxd_template_new_${action//-/_}"
     if ! declare -F | grep -q "${func}$"; then
@@ -380,6 +411,8 @@ export -a ptxd_template_help_list
 
 ptxd_template_new_host() {
     template=template-class
+    export DEFAULT="	default y if ALLYES
+"
     ptxd_template_setup_class HOST_ &&
     ptxd_template_read_remote_existing &&
     ptxd_template_write_rules
@@ -406,6 +439,45 @@ ptxd_template_new_cross() {
 export -f ptxd_template_new_cross
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="cross"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create cross development package"
+
+ptxd_template_new_python3_all() {
+    export prefix="${action}"
+    export PREFIX=${prefix^^}
+    PREFIX=${PREFIX//-/_}
+    ptxd_template_read_basic &&
+    ptxd_template_read_author &&
+    ptxd_template_read_url \
+	"\$(call ptx/mirror-pypi, ${package}, \$(${PREFIX}_${PACKAGE}).\$(${PREFIX}_${PACKAGE}_SUFFIX))" \
+	"tar.gz"
+    # turn URL of basedir into complete URL
+    [[ "$URL" != "\$(call ptx/mirror"* ]] \
+	&& URL="$URL/\$(${PACKAGE}).\$(${PACKAGE}_SUFFIX)"
+    package_filename="${prefix}-${package_filename}"
+    ptxd_template_write_rules
+}
+export -f ptxd_template_new_python3_all
+
+ptxd_template_new_python3() {
+    ptxd_template_new_python3_all
+}
+export -f ptxd_template_new_python3
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="python3"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create python3 package for embedded target"
+
+ptxd_template_new_host_python3() {
+    ptxd_template_new_python3_all
+}
+export -f ptxd_template_new_host_python3
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="host-python3"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create python3 host package"
+
+ptxd_template_new_host_system_python3() {
+    template="template-host-python3"
+    ptxd_template_new_python3_all
+}
+export -f ptxd_template_new_host_system_python3
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="host-system-python3"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create system-python3 host package"
 
 ptxd_template_new_src_autoconf_lib() {
     ptxd_template_autoconf_base
@@ -436,7 +508,10 @@ ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-cmake-prog"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create cmake binary"
 
 ptxd_template_new_src_qmake_prog() {
-    ptxd_template_src_base
+    ptxd_template_read_local &&
+    ptxd_template_read_qt_version &&
+    ptxd_template_write_rules &&
+    ptxd_template_write_src
 }
 export -f ptxd_template_new_src_qmake_prog
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="src-qmake-prog"
@@ -491,6 +566,7 @@ ptxd_template_new_kernel() {
     export class="kernel-"
     ptxd_template_read_basic &&
     ptxd_template_read "enter kernel image" image "zImage"
+    ptxd_template_read "enter device-tree files" dts "yourboard.dts"
     ptxd_template_read_author &&
     ptxd_template_write_platform_rules
 }
@@ -528,6 +604,31 @@ ptxd_template_new_image_tgz() {
 export -f ptxd_template_new_image_tgz
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="image-tgz"
 ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for a tgz image"
+
+ptxd_template_new_image_fit() {
+    export class="image-"
+    ptxd_template_read_name &&
+    ptxd_template_read_author &&
+    ptxd_template_read "sign FIT image? (y/N)" SIGN
+    case "$SIGN" in
+	y*|Y*)
+	    export select_CODE_SIGNING="select CODE_SIGNING
+	"
+	    export CODE_SIGNING_VARS="
+IMAGE_${PACKAGE}_SIGN_ROLE	:= # TODO: role name of the code signing provider, passed to cs_get_uri
+IMAGE_${PACKAGE}_KEY_NAME_HINT	:= # TODO: key-name-hint property in the signature node of the FIT image
+"
+	;;
+	*)
+	    export select_CODE_SIGNING=""
+	    export CODE_SIGNING_VARS=""
+	;;
+    esac
+    ptxd_template_write_platform_rules
+}
+export -f ptxd_template_new_image_fit
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="image-fit"
+ptxd_template_help_list[${#ptxd_template_help_list[@]}]="create package for a FIT image"
 
 ptxd_template_new_image_genimage() {
     export class="image-"
@@ -588,7 +689,7 @@ ptxd_template_new_code_signing_provider() {
     elif [ "$TYPE" = "HSM with OpenSC support" ]; then
 	export EXTRA_DEPENDENCIES="select HOST_OPENSC
 	select HOST_OPENSC_PCSC"
-	export MODULE_PATH="\${PTXDIST_SYSROOT_HOST}/lib/pkcs11/opensc-pkcs11.so"
+	export MODULE_PATH="\${PTXDIST_SYSROOT_HOST}/usr/lib/pkcs11/opensc-pkcs11.so"
 	ptxd_template_filter "${template_file}" "${filename}"
     elif [ "$TYPE" = "other HSM" ]; then
 	export EXTRA_DEPENDENCIES="select FIXME"

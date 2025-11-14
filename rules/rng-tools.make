@@ -9,14 +9,18 @@
 
 PACKAGES-$(PTXCONF_RNG_TOOLS) += rng-tools
 
-RNG_TOOLS_VERSION	:= 6.5
-RNG_TOOLS_MD5		:= c153517cc73f7f2a899bf59df06ed1ce
+RNG_TOOLS_VERSION	:= 6.14
+RNG_TOOLS_MD5		:= 917d21dd2b06816b0484e220dfb5ba4b
 RNG_TOOLS		:= rng-tools-$(RNG_TOOLS_VERSION)
 RNG_TOOLS_SUFFIX	:= tar.gz
 RNG_TOOLS_URL		:= https://github.com/nhorman/rng-tools/archive/v$(RNG_TOOLS_VERSION).$(RNG_TOOLS_SUFFIX)
 RNG_TOOLS_SOURCE	:= $(SRCDIR)/$(RNG_TOOLS).$(RNG_TOOLS_SUFFIX)
 RNG_TOOLS_DIR		:= $(BUILDDIR)/$(RNG_TOOLS)
 RNG_TOOLS_LICENSE	:= GPL-2.0-or-later
+RNG_TOOLS_LICENSE_FILES	:= \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+	file://rngd.c;startline=12;endline=26;md5=8737e0a69b00f9cb52b9411c81aaa1d5 \
+	file://rngtest.c;startline=7;endline=21;md5=0bf96e235e77c1ff6cab766073094c7f
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -25,8 +29,11 @@ RNG_TOOLS_LICENSE	:= GPL-2.0-or-later
 RNG_TOOLS_CONF_TOOL	:= autoconf
 RNG_TOOLS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--with-libgcrypt \
-	--without-nistbeacon
+	--disable-jitterentropy \
+	--without-nistbeacon \
+	--without-pkcs11 \
+	--without-rtlsdr \
+	--without-libargp
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -41,15 +48,15 @@ $(STATEDIR)/rng-tools.targetinstall:
 	@$(call install_fixup, rng-tools,AUTHOR,"Andreas Pretzsch <apr@cn-eng.de>")
 	@$(call install_fixup, rng-tools,DESCRIPTION,"random number generator daemon - seed kernel random from hwrng")
 
+ifdef PTXCONF_RNG_TOOLS_RNGD
 	@$(call install_copy, rng-tools, 0, 0, 0755, -, /usr/sbin/rngd)
-ifdef PTXCONF_INITMETHOD_BBINIT
+endif
 ifdef PTXCONF_RNG_TOOLS_STARTSCRIPT
 	@$(call install_alternative, rng-tools, 0, 0, 0755, /etc/init.d/rngd)
 ifneq ($(call remove_quotes,$(PTXCONF_RNG_TOOLS_BBINIT_LINK)),)
 	@$(call install_link, rng-tools, \
 		../init.d/rngd, \
 		/etc/rc.d/$(PTXCONF_RNG_TOOLS_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_RNG_TOOLS_SYSTEMD_UNIT

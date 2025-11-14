@@ -16,11 +16,11 @@ PACKAGES-$(PTXCONF_PPP) += ppp
 #
 # Paths and names
 #
-PPP_VERSION	:= 2.4.7
-PPP_MD5		:= 78818f40e6d33a1d1de68a1551f6595a
+PPP_VERSION	:= 2.4.9
+PPP_MD5		:= c88153ae3d16ae114152cd3c15c7301d
 PPP		:= ppp-$(PPP_VERSION)
 PPP_SUFFIX	:= tar.gz
-PPP_URL		:= http://ftp.samba.org/pub/ppp/$(PPP).$(PPP_SUFFIX)
+PPP_URL		:= https://www.samba.org/ftp/ppp/$(PPP).$(PPP_SUFFIX)
 PPP_SOURCE	:= $(SRCDIR)/$(PPP).$(PPP_SUFFIX)
 PPP_DIR		:= $(BUILDDIR)/$(PPP)
 PPP_LICENSE	:= BSD AND GPL-2.0-only
@@ -33,11 +33,8 @@ PPP_KERNEL_VERSION := $(if $(KERNEL_HEADER_VERSION),$(KERNEL_HEADER_VERSION),$(K
 
 ifdef PTXCONF_PPP
 ifeq ($(PPP_KERNEL_VERSION),)
- $(warning ######################### ERROR ###########################)
- $(warning # Linux kernel version required in order to make ppp work #)
- $(warning #   Define a platform kernel or the kernel headers        #)
- $(warning ###########################################################)
- $(error )
+$(call ptx/error, Linux kernel version required in order to make ppp work!)
+$(call ptx/error, Define a platform kernel or the kernel headers)
 endif
 endif
 
@@ -58,9 +55,10 @@ PPP_SHARED_INST_PATH := /usr/lib/pppd/$(PPP_VERSION)
 $(STATEDIR)/ppp.prepare:
 	@$(call targetinfo)
 	@cd $(PPP_DIR) && $(PPP_PATH) $(PPP_CONF_ENV) \
-		./configure --prefix=/usr --sysconfdir=/etc
+		./configure --prefix=/usr --sysconfdir=/etc --cc=$(CROSS_CC)
 
 	@$(call disable_sh,$(PPP_DIR)/pppd/Makefile,USE_PAM=y)
+	@$(call disable_sh,$(PPP_DIR)/pppd/Makefile,SYSTEMD=y)
 
 ifdef PTXCONF_GLOBAL_IPV6
 	@$(call enable_sh,$(PPP_DIR)/pppd/Makefile,HAVE_INET6=y)
@@ -130,6 +128,7 @@ ifdef PTXCONF_PPP_PLUGINS
 else
 	@$(call disable_sh,$(PPP_DIR)/pppd/Makefile,PLUGIN=y)
 endif
+
 	@$(call touch)
 
 
@@ -175,7 +174,6 @@ endif
 #	#
 #	# busybox init
 #	#
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_PPP_STARTSCRIPT
 	@$(call install_alternative, ppp, 0, 0, 0755, /etc/init.d/pppd)
 	@$(call install_replace, ppp, /etc/init.d/pppd, \
@@ -185,7 +183,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_PPPD_BBINIT_LINK)),)
 	@$(call install_link, ppp, \
 		../init.d/pppd, \
 		/etc/rc.d/$(PTXCONF_PPPD_BBINIT_LINK))
-endif
 endif
 endif
 

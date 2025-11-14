@@ -7,7 +7,7 @@
 menu "System Logging Utilities"
 
 config BUSYBOX_KLOGD
-	bool "klogd (5.7 kb)"
+	bool "klogd (6.2 kb)"
 	default y
 	help
 	klogd is a utility which intercepts and logs all
@@ -23,7 +23,6 @@ config BUSYBOX_FEATURE_KLOGD_KLOGCTL
 	bool "Use the klogctl() interface"
 	default y
 	depends on BUSYBOX_KLOGD
-	select BUSYBOX_PLATFORM_LINUX
 	help
 	The klogd applet supports two interfaces for reading
 	kernel messages. Linux provides the klogctl() interface
@@ -36,7 +35,7 @@ config BUSYBOX_FEATURE_KLOGD_KLOGCTL
 
 	If in doubt, say 'Y'.
 config BUSYBOX_LOGGER
-	bool "logger (6.3 kb)"
+	bool "logger (6.5 kb)"
 	default y
 	select BUSYBOX_FEATURE_SYSLOG
 	help
@@ -45,7 +44,7 @@ config BUSYBOX_LOGGER
 	they can be logged. This is generally used to help locate
 	problems that occur within programs and scripts.
 config BUSYBOX_LOGREAD
-	bool "logread (4.8 kb)"
+	bool "logread (5 kb)"
 	default y
 	help
 	If you enabled Circular Buffer support, you almost
@@ -65,7 +64,7 @@ config BUSYBOX_FEATURE_LOGREAD_REDUCED_LOCKING
 	contention at some minor memory expense.
 
 config BUSYBOX_SYSLOGD
-	bool "syslogd (13 kb)"
+	bool "syslogd (14 kb)"
 	default y
 	help
 	The syslogd utility is used to record logs of all the
@@ -116,6 +115,14 @@ config BUSYBOX_FEATURE_SYSLOGD_CFG
 	help
 	Supports restricted syslogd config. See docs/syslog.conf.txt
 
+config BUSYBOX_FEATURE_SYSLOGD_PRECISE_TIMESTAMPS
+	bool "Include milliseconds in timestamps"
+	default n
+	depends on BUSYBOX_SYSLOGD
+	help
+	Includes milliseconds (HH:MM:SS.mmm) in timestamp when
+	timestamps are added.
+
 config BUSYBOX_FEATURE_SYSLOGD_READ_BUFFER_SIZE
 	int "Read buffer size in bytes"
 	default 256
@@ -153,7 +160,6 @@ config BUSYBOX_FEATURE_KMSG_SYSLOG
 	bool "Linux kernel printk buffer support"
 	default y
 	depends on BUSYBOX_SYSLOGD
-	select BUSYBOX_PLATFORM_LINUX
 	help
 	When you enable this feature, the syslogd utility will
 	write system log message to the Linux kernel's printk buffer.

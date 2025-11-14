@@ -15,16 +15,16 @@ PACKAGES-$(PTXCONF_LIBFFI) += libffi
 #
 # Paths and names
 #
-LIBFFI_VERSION	:= 3.3
-LIBFFI_MD5	:= 6313289e32f1d38a9df4770b014a2ca7
-LIBFFI		:= libffi-$(LIBFFI_VERSION)
-LIBFFI_SUFFIX	:= tar.gz
-LIBFFI_SOURCE	:= $(SRCDIR)/$(LIBFFI).$(LIBFFI_SUFFIX)
-LIBFFI_DIR	:= $(BUILDDIR)/$(LIBFFI)
-LIBFFI_URL	:= \
-	http://ftp.gwdg.de/pub/linux/sources.redhat.com/libffi/$(LIBFFI).$(LIBFFI_SUFFIX) \
-	ftp://sourceware.org/pub/libffi/$(LIBFFI).$(LIBFFI_SUFFIX)
-LIBFFI_LICENSE	:= MIT
+LIBFFI_VERSION		:= 3.4.6
+LIBFFI_MD5		:= b9cac6c5997dca2b3787a59ede34e0eb
+LIBFFI			:= libffi-$(LIBFFI_VERSION)
+LIBFFI_SUFFIX		:= tar.gz
+LIBFFI_SOURCE		:= $(SRCDIR)/$(LIBFFI).$(LIBFFI_SUFFIX)
+LIBFFI_DIR		:= $(BUILDDIR)/$(LIBFFI)
+LIBFFI_URL		:= https://github.com/libffi/libffi/releases/download/v$(LIBFFI_VERSION)/$(LIBFFI).$(LIBFFI_SUFFIX)
+LIBFFI_LICENSE		:= MIT
+LIBFFI_LICENSE_FILES	:= \
+	file://LICENSE;md5=1db54c9fd307a12218766c3c7f650ca7
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -33,13 +33,17 @@ LIBFFI_LICENSE	:= MIT
 LIBFFI_CONF_TOOL := autoconf
 LIBFFI_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
+	--disable-builddir \
 	--disable-static \
 	--enable-portable-binary \
 	--disable-pax_emutramp \
+	--disable-docs \
 	--disable-debug \
 	--enable-structs \
 	--enable-raw-api \
+	--enable-exec-static-tramp \
 	--disable-purify-safety \
+	--disable-multi-os-directory \
 	--without-gcc-arch
 
 # ----------------------------------------------------------------------------

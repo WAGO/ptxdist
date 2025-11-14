@@ -28,7 +28,7 @@ SDL2_TESTS_LICENSE	:= zlib
 # Prepare
 # ----------------------------------------------------------------------------
 
-SDL2_TEST_ENV		:= \
+SDL2_TEST_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	SDL_LIBS="-lSDL2 -lunwind -lunwind-generic"
 
@@ -38,7 +38,8 @@ SDL2_TEST_ENV		:= \
 SDL2_TEST_CONF_TOOL	:= autoconf
 SDL2_TEST_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
-	--$(call ptx/endis,PTXCONF_SDL2_OPENGL)-opengl
+	--enable-sdltest \
+	--$(call ptx/wwo,PTXCONF_SDL2_TEST_XORG)-x
 
 ifdef PTXCONF_SDL2_PULSEAUDIO
 SDL2_TEST_LDFLAGS	:= \
@@ -157,11 +158,11 @@ $(STATEDIR)/sdl2-test.targetinstall:
 	@$(call install_fixup, sdl2-test,DESCRIPTION,missing)
 
 	@$(foreach file, $(SDL2_TEST_TOOLS), \
-		$(call install_copy, sdl2-test, 0, 0, 755, -, \
+		$(call install_copy, sdl2-test, 0, 0, 0755, -, \
 				/usr/bin/sdl2tests/$(file))$(ptx/nl))
 
 	@$(foreach file, $(SDL2_TEST_DATA), \
-		$(call install_copy, sdl2-test, 0, 0, 644, -, \
+		$(call install_copy, sdl2-test, 0, 0, 0644, -, \
 				/usr/bin/sdl2tests/$(file))$(ptx/nl))
 
 	@$(call install_finish, sdl2-test)

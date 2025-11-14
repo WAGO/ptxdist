@@ -80,8 +80,6 @@ Usage:
 
 Removes the given directory ``<directory path>``
 
-.. _install_copy:
-
 world/get, world/extract, world/prepare, world/compile, world/install
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -150,7 +148,72 @@ For ``install`` the package directory is deleted.
 When ``--verbose`` is used then the full command is logged. With
 ``--quiet`` both stdout and stderr are redirected to the logfile.
 
-.. _install_copy,reference:
+ptx/image-install, ptx/image-install-link, world/image-clean
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usage:
+
+.. code-block:: none
+
+ @$(call ptx/image-install, <PKG>, $(<PKG>_BUILD_DIR)/<source-image-name>[, <image-name>])
+ @$(call ptx/image-install-link, <PKG>, <link-target>, <link-name>)
+ @$(call world/image-clean, <PKG>)
+
+These macros are used to install files to ``|ptxdistPlatformDir|/images``.
+They are only allowed in the *targetinstall* stage. They are used by
+packages that produce files that are not part of a filesystem. Bootloaders
+are typical packages that do this.
+
+``ptx/image-install`` copies a file. The source must be an absolute path.
+The destination must be relative to the image directory. If the destination
+file name is the source file without the path, then this argument can be
+omitted.
+
+``ptx/image-install-link`` creates a symlink in the image directory.
+
+``world/image-clean`` will remove the files that were created by the other
+two macros in a previous run of the *targetinstall* stage. This macro is also
+called automatically by PTXdist's default *clean* stage.
+
+.. _world_image_fit:
+
+world/image-fit
+~~~~~~~~~~~~~~~
+
+.. code-block:: none
+
+ @$(call world/image-fit, <PKG>)
+
+Build a FIT image containing a kernel, optionally an initial ramdisk, and one or
+multiple device trees. For each device tree, a configuration node is generated.
+
+.. note:: You can generate a template for a new FIT image recipe by
+   calling ``ptxdist newpackage image-fit``.
+
+The following variables are respected:
+
+``<PKG>_IMAGE``
+   The output file, usually something like ``$(IMAGEDIR)/pkg.fit``.
+
+``<PKG>_KERNEL``
+   The kernel image to package into the FIT image.
+
+``<PKG>_DTB``
+   One or more device trees that should be included in the FIT image.
+
+``<PKG>_INITRAMFS``
+   If the FIT image should contain an initial ramdisk, this variable determines
+   the initrd file name that is included. Otherwise it can be left empty.
+
+``<PKG>_SIGN_ROLE``
+   If the FIT image should be signed, this variable determines the role name
+   used for the signature. It is passed to :ref:`cs_get_uri`.
+
+``<PKG>_KEY_NAME_HINT``
+   If the FIT image should be signed, this variable determines the
+   *key-name-hint* property of the signature node.
+
+.. _install_copy:
 
 install_copy
 ~~~~~~~~~~~~~
@@ -175,7 +238,7 @@ Some of the parameters have fixed meanings:
 **<GID>**
   Group ID the file should use in the target's root filesystem
 **<permission>**
-  Permission (in an octal value) the file should use in the target's root filesystem
+  Permission (as a four-digit octal value) the file should use in the target's root filesystem
 
 The remaining parameters vary with the use case:
 
@@ -252,7 +315,7 @@ Copy a file from the package install directory to the root filesystem:
 
  $(call install_copy, foo, 0, 0, 0755, -, /usr/bin/foo)
 
-.. _install_tree,reference:
+.. _install_tree:
 
 install_tree
 ~~~~~~~~~~~~
@@ -261,7 +324,7 @@ Usage:
 
 .. code-block:: make
 
- $(call install_tree, <package>, <UID>, <GID>, <source dir>, <destination dir>, <strip>])
+ $(call install_tree, <package>, <UID>, <GID>, <source dir>, <destination dir>[, <strip>])
 
 Installs the whole directory tree with all files from the given directory into:
 
@@ -284,7 +347,7 @@ Some of the parameters have fixed meanings:
 **<destination dir>**
   The basename of the to-be-installed tree in the root filesystem
 **<strip>**
-  same as for :ref:`install_copy,reference`.
+  same as for :ref:`install_copy`.
 
 Note: This installation macro
 
@@ -386,7 +449,7 @@ The base parameters and their meanings:
 **<GID>**
   Group ID the file should use in the target's root filesystem
 **<permission>**
-  Permission (in an octal value) the file should use in the target's root filesystem
+  Permission (as a four-digit octal value) the file should use in the target's root filesystem
 
 The parameter <destination> is meant as an absolute path
 and filename in target's root filesystem. PTXdist searches for the source
@@ -483,7 +546,7 @@ Usage:
 
 .. code-block:: make
 
- $(call install_archive, <package>, <UID>, <GID>, <archive> , <base path>)
+ $(call install_archive, <package>, <UID>, <GID>, <archive> , <base path>[, <strip>])
 
 Installs archives content into:
 
@@ -506,6 +569,8 @@ All parameters have fixed meanings:
 **<base path>**
   Base path component in the root filesystem the archive should be extracted
   to. Can be just ``/`` for root.
+**<strip>**
+  same as for :ref:`install_copy`.
 
 install_glob
 ~~~~~~~~~~~~
@@ -583,7 +648,7 @@ The parameters and their meanings:
 **<GID>**
   Group ID the directories and files should use in the target's root filesystem
 **<permission>**
-  Permission (as an octal value) the library should use in the target's root
+  Permission (as a four-digit octal value) the library should use in the target's root
   filesystem (mostly 0644)
 **<libname>**
   Basename of the library without any extension and path
@@ -656,6 +721,24 @@ be installed with some other ``install_*`` command before
    	@$(call install_replace, timezone, /etc/timezone, @TIMEZONE@, \
    		$(PTXCONF_TIMEZONE_LOCALTIME))
 
+.. _ptx/cfghash:
+.. _ptx/cfghash-file:
+
+ptx/cfghash, ptx/cfghash-file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usage:
+
+.. code-block:: make
+
+ $(call ptx/cfghash, <PKG>, <string>)
+ $(call ptx/cfghash-file, <PKG>, <file>)
+
+Add an arbitrary **<string>** or the content of **<file>** to the config hash
+for **<PKG>**.
+This has the effect that the package will be rebuilt when the string or the
+content of the file changes.
+
 .. _param_macros:
 .. _ptxEndis:
 .. _ptxDisen:
@@ -675,6 +758,7 @@ Usage:
  $(call ptx/wow, VARIABLE)
  $(call ptx/wwo, VARIABLE)
  $(call ptx/yesno, VARIABLE)
+ $(call ptx/noyes, VARIABLE)
  $(call ptx/truefalse, VARIABLE)
  $(call ptx/falsetrue, VARIABLE)
  $(call ptx/onoff, VARIABLE)
@@ -695,6 +779,8 @@ These are useful for ``<PKG>_CONF_OPT`` variables, and expand as follows:
 | ptx/wwo            | ``with``                      | ``without``                     | autoconf            |
 +--------------------+-------------------------------+---------------------------------+---------------------+
 | ptx/yesno          | ``yes``                       | ``no``                          | autoconf cache vars |
++--------------------+-------------------------------+---------------------------------+---------------------+
+| ptx/noyes          | ``no``                        | ``yes``                         | scons               |
 +--------------------+-------------------------------+---------------------------------+---------------------+
 | ptx/truefalse      | ``true``                      | ``false``                       | meson               |
 +--------------------+-------------------------------+---------------------------------+---------------------+
@@ -759,10 +845,15 @@ whereas if the respective variable is unset, they would expand to the opposite:
 ptx/get-alternative
 ~~~~~~~~~~~~~~~~~~~
 
+Usage:
+
+.. code-block:: make
+
+ $(call ptx/get-alternative, <prefix>, <file>)
+
 This macro can be used to find files or directories in the BSP and PTXdist.
-There are two arguments, **prefix** and **file**. The search path is very
-similar to :ref:`install_alternative`. The first existing location of the
-following paths is returned:
+The search path is very similar to :ref:`install_alternative`.
+The first existing location of the following paths is returned:
 
 * ``$(PTXDIST_WORKSPACE)/$(prefix)$(PTXDIST_PLATFORMSUFFIX)/$(file)``
 * ``$(PTXDIST_WORKSPACE)/$(prefix)/$(file)$(PTXDIST_PLATFORMSUFFIX)``
@@ -777,9 +868,14 @@ following paths is returned:
 ptx/in-path
 ~~~~~~~~~~~
 
+Usage:
+
+.. code-block:: make
+
+ $(call ptx/in-path, <path>, <file>)
+
 This macro can be used to find files or directories in the BSP and PTXdist.
-There are two arguments, **path variable** and **file**. The **path
-variable** must be a variable name that is available in a shell called by
+The **path** must be a variable name that is available in a shell called by
 **make**. The variable must contain a ``:`` separated list of directories.
 The **file** will be searched in these directories and the first existing
 path is returned. PTXdist defines several variables that can be used here.
@@ -803,8 +899,14 @@ directories for each of these variables.
 ptx/in-platformconfigdir
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-This macro is only useful with multiple layers. It has one argument
-**file**. The **file** is searched for in the platform directory in
+Usage:
+
+.. code-block:: make
+
+ $(call ptx/in-platformconfigdir, <file>)
+
+This macro is only useful with multiple layers.
+The argument **file** is searched for in the platform directory in
 all layers in the usual search order. It returns the first existing file.
 If none exists it returns ``$(PTXDIST_PLATFORMCONFIGDIR)/$(file)``. This
 avoids unexpected errors due to empty variables if a file is missing.

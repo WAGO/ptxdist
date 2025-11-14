@@ -36,6 +36,52 @@ LMBENCH_CONF_TOOL := autoconf
 # Target-Install
 # ----------------------------------------------------------------------------
 
+LMBENCH_TOOLS_PROGS := \
+        bw_file_rd \
+        bw_mem \
+        bw_mmap_rd \
+        bw_pipe \
+        bw_tcp \
+        bw_unix \
+        disk \
+        enough \
+        flushdisk \
+        hello \
+        lat_connect \
+        lat_ctx \
+        lat_fcntl \
+        lat_fifo \
+        lat_fs \
+        lat_http \
+        lat_mem_rd \
+        lat_mmap \
+        lat_ops \
+        lat_pagefault \
+        lat_pipe \
+        lat_proc \
+        lat_rpc \
+        lat_select \
+        lat_sem \
+        lat_sig \
+        lat_syscall \
+        lat_tcp \
+        lat_udp \
+        lat_unix \
+        lat_unix_connect \
+        line \
+        lmdd \
+        lmhttp \
+        loop_o \
+        memsize \
+        mhz \
+        msleep \
+        par_mem \
+        par_ops \
+        stream \
+        timing_o \
+        tlb
+
+
 $(STATEDIR)/lmbench.targetinstall:
 	@$(call targetinfo)
 
@@ -45,53 +91,9 @@ $(STATEDIR)/lmbench.targetinstall:
 	@$(call install_fixup, lmbench,AUTHOR,"Robert Schwebel")
 	@$(call install_fixup, lmbench,DESCRIPTION,missing)
 
-	for file in \
-		/usr/bin/par_mem \
-		/usr/bin/lat_tcp \
-		/usr/bin/par_ops \
-		/usr/bin/lat_mmap \
-		/usr/bin/hello \
-		/usr/bin/bw_unix \
-		/usr/bin/lat_syscall \
-		/usr/bin/lat_sem \
-		/usr/bin/lat_fs \
-		/usr/bin/loop_o \
-		/usr/bin/lat_fcntl \
-		/usr/bin/lat_unix \
-		/usr/bin/bw_tcp \
-		/usr/bin/lat_rpc \
-		/usr/bin/lat_unix_connect \
-		/usr/bin/bw_file_rd \
-		/usr/bin/disk \
-		/usr/bin/lat_mem_rd \
-		/usr/bin/lat_select \
-		/usr/bin/lat_connect \
-		/usr/bin/lat_fifo \
-		/usr/bin/line \
-		/usr/bin/timing_o \
-		/usr/bin/lat_ctx \
-		/usr/bin/bw_mem \
-		/usr/bin/lat_sig \
-		/usr/bin/lat_pipe \
-		/usr/bin/lat_pagefault \
-		/usr/bin/lmhttp \
-		/usr/bin/tlb \
-		/usr/bin/bw_pipe \
-		/usr/bin/mhz \
-		/usr/bin/lat_http \
-		/usr/bin/msleep \
-		/usr/bin/lat_ops \
-		/usr/bin/lat_udp \
-		/usr/bin/stream \
-		/usr/bin/enough \
-		/usr/bin/flushdisk \
-		/usr/bin/lmdd \
-		/usr/bin/lat_proc \
-		/usr/bin/bw_mmap_rd \
-		/usr/bin/memsize \
-	; do \
-		$(call install_copy, lmbench, 0, 0, 0755, -, $$file); \
-	done
+	@$(foreach prog, $(LMBENCH_TOOLS_PROGS), \
+		$(call install_copy, lmbench, 0, 0, 0755, -, \
+		/usr/bin/$(prog))$(ptx/nl))
 
 	@$(call install_lib, lmbench, 0, 0, 0644, liblmbench)
 

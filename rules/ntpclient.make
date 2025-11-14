@@ -15,21 +15,22 @@ PACKAGES-$(PTXCONF_NTPCLIENT) += ntpclient
 #
 # Paths and names
 #
-NTPCLIENT_VERSION	:= 365
-NTPCLIENT_MD5		:= cb98711f11769cdd22fc592844cef414
+NTPCLIENT_VERSION	:= 2024_132
+NTPCLIENT_MD5		:= 847a3941a1b7218d6e73c44825c40138
 NTPCLIENT_SUFFIX	:= tar.gz
-NTPCLIENT		:= ntpclient-2007
-NTPCLIENT_TARBALL	:= ntpclient_2007_$(NTPCLIENT_VERSION).$(NTPCLIENT_SUFFIX)
+NTPCLIENT		:= ntpclient_$(NTPCLIENT_VERSION)
+NTPCLIENT_TARBALL	:= $(NTPCLIENT).$(NTPCLIENT_SUFFIX)
 NTPCLIENT_URL		:= http://doolittle.icarus.com/ntpclient/$(NTPCLIENT_TARBALL)
 NTPCLIENT_SOURCE	:= $(SRCDIR)/$(NTPCLIENT_TARBALL)
 NTPCLIENT_DIR		:= $(BUILDDIR)/$(NTPCLIENT)
 NTPCLIENT_LICENSE	:= GPL-2.0-only
+NTPCLIENT_LICENSE_FILES	:= \
+	file://ntpclient.c;startline=6;endline=16;md5=aaa51db4d92042ba01b32afb583c7809
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-NTPCLIENT_PATH	:= PATH=$(CROSS_PATH)
 NTPCLIENT_MAKE_OPT := \
 	CC="$(CROSS_CC)"
 
@@ -81,7 +82,6 @@ endif
 # busybox init: start script
 #
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NTPCLIENT_STARTSCRIPT
 	@$(call install_alternative, ntpclient, 0, 0, 0755, /etc/init.d/ntpclient)
 ifneq ($(PTXCONF_NTPCLIENT_NTPSERVER_NAME),"")
@@ -95,7 +95,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_NTPCLIENT_BBINIT_LINK)),)
 	@$(call install_link, ntpclient, \
 		../init.d/ntpclient, \
 		/etc/rc.d/$(PTXCONF_NTPCLIENT_BBINIT_LINK))
-endif
 endif
 endif
 

@@ -17,9 +17,9 @@ HOST_PACKAGES-$(PTXCONF_HOST_LIBCAP) += host-libcap
 # ----------------------------------------------------------------------------
 
 HOST_LIBCAP_MAKE_OPT := \
-	prefix= \
+	prefix=/usr \
 	lib=lib \
-	BUILD_GPERF=no \
+	USE_GPERF=no \
 	PAM_CAP=no \
 	GOLANG=no \
 	LIBATTR=no \

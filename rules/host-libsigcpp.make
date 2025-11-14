@@ -20,12 +20,9 @@ HOST_LIBSIGCPP_DIR	= $(HOST_BUILDDIR)/$(LIBSIGCPP)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBSIGCPP_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBSIGCPP_ENV 	:= $(HOST_ENV)
-
 #
-# autoconf
+# meson
 #
-HOST_LIBSIGCPP_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_LIBSIGCPP_CONF_TOOL := meson
 
 # vim: syntax=make

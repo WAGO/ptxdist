@@ -15,11 +15,11 @@ PACKAGES-$(PTXCONF_NETWORKMANAGER) += networkmanager
 #
 # Paths and names
 #
-NETWORKMANAGER_VERSION	:= 1.26.0
-NETWORKMANAGER_MD5	:= c0edbbf98a1ec81eed5a03539610d324
+NETWORKMANAGER_VERSION	:= 1.48.0
+NETWORKMANAGER_MD5	:= ba52091831d0d68122933a494507986a
 NETWORKMANAGER		:= NetworkManager-$(NETWORKMANAGER_VERSION)
 NETWORKMANAGER_SUFFIX	:= tar.xz
-NETWORKMANAGER_URL	:= https://ftp.gnome.org/pub/GNOME/sources/NetworkManager/$(basename $(NETWORKMANAGER_VERSION))/$(NETWORKMANAGER).$(NETWORKMANAGER_SUFFIX)
+NETWORKMANAGER_URL	:= $(call ptx/mirror, GNOME, NetworkManager/$(basename $(NETWORKMANAGER_VERSION))/$(NETWORKMANAGER).$(NETWORKMANAGER_SUFFIX))
 NETWORKMANAGER_SOURCE	:= $(SRCDIR)/$(NETWORKMANAGER).$(NETWORKMANAGER_SUFFIX)
 NETWORKMANAGER_DIR	:= $(BUILDDIR)/$(NETWORKMANAGER)
 NETWORKMANAGER_LICENSE	:= GPL-2.0-or-later AND LGPL-2.0-or-later
@@ -47,17 +47,14 @@ NETWORKMANAGER_CONF_OPT = \
 	-Ddhcpcanon=false \
 	-Ddhcpcd=false \
 	-Ddnsmasq=/usr/sbin/dnsmasq \
-	-Ddnssec_trigger=/bin/true \
 	-Ddocs=false \
 	-Debpf=false \
 	-Dfirewalld_zone=false \
 	-Dhostname_persist=default \
 	-Difcfg_rh=false \
 	-Difupdown=true \
-	-Dintrospection=false \
-	-Diptables=/usr/sbin/iptables \
+	-Dintrospection=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_INTROSPECTION) \
 	-Diwd=false \
-	-Djson_validation=false \
 	-Dkernel_firmware_dir=/lib/firmware \
 	-Dld_gc=true \
 	-Dlibaudit=no \
@@ -65,7 +62,7 @@ NETWORKMANAGER_CONF_OPT = \
 	-Dmodem_manager=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_WWAN) \
 	-Dmodify_system=false \
 	-Dmore_asserts=no \
-	-Dmore_logging=false \
+	-Dmore_logging=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_MORE_LOGGING) \
 	-Dnetconfig=false \
 	-Dnm_cloud_setup=false \
 	-Dnmcli=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_NMCLI) \
@@ -73,16 +70,17 @@ NETWORKMANAGER_CONF_OPT = \
 	-Dofono=false \
 	-Dovs=false \
 	-Dpolkit=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_POLKIT) \
-	-Dpolkit_agent=false \
+	-Dpolkit_agent_helper_1=/usr/libexec/polkit-agent-helper-1 \
 	-Dppp=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_PPP) \
 	-Dpppd=/usr/sbin/pppd \
 	-Dpppd_plugin_dir=$(PPP_SHARED_INST_PATH) \
 	-Dqt=false \
+	-Dreadline=$(call ptx/ifdef,PTXCONF_NETWORKMANAGER_NMCLI,libreadline,none) \
 	-Dresolvconf=false \
 	-Dselinux=false \
 	-Dsession_tracking=no \
 	-Dsession_tracking_consolekit=false \
-	-Dsuspend_resume=$(call ptx/ifdef,PTXCONF_NETWORKMANAGER_SYSTEMD_UNIT,systemd,upower) \
+	-Dsuspend_resume=$(call ptx/ifdef,PTXCONF_NETWORKMANAGER_SYSTEMD_UNIT,systemd,consolekit) \
 	-Dsystem_ca_path=/etc/ssl/certs \
 	-Dsystemd_journal=$(call ptx/truefalse,PTXCONF_NETWORKMANAGER_SYSTEMD_UNIT) \
 	-Dsystemdsystemunitdir=/usr/lib/systemd/system \
@@ -110,10 +108,6 @@ $(STATEDIR)/networkmanager.install:
 ifdef PTXCONF_NETWORKMANAGER_EXAMPLES
 	@cd $(NETWORKMANAGER_DIR)/examples/C/glib/ \
 		&& for FILE in `find -type f -executable -printf '%f\n'`; do \
-		install -vD -m 755 "$${FILE}" "$(NETWORKMANAGER_PKGDIR)/usr/bin/nm-$${FILE}"; \
-	done
-	@cd $(NETWORKMANAGER_DIR)/examples/python/dbus \
-		&& for FILE in `find -name "*.py" -printf '%f\n'`; do \
 		install -vD -m 755 "$${FILE}" "$(NETWORKMANAGER_PKGDIR)/usr/bin/nm-$${FILE}"; \
 	done
 	@cd $(NETWORKMANAGER_DIR)/examples/shell/ \
@@ -146,7 +140,6 @@ $(STATEDIR)/networkmanager.targetinstall:
 
 	@$(call install_copy, networkmanager, 0, 0, 0755, /var/lib/NetworkManager)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_NETWORKMANAGER_STARTSCRIPT
 	@$(call install_alternative, networkmanager, 0, 0, 0755, /etc/init.d/NetworkManager)
 
@@ -154,7 +147,6 @@ ifneq ($(call remove_quotes, $(PTXCONF_NETWORKMANAGER_BBINIT_LINK)),)
 	@$(call install_link, networkmanager, \
 		../init.d/NetworkManager, \
 		/etc/rc.d/$(PTXCONF_NETWORKMANAGER_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_NETWORKMANAGER_SYSTEMD_UNIT
@@ -219,6 +211,10 @@ endif
 
 ifdef PTXCONF_NETWORKMANAGER_EXAMPLES
 	@$(call install_glob, networkmanager, 0, 0, -, /usr/bin, */nm-*-*)
+endif
+
+ifdef PTXCONF_NETWORKMANAGER_INTROSPECTION
+	@$(call install_tree, networkmanager, 0, 0, -, /usr/lib/girepository-1.0)
 endif
 
 	@$(call install_finish, networkmanager)

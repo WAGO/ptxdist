@@ -14,14 +14,17 @@ PACKAGES-$(PTXCONF_GLIB_NETWORKING) += glib-networking
 #
 # Paths and names
 #
-GLIB_NETWORKING_VERSION	:= 2.62.1
-GLIB_NETWORKING_MD5	:= 64ca1e1e43e623b916059585bf7e4758
+GLIB_NETWORKING_VERSION	:= 2.78.0
+GLIB_NETWORKING_MD5	:= 402ff1e8f24dafb02354d9b66ffa11df
 GLIB_NETWORKING		:= glib-networking-$(GLIB_NETWORKING_VERSION)
 GLIB_NETWORKING_SUFFIX	:= tar.xz
-GLIB_NETWORKING_URL	:= http://ftp.gnome.org/pub/GNOME/sources/glib-networking/$(basename $(GLIB_NETWORKING_VERSION))/$(GLIB_NETWORKING).$(GLIB_NETWORKING_SUFFIX)
+GLIB_NETWORKING_URL	:= $(call ptx/mirror, GNOME, glib-networking/$(basename $(GLIB_NETWORKING_VERSION))/$(GLIB_NETWORKING).$(GLIB_NETWORKING_SUFFIX))
 GLIB_NETWORKING_SOURCE	:= $(SRCDIR)/$(GLIB_NETWORKING).$(GLIB_NETWORKING_SUFFIX)
 GLIB_NETWORKING_DIR	:= $(BUILDDIR)/$(GLIB_NETWORKING)
 GLIB_NETWORKING_LICENSE	:= LGPL-2.0-or-later
+GLIB_NETWORKING_LICENSE_FILES := \
+	file://tls/gnutls/gnutls-module.c;startline=2;endline=23;md5=2eca03d4880fd21dbb04b8bcafe2cd59 \
+	file://COPYING;md5=4fbd65380cdd255951079008b364516c
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -36,12 +39,11 @@ GLIB_NETWORKING_CONF_ENV	:= \
 GLIB_NETWORKING_CONF_TOOL	:= meson
 GLIB_NETWORKING_CONF_OPT	:= \
 	$(CROSS_MESON_USR) \
-	-Dca_certificates_path=/etc/ssl/certs/ca-certificates.crt \
-	-Dgnome_proxy_support=false \
+	-Dgnome_proxy=disabled \
+	-Dgnutls=enabled \
 	-Dinstalled_tests=false \
-	-Dlibproxy_support=false \
-	-Dpkcs11_support=false \
-	-Dstatic_modules=false
+	-Dlibproxy=disabled \
+	-Dopenssl=disabled
 
 # ----------------------------------------------------------------------------
 # Target-Install

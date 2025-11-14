@@ -15,42 +15,42 @@ PACKAGES-$(PTXCONF_WESTON) += weston
 #
 # Paths and names
 #
-WESTON_VERSION	:= 8.0.0
-LIBWESTON_MAJOR := 8
-WESTON_MD5	:= 53e4810d852df0601d01fd986a5b22b3
+WESTON_VERSION	:= 14.0.1
+LIBWESTON_MAJOR := 14
+WESTON_MD5	:= d07a8f4dfb7cb81035052928ba1a8c71
 WESTON		:= weston-$(WESTON_VERSION)
-WESTON_SUFFIX	:= tar.xz
-WESTON_URL	:= http://wayland.freedesktop.org/releases/$(WESTON).$(WESTON_SUFFIX)
+WESTON_SUFFIX	:= tar.gz
+WESTON_URL	:= https://gitlab.freedesktop.org/wayland/weston/-/archive/$(WESTON_VERSION)/$(WESTON).$(WESTON_SUFFIX)
 WESTON_SOURCE	:= $(SRCDIR)/$(WESTON).$(WESTON_SUFFIX)
 WESTON_DIR	:= $(BUILDDIR)/$(WESTON)
 WESTON_LICENSE	:= MIT
+WESTON_LICENSE_FILES	:= file://COPYING;md5=d79ee9e66bb0f95d3386a7acae780b70
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
 WESTON_SIMPLE_CLIENTS-y := damage im shm touch
-WESTON_SIMPLE_CLIENTS-$(PTXCONF_WESTON_GL) += egl dmabuf-egl
+WESTON_SIMPLE_CLIENTS-$(PTXCONF_WESTON_GL) += egl dmabuf-egl dmabuf-feedback
 
 WESTON_CONF_TOOL	:= meson
 WESTON_CONF_OPT		:= \
 	$(CROSS_MESON_USR) \
 	-Dbackend-default=drm \
-	-Dbackend-drm=$(call ptx/truefalse,PTXCONF_WESTON_DRM_COMPOSITOR) \
+	-Dbackend-drm=true \
 	-Dbackend-drm-screencast-vaapi=false \
-	-Dbackend-fbdev=$(call ptx/truefalse,PTXCONF_WESTON_FBDEV_COMPOSITOR) \
 	-Dbackend-headless=$(call ptx/truefalse,PTXCONF_WESTON_HEADLESS_COMPOSITOR) \
+	-Dbackend-pipewire=$(call ptx/truefalse,PTXCONF_WESTON_BACKEND_PIPEWIRE) \
 	-Dbackend-rdp=false \
+	-Dbackend-vnc=$(call ptx/truefalse,PTXCONF_WESTON_BACKEND_VNC) \
 	-Dbackend-wayland=$(call ptx/truefalse,PTXCONF_WESTON_GL) \
 	-Dbackend-x11=false \
-	-Dcolor-management-colord=false \
-	-Dcolor-management-lcms=false \
+	-Dcolor-management-lcms=$(call ptx/truefalse,PTXCONF_WESTON_COLOR_MANAGEMENT_LCMS) \
 	-Ddemo-clients=$(call ptx/truefalse,PTXCONF_WESTON_IVISHELL_EXAMPLE) \
 	-Ddesktop-shell-client-default=weston-desktop-shell \
 	-Ddoc=false \
 	-Dimage-jpeg=true \
 	-Dimage-webp=false \
-	-Dlauncher-logind=$(call ptx/truefalse,PTXCONF_WESTON_SYSTEMD_LOGIND) \
 	-Dpipewire=$(call ptx/truefalse,PTXCONF_WESTON_PIPEWIRE) \
 	-Dremoting=$(call ptx/truefalse,PTXCONF_WESTON_REMOTING) \
 	-Drenderer-gl=$(call ptx/truefalse,PTXCONF_WESTON_GL) \
@@ -59,12 +59,14 @@ WESTON_CONF_OPT		:= \
 	-Dshell-desktop=true \
 	-Dshell-fullscreen=true \
 	-Dshell-ivi=$(call ptx/truefalse,PTXCONF_WESTON_IVISHELL) \
+	-Dshell-kiosk=$(call ptx/truefalse,PTXCONF_WESTON_SHELL_KIOSK) \
 	-Dsimple-clients=$(subst $(space),$(comma),$(WESTON_SIMPLE_CLIENTS-y)) \
 	-Dsystemd=$(call ptx/truefalse,PTXCONF_WESTON_SYSTEMD) \
 	-Dtest-junit-xml=false \
+	-Dtest-skip-is-failure=false \
+	-Dtests=false \
 	-Dtools=calibrator,debug,info,terminal,touch-calibrator \
 	-Dwcap-decode=$(call ptx/truefalse,PTXCONF_WESTON_WCAP_TOOLS) \
-	-Dweston-launch=$(call ptx/truefalse,PTXCONF_WESTON_LAUNCH) \
 	-Dxwayland=$(call ptx/truefalse,PTXCONF_WESTON_XWAYLAND) \
 	-Dxwayland-path=/usr/bin/Xwayland
 
@@ -76,18 +78,12 @@ $(STATEDIR)/weston.install:
 	@$(call targetinfo)
 	@$(call world/install, WESTON)
 
-	@mkdir -p $(WESTON_PKGDIR)/etc/xdg/weston
 ifndef PTXCONF_WESTON_IVISHELL_EXAMPLE
-	@bindir="/usr/bin" \
-		abs_top_builddir="/usr/bin" \
-		libexecdir="/usr/libexec" \
-		ptxd_replace_magic "$(WESTON_DIR)/weston.ini.in" > \
-		"$(WESTON_PKGDIR)/etc/xdg/weston/weston.ini"
+	@install -D -m644 $(WESTON_DIR)-build/frontend/weston.ini \
+		$(WESTON_PKGDIR)/etc/xdg/weston/weston.ini
 else
-	@bindir="/usr/bin" \
-		westondatadir="/usr/share/weston" \
-		ptxd_replace_magic "$(WESTON_DIR)/ivi-shell/weston.ini.in" > \
-		"$(WESTON_PKGDIR)/etc/xdg/weston/weston.ini"
+	@install -D -m644 $(WESTON_DIR)-build/ivi-shell/weston.ini \
+		$(WESTON_PKGDIR)/etc/xdg/weston/weston.ini
 endif
 
 	@$(call touch)
@@ -106,17 +102,14 @@ $(STATEDIR)/weston.targetinstall:
 	@$(call install_fixup, weston,DESCRIPTION,"wayland reference compositor implementation")
 
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston)
-	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-info)
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-debug)
-ifdef PTXCONF_WESTON_LAUNCH
-	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-launch)
-endif
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-screenshooter)
 ifdef PTXCONF_WESTON_SIMPLE_CLIENTS
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-damage)
 ifdef PTXCONF_WESTON_GL
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-egl)
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-dmabuf-egl)
+	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-dmabuf-feedback)
 endif
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-shm)
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-touch)
@@ -131,18 +124,18 @@ ifdef PTXCONF_WESTON_WCAP_TOOLS
 endif
 
 	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR))
-	@$(call install_lib, weston, 0, 0, 0644, libweston-desktop-$(LIBWESTON_MAJOR))
 ifdef PTXCONF_WESTON_XWAYLAND
 	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/xwayland)
 endif
-ifdef PTXCONF_WESTON_DRM_COMPOSITOR
 	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/drm-backend)
-endif
 ifdef PTXCONF_WESTON_HEADLESS_COMPOSITOR
 	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/headless-backend)
 endif
-ifdef PTXCONF_WESTON_FBDEV_COMPOSITOR
-	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/fbdev-backend)
+ifdef PTXCONF_WESTON_BACKEND_PIPEWIRE
+	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/pipewire-backend)
+endif
+ifdef PTXCONF_WESTON_BACKEND_VNC
+	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/vnc-backend)
 endif
 ifdef PTXCONF_WESTON_GL
 	@$(call install_lib, weston, 0, 0, 0644, libweston-$(LIBWESTON_MAJOR)/wayland-backend)
@@ -159,19 +152,20 @@ endif
 ifdef PTXCONF_WESTON_IVISHELL
 	@$(call install_lib, weston, 0, 0, 0644, weston/ivi-shell)
 endif
+ifdef PTXCONF_WESTON_SHELL_KIOSK
+	@$(call install_lib, weston, 0, 0, 0644, weston/kiosk-shell)
+endif
 ifdef PTXCONF_WESTON_SYSTEMD
 	@$(call install_lib, weston, 0, 0, 0644, weston/systemd-notify)
 endif
 	@$(call install_lib, weston, 0, 0, 0644, weston/libexec_weston)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_WESTON_STARTSCRIPT
 	@$(call install_alternative, weston, 0, 0, 0755, /etc/init.d/weston-init)
 ifneq ($(call remove_quotes,$(PTXCONF_WESTON_BBINIT_LINK)),)
 	@$(call install_link, weston, \
 		../init.d/weston-init, \
 		/etc/rc.d/$(PTXCONF_WESTON_BBINIT_LINK))
-endif
 endif
 endif
 
@@ -222,6 +216,7 @@ ifdef PTXCONF_WESTON_GL
 endif
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-simple-shm)
 	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-smoke)
+	@$(call install_copy, weston, 0, 0, 0755, -, /usr/bin/weston-tablet)
 endif
 
 	@$(call install_finish, weston)

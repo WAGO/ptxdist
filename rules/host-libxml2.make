@@ -21,13 +21,11 @@ HOST_LIBXML2_DIR	= $(HOST_BUILDDIR)/$(LIBXML2)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBXML2_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBXML2_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_LIBXML2_AUTOCONF	:= \
+HOST_LIBXML2_CONF_TOOL	:= autoconf
+HOST_LIBXML2_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--disable-static \
 	--without-iconv \

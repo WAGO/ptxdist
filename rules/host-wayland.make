@@ -16,14 +16,16 @@ HOST_PACKAGES-$(PTXCONF_HOST_WAYLAND) += host-wayland
 # ----------------------------------------------------------------------------
 
 #
-# autoconf
+# meson
 #
-HOST_WAYLAND_CONF_TOOL	:= autoconf
+HOST_WAYLAND_CONF_TOOL	:= meson
 HOST_WAYLAND_CONF_OPT	:= \
-	$(HOST_AUTOCONF) \
-	--disable-libraries \
-	--disable-documentation \
-	--disable-dtd-validation \
-	--without-host-scanner
+	$(HOST_MESON_OPT) \
+	-Ddocumentation=false \
+	-Ddtd_validation=false \
+	-Dicon_directory= \
+	-Dlibraries=true \
+	-Dscanner=true \
+	-Dtests=false
 
 # vim: syntax=make

@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_IPROUTE2) += iproute2
 #
 # Paths and names
 #
-IPROUTE2_VERSION	:= 5.7.0
-IPROUTE2_MD5		:= da22ab8562eda56ae232872fa72e4870
+IPROUTE2_VERSION	:= 6.12.0
+IPROUTE2_MD5		:= bc789bd210bc5d1ca6c64ea1c87d6979
 IPROUTE2		:= iproute2-$(IPROUTE2_VERSION)
 IPROUTE2_SUFFIX		:= tar.xz
 IPROUTE2_URL		:= $(call ptx/mirror, KERNEL, utils/net/iproute2/$(IPROUTE2).$(IPROUTE2_SUFFIX))
@@ -28,8 +28,9 @@ IPROUTE2_LICENSE	:= GPL-2.0-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-# iproute2's configure is handcrafted and doesn't take standard configure options
-IPROUTE2_CONF_OPT := ''
+# iproute2's configure is handcrafted
+IPROUTE2_CONF_OPT := \
+	$(CROSS_AUTOCONF_USR)
 
 $(STATEDIR)/iproute2.prepare:
 	@$(call targetinfo)
@@ -58,18 +59,16 @@ IPROUTE2_INSTALL_FILES-y =
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_ARPD) +=	arpd
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_BRIDGE) +=	bridge
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_CTSTAT) +=	ctstat
+IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_DCB) +=	dcb
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_DEVLINK) +=	devlink
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_GENL) +=	genl
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_IP) +=	ip
-IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_IFCFG) +=	ifcfg
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_IFSTAT) +=	ifstat
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_LNSTAT) +=	lnstat
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_NSTAT) +=	nstat
-IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_ROUTEF) +=	routef
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_ROUTEL) +=	routel
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_RTACCT) +=	rtacct
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_RTMON) +=	rtmon
-IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_RTPR) +=	rtpr
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_RTSTAT) +=	rtstat
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_SS) +=	ss
 IPROUTE2_INSTALL_FILES-$(PTXCONF_IPROUTE2_TC) +=	tc
@@ -95,14 +94,14 @@ ifdef PTXCONF_IPROUTE2_TC
 	@$(call install_copy, iproute2, 0, 0, 0644, -, /usr/lib/tc/experimental.dist)
 endif
 
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/ematch_map)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/group)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/nl_protos)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/rt_dsfield)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/rt_protos)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/rt_realms)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/rt_scopes)
-	@$(call install_alternative, iproute2, 0, 0, 0644, /etc/iproute2/rt_tables)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/ematch_map)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/group)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/nl_protos)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/rt_dsfield)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/rt_protos)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/rt_realms)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/rt_scopes)
+	@$(call install_alternative, iproute2, 0, 0, 0644, /usr/share/iproute2/rt_tables)
 
 	@$(call install_finish, iproute2)
 

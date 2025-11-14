@@ -17,6 +17,7 @@ import sys
 import os
 import re
 import fileinput
+import subprocess
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -32,6 +33,13 @@ import fileinput
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = []
+
+def add_latex_extensions(app, docname, source):
+    if app.builder.name == 'latex':
+        app.setup_extension('sphinxcontrib.rsvgconverter')
+
+def setup(app):
+    app.connect('source-read', add_latex_extensions)
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -100,13 +108,13 @@ pygments_style = 'none'
 
 numfig = True
 
-gnu_target = os.getenv("PTXCONF_GNU_TARGET") or "arm-v5te-linux-gnueabi"
+gnu_target = os.getenv("PTXCONF_GNU_TARGET") or "arm-v7a-linux-gnueabihf"
 try:
 	toolchain = os.readlink(os.path.join(os.getenv("PTXDIST_PLATFORMDIR",""), "selected_toolchain")).split("/")
 except:
-	toolchain = "/opt/OSELAS.Toolchain-2019.09.1/arm-v5te-linux-gnueabi/gcc-9.2.1-glibc-2.30-binutils-2.32-kernel-5.0-sanitized/bin".split("/")
+	toolchain = "/opt/OSELAS.Toolchain-2023.07.1/arm-v7a-linux-gnueabihf/gcc-13.2.1-clang-16.0.6-glibc-2.37-binutils-2.40-kernel-6.3.6-sanitized/bin".split("/")
 
-ptxdistPlatformName = os.getenv("PTXCONF_PLATFORM", "versatilepb")
+ptxdistPlatformName = os.getenv("PTXCONF_PLATFORM", "example")
 ptxdistPlatformDir = "platform-" + ptxdistPlatformName
 oselasTCNarch = gnu_target.split("-")[0]
 oselasTCNvariant = gnu_target.split("-")[1]
@@ -119,10 +127,19 @@ ptxdistBSPName = "OSELAS.BSP-" + ptxdistHwVendor + "-" + ptxdistHwProduct + os.g
 ptxdistBSPRevision = os.getenv("PTXDIST_BSP_AUTOVERSION", "???")
 ptxdistCompilerName = gnu_target
 ptxdistCompilerVersion = toolchain[-2]
-ptxdistPlatformConfigDir = os.path.basename(os.getenv("PTXDIST_PLATFORMCONFIGDIR")) if os.getenv("PTXDIST_PLATFORMCONFIGDIR") != os.getenv("PTXDIST_TOPDIR") else "platform-versatilepb"
+ptxdistPlatformConfigDir = os.path.basename(os.getenv("PTXDIST_PLATFORMCONFIGDIR")) if os.getenv("PTXDIST_PLATFORMCONFIGDIR") != os.getenv("PTXDIST_TOPDIR") else "platform-<example>"
 ptxdistPlatformCollection = "\ "
 ptxdistVendorVersion = os.getenv("PTXDIST_VERSION_YEAR") + "." + os.getenv("PTXDIST_VERSION_MONTH") + "." + os.getenv("PTXDIST_VERSION_BUGFIX")
 package = "<package>"
+
+if "ptxdistonly" in tags.tags.keys():
+	ptxdistBSPSource = "The source of the BSP of your choice."
+else:
+	try:
+		url = subprocess.check_output('git -C "${PTXDIST_WORKSPACE}" remote get-url origin', shell=True).decode().strip()
+		ptxdistBSPSource = f"From git: `{url} <{url}>`_"
+	except subprocess.CalledProcessError as e:
+		ptxdistBSPSource = ptxdistBSPName + ".tar.bz2 (or a similar source)" + str(e)
 
 sys.path.append(".")
 try:
@@ -141,6 +158,7 @@ replace_dict = {
 	b"|ptxdistHwVendor|": ptxdistHwVendor,
 	b"|ptxdistHwProduct|": ptxdistHwProduct,
 	b"|ptxdistBSPName|": ptxdistBSPName,
+	b"|ptxdistBSPSource|": ptxdistBSPSource,
 	b"|ptxdistBSPRevision|": ptxdistBSPRevision,
 	b"|ptxdistCompilerName|": ptxdistCompilerName,
 	b"|ptxdistCompilerVersion|": ptxdistCompilerVersion,
@@ -172,15 +190,16 @@ html_theme = 'sphinx_rtd_theme'
 
 html_static_path = ['_static']
 
-html_context = {
-    'css_files': ['_static/css/custom.css'],
-    'script_files': [
-        '_static/js/jquery-3.1.0.min.js',
-        '_static/underscore.js',
-        '_static/doctools.js',
-        '_static/js/main.js',
-    ],
-}
+html_css_files = [
+        'css/custom.css',
+]
+
+html_js_files = [
+        'js/jquery-3.1.0.min.js',
+        'underscore.js',
+        'doctools.js',
+        'js/main.js',
+]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

@@ -18,7 +18,7 @@ http://www.ptxdist.org/pages/support.html
 on how to subscribe to this list. If you want to search through the
 mailing list archive, visit
 
-https://www.mail-archive.com/ptxdist@pengutronix.de/
+https://lore.ptxdist.org/ptxdist
 
 Please note again that this mailing list is just related to the PTXdist as a
 software. For questions regarding your specific BSP, see the following items.
@@ -31,16 +31,17 @@ online version can be read here:
 
 http://www.kroah.com/lkn/
 
-Chat/IRC
---------
+Chat: IRC and Matrix
+--------------------
 
-About PTXdist in particular
+Some of the PTXdist development community is active on IRC.
+Create a connection to the server ``irc.libera.chat`` on port 6697 (TLS) or
+6667 (plain text) and enter the chatroom ``#ptxdist``.
 
-**irc.freenode.net:6667**
+The same room is also bridged to Matrix at ``#ptxdist:matrix.org``.
 
-Create a connection to the ``irc.freenode.net:6667`` server and enter
-the chatroom ``#ptxdist``. This is an English room to answer questions
-about PTXdist. Best time to meet somebody there is at European daytime.
+This is an English room to answer questions about PTXdist.
+Best time to meet somebody there is at European daytime.
 
 Commercial Support
 ------------------

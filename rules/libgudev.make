@@ -14,14 +14,17 @@ PACKAGES-$(PTXCONF_LIBGUDEV) += libgudev
 #
 # Paths and names
 #
-LIBGUDEV_VERSION	:= 230
-LIBGUDEV_MD5		:= e4dee8f3f349e9372213d33887819a4d
+LIBGUDEV_VERSION	:= 238
+LIBGUDEV_MD5		:= 46da30a1c69101c3a13fa660d9ab7b73
 LIBGUDEV		:= libgudev-$(LIBGUDEV_VERSION)
 LIBGUDEV_SUFFIX		:= tar.xz
-LIBGUDEV_URL		:= https://download.gnome.org/sources/libgudev/$(LIBGUDEV_VERSION)/$(LIBGUDEV).$(LIBGUDEV_SUFFIX)
+LIBGUDEV_URL		:= $(call ptx/mirror, GNOME, libgudev/$(LIBGUDEV_VERSION)/$(LIBGUDEV).$(LIBGUDEV_SUFFIX))
 LIBGUDEV_SOURCE		:= $(SRCDIR)/$(LIBGUDEV).$(LIBGUDEV_SUFFIX)
 LIBGUDEV_DIR		:= $(BUILDDIR)/$(LIBGUDEV)
 LIBGUDEV_LICENSE	:= LGPL-2.1-or-later
+LIBGUDEV_LICENSE_FILES	:= \
+	file://gudev/gudevclient.c;startline=3;endline=17;md5=829bbbdef46b2ae9fc89115aea26f119 \
+	file://COPYING;md5=4fbd65380cdd255951079008b364516c
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,15 +35,15 @@ PTXCONF_LIBGUDEV_INTROSPECTION :=
 endif
 
 #
-# autoconf
+# meson
 #
-LIBGUDEV_CONF_TOOL	:= autoconf
+LIBGUDEV_CONF_TOOL	:= meson
 LIBGUDEV_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-gtk-doc \
-	--disable-gtk-doc-html \
-	--disable-gtk-doc-pdf \
-	--$(call ptx/endis, PTXCONF_LIBGUDEV_INTROSPECTION)-introspection
+	$(CROSS_MESON_USR) \
+	-Dgtk_doc=false \
+	-Dintrospection=$(call ptx/endis, PTXCONF_LIBGUDEV_INTROSPECTION)d \
+	-Dtests=disabled \
+	-Dvapi=disabled
 
 # ----------------------------------------------------------------------------
 # Target-Install

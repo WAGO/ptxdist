@@ -26,14 +26,13 @@ PV_DIR		:= $(BUILDDIR)/$(PV)
 # Prepare
 # ----------------------------------------------------------------------------
 
-PV_PATH	:= PATH=$(CROSS_PATH)
-PV_ENV 	:= $(CROSS_ENV)
-PV_MAKEVARS := $(CROSS_ENV_LD)
+PV_MAKE_OPT	:= $(CROSS_ENV_LD)
 
 #
 # autoconf
 #
-PV_AUTOCONF := \
+PV_CONF_TOOL	:= autoconf
+PV_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-nls \
 	--disable-splice \

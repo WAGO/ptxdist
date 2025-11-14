@@ -30,7 +30,8 @@ PUREFTPD_DIR		:= $(BUILDDIR)/$(PUREFTPD)
 #
 # autoconf
 #
-PUREFTPD_AUTOCONF := \
+PUREFTPD_CONF_TOOL	:= autoconf
+PUREFTPD_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--without-dmalloc \
 	--with-standalone \
@@ -113,7 +114,6 @@ endif
 #	#
 #	# busybox init
 #	#
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_PUREFTPD_STARTSCRIPT
 	@$(call install_alternative, pureftpd, 0, 0, 0755, /etc/init.d/pureftpd)
 
@@ -131,7 +131,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_PUREFTPD_BBINIT_LINK)),)
 	@$(call install_link, pureftpd, \
 		../init.d/pureftpd, \
 		/etc/rc.d/$(PTXCONF_PUREFTPD_BBINIT_LINK))
-endif
 endif
 endif
 

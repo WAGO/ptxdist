@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_OPENSC) += opensc
 #
 # Paths and names
 #
-OPENSC_VERSION	:= 0.19.0
-OPENSC_MD5	:= 40734b2343cf83c62c4c403f8a37475e
+OPENSC_VERSION	:= 0.23.0
+OPENSC_MD5	:= 35c599e673ae9205550974e2dcbe0825
 OPENSC		:= OpenSC-$(OPENSC_VERSION)
 OPENSC_SUFFIX	:= tar.gz
 OPENSC_URL	:= https://github.com/OpenSC/OpenSC/releases/download/$(OPENSC_VERSION)/$(OPENSC).$(OPENSC_SUFFIX)
@@ -56,7 +56,7 @@ OPENSC_CONF_OPT := \
 	--disable-doc \
 	--disable-dnie-ui \
 	--disable-notify \
-	--$(call ptx/endis,PTXCONF_OPENSC_TESTSUITE)-tests \
+	--$(call ptx/endis,PTXCONF_OPENSC_TESTSUITE)-cmocka \
 	--disable-static
 
 # ----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ ifdef PTXCONF_OPENSC_TESTSUITE
 	@$(call install_copy, opensc, 0, 0, 0755, /usr/lib/opensc/tests/regression)
 	@$(foreach prog, $(OPENSC_TESTS), \
                 $(call install_copy, opensc, 0, 0, 0755, $(OPENSC_DIR)/src/tests/$(prog), \
-			/usr/lib/opensc/tests/$(prog));)
+			/usr/lib/opensc/tests/$(prog))$(ptx/nl))
 
 	@$(call install_copy, opensc, 0, 0, 0644, $(OPENSC_DIR)/src/tests/regression/bintest, \
 		/usr/lib/opensc/tests/regression/bintest)

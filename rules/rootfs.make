@@ -63,6 +63,7 @@ ifdef PTXCONF_ROOTFS_HOME_ROOT
 	@$(call install_copy, rootfs, 0, 0, 0700, /root)
 endif
 ifdef PTXCONF_ROOTFS_MEDIA
+	@$(call install_copy, rootfs, 0, 0, 0755, /media)
 ifneq ($(call remove_quotes,$(PTXCONF_ROOTFS_MEDIA1)),)
 	@$(call install_copy, rootfs, 0, 0, 0777, /media/$(PTXCONF_ROOTFS_MEDIA1))
 endif
@@ -216,12 +217,14 @@ ifdef PTXCONF_ROOTFS_ISSUE
 		$(call remove_quotes,$(PTXCONF_ROOTFS_ETC_HOSTNAME)))
 	@$(call install_replace_figlet, rootfs, /etc/issue, \
 		@FIGLET:VENDOR@, \
-		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_PROJECT_VENDOR)`, \
-		etcissue)
+		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< \
+			"$(call remove_quotes,$(PTXCONF_PROJECT_VENDOR))"`, \
+			etcissue)
 	@$(call install_replace_figlet, rootfs, /etc/issue, \
 		@FIGLET:HOSTNAME@, \
-		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< $(PTXCONF_ROOTFS_ETC_HOSTNAME)`, \
-		etcissue)
+		`sed -r 's/ ?([\.:;,]) ?/ \1 /' <<< \
+			"$(call remove_quotes,$(PTXCONF_ROOTFS_ETC_HOSTNAME))"`, \
+			etcissue)
 endif
 
 ifdef PTXCONF_ROOTFS_HOSTS
@@ -276,7 +279,6 @@ endif
 
 	@$(call install_finish, rootfs)
 
-	@echo "$(ROOTFS_STAMP)" > $(STATEDIR)/rootfs.stamp
 	@$(call touch)
 
 # vim: syntax=make

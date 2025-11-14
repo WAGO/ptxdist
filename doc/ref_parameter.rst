@@ -20,7 +20,7 @@ Setup and Project Actions
   *platform*, *boardsetup*, *setup*, *go* and *images*.
 
 ``select <config>``
-  this action will select a user land
+  this action will select a userland
   configuration. This step is only required in projects where no
   ``selected_ptxconfig`` file is present. The <config> argument must point
   to a valid userland configuration file. PTXdist provides this feature
@@ -53,9 +53,13 @@ Setup and Project Actions
 
 ``setup``
   PTXdist uses some global settings, independent from the
-  project it is working on. These settings belong to users preferences or
+  project it is working on. These settings belong to user preferences or
   simply some network settings to permit PTXdist to download required
   packages.
+
+``localsetup``
+  The same setting as `ptxdist setup`. Any changes are saved locally in the
+  BSP and overwrite the global settings.
 
 ``boardsetup``
   PTXdist based projects can provide information to
@@ -95,12 +99,13 @@ Setup and Project Actions
   functionality as ``menuconfig``. It can be used instead of ``menuconfig``
   for all the component described above.
 
-``oldconfig [<component>]``, ``allmodconfig [<component>]``, ``allyesconfig [<component>]``, ``allnoconfig [<component>]``, ``randconfig [<component>]``
+``oldconfig [<component>]``, ``allmodconfig [<component>]``, ``allyesconfig [<component>]``, ``allnoconfig [<component>]``, ``alldefconfig [<component>]``, ``randconfig [<component>]``
   this action will run the corresponding kconfig action for the specified
   component. ``oldconfig`` will prompt for all new options.
-  ``allmodconfig``, ``allyesconfig`` and ``allnoconfig`` will set all
-  options to 'm', 'y' or 'n' respectively. ``randconfig`` will randomize
-  the options. The ``KCONFIG_ALLCONFIG`` and ``KCONFIG_SEED`` environment
+  ``allmodconfig``, ``allyesconfig``, ``allnoconfig`` or ``alldefconfig``
+  will set all options to 'm', 'y', 'n', or their default values respectively.
+  ``randconfig`` will randomize the options.
+  The ``KCONFIG_ALLCONFIG`` and ``KCONFIG_SEED`` environment
   variables can be used as described in the Linux kernel documentation.
 
 ``migrate``
@@ -228,6 +233,32 @@ Misc Actions
   are shown as well, so this can be used to verify that the correct version
   of these files are used.
 
+``fast-bsp-report``
+  create a yaml report that describes the BSP and all packages. The data is
+  similar to what ``bsp-info`` and ``package-info`` provide but combined
+  into a machine readable format.
+
+  To run this command, the BSP must be configured (e.g. the toolchain must
+  be available), but it works without building packages.
+
+  The expected format of the yaml file is described in schema
+  ``scripts/bsp-report-schema.yaml`` in the PTXdist source tree. There is
+  also a simple helper script ``scripts/validate-bsp-report-schema.py``
+  that can be used to validate the yaml file.
+
+  The result is found in ``<platform-dir>/release/fast-bsp-report.yaml``.
+
+``full-bsp-report``
+  create a yaml report much like ``fast-bsp-report``. It contains some
+  additional data, such as the list of ipkgs created by a package. The
+  license information is validated and expanded, so this can be used to
+  create a custom license report.
+
+  When the report is generated all packages will be built unless they are
+  already built.
+
+  The result is found in ``<platform-dir>/release/full-bsp-report.yaml``.
+
 .. _command_print:
 
 ``print <var>``
@@ -249,6 +280,11 @@ Misc Actions
   For the specified package (or all selected packages), check the MD5 sums
   of license files.
 
+``lint``
+  check the BSP and PTXdist for all kinds of issues. These are not checks
+  for things that cause build errors. Instead the checks look for
+  inconsistencies that may cause hidden problems.
+
 ``list-packages``
   print a list of all selected packages. This list does not include the
   host and cross tools.
@@ -267,8 +303,10 @@ Misc Actions
 ``make <target>``
   build specified make target in PTXdist.
 
-``export_src <target-dir>``
+``export-src <target-dir>``
   export all source archives needed for this project to ``<target-dir>``.
+
+  For backwards compatibility, the old syntax ``export_src`` is still accepted.
 
 ``docs-html``
   build HTML documentation for a BSP. The output is written to
@@ -312,7 +350,7 @@ Options
   suppress output, show only stderr
 
 ``--verbose``, ``-v``
-  be more verbose, print command before execute them
+  be more verbose, print command before execution
 
 ``--output-sync``, ``--no-output-sync``
   enable or disable output synchronization. By default output
@@ -377,6 +415,8 @@ Options
 
 ``--git``
   use git to apply patches
+
+.. _ptxdist_parameter_autoversion:
 
 ``--auto-version``
   automatically switch to the correct PTXdist version. This will look for

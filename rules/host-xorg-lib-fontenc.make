@@ -21,12 +21,9 @@ HOST_XORG_LIB_FONTENC_DIR	= $(HOST_BUILDDIR)/$(XORG_LIB_FONTENC)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_XORG_LIB_FONTENC_PATH	:= PATH=$(HOST_PATH)
-HOST_XORG_LIB_FONTENC_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_XORG_LIB_FONTENC_AUTOCONF	:= $(HOST_AUTOCONF)
+HOST_XORG_LIB_FONTENC_CONF_TOOL	:= autoconf
 
 # vim: syntax=make

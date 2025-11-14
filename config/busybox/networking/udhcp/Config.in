@@ -7,10 +7,16 @@
 config BUSYBOX_UDHCPD
 	bool "udhcpd (21 kb)"
 	default y
-	select BUSYBOX_PLATFORM_LINUX
 	help
 	udhcpd is a DHCP server geared primarily toward embedded systems,
 	while striving to be fully functional and RFC compliant.
+
+config BUSYBOX_FEATURE_UDHCPD_BOOTP
+	bool "Answer to BOOTP requests as well"
+	default y
+	depends on BUSYBOX_UDHCPD
+	help
+	Support old BOOTP protocol too.
 
 config BUSYBOX_FEATURE_UDHCPD_BASE_IP_ON_MAC
 	bool "Select IP address based on client MAC"
@@ -45,7 +51,7 @@ config BUSYBOX_DHCPD_LEASES_FILE
 	of the file. Normally it is safe to leave it untouched.
 
 config BUSYBOX_DUMPLEASES
-	bool "dumpleases (5.1 kb)"
+	bool "dumpleases (5.3 kb)"
 	default y
 	help
 	dumpleases displays the leases written out by the udhcpd.
@@ -53,7 +59,7 @@ config BUSYBOX_DUMPLEASES
 	by the absolute time that it expires in seconds from epoch.
 
 config BUSYBOX_DHCPRELAY
-	bool "dhcprelay (5.2 kb)"
+	bool "dhcprelay (5.5 kb)"
 	default y
 	help
 	dhcprelay listens for DHCP requests on one or more interfaces
@@ -63,7 +69,6 @@ config BUSYBOX_DHCPRELAY
 config BUSYBOX_UDHCPC
 	bool "udhcpc (24 kb)"
 	default y
-	select BUSYBOX_PLATFORM_LINUX
 	help
 	udhcpc is a DHCP client geared primarily toward embedded systems,
 	while striving to be fully functional and RFC compliant.
@@ -95,11 +100,16 @@ config BUSYBOX_FEATURE_UDHCPC_SANITIZEOPT
 config BUSYBOX_UDHCPC_DEFAULT_SCRIPT
 	string "Absolute path to config script"
 	default "/usr/share/udhcpc/default.script"
-	depends on BUSYBOX_UDHCPC || BUSYBOX_UDHCPC6
+	depends on BUSYBOX_UDHCPC
 	help
 	This script is called after udhcpc receives an answer. See
 	examples/udhcp for a working example. Normally it is safe
 	to leave this untouched.
+
+config BUSYBOX_UDHCPC6_DEFAULT_SCRIPT
+	string "Absolute path to config script for IPv6"
+	default "/usr/share/udhcpc/default6.script"
+	depends on BUSYBOX_UDHCPC6
 
 # udhcpc6 config is inserted here:
 config BUSYBOX_UDHCPC6
@@ -143,6 +153,14 @@ config BUSYBOX_FEATURE_UDHCPC6_RFC5970
 
 comment "Common options for DHCP applets"
         depends on BUSYBOX_UDHCPD || BUSYBOX_UDHCPC || BUSYBOX_UDHCPC6 || BUSYBOX_DHCPRELAY
+
+config BUSYBOX_UDHCPC_DEFAULT_INTERFACE
+	string "Default interface name"
+	default "eth0"
+	depends on BUSYBOX_UDHCPC || BUSYBOX_UDHCPC6
+	help
+	The interface that will be used if no other interface is
+	specified on the commandline.
 
 config BUSYBOX_FEATURE_UDHCP_PORT
 	bool "Enable '-P port' option for udhcpd and udhcpc"

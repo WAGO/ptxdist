@@ -17,7 +17,8 @@ HOST_PACKAGES-$(PTXCONF_HOST_LIBARCHIVE) += host-libarchive
 
 HOST_LIBARCHIVE_CONF_ENV	:= \
 	$(HOST_ENV) \
-	ac_cv_have_decl_EXT2_IOC_GETFLAGS=no
+	ac_cv_have_decl_EXT2_IOC_GETFLAGS=no \
+	ac_cv_header_ext2fs_ext2_fs_h=no
 
 #
 # autoconf
@@ -29,17 +30,21 @@ HOST_LIBARCHIVE_CONF_OPT	:= \
 	--disable-bsdtar \
 	--disable-bsdcat \
 	--disable-bsdcpio \
+	--disable-bsdunzip \
 	--disable-rpath \
 	--enable-posix-regex-lib=libc \
 	--disable-xattr \
 	--disable-acl \
 	--with-zlib \
 	--without-bz2lib \
+	--without-libb2 \
 	--without-iconv \
 	--without-lz4 \
+	--without-zstd \
 	--without-lzma \
 	--without-lzo2 \
 	--without-cng \
+	--without-mbedtls \
 	--without-nettle \
 	--without-openssl \
 	--without-xml2 \

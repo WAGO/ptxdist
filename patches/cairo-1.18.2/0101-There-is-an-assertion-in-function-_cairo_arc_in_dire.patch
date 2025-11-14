@@ -1,0 +1,29 @@
+From: Christian Melki <christian.melki@t2data.com>
+Date: Tue, 17 May 2022 11:10:14 +0200
+Subject: [PATCH] There is an assertion in function _cairo_arc_in_direction().
+
+CVE: CVE-2019-6462
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+
+The patch was imported from the Yocto project.
+
+Signed-off-by: Christian Melki <christian.melki@t2data.com>
+---
+ src/cairo-arc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/cairo-arc.c b/src/cairo-arc.c
+index 010b9c1a7a18..4516c00e2602 100644
+--- a/src/cairo-arc.c
++++ b/src/cairo-arc.c
+@@ -191,7 +191,8 @@ _cairo_arc_in_direction (cairo_t	  *cr,
+     if (! ISFINITE (angle_max) || ! ISFINITE (angle_min))
+         return;
+ 
+-    assert (angle_max >= angle_min);
++    if (angle_max < angle_min)
++       return;
+ 
+     if (angle_max - angle_min > 2 * M_PI * MAX_FULL_CIRCLES) {
+ 	angle_max = fmod (angle_max - angle_min, 2 * M_PI);

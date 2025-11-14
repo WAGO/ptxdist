@@ -18,7 +18,7 @@ RSYNC_VERSION	:= 2.6.9
 RSYNC_MD5	:= 996d8d8831dbca17910094e56dcb5942
 RSYNC		:= rsync-$(RSYNC_VERSION)
 RSYNC_SUFFIX	:= tar.gz
-RSYNC_URL	:= http://samba.org/ftp/rsync/src/$(RSYNC).$(RSYNC_SUFFIX)
+RSYNC_URL	:= https://www.samba.org/ftp/rsync/src/$(RSYNC).$(RSYNC_SUFFIX)
 RSYNC_SOURCE	:= $(SRCDIR)/$(RSYNC).$(RSYNC_SUFFIX)
 RSYNC_DIR	:= $(BUILDDIR)/$(RSYNC)
 
@@ -26,15 +26,15 @@ RSYNC_DIR	:= $(BUILDDIR)/$(RSYNC)
 # Prepare
 # ----------------------------------------------------------------------------
 
-RSYNC_PATH	:= PATH=$(CROSS_PATH)
-RSYNC_ENV 	:= \
+RSYNC_CONF_ENV	:= \
 	$(CROSS_ENV) \
 	rsync_cv_HAVE_GETTIMEOFDAY_TZ=yes 
 
 #
 # autoconf
 #
-RSYNC_AUTOCONF := \
+RSYNC_CONF_TOOL	:= autoconf
+RSYNC_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_IPV6_OPTION) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
@@ -44,7 +44,7 @@ RSYNC_AUTOCONF := \
 	--disable-locale
 
 ifneq ($(call remove_quotes,$(PTXCONF_RSYNC_CONFIG_FILE)),)
-RSYNC_AUTOCONF += --with-rsyncd-conf=$(PTXCONF_RSYNC_CONFIG_FILE)
+RSYNC_CONF_OPT	+= --with-rsyncd-conf=$(PTXCONF_RSYNC_CONFIG_FILE)
 endif
 
 # ----------------------------------------------------------------------------
@@ -66,8 +66,6 @@ $(STATEDIR)/rsync.targetinstall:
 	@$(call install_alternative, rsync, 0, 0, 0644, /etc/rsyncd.conf, n)
 	@$(call install_alternative, rsync, 0, 0, 0644, /etc/rsyncd.secrets, n)
 
-ifdef PTXCONF_RSYNC_STARTUP_TYPE_STANDALONE
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_RSYNC_STARTSCRIPT
 	@$(call install_alternative, rsync, 0, 0, 0755, /etc/init.d/rsyncd, n)
 	@$(call install_replace, rsync, /etc/init.d/rsyncd, \
@@ -78,8 +76,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_RSYNC_BBINIT_LINK)),)
 	@$(call install_link, rsync, \
 		../init.d/rsyncd, \
 		/etc/rc.d/$(PTXCONF_RSYNC_BBINIT_LINK))
-endif
-endif
 endif
 endif
 

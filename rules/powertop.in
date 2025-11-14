@@ -3,6 +3,8 @@
 menuconfig POWERTOP
 	tristate
 	prompt "powertop                      "
+	select HOST_GETTEXT
+	select HOST_AUTOTOOLS_AUTOCONF_ARCHIVE
 	select NCURSES
 	select LIBNL3
 	select LIBC_RESOLV
@@ -37,5 +39,5 @@ config POWERTOP_PCI_SUPPORT
 endif
 
 comment "BusyBox' powertop is selected!"
-        depends on BUSYBOX_POWERTOP
+	depends on BUSYBOX_POWERTOP
 

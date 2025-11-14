@@ -16,8 +16,8 @@ PACKAGES-$(PTXCONF_GDB) += gdb
 #
 # Paths and names
 #
-GDB_VERSION	 = $(SHARED_GDB_VERSION)
-GDB_MD5		 = $(SHARED_GDB_MD5)
+GDB_VERSION	 = $(call ptx/config-version,PTXCONF_GDB,SHARED_GDB)
+GDB_MD5		 = $(call ptx/config-md5,PTXCONF_GDB,SHARED_GDB)
 GDB		:= gdb-$(GDB_VERSION)
 GDB_SUFFIX	:= tar.xz
 GDB_SOURCE	:= $(SRCDIR)/$(GDB).$(GDB_SUFFIX)
@@ -26,7 +26,7 @@ GDB_LICENSE	:= GPL-3.0-or-later
 
 GDB_URL := \
 	$(call ptx/mirror, GNU, gdb/$(GDB).$(GDB_SUFFIX)) \
-	ftp://sourceware.org/pub/gdb/snapshots/current/$(GDB).$(GDB_SUFFIX)
+	https://sourceware.org/pub/gdb/snapshots/current/$(GDB).$(GDB_SUFFIX)
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -37,26 +37,47 @@ GDB_WRAPPER_BLACKLIST := \
 	TARGET_HARDEN_PIE
 endif
 
-GDB_ENV := \
+GDB_CONF_OPT_HOST	:= \
+	--disable-tui \
+	--disable-rpath \
+	--with-lzma=$(call ptx/yesno, PTXCONF_GDB_DEBUGINFO_SUPPORT) \
+	--without-expat \
+	--without-mpfr \
+	--without-python
+
+ifneq ($(filter 1%,$(GDB_VERSION)),)
+# version >= 10
+GDB_CONF_OPT_HOST	+= \
+	--without-xxhash
+endif
+
+GDB_CONF_ENV		:= \
 	$(CROSS_ENV) \
 	$(CROSS_ENV_FLAGS_FOR_TARGET) \
-	host_configargs='--disable-tui --disable-rpath --without-expat'
+	host_configargs='$(GDB_CONF_OPT_HOST)'
 
 ifndef PTXCONF_GDB_SHARED
-GDB_MAKEVARS := LDFLAGS=-static
+GDB_MAKE_OPT := LDFLAGS=-static
 endif
 
 #
 # autoconf
 #
-GDB_AUTOCONF := \
+GDB_CONF_TOOL		:= autoconf
+GDB_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
 	--target=$(PTXCONF_GNU_TARGET) \
 	--with-build-sysroot=$(SYSROOT) \
-	--disable-werror
-
+	--disable-werror \
+	--with-system-zlib \
+	$(call ptx/ifdef, PTXCONF_GDB_14_1,--$(call ptx/wwo, PTXCONF_GDB_ZSTD)-zstd,)
 
 GDB_BUILD_OOT := YES
+
+# for gdb subdir configure
+GDB_MAKE_ENV		:= \
+	with_libgmp_prefix=no \
+	with_liblzma_prefix=no
 
 # ----------------------------------------------------------------------------
 # Install

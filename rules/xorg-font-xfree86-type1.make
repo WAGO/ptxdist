@@ -31,13 +31,11 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_FONT_XFREE86_TYPE1_PATH	:= PATH=$(CROSS_PATH)
-XORG_FONT_XFREE86_TYPE1_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_FONT_XFREE86_TYPE1_AUTOCONF := \
+XORG_FONT_XFREE86_TYPE1_CONF_TOOL := autoconf
+XORG_FONT_XFREE86_TYPE1_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--with-fontdir=$(XORG_FONTDIR)/Type1
 

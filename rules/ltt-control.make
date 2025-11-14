@@ -27,13 +27,11 @@ LTT_CONTROL_DIR		:= $(BUILDDIR)/$(LTT_CONTROL)
 # Prepare
 # ----------------------------------------------------------------------------
 
-LTT_CONTROL_PATH	:= PATH=$(CROSS_PATH)
-LTT_CONTROL_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LTT_CONTROL_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LTT_CONTROL_CONF_TOOL	:= autoconf
+LTT_CONTROL_CONF_OPT	:= $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

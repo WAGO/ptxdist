@@ -7,9 +7,8 @@ menuconfig LIBXML2
 	select LIBC_DL	if LIBXML2_MODULES
 	select ZLIB	if LIBXML2_ZLIB
 	select XZ	if LIBXML2_LZMA
-	select PYTHON	if LIBXML2_PYTHON
 	help
-	  Libxml2 is a XML C parser and toolkit. XML itself is a
+	  Libxml2 is an XML C parser and toolkit. XML itself is a
 	  metalanguage to design markup languages, i.e. text
 	  language where semantic and structure are added to the
 	  content using extra "markup" information enclosed
@@ -50,19 +49,6 @@ config LIBXML2_DEBUG
 	prompt "Debugging"
 	help
 	  Enable debugging support.
-
-config LIBXML2_DOCBOOK
-	bool
-	default y
-	prompt "Docbook support"
-	help
-	  Enable Docbook SGML support
-
-config LIBXML2_FEXCEPTIONS
-	bool
-	prompt "C++ Exception Support"
-	help
-	  Add GCC flag -fexceptions for C++ exceptions.
 
 config LIBXML2_FTP
 	bool
@@ -105,12 +91,6 @@ config LIBXML2_LEGACY
 	help
 	  Add support for deprecated APIs (compatibility)
 
-config LIBXML2_MEM_DEBUG
-	bool
-	prompt "Memory Debugging Module"
-	help
-	  Add the memory debugging support.
-
 config LIBXML2_MINIMUM
 	bool
 	prompt "Optimize for size"
@@ -138,19 +118,13 @@ config LIBXML2_PUSH
 	help
 	  Add the PUSH parser interface.
 
-config LIBXML2_PYTHON
-	bool
-	prompt "Python bindings"
-	depends on BROKEN
-	help
-	  Build Python bindings if found.
-
 config LIBXML2_READER
 	bool
 	default y
 	# hard dependencies from configure.in
 	select LIBXML2_PUSH
 	# needed for xmlValidatePopElement
+	select LIBXML2_REGEXPS
 	select LIBXML2_DTD
 	prompt "xmlReader Parsing Interface"
 	help
@@ -164,12 +138,6 @@ config LIBXML2_REGEXPS
 	  Add support for Regular Expressions.
 
 #  --with-readline=DIR     use readline in DIR
-
-config LIBXML2_RUN_DEBUG
-	bool
-	prompt "Enable Runtime Debugging"
-	help
-	  Enable runtime debugging module.
 
 config LIBXML2_SAX1
 	bool
@@ -270,5 +238,11 @@ config LIBXML2_LZMA
 	prompt "lzma (compression) support"
 	help
 	  LZMA (compression) support with liblzma from XZ tools.
+
+config LIBXML2_XMLLINT
+	bool
+	prompt "install xmllint"
+	help
+	  Install xmllint tool
 
 endif

@@ -3,6 +3,7 @@
 menuconfig V4L_UTILS
 	tristate
 	prompt "v4l-utils                     "
+	select HOST_MESON
 	select UDEV		if V4L_UTILS_MEDIACTL
 	select UDEV_LIBUDEV	if V4L_UTILS_MEDIACTL
 	select LIBC_DL		if V4L_UTILS_LIBV4L2 || V4L_UTILS_MEDIACTL
@@ -11,6 +12,7 @@ menuconfig V4L_UTILS
 	select LIBC_PTHREAD	if V4L_UTILS_LIBV4L2 || V4L_UTILS_MEDIACTL
 	select GCCLIBS_GCC_S	if V4L_UTILS_V4L2CTL || V4L_UTILS_V4L2COMPLIANCE
 	select LIBJPEG		if V4L_UTILS_LIBV4LCONVERT
+	select JSON_C		if V4L_UTILS_TRACER
 	help
 	  Linux V4L2 and DVB API utilities and v4l libraries (libv4l).
 
@@ -23,8 +25,14 @@ config V4L_UTILS_LIBV4L1
 
 config V4L_UTILS_LIBV4L2
 	bool
-	select V4L_UTILS_LIBV4LCONVERT
 	prompt "install libv4l2"
+
+config V4L_UTILS_V4L2CONVERT
+	bool
+	select V4L_UTILS_LIBV4L2
+	select V4L_UTILS_LIBV4LCONVERT
+	depends on !GLIBC_Y2038
+	prompt "install v4l2convert"
 
 config V4L_UTILS_LIBV4LCONVERT
 	bool
@@ -88,5 +96,10 @@ config V4L_UTILS_V4L2CTL
 config V4L_UTILS_V4L2SYSFSPATH
 	bool
 	prompt "install v4l2-sysfs-path"
+
+config V4L_UTILS_TRACER
+	bool
+	depends on !GLIBC_Y2038
+	prompt "install v4l2-tracer"
 
 endif

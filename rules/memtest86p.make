@@ -19,7 +19,7 @@ endif
 MEMTEST86P_VERSION	:= 4.20
 MEMTEST86P		:= memtest86+-$(MEMTEST86P_VERSION)
 MEMTEST86P_SUFFIX	:= tar.gz
-MEMTEST86P_URL		:= http://www.memtest.org/download/$(MEMTEST86P_VERSION)/$(MEMTEST86P).$(MEMTEST86P_SUFFIX)
+MEMTEST86P_URL		:= http://www.memtest.org/download/archives/$(MEMTEST86P_VERSION)/$(MEMTEST86P).$(MEMTEST86P_SUFFIX)
 MEMTEST86P_SOURCE	:= $(SRCDIR)/$(MEMTEST86P).$(MEMTEST86P_SUFFIX)
 MEMTEST86P_DIR		:= $(BUILDDIR)/$(MEMTEST86P)
 MEMTEST86P_LICENSE	:= GPL-2
@@ -46,7 +46,6 @@ endif
 # Compile
 # ----------------------------------------------------------------------------
 
-MEMTEST86P_PATH	:= PATH=$(CROSS_PATH)
 MEMTEST86P_MAKE_OPT	:= $(CROSS_ENV_PROGS)
 MEMTEST86P_CFLAGS	:= -fgnu89-inline
 

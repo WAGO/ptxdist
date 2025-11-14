@@ -12,7 +12,7 @@ menuconfig DNSMASQ
 	help
 	  A small caching DNS proxy and DHCP server.
 
- 	  Dnsmasq is lightweight, easy to configure DNS forwarder
+	  Dnsmasq is lightweight, easy to configure DNS forwarder
 	  and DHCP server. It is designed to provide DNS and,
 	  optionally, DHCP, to a small network. It can serve the
 	  names of local machines which are not in the global DNS.
@@ -20,7 +20,7 @@ menuconfig DNSMASQ
 	  machines with DHCP-allocated addresses to appear in the DNS
 	  with names configured either in each host or in a central
 	  configuration file. Dnsmasq supports static and dynamic
- 	  DHCP leases and BOOTP for network booting of diskless machines.
+	  DHCP leases and BOOTP for network booting of diskless machines.
 	  Note: In order to make dnsmasq work as DHCP, you have to enable
 	  the following kernel features: FIXME
 
@@ -63,7 +63,6 @@ config DNSMASQ_SCRIPT
 
 config DNSMASQ_SCRIPT_LUA
 	bool
-	default n
 	depends on DNSMASQ_SCRIPT
 	prompt "include lease script LUA support"
 	help
@@ -71,7 +70,6 @@ config DNSMASQ_SCRIPT_LUA
 
 config DNSMASQ_DNSSEC
 	bool
-	default n
 	prompt "include DNSSEC support"
 	help
 	  Without this option it is not possible to call scripts when a lease changes
@@ -86,7 +84,7 @@ choice
 		bool
 		prompt "inetd driven"
 		help
-		  Install a inetd rule for dnsmasq. This option adds the following line
+		  Install an inetd rule for dnsmasq. This option adds the following line
 		  to /etc/inetd.conf.d/dnsmasq:
 
 		  domain stream tcp nowait root /sbin/dnsmasq domain
@@ -99,6 +97,7 @@ choice
 
 	config DNSMASQ_STARTSCRIPT
 		bool
+		depends on INITMETHOD_BBINIT
 		prompt "standalone"
 		help
 		  This installs dnsmasq startup script /etc/init.d/dnsmasq.

@@ -30,13 +30,11 @@ endif
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_FONT_ENCODINGS_PATH	:= PATH=$(CROSS_PATH)
-XORG_FONT_ENCODINGS_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_FONT_ENCODINGS_AUTOCONF := \
+XORG_FONT_ENCODINGS_CONF_TOOL	:= autoconf
+XORG_FONT_ENCODINGS_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--with-encodingsdir=$(XORG_FONTDIR)/encodings
 

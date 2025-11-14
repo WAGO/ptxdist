@@ -18,7 +18,7 @@ TOMOYO_TOOLS_VERSION	:= 2.5.0-20130406
 TOMOYO_TOOLS_MD5	:= 8888f83fcb87823d714ff551e8680d0d
 TOMOYO_TOOLS		:= tomoyo-tools-$(TOMOYO_TOOLS_VERSION)
 TOMOYO_TOOLS_SUFFIX	:= tar.gz
-TOMOYO_TOOLS_URL	:= http://sourceforge.jp/frs/redir.php?m=jaist&f=/tomoyo/53357/$(TOMOYO_TOOLS).$(TOMOYO_TOOLS_SUFFIX)
+TOMOYO_TOOLS_URL	:= http://jaist.dl.sourceforge.jp/tomoyo/53357/$(TOMOYO_TOOLS).$(TOMOYO_TOOLS_SUFFIX)
 TOMOYO_TOOLS_SOURCE	:= $(SRCDIR)/$(TOMOYO_TOOLS).$(TOMOYO_TOOLS_SUFFIX)
 TOMOYO_TOOLS_DIR	:= $(BUILDDIR)/tomoyo-tools
 TOMOYO_TOOLS_LICENSE	:= GPL
@@ -72,10 +72,12 @@ $(STATEDIR)/tomoyo-tools.targetinstall:
 	@$(call install_copy, tomoyo-tools, 0, 0, 0755, -, /sbin/tomoyo-init)
 
 	@$(foreach prog, $(TOMOYO_TOOLS_SBIN_PROGS), \
-		$(call install_copy, tomoyo-tools, 0, 0, 0755, -, /usr/sbin/$(prog));)
+		$(call install_copy, tomoyo-tools, 0, 0, 0755, -, \
+			/usr/sbin/$(prog))$(ptx/nl))
 
 	@$(foreach prog, $(TOMOYO_TOOLS_LIBEXEC_PROGS), \
-		$(call install_copy, tomoyo-tools, 0, 0, 0755, -, /usr/lib/tomoyo/$(prog));)
+		$(call install_copy, tomoyo-tools, 0, 0, 0755, -, \
+			/usr/lib/tomoyo/$(prog))$(ptx/nl))
 
 	@$(call install_lib, tomoyo-tools, 0, 0, 0644, libtomoyotools)
 

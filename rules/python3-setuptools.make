@@ -14,16 +14,16 @@ PACKAGES-$(PTXCONF_PYTHON3_SETUPTOOLS) += python3-setuptools
 #
 # Paths and names
 #
-PYTHON3_SETUPTOOLS_VERSION	:= 41.6.0
-PYTHON3_SETUPTOOLS_MD5		:= 5585a55bfc28474ef13cc0b1819c5a46
+PYTHON3_SETUPTOOLS_VERSION	:= 67.4.0
+PYTHON3_SETUPTOOLS_MD5		:= a15e7546790b932a94fd9ccca7f839de
 PYTHON3_SETUPTOOLS		:= setuptools-$(PYTHON3_SETUPTOOLS_VERSION)
-PYTHON3_SETUPTOOLS_SUFFIX	:= zip
-PYTHON3_SETUPTOOLS_URL		:= https://files.pythonhosted.org/packages/source/s/setuptools/$(PYTHON3_SETUPTOOLS).$(PYTHON3_SETUPTOOLS_SUFFIX)
+PYTHON3_SETUPTOOLS_SUFFIX	:= tar.gz
+PYTHON3_SETUPTOOLS_URL		:= $(call ptx/mirror-pypi, setuptools, $(PYTHON3_SETUPTOOLS).$(PYTHON3_SETUPTOOLS_SUFFIX))
 PYTHON3_SETUPTOOLS_SOURCE	:= $(SRCDIR)/$(PYTHON3_SETUPTOOLS).$(PYTHON3_SETUPTOOLS_SUFFIX)
 PYTHON3_SETUPTOOLS_DIR		:= $(BUILDDIR)/$(PYTHON3_SETUPTOOLS)
 PYTHON3_SETUPTOOLS_LICENSE	:= MIT
 PYTHON3_SETUPTOOLS_LICENSE_FILES	:= \
-	file://LICENSE;md5=9a33897f1bca1160d7aad3835152e158
+	file://LICENSE;md5=7a7126e068206290f3fe9f8d6c713ea6
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-setuptools.targetinstall:
 	@$(call install_fixup, python3-setuptools,DESCRIPTION,missing)
 
 	@$(call install_glob,python3-setuptools, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py *.exe)
 
 	@$(call install_finish, python3-setuptools)
 

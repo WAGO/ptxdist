@@ -14,14 +14,15 @@ PACKAGES-$(PTXCONF_TAR) += tar
 #
 # Paths and names
 #
-TAR_VERSION	:= 1.30
-TAR_MD5		:= 2d01c6cd1387be98f57a0ec4e6e35826
+TAR_VERSION	:= 1.35
+TAR_MD5		:= a2d8042658cfd8ea939e6d911eaf4152
 TAR		:= tar-$(TAR_VERSION)
 TAR_SUFFIX	:= tar.xz
 TAR_URL		:= $(call ptx/mirror, GNU, tar/$(TAR).$(TAR_SUFFIX))
 TAR_SOURCE	:= $(SRCDIR)/$(TAR).$(TAR_SUFFIX)
 TAR_DIR		:= $(BUILDDIR)/$(TAR)
 TAR_LICENSE	:= GPL-3.0-or-later
+TAR_LICENSE_FILES := file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -35,12 +36,17 @@ TAR_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--disable-acl \
+	--disable-gcc-warnings \
 	--disable-rpath \
 	--disable-nls \
 	--disable-backup-scripts \
+	--$(call ptx/endis, PTXDIST_Y2038)-year2038 \
 	--with-posix-acls \
 	--with-included-regex \
 	--without-selinux \
+	--with-packager \
+	--with-packager-version \
+	--with-packager-bug-reports \
 	--with-xattrs
 
 # ----------------------------------------------------------------------------

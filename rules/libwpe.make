@@ -14,9 +14,9 @@ PACKAGES-$(PTXCONF_LIBWPE) += libwpe
 #
 # Paths and names
 #
-LIBWPE_VERSION		:= 1.6.0
+LIBWPE_VERSION		:= 1.14.2
 LIBWPE_LIBRARY_VERSION	:= 1.0
-LIBWPE_MD5		:= 6e8a2c279dcc3617db5ec7ac4c03d628
+LIBWPE_MD5		:= 61840e24ba0a0f5828194dff28db92ee
 LIBWPE			:= libwpe-$(LIBWPE_VERSION)
 LIBWPE_SUFFIX		:= tar.xz
 LIBWPE_URL		:= https://wpewebkit.org/releases/$(LIBWPE).$(LIBWPE_SUFFIX)
@@ -32,12 +32,12 @@ LIBWPE_LICENSE_FILES	:= file://COPYING;md5=371a616eb4903c6cb79e9893a5f615cc
 #
 # cmake
 #
-LIBWPE_CONF_TOOL	:= cmake
+LIBWPE_CONF_TOOL	:= meson
 LIBWPE_CONF_OPT	:= \
-	$(CROSS_CMAKE_USR) \
-	-G Ninja \
-	-DBUILD_DOCS=OFF \
-	-DWPE_BACKEND= \
+	$(CROSS_MESON_USR) \
+	-Dbuild-docs=false \
+	-Ddefault-backend= \
+	-Denable-xkb=true
 
 # ----------------------------------------------------------------------------
 # Target-Install

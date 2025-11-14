@@ -1,0 +1,85 @@
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Sat, 4 Feb 2023 16:18:21 +0100
+Subject: [PATCH] run native code generators with qemu
+
+Host tools cannot be used because they would generate code based on
+properties of the host architecture, e.g. pointer size.
+
+Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+---
+ node.gyp                 | 3 +++
+ tools/v8_gypfiles/v8.gyp | 5 +++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/node.gyp b/node.gyp
+index aa98fe4c2fae..5ebc27d92de4 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -662,6 +662,7 @@
+                   'action_name': 'node_mksnapshot',
+                   'process_outputs_as_sources': 1,
+                   'inputs': [
++                    '<(PRODUCT_DIR)/tool-wrapper',
+                     '<(node_mksnapshot_exec)',
+                     '<(node_snapshot_main)',
+                   ],
+@@ -966,6 +967,7 @@
+           'action_name': 'node_js2c',
+           'process_outputs_as_sources': 1,
+           'inputs': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(node_js2c_exec)',
+             '<@(library_files)',
+             '<@(deps_files)',
+@@ -975,6 +977,7 @@
+             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
+           ],
+           'action': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(node_js2c_exec)',
+             '<@(_outputs)',
+             'lib',
+diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
+index adfc3f6e1095..f4c472a08d23 100644
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -81,6 +81,7 @@
+         {
+           'action_name': 'run_torque_action',
+           'inputs': [  # Order matters.
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '<@(torque_files)',
+           ],
+@@ -112,6 +113,7 @@
+             '<@(torque_outputs_inc)',
+           ],
+           'action': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
+             '-o', '<(SHARED_INTERMEDIATE_DIR)/torque-generated',
+             '-v8-root', '<(V8_ROOT)',
+@@ -224,6 +226,7 @@
+         {
+           'action_name': 'generate_bytecode_builtins_list_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)bytecode_builtins_list_generator<(EXECUTABLE_SUFFIX)',
+           ],
+           'outputs': [
+@@ -401,6 +404,7 @@
+             ],
+           },
+           'inputs': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(mksnapshot_exec)',
+           ],
+           'outputs': [
+@@ -1670,6 +1674,7 @@
+         {
+           'action_name': 'run_gen-regexp-special-case_action',
+           'inputs': [
++            '<(PRODUCT_DIR)/tool-wrapper',
+             '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)gen-regexp-special-case<(EXECUTABLE_SUFFIX)',
+           ],
+           'outputs': [

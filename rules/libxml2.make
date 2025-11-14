@@ -16,33 +16,30 @@ PACKAGES-$(PTXCONF_LIBXML2) += libxml2
 #
 # Paths and names
 #
-LIBXML2_VERSION	:= 2.9.10
-LIBXML2_MD5	:= 10942a1dc23137a8aa07f0639cbfece5
+LIBXML2_VERSION	:= 2.13.4
+LIBXML2_MD5	:= 1c5f9cfeee665eb6f1ddc186aba4cf2f
 LIBXML2		:= libxml2-$(LIBXML2_VERSION)
-LIBXML2_SUFFIX	:= tar.gz
+LIBXML2_SUFFIX	:= tar.xz
 LIBXML2_SOURCE	:= $(SRCDIR)/$(LIBXML2).$(LIBXML2_SUFFIX)
 LIBXML2_DIR	:= $(BUILDDIR)/$(LIBXML2)
 LIBXML2_LICENSE	:= MIT AND ISC
-# The file 'COPYING' is just a symlink on the file 'Copyright'
 LIBXML2_LICENSE_FILES := \
-	file://Copyright;md5=2044417e2e5006b65a8b9067b683fcf1 \
-	file://hash.c;startline=6;endline=15;md5=96f7296605eae807670fb08947829969
+	file://Copyright;md5=f437ed9058e8e5135e47c01e973376ba \
+	file://dict.c;startline=5;endline=16;md5=6bf674402d04fa793fdc1f4d26635d33 \
+	file://list.c;startline=4;endline=15;md5=3fca05145285fa81f48c16c86a4a70b8
 
 LIBXML2_URL := \
-	ftp://xmlsoft.org/libxml2/$(LIBXML2).$(LIBXML2_SUFFIX) \
-	ftp://xmlsoft.org/libxml2/old/$(LIBXML2).$(LIBXML2_SUFFIX)
+	https://download.gnome.org/sources/libxml2/$(basename $(LIBXML2_VERSION))/$(LIBXML2).$(LIBXML2_SUFFIX)
 
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBXML2_PATH	:= PATH=$(CROSS_PATH)
-LIBXML2_ENV	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBXML2_AUTOCONF := \
+LIBXML2_CONF_TOOL := autoconf
+LIBXML2_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-static \
 	$(GLOBAL_IPV6_OPTION) \
@@ -50,23 +47,20 @@ LIBXML2_AUTOCONF := \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_C14N)-c14n \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_CATALOG)-catalog \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_DEBUG)-debug \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_DOCBOOK)-docbook \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_FEXCEPTIONS)-fexceptions \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_FTP)-ftp \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_HISTORY)-history \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_HTML)-html \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_HTTP)-http \
 	--without-icu \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_ISO8859X)-iso8859x \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_LEGACY)-legacy \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_MEM_DEBUG)-mem-debug \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_MINIMUM)-minimum \
+	--$(call ptx/wwo, PTXCONF_LIBXML2_LZMA)-lzma \
+	--$(call ptx/wwo, PTXCONF_LIBXML2_MODULES)-modules \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_OUTPUT)-output \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_PATTERN)-pattern \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_PUSH)-push \
+	--without-python \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_READER)-reader \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_REGEXPS)-regexps \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_RUN_DEBUG)-run-debug \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_SAX1)-sax1 \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_SCHEMAS)-schemas \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_SCHEMATRON)-schematron \
@@ -78,27 +72,22 @@ LIBXML2_AUTOCONF := \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_XINCLUDE)-xinclude \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_XPATH)-xpath \
 	--$(call ptx/wwo, PTXCONF_LIBXML2_XPTR)-xptr \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_MODULES)-modules \
-	--$(call ptx/wwo, PTXCONF_LIBXML2_LZMA)-lzma \
-	--without-coverage
+	--$(call ptx/wwo, PTXCONF_LIBXML2_XPTR)-xptr-locs \
+	--$(call ptx/wwo, PTXCONF_LIBXML2_MINIMUM)-minimum \
+	--$(call ptx/wwo, PTXCONF_LIBXML2_LEGACY)-legacy \
+	--with-tls
 
 ifdef PTXCONF_ICONV
 # --with-iconv=yes -> does the right thing for libc-iconv
-LIBXML2_AUTOCONF += --with-iconv=yes
+LIBXML2_CONF_OPT += --with-iconv=yes
 else
-LIBXML2_AUTOCONF += --with-iconv=no
-endif
-
-ifdef PTXCONF_LIBXML2_PYTHON
-LIBXML2_AUTOCONF += --with-python=$(SYSROOT)/usr
-else
-LIBXML2_AUTOCONF += --with-python=no
+LIBXML2_CONF_OPT += --with-iconv=no
 endif
 
 ifdef PTXCONF_LIBXML2_ZLIB
-LIBXML2_AUTOCONF += --with-zlib=$(SYSROOT)/usr
+LIBXML2_CONF_OPT += --with-zlib=$(SYSROOT)/usr
 else
-LIBXML2_AUTOCONF += --without-zlib
+LIBXML2_CONF_OPT += --without-zlib
 endif
 
 # ----------------------------------------------------------------------------
@@ -115,6 +104,10 @@ $(STATEDIR)/libxml2.targetinstall:
 	@$(call install_fixup, libxml2,DESCRIPTION,missing)
 
 	@$(call install_lib, libxml2, 0, 0, 0644, libxml2)
+
+ifdef PTXCONF_LIBXML2_XMLLINT
+	@$(call install_copy, libxml2, 0, 0, 0755, -, /usr/bin/xmllint)
+endif
 
 	@$(call install_finish, libxml2)
 

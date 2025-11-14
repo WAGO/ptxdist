@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_WPA_SUPPLICANT) += wpa_supplicant
 # Paths and names
 #
 WPA_SUPPLICANT_NAME	:= wpa_supplicant
-WPA_SUPPLICANT_VERSION	:= 2.9
-WPA_SUPPLICANT_MD5	:= 2d2958c782576dc9901092fbfecb4190
+WPA_SUPPLICANT_VERSION	:= 2.10
+WPA_SUPPLICANT_MD5	:= d26797fcb002898d4ee989179346e1cc
 WPA_SUPPLICANT		:= $(WPA_SUPPLICANT_NAME)-$(WPA_SUPPLICANT_VERSION)
 WPA_SUPPLICANT_SUFFIX	:= tar.gz
 WPA_SUPPLICANT_URL	:= https://w1.fi/releases/$(WPA_SUPPLICANT).$(WPA_SUPPLICANT_SUFFIX)
@@ -32,7 +32,6 @@ WPA_SUPPLICANT_LICENSE	:= GPL-2.0-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-WPA_SUPPLICANT_PATH	:= PATH=$(CROSS_PATH)
 WPA_SUPPLICANT_MAKE_ENV	:= \
 	$(CROSS_ENV) \
 	LIBDIR=/usr/lib \
@@ -41,14 +40,14 @@ WPA_SUPPLICANT_MAKE_ENV	:= \
 #
 # autoconf
 #
-WPA_SUPPLICANT_AUTOCONF := $(CROSS_AUTOCONF_USR)
+WPA_SUPPLICANT_CONF_TOOL := autoconf
+WPA_SUPPLICANT_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
 $(STATEDIR)/wpa_supplicant.prepare:
 	@$(call targetinfo)
 
 #	# run 'make clean' as wpa_supplicant's build system does not recognize config changes
-	@-cd $(WPA_SUPPLICANT_DIR)/$(WPA_SUPPLICANT_SUBDIR) && \
-		$(WPA_SUPPLICANT_MAKE_ENV) $(WPA_SUPPLICANT_PATH) $(MAKE) clean
+	@-$(call compile, WPA_SUPPLICANT, clean)
 
 	@cp $(WPA_SUPPLICANT_CONFIG) $(WPA_SUPPLICANT_DOTCONFIG)
 	@$(call enable_sh,$(WPA_SUPPLICANT_DOTCONFIG),CC=$(CROSS_CC))

@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_PIGLIT) += piglit
 #
 # Paths and names
 #
-PIGLIT_VERSION	:= 2020-02-22-g6c0de1646ec0
-PIGLIT_MD5	:= 7ff7552117bd1e5fc05ed7ab2077b77c
+PIGLIT_VERSION	:= 2024-09-13-g54f78df2bd6b
+PIGLIT_MD5	:= 3f4550e75d13dcb53d0533f3bfe74aeb
 PIGLIT		:= piglit-$(PIGLIT_VERSION)
 PIGLIT_SUFFIX	:= tar.gz
 PIGLIT_URL	:= https://gitlab.freedesktop.org/mesa/piglit/-/archive/$(PIGLIT_VERSION)/$(PIGLIT).$(PIGLIT_SUFFIX)
@@ -31,6 +31,8 @@ PIGLIT_BUILD_OOT	:= NO
 PIGLIT_CONF_TOOL	:= cmake
 
 PIGLIT_CONF_OPT		:= $(CROSS_CMAKE_USR) \
+	-G Ninja \
+	-DCMAKE_DISABLE_FIND_PACKAGE_Git=TRUE \
 	-DPYTHON_EXECUTABLE:FILEPATH=$(SYSTEMPYTHON3) \
 	-DPIGLIT_USE_WAFFLE=1 \
 	-DPIGLIT_BUILD_GL_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGL,1,0) \
@@ -38,6 +40,7 @@ PIGLIT_CONF_OPT		:= $(CROSS_CMAKE_USR) \
 	-DPIGLIT_BUILD_GLES2_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGLES2,1,0) \
 	-DPIGLIT_BUILD_GLES3_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_OPENGLES3,1,0) \
 	-DPIGLIT_BUILD_CL_TESTS=0 \
+	-DPIGLIT_BUILD_VK_TESTS=$(call ptx/ifdef, PTXCONF_PIGLIT_TESTS_VULKAN,1,0) \
 	-DHAVE_LIBCACA:BOOL=NO
 
 PIGLIT_MAKE_ENV		:= \
@@ -56,7 +59,7 @@ $(STATEDIR)/piglit.targetinstall:
 	@$(call install_fixup, piglit,AUTHOR,"Lucas Stach <l.stach@pengutronix.de>")
 	@$(call install_fixup, piglit,DESCRIPTION,missing)
 
-	@$(call install_copy, piglit, 0, 0, 755, -, /usr/bin/piglit)
+	@$(call install_copy, piglit, 0, 0, 0755, -, /usr/bin/piglit)
 	@$(call install_tree, piglit, 0, 0, -, /usr/lib/piglit, n)
 
 	@$(call install_finish, piglit)

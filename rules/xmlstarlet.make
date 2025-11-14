@@ -27,15 +27,13 @@ XMLSTARLET_DIR		:= $(BUILDDIR)/$(XMLSTARLET)
 # Prepare
 # ----------------------------------------------------------------------------
 
-XMLSTARLET_PATH := PATH=$(CROSS_PATH)
-XMLSTARLET_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
 # Don't set --with-libiconv-prefix (not necessary for libc-iconv)
 #
-XMLSTARLET_AUTOCONF := \
+XMLSTARLET_CONF_TOOL	:= autoconf
+XMLSTARLET_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--with-libxml-prefix=$(SYSROOT)/usr \
 	--with-libxslt-prefix=$(SYSROOT)/usr \

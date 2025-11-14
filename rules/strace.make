@@ -16,14 +16,19 @@ PACKAGES-$(PTXCONF_STRACE) += strace
 #
 # Paths and names
 #
-STRACE_VERSION	:= 5.7
-STRACE_MD5	:= 8c35b8ebf187b2ec18209bd7bbd16e7a
+STRACE_VERSION	:= 6.12
+STRACE_MD5	:= 6b774465c06b0dd01efc00a2db1341c2
 STRACE		:= strace-$(STRACE_VERSION)
 STRACE_SUFFIX	:= tar.xz
 STRACE_URL	:= https://strace.io/files/$(STRACE_VERSION)/$(STRACE).$(STRACE_SUFFIX)
 STRACE_SOURCE	:= $(SRCDIR)/$(STRACE).$(STRACE_SUFFIX)
 STRACE_DIR	:= $(BUILDDIR)/$(STRACE)
-STRACE_LICENSE	:= BSD-3-Clause
+STRACE_LICENSE	:= LGPL-2.1-or-later AND GPL-2.0-only WITH Linux-syscall-note
+STRACE_LICENSE_FILES := \
+	file://COPYING;md5=2433d82e1432a76dc3eadd9002bfe304\
+	file://bundled/linux/COPYING;md5=391c7a5bbfb151ad3dbe0a7fb5791a46 \
+	file://bundled/linux/GPL-2.0;md5=e6a75371ba4d16749254a51215d13f97 \
+	file://LGPL-2.1-or-later;md5=9e4c7a7a5be83d7f3da645ac5d466052
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,11 +37,13 @@ STRACE_LICENSE	:= BSD-3-Clause
 STRACE_CONF_TOOL	:= autoconf
 STRACE_CONF_OPT		:= \
 	$(CROSS_AUTOCONF_USR) \
-	--disable-gcc-Werror \
 	--disable-code-coverage \
+	--enable-bundled=check \
 	--disable-arm-oabi \
+	--disable-gcc-Werror \
 	--disable-stacktrace \
 	--disable-mpers \
+	--enable-install-tests=no \
 	--disable-valgrind \
 	--disable-valgrind-memcheck \
 	--disable-valgrind-helgrind \
@@ -45,8 +52,8 @@ STRACE_CONF_OPT		:= \
 	--without-gcov \
 	--without-libdw \
 	--without-libunwind \
-	--without-libiberty
-
+	--without-libiberty \
+	--without-libselinux
 
 # ----------------------------------------------------------------------------
 # Target-Install

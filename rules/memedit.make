@@ -29,13 +29,11 @@ MEMEDIT_DIR	:= $(BUILDDIR)/$(MEMEDIT)
 # Prepare
 # ----------------------------------------------------------------------------
 
-MEMEDIT_PATH	:= PATH=$(CROSS_PATH)
-MEMEDIT_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-MEMEDIT_AUTOCONF := $(CROSS_AUTOCONF_USR)
+MEMEDIT_CONF_TOOL := autoconf
+MEMEDIT_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -1,0 +1,25 @@
+## SECTION=multimedia_wayland
+
+menuconfig WAYVNC
+	tristate
+	select HOST_MESON
+	select AML
+	select JANSSON
+	select LIBDRM
+	select LIBXKBCOMMON
+	select NEATVNC
+	select PIXMAN
+	select WAYLAND
+	select MESALIB		if WAYVNC_SCREENCOPY_DMABUF
+	select MESALIB_GBM	if WAYVNC_SCREENCOPY_DMABUF
+	prompt "wayvnc                        "
+	help
+	  A VNC server for wlroots based Wayland compositors.
+
+if WAYVNC
+
+config WAYVNC_SCREENCOPY_DMABUF
+	bool
+	prompt "Enable GPU-side screencopy"
+
+endif

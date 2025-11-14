@@ -14,18 +14,18 @@ PACKAGES-$(PTXCONF_XZ) += xz
 #
 # Paths and names
 #
-XZ_VERSION	:= 5.2.5
-XZ_MD5		:= 33ab3ef79aa1146b83b778210e7b0a54
+XZ_VERSION	:= 5.4.4
+XZ_MD5		:= fbb849a27e266964aefe26bad508144f
 XZ		:= xz-$(XZ_VERSION)
 XZ_SUFFIX	:= tar.bz2
-XZ_URL		:= http://tukaani.org/xz/$(XZ).$(XZ_SUFFIX)
+XZ_URL		:= https://tukaani.org/xz/$(XZ).$(XZ_SUFFIX)
 XZ_SOURCE	:= $(SRCDIR)/$(XZ).$(XZ_SUFFIX)
 XZ_DIR		:= $(BUILDDIR)/$(XZ)
 XZ_LICENSE	:= public_domain AND LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later
 XZ_LICENSE_FILES := \
-	file://COPYING;md5=97d554a32881fee0aa283d96e47cb24a \
+	file://COPYING;md5=c8ea84ebe7b93cce676b54355dc6b2c0 \
 	file://COPYING.GPLv2;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
-	file://COPYING.GPLv3;md5=d32239bcb673463ab874e80d47fae504 \
+	file://COPYING.GPLv3;md5=1ebbd3e34237af26da5dc08a4e440464 \
 	file://COPYING.LGPLv2.1;md5=4fbd65380cdd255951079008b364516c
 
 # ----------------------------------------------------------------------------
@@ -40,7 +40,10 @@ XZ_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-debug \
 	--disable-external-sha256 \
+	--disable-microlzma \
+	--disable-lzip-decoder \
 	--enable-assembler \
+	--enable-clmul-crc \
 	--disable-small \
 	--enable-threads \
 	--$(call ptx/endis,PTXCONF_XZ_TOOLS)-xz \
@@ -50,14 +53,15 @@ XZ_CONF_OPT	:= \
 	--disable-lzma-links \
 	--$(call ptx/endis,PTXCONF_XZ_TOOLS)-scripts \
 	--disable-doc \
-	--enable-symbol-versions \
 	--disable-sandbox \
 	--enable-shared \
 	--disable-static \
+	--enable-symbol-versions \
 	--disable-nls \
 	--disable-rpath \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-unaligned-access=auto \
+	--disable-unsafe-type-punning \
 	--disable-werror
 
 # ----------------------------------------------------------------------------

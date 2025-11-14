@@ -1,0 +1,35 @@
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Date: Fri, 31 May 2013 17:28:01 +0200
+Subject: [PATCH] build and install share lib only
+
+This patch removes the static library from the dependency list
+for "all" and "install". This way libpcap.a is not built and
+tcpdump cannot link against it.
+
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 54246586828d..4c6768d6d764 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -429,7 +429,7 @@ RELEASE_FILES = $(COMMON_C_SRC) $(HDR) $(MAN1) $(MAN3PCAP_EXPAND) \
+ 	$(MAN3PCAP_NOEXPAND) $(MANFILE) $(MANMISC) $(EXTRA_DIST) \
+ 	$(TEST_DIST)
+ 
+-all: libpcap.a shared $(BUILD_RPCAPD) libpcap.pc pcap-config
++all: shared $(BUILD_RPCAPD) libpcap.pc pcap-config
+ 
+ libpcap.a: $(OBJ)
+ 	@rm -f $@
+@@ -615,7 +615,7 @@ testprogs: FORCE
+ 
+ FORCE:
+ 
+-install: install-shared install-archive libpcap.pc pcap-config @INSTALL_RPCAPD@
++install: install-shared libpcap.pc pcap-config @INSTALL_RPCAPD@
+ 	[ -d $(DESTDIR)$(libdir) ] || \
+ 	    (mkdir -p $(DESTDIR)$(libdir); chmod 755 $(DESTDIR)$(libdir))
+ 	[ -d $(DESTDIR)$(includedir) ] || \

@@ -29,13 +29,11 @@ XTERM_LICENSE_FILES := \
 # Prepare
 # ----------------------------------------------------------------------------
 
-XTERM_PATH	:= PATH=$(CROSS_PATH)
-XTERM_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XTERM_AUTOCONF := \
+XTERM_CONF_TOOL	:= autoconf
+XTERM_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-freetype \
 	--disable-rpath-hack \

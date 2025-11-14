@@ -18,7 +18,7 @@ PYTHON3_MORE_ITERTOOLS_VERSION	:= 8.4.0
 PYTHON3_MORE_ITERTOOLS_MD5	:= 0912041c05148ed079984cff69af2e99
 PYTHON3_MORE_ITERTOOLS		:= more-itertools-$(PYTHON3_MORE_ITERTOOLS_VERSION)
 PYTHON3_MORE_ITERTOOLS_SUFFIX	:= tar.gz
-PYTHON3_MORE_ITERTOOLS_URL	:= https://pypi.python.org/packages/source/m/more-itertools/$(PYTHON3_MORE_ITERTOOLS).$(PYTHON3_MORE_ITERTOOLS_SUFFIX)
+PYTHON3_MORE_ITERTOOLS_URL	:= $(call ptx/mirror-pypi, more-itertools, $(PYTHON3_MORE_ITERTOOLS).$(PYTHON3_MORE_ITERTOOLS_SUFFIX))
 PYTHON3_MORE_ITERTOOLS_SOURCE	:= $(SRCDIR)/$(PYTHON3_MORE_ITERTOOLS).$(PYTHON3_MORE_ITERTOOLS_SUFFIX)
 PYTHON3_MORE_ITERTOOLS_DIR	:= $(BUILDDIR)/$(PYTHON3_MORE_ITERTOOLS)
 PYTHON3_MORE_ITERTOOLS_LICENSE	:= MIT
@@ -45,7 +45,7 @@ $(STATEDIR)/python3-more-itertools.targetinstall:
 	@$(call install_fixup, python3-more-itertools, DESCRIPTION, missing)
 
 	@$(call install_glob, python3-more-itertools, 0, 0, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages,, *.py)
+		$(PYTHON3_SITEPACKAGES),, *.py)
 
 	@$(call install_finish, python3-more-itertools)
 

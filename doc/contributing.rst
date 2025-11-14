@@ -1,6 +1,75 @@
 Contributing to PTXdist
 =======================
 
+Development Tree
+----------------
+
+PTXdist uses Git for version control.
+The master repository is available at::
+
+   git://git.pengutronix.de/ptxdist
+
+A `Git web interface <https://git.pengutronix.de/cgit/ptxdist/>`_ is also available.
+
+How to Contribute
+-----------------
+
+Patches for PTXdist are always welcome.
+Contributions should be sent to the :ref:`mailing_list`.
+This is usually done with ``git send-email``.
+If you're unfamiliar with this workflow, have a look at the intro at
+`git-send-email.io <https://git-send-email.io/>`_.
+
+All patches must contain a descriptive subject and should, for all
+non-obvious changes, contain a commit message describing what has changed
+and why this is necessary.
+
+Each patch accepted into the master repository must be certified to be
+compatible with PTXdist's license (GPLv2, see `COPYING`_).
+To do this you have to sign your patches (or the ones you forward).
+If you can certify the below::
+
+   Developer's Certificate of Origin 1.1
+   
+   By making a contribution to this project, I certify that:
+   
+   (a) The contribution was created in whole or in part by me and I
+       have the right to submit it under the open source license
+       indicated in the file; or
+   
+   (b) The contribution is based upon previous work that, to the best
+       of my knowledge, is covered under an appropriate open source
+       license and I have the right under that license to submit that
+       work with modifications, whether created in whole or in part
+       by me, under the same open source license (unless I am
+       permitted to submit under a different license), as indicated
+       in the file; or
+   
+   (c) The contribution was provided directly to me by some other
+       person who certified (a), (b) or (c) and I have not modified
+       it.
+   
+   (d) I understand and agree that this project and the contribution
+       are public and that a record of the contribution (including all
+       personal information I submit with it, including my sign-off) is
+       maintained indefinitely and may be redistributed consistent with
+       this project or the open source license(s) involved.
+
+then you just add a line saying::
+
+   Signed-off-by: Random J Developer <random@developer.example.org>
+
+using your real name (sorry, no pseudonyms or anonymous contributions) at the
+end of the patch description.
+
+.. _COPYING: https://git.pengutronix.de/cgit/ptxdist/tree/COPYING
+
+There are some more usual tags (like *Acked-by* or *Reported-by*) which only
+have informational character and so are not formally specified here.
+See the `Linux kernel documentation
+<https://www.kernel.org/doc/html/latest/process/submitting-patches.html>`_
+for a more complete list.
+
 PTXdist Packages
 ----------------
 
@@ -8,18 +77,6 @@ While contributions to all parts of PTXdist are welcome, most contributions
 concern individual packages. Here is a checklist of things to look out for
 while creating or updating packages. These are not hard requirements, but
 there should be good reasons for different choices.
-
-How to Contribute
-~~~~~~~~~~~~~~~~~
-
-Contributions should be sent as patches to the :ref:`mailing_list`. This
-is usually done with ``git send-email``.
-
-All patches must contain a descriptive subject and should, for all
-non-obvious changes, contain a commit message describing what has changed
-and why this is necessary.
-
-All patches must contain the correct ``Signed-off-by:`` tag.
 
 Package Builds should be Reproducible
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,6 +135,16 @@ in mind:
    :ref:`configure_helper` can be used to find the new options.
 -  There may be patches for the old version. Make sure they are updated as
    well, or removed if they are no longer needed.
+   Running ``ptxdist lint`` will tell you about this.
+-  Run ``ptxdist licensecheck [<pkg>]`` to make sure that the checksum of
+   pinned-down license files haven't changed.
+
+   If the license file has changed, look at the difference between the old and
+   the new version of the file (e.g. by comparing the two versioned build
+   folders in ``platform-nnn/build-target/``), and update the package's
+   ``_LICENSE`` variable if necessary.
+   Often the difference is only in the copyright year, but in any case, describe
+   the changes in the license file when sending your patch!
 
 Misc
 ~~~~
@@ -89,6 +156,16 @@ other distributions are usually a good inspiration.
 For new packages, the generated templates contain commented-out default
 sections. These are meant as a helper to simplify creating custom stages.
 Any remaining default stages must be removed.
+
+All submissions should be checked with ``ptxdist lint``. It does basic
+sanity checks and finds some typical errors. Old patches that where not
+updated of removed after a version bump. Unknown PTXCONF_* variables or
+macros used in menu files. There are often typos or the variables was just
+removed.
+
+New packages must also have licensing information in the ``<PKG>_LICENSE``
+and ``<PKG>_LICENSE_FILES`` variables.
+Refer to the section :ref:`licensing_in_packages` for more information.
 
 Helper Scripts
 --------------

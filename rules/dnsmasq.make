@@ -15,16 +15,16 @@ PACKAGES-$(PTXCONF_DNSMASQ) += dnsmasq
 #
 # Paths and names
 #
-DNSMASQ_VERSION		:= 2.81
-DNSMASQ_MD5		:= 2642c3f17f4a9762a83dd70daa6cfeb6
+DNSMASQ_VERSION		:= 2.89
+DNSMASQ_MD5		:= a227ce79d772c8a49f94335cdb041e77
 DNSMASQ			:= dnsmasq-$(DNSMASQ_VERSION)
 DNSMASQ_SUFFIX		:= tar.xz
-DNSMASQ_URL		:= http://www.thekelleys.org.uk/dnsmasq/$(DNSMASQ).$(DNSMASQ_SUFFIX)
+DNSMASQ_URL		:= https://thekelleys.org.uk/dnsmasq/$(DNSMASQ).$(DNSMASQ_SUFFIX)
 DNSMASQ_SOURCE		:= $(SRCDIR)/$(DNSMASQ).$(DNSMASQ_SUFFIX)
 DNSMASQ_DIR		:= $(BUILDDIR)/$(DNSMASQ)
 DNSMASQ_LICENSE	:= GPL-2.0-only OR GPL-3.0-only
 DNSMASQ_LICENSE_FILES	:= \
-	file://COPYING;md5=0636e73ff0215e8d672dc4c32c317bb3 \
+	file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 	file://COPYING-v3;md5=d32239bcb673463ab874e80d47fae504 \
 	file://src/dnsmasq.c;startline=2;endline=15;md5=0da70ade5c9cf3c1edf1f8dc6ab8aa9f
 
@@ -85,7 +85,6 @@ ifdef PTXCONF_DNSMASQ_INETD
 	@$(call install_alternative, dnsmasq, 0, 0, 0644, /etc/inetd.conf.d/dnsmasq)
 endif
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_DNSMASQ_STARTSCRIPT
 	@$(call install_alternative, dnsmasq, 0, 0, 0755, /etc/init.d/dnsmasq)
 
@@ -93,7 +92,6 @@ ifneq ($(call remove_quotes,$(PTXCONF_DNSMASQ_BBINIT_LINK)),)
 	@$(call install_link, dnsmasq, \
 		../init.d/dnsmasq, \
 		/etc/rc.d/$(PTXCONF_DNSMASQ_BBINIT_LINK))
-endif
 endif
 endif
 ifdef PTXCONF_DNSMASQ_SYSTEMD_UNIT

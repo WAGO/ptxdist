@@ -28,15 +28,13 @@ LIBCGI_LICENSE	:= LGPL-2.1-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBCGI_PATH	:= PATH=$(CROSS_PATH)
-LIBCGI_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBCGI_AUTOCONF := $(CROSS_AUTOCONF_USR)
+LIBCGI_CONF_TOOL := autoconf
+LIBCGI_CONF_OPT := $(CROSS_AUTOCONF_USR)
 
-LIBCGI_MAKEVARS	:= $(CROSS_ENV_CC) $(CROSS_ENV_AR)
+LIBCGI_MAKE_OPT	:= $(CROSS_ENV_CC) $(CROSS_ENV_AR)
 
 # ----------------------------------------------------------------------------
 # Target-Install

@@ -144,6 +144,34 @@ config SETUP_DEBMIRROR
 	  The Debian pool mirror to use for downloading various
 	  components of the target root filesystem.
 
+config SETUP_GNOMEMIRROR
+	string
+	default "https://download.gnome.org/sources https://ftp-stud.hs-esslingen.de/pub/Mirrors/ftp.gnome.org/sources"
+	prompt "GNOME Mirror"
+	help
+	  For all GNOME related packages enter an available mirror here.
+
+config SETUP_GNUMIRROR
+	string
+	default "https://ftp.gnu.org/gnu https://ftpmirror.gnu.org"
+	prompt "GNU.org Mirror"
+	help
+	  For all GNU.org related packages enter an available mirror here.
+
+config SETUP_KERNELMIRROR
+	string
+	default "https://mirrors.edge.kernel.org/pub/linux https://www.kernel.org/pub/linux"
+	prompt "kernel.org Mirror"
+	help
+	  For all kernel.org related packages enter an available mirror here.
+
+config SETUP_PYPIMIRROR
+	string
+	default "https://files.pythonhosted.org/packages/source"
+	prompt "Python pypi source mirror"
+	help
+	  For all packages available on pypi, enter an available mirror here.
+
 config SETUP_SFMIRROR
 	string
 	default "http://downloads.sourceforge.net/sourceforge"
@@ -151,26 +179,12 @@ config SETUP_SFMIRROR
 	help
 	  For all Sourceforge related packages enter an available mirror here.
 
-config SETUP_GNUMIRROR
-	string
-	default "https://ftp.gnu.org/gnu http://ftp.uni-kl.de/pub/gnu"
-	prompt "GNU.org Mirror"
-	help
-	  For all GNU.org related packages enter an available mirror here.
-
 config SETUP_XORGMIRROR
 	string
 	default "https://ftp.x.org/archive https://xorg.freedesktop.org/releases"
 	prompt "x.org Mirror"
 	help
 	  For all x.org related packages enter an available mirror here.
-
-config SETUP_KERNELMIRROR
-	string
-	default "https://www.kernel.org/pub/linux http://www.linux-mips.org/pub/linux/mips http://mirror.linux.org.au/linux"
-	prompt "kernel.org Mirror"
-	help
-	  For all kernel.org related packages enter an available mirror here.
 
 choice
 	prompt "archive check"
@@ -290,6 +304,12 @@ config SETUP_CHECK_EXIT_ON_ERROR
 	  quite aggressive error checking. Don't turn this on until
 	  you know what you're doing.
 
+config SETUP_DEPRECATED_FATAL
+	bool "bailout on deprecated variable use"
+	help
+	  Terminate on deprecated variable use. Turn this on only
+          if you are going to hunt for deprecated variables.
+
 config SETUP_ICECC
 	bool "use icecc"
 	depends on !SETUP_CCACHE
@@ -393,3 +413,57 @@ config SETUP_HOST_MAKE
 	  Specify the host make programm here.
 
 endmenu
+
+menuconfig SETUP_CONTAINER_ENABLE
+	bool
+	prompt "build in container"
+	help
+	  Build the BSP in a container. PTXdist will not create any container
+	  but it will mount all relevant directories that are needed to build
+	  the BSP.
+
+if SETUP_CONTAINER_ENABLE
+
+choice
+	prompt "container manager"
+
+	config SETUP_CONTAINER_DOCKER
+		bool
+		prompt "docker"
+		help
+		  Use docker as container manager. The provided container image
+		  must be created with a user that has the same uid as the owner
+		  of the BSP repository. It will be explicitly selected with
+		  '--user $uid'
+
+	config SETUP_CONTAINER_PODMAN
+		bool
+		prompt "podman"
+		help
+		  Use podman ad container provider. '--userns=keep-id' will be
+		  used to map calling user into the container.
+
+endchoice
+
+config SETUP_CONTAINER_IMAGE
+	string
+	prompt "image name"
+	help
+	  The name of the container image that should be used.
+
+config SETUP_CONTAINER_ARGS
+	string
+	prompt "extra args"
+	help
+	  Additional arguments for the container manager. The will be inserted
+	  directly before the container image in the docker/podman command-line.
+
+config SETUP_CONTAINER_DEVELOP
+	bool
+	prompt "developer mode"
+	help
+	  In developer mode, additional directories will be mounted into the
+	  container, such at the user global ptxdistrc and sources symlinked in
+	  local_src/.
+
+endif

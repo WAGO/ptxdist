@@ -16,7 +16,7 @@ PACKAGES-$(PTXCONF_KERNEL) += kernel
 # Paths and names
 #
 KERNEL			:= linux-$(KERNEL_VERSION)
-KERNEL_MD5		:= $(call remove_quotes,$(PTXCONF_KERNEL_MD5))
+KERNEL_MD5		:= $(call ptx/config-md5, PTXCONF_KERNEL)
 ifneq ($(KERNEL_NEEDS_GIT_URL),y)
 KERNEL_SUFFIX		:= tar.xz
 KERNEL_URL		:= $(call kernel-url, KERNEL)
@@ -27,10 +27,27 @@ endif
 KERNEL_DIR		:= $(BUILDDIR)/$(KERNEL)
 KERNEL_BUILD_DIR	:= $(KERNEL_DIR)-build
 KERNEL_CONFIG		:= $(call ptx/in-platformconfigdir, $(call remove_quotes, $(PTXCONF_KERNEL_CONFIG)))
+KERNEL_DTS_PATH		:= $(call remove_quotes,$(PTXCONF_KERNEL_DTS_PATH))
+KERNEL_DTS		:= $(call remove_quotes,$(PTXCONF_KERNEL_DTS))
+KERNEL_DTSO_PATH	:= $(call remove_quotes,$(PTXCONF_KERNEL_DTSO_PATH))
+KERNEL_DTSO		:= $(call remove_quotes,$(PTXCONF_KERNEL_DTSO))
+KERNEL_DTB_FILES	:= $(addsuffix .dtb,$(basename $(notdir $(KERNEL_DTS))))
+KERNEL_DTBO_FILES	:= $(addsuffix .dtbo,$(basename $(notdir $(KERNEL_DTSO))))
+KERNEL_DTBO_DIR		:= /boot/overlays
 KERNEL_LICENSE		:= GPL-2.0-only
 KERNEL_SOURCE		:= $(SRCDIR)/$(KERNEL).$(KERNEL_SUFFIX)
 KERNEL_DEVPKG		:= NO
 KERNEL_BUILD_OOT	:= KEEP
+
+# track changes to devices-trees in the BSP
+$(call world/dts-cfghash-file, KERNEL)
+
+# in case we migrate some old syntax
+ifneq ($(filter /%,$(KERNEL_DTS)),)
+$(call ptx/error, the device trees in PTXCONF_KERNEL_DTS must be specified without an)
+$(call ptx/error, absolute path. Use PTXCONF_KERNEL_DTS_PATH to provide a list of direcories)
+$(call ptx/error, that will be searched.)
+endif
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -40,11 +57,13 @@ KERNEL_BUILD_OOT	:= KEEP
 KERNEL_WRAPPER_BLACKLIST := \
 	$(PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST)
 
+# Note: for some reason, the error is not visible without the dummy '$(shell :)'
+# when running 'ptxdist -j -q go'.
 define kernel/deprecated
 $(if $(strip \
 $(filter $(STATEDIR)/%, \
 $(filter-out $(STATEDIR)/kernel.%,$@)) \
-),$(error $(notdir $@): \
+),$(shell :)$(error $(notdir $@): \
 	use KERNEL_MODULE_OPT instead of $(1) for kernel module packages))
 endef
 
@@ -52,49 +71,53 @@ endef
 KERNEL_MAKEVARS = $(call kernel/deprecated, KERNEL_MAKEVARS)
 
 # like kernel-opts but with different CROSS_COMPILE=
-KERNEL_BASE_OPT := \
-	V=$(PTXDIST_VERBOSE) \
-	HOSTCC=$(HOSTCC) \
-	ARCH=$(GENERIC_KERNEL_ARCH) \
-	CROSS_COMPILE=$(KERNEL_CROSS_COMPILE) \
-	DEPMOD=$(PTXDIST_SYSROOT_HOST)/sbin/depmod \
-	\
-	INSTALL_MOD_PATH=$(KERNEL_PKGDIR) \
-	PTX_KERNEL_DIR=$(KERNEL_DIR) \
+KERNEL_BASE_OPT		= \
+	$(call kernel-opts, KERNEL,$(KERNEL_CROSS_COMPILE)) \
 	$(call remove_quotes,$(PTXCONF_KERNEL_EXTRA_MAKEVARS))
 
 # Intermediate option. This will be used by kernel module packages.
-KERNEL_MODULE_OPT := \
+KERNEL_MODULE_OPT	= \
 	-C $(KERNEL_DIR) \
 	O=$(KERNEL_BUILD_DIR) \
 	$(KERNEL_BASE_OPT)
 
-KERNEL_SHARED_OPT := \
-	$(KERNEL_MODULE_OPT)
+KERNEL_SHARED_OPT	= \
+	$(KERNEL_MODULE_OPT) \
+	PAHOLE=false
 
 ifndef PTXCONF_KERNEL_GCC_PLUGINS
 # no gcc plugins; avoid config changes depending on the host compiler
-KERNEL_SHARED_OPT += \
-	HOSTCXX="$(HOSTXX) -DGENERATOR_FILE" \
+KERNEL_SHARED_OPT	+= \
+	HOSTCXX="$(HOSTCXX) -DGENERATOR_FILE" \
 	HOSTCC="$(HOSTCC) -DGENERATOR_FILE"
+KERNEL_CONF_ENV		:= \
+	PTXDIST_NO_GCC_PLUGINS=1
+KERNEL_MAKE_ENV		:= \
+	PTXDIST_NO_GCC_PLUGINS=1
 endif
 
-KERNEL_CONF_OPT := \
+ifneq ($(PTXCONF_KERNEL_CODE_SIGNING)$(PTXCONF_KERNEL_MODULES_SIGN),)
+KERNEL_MAKE_ENV		+= \
+	$(CODE_SIGNING_ENV)
+endif
+
+KERNEL_CONF_TOOL	:= kconfig
+KERNEL_CONF_OPT		= \
 	$(KERNEL_SHARED_OPT)
 
 ifdef PTXCONF_KERNEL_CONFIG_BASE_VERSION
 # force using KERNEL_VERSION in the kernelconfig
-KERNEL_CONF_OPT += \
+KERNEL_CONF_OPT		+= \
 	KERNELVERSION=$(KERNEL_VERSION)
 endif
 
 #
 # support the different kernel image formats
 #
-KERNEL_IMAGE := $(call remove_quotes, $(PTXCONF_KERNEL_IMAGE))
+KERNEL_IMAGE		:= $(call remove_quotes, $(PTXCONF_KERNEL_IMAGE))
 
-# these are sane default
-KERNEL_IMAGE_PATH_y := $(KERNEL_BUILD_DIR)/arch/$(GENERIC_KERNEL_ARCH)/boot/$(KERNEL_IMAGE)
+# these are sane defaults
+KERNEL_IMAGE_PATH_y	:= $(KERNEL_BUILD_DIR)/arch/$(GENERIC_KERNEL_ARCH)/boot/$(KERNEL_IMAGE)
 
 # vmlinux and vmlinuz are special
 KERNEL_IMAGE_PATH_$(PTXCONF_KERNEL_IMAGE_VMLINUX) := $(KERNEL_BUILD_DIR)/vmlinux
@@ -140,13 +163,23 @@ endif
 	@$(call world/prepare, KERNEL)
 
 #
-# Use a existing dummy INITRAMFS_SOURCE for the fist 'make' call. The
+# Use an existing dummy INITRAMFS_SOURCE for the first 'make' call. The
 # kernel image will be rebuilt in the image-kernel package with the real
 # initramfs.
 #
 ifdef KERNEL_INITRAMFS_SOURCE_y
 	@touch "$(KERNEL_INITRAMFS_SOURCE_y)"
 	@sed -i -e 's,^CONFIG_INITRAMFS_SOURCE.*$$,CONFIG_INITRAMFS_SOURCE=\"$(KERNEL_INITRAMFS_SOURCE_y)\",g' \
+		"$(KERNEL_BUILD_DIR)/.config"
+endif
+ifdef PTXCONF_KERNEL_CODE_SIGNING
+	if [ -n "`cs_get_ca kernel-trusted`" ]; then \
+		sed -i -e "s'^\(CONFIG_SYSTEM_TRUSTED_KEYS\)=.*'\1=\"`cs_get_ca kernel-trusted`\"'" \
+			"$(KERNEL_BUILD_DIR)/.config"; \
+	fi
+endif
+ifdef PTXCONF_KERNEL_MODULES_SIGN
+	sed -i -e "s'^\(CONFIG_MODULE_SIG_KEY\)=.*'\1=\"`cs_get_uri kernel-modules`\"'" \
 		"$(KERNEL_BUILD_DIR)/.config"
 endif
 	@$(call touch)
@@ -174,6 +207,7 @@ KERNEL_TOOL_PERF_OPTS	:= \
 	-C $(KERNEL_DIR)/tools/perf \
 	O=$(KERNEL_BUILD_DIR)/tools/perf \
 	$(KERNEL_BASE_OPT) \
+	prefix=/usr \
 	WERROR=0 \
 	NO_LIBPERL=1 \
 	NO_LIBPYTHON=1 \
@@ -203,7 +237,7 @@ KERNEL_TOOL_PERF_OPTS	:= \
 # manual make to handle CPPFLAGS and broken parallel building for some
 # kernel versions
 KERNEL_TOOL_IIO_OPTS	:= \
-	PTXDIST_ICECC= \
+	PTXDIST_ICECC=$(PTXDIST_ICERUN) \
 	CPPFLAGS="-D__EXPORTED_HEADERS__ -I$(KERNEL_DIR)/include/uapi -I$(KERNEL_DIR)/include" \
 	-C $(KERNEL_DIR)/tools/iio \
 	O=$(KERNEL_BUILD_DIR)/tools/iio \
@@ -231,7 +265,7 @@ endif
 # Install
 # ----------------------------------------------------------------------------
 
-KERNEL_INSTALL_OPT := \
+KERNEL_INSTALL_OPT = \
 	$(KERNEL_BASE_OPT) \
 	modules_install
 
@@ -240,14 +274,25 @@ $(STATEDIR)/kernel.install:
 ifdef PTXCONF_KERNEL_MODULES_INSTALL
 	@$(call world/install, KERNEL)
 endif
+	@$(call world/dtb, KERNEL)
+	@$(call world/dtbo, KERNEL)
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Target-Install
 # ----------------------------------------------------------------------------
 
+ifneq ($(KERNEL_DTB_FILES),)
+$(addprefix $(IMAGEDIR)/,$(KERNEL_DTB_FILES)): $(STATEDIR)/kernel.targetinstall
+endif
+
 $(STATEDIR)/kernel.targetinstall:
 	@$(call targetinfo)
+
+	@$(foreach dtb, $(KERNEL_DTB_FILES), \
+		echo -e "Installing $(dtb) ...\n"$(ptx/nl) \
+		install -D -m0644 $(KERNEL_PKGDIR)/boot/$(dtb) \
+			$(IMAGEDIR)/$(dtb)$(ptx/nl))
 
 ifdef PTXCONF_KERNEL_XPKG
 	@$(call install_init,  kernel)
@@ -260,6 +305,14 @@ ifdef PTXCONF_KERNEL_XPKG
 
 ifdef PTXCONF_KERNEL_INSTALL
 	@$(call install_copy, kernel, 0, 0, 0644, $(KERNEL_IMAGE_PATH_y), /boot/$(KERNEL_IMAGE), n)
+
+	@$(foreach dtb, $(KERNEL_DTB_FILES), \
+		$(call install_copy, kernel, 0, 0, 0644, -, \
+			/boot/$(dtb), n)$(ptx/nl))
+
+	@$(foreach dtbo, $(KERNEL_DTBO_FILES), \
+		$(call install_copy, kernel, 0, 0, 0644, -, \
+			$(KERNEL_DTBO_DIR)/$(dtbo), n)$(ptx/nl))
 endif
 
 # install the ELF kernel image for debugging purpose
@@ -308,7 +361,7 @@ ifdef PTXCONF_KERNEL_MODULES_INSTALL
 	@$(call install_fixup, kernel-modules, AUTHOR,"Robert Schwebel <r.schwebel@pengutronix.de>")
 	@$(call install_fixup, kernel-modules, DESCRIPTION,missing)
 
-	@$(call install_glob, kernel-modules, 0, 0, -, /lib/modules, *.ko,, k)
+	@$(call install_glob, kernel-modules, 0, 0, -, /lib/modules, *.ko,, n)
 	@$(call install_glob, kernel-modules, 0, 0, -, /lib/modules,, *.ko */build */source, n)
 
 	@$(call install_finish, kernel-modules)
@@ -317,10 +370,20 @@ endif
 	@$(call touch)
 
 # ----------------------------------------------------------------------------
+# Clean
+# ----------------------------------------------------------------------------
+
+$(STATEDIR)/kernel.clean:
+	@$(call targetinfo)
+	@$(call clean_pkg, KERNEL)
+	@$(foreach dtb,$(KERNEL_DTB_FILES), \
+		rm -vf $(IMAGEDIR)/$(dtb)$(ptx/nl))
+
+# ----------------------------------------------------------------------------
 # oldconfig / menuconfig
 # ----------------------------------------------------------------------------
 
-kernel_oldconfig kernel_menuconfig kernel_nconfig: $(STATEDIR)/kernel.extract
+$(call ptx/kconfig-targets, kernel): $(STATEDIR)/kernel.extract
 	@$(call world/kconfig, KERNEL, $(subst kernel_,,$@))
 
 # vim: syntax=make

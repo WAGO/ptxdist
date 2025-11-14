@@ -14,8 +14,8 @@ PACKAGES-$(PTXCONF_MONIT) += monit
 #
 # Paths and names
 #
-MONIT_VERSION	:= 5.26.0
-MONIT_MD5	:= 9f7dc65e902c103e4c5891354994c3df
+MONIT_VERSION	:= 5.32.0
+MONIT_MD5	:= 4e3e9f9dd4a5094101e1cd24a292a4fb
 MONIT		:= monit-$(MONIT_VERSION)
 MONIT_SUFFIX	:= tar.gz
 MONIT_URL	:= http://mmonit.com/monit/dist/$(MONIT).$(MONIT_SUFFIX)
@@ -29,6 +29,7 @@ MONIT_LICENSE_FILES := file://COPYING;md5=ea116a7defaf0e93b3bb73b2a34a3f51
 # ----------------------------------------------------------------------------
 
 MONIT_CONF_ENV	:= $(CROSS_ENV) \
+	ac_cv_lib_nsl_inet_addr=no \
 	libmonit_cv_setjmp_available=yes \
 	libmonit_cv_vsnprintf_c99_conformant=yes
 
@@ -36,11 +37,14 @@ MONIT_CONF_TOOL	:= autoconf
 MONIT_CONF_OPT	:= $(CROSS_AUTOCONF_USR) \
 	$(GLOBAL_LARGE_FILE_OPTION) \
 	--enable-optimized \
+	--disable-werror \
 	--disable-profiling \
+	--disable-codesign \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_IPV6)-ipv6 \
 	--$(call ptx/wwo, PTXCONF_GLOBAL_LARGE_FILE)-largefiles \
 	--$(call ptx/wwo, PTXCONF_MONIT_ZLIB)-zlib \
 	--without-pam \
+	--without-asan \
 	--$(call ptx/wwo, PTXCONF_MONIT_SSL)-ssl \
 	--with-ssl-dir=$(SYSROOT)/usr
 
@@ -62,13 +66,11 @@ $(STATEDIR)/monit.targetinstall:
 	@$(call install_copy, monit, 0, 0, 0755, /var/lib/monit/events)
 	@$(call install_alternative, monit, 0, 0, 0600, /etc/monitrc)
 
-ifdef PTXCONF_INITMETHOD_BBINIT
 ifdef PTXCONF_MONIT_STARTSCRIPT
 	@$(call install_alternative, monit, 0, 0, 0755, /etc/init.d/monit)
 ifneq ($(call remove_quotes,$(PTXCONF_MONIT_BBINIT_LINK)),)
 	@$(call install_link, monit, ../init.d/monit, \
 		/etc/rc.d/$(PTXCONF_MONIT_BBINIT_LINK))
-endif
 endif
 endif
 

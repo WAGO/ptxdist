@@ -14,11 +14,13 @@ PACKAGES-$(PTXCONF_LIBCAP_NG) += libcap-ng
 #
 # Paths and names
 #
-LIBCAP_NG_VERSION	:= 0.7.10
-LIBCAP_NG_MD5		:= 57dc267e2949cdecb651a929f9206572
+LIBCAP_NG_VERSION	:= 0.8.5
+LIBCAP_NG_MD5		:= 3c280d902b902f28caf3990e018fcd31
 LIBCAP_NG		:= libcap-ng-$(LIBCAP_NG_VERSION)
 LIBCAP_NG_SUFFIX	:= tar.gz
-LIBCAP_NG_URL		:= http://people.redhat.com/sgrubb/libcap-ng/$(LIBCAP_NG).$(LIBCAP_NG_SUFFIX)
+LIBCAP_NG_URL		:= \
+	https://people.redhat.com/sgrubb/libcap-ng/$(LIBCAP_NG).$(LIBCAP_NG_SUFFIX) \
+	https://sources.buildroot.net/libcap-ng/$(LIBCAP_NG).$(LIBCAP_NG_SUFFIX)
 LIBCAP_NG_SOURCE	:= $(SRCDIR)/$(LIBCAP_NG).$(LIBCAP_NG_SUFFIX)
 LIBCAP_NG_DIR		:= $(BUILDDIR)/$(LIBCAP_NG)
 LIBCAP_NG_LICENSE	:= LGPL-2.1-or-later AND GPL-2.0-or-later
@@ -39,7 +41,6 @@ LIBCAP_NG_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--without-debug \
 	--without-warn \
-	--without-python \
 	--without-python3
 
 # ----------------------------------------------------------------------------

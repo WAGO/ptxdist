@@ -3,7 +3,9 @@
 menuconfig KERNEL
 	bool
 	default y
+	select CODE_SIGNING		if KERNEL_CODE_SIGNING
 	select HOST_U_BOOT_TOOLS	if KERNEL_IMAGE_U || (KERNEL_IMAGE_SIMPLE && ARCH_MICROBLAZE)
+	select HOST_ZSTD		if KERNEL_ZSTD
 	select HOST_XZ			if KERNEL_XZ
 	select HOST_LZOP		if KERNEL_LZOP
 	select HOST_LZ4			if KERNEL_LZ4
@@ -37,14 +39,35 @@ config KERNEL_MODULES_INSTALL
 	prompt "Install modules into /lib/modules"
 	depends on KERNEL_MODULES
 
+config KERNEL_MODULES_SIGN
+	bool
+	depends on KERNEL_MODULES
+	select KERNEL_CODE_SIGNING
+	select KERNEL_MODULES_INSTALL
+	prompt "sign modules"
+	help
+	  If enabled, kernel modules are signed during the install stage with
+	  the key specified by the code signing provider in the "kernel-modules"
+	  role.
+
+	  See the section "Kernel module signing" in the "Daily Work" chapter in
+	  the PTXdist manual for use cases and more infos about what needs to be
+	  enabled in the kernel config file.
+
 config KERNEL_VERSION
 	prompt "kernel version"
 	string
 	default "4.15"
+	help
+	  Fill in the kernel version that you want to use. Normally, you should
+	  use the latest stable version, see <https://kernel.org>.
 
 config KERNEL_MD5
 	prompt "kernel source md5sum"
 	string
+	help
+	  To ensure integrity of the downloaded source tarball, fill in its
+	  MD5 sum here.
 
 choice
 	prompt "Image Type          "
@@ -106,6 +129,7 @@ choice
 		help
 		 This is the target to get the kernel image as an raw uncompressed
 		 binary file.
+
 	config KERNEL_IMAGE_SIMPLE
 		bool
 		prompt "simpleImage"
@@ -140,16 +164,96 @@ endif
 
 config KERNEL_IMAGE
 	string
-	default "bzImage" if KERNEL_IMAGE_BZ
-	default "Image.gz"  if KERNEL_IMAGE_Z && ARCH_ARM64
-	default "zImage"  if KERNEL_IMAGE_Z
-	default "xipImage" if KERNEL_IMAGE_XIP
-	default "uImage"  if KERNEL_IMAGE_U
-	default "vmImage" if KERNEL_IMAGE_VM
-	default "vmlinux" if KERNEL_IMAGE_VMLINUX
-	default "vmlinuz" if KERNEL_IMAGE_VMLINUZ
-	default "Image"   if KERNEL_IMAGE_RAW
+	default "bzImage"	if KERNEL_IMAGE_BZ
+	default "Image.gz"	if KERNEL_IMAGE_Z && (ARCH_ARM64 || ARCH_RISCV)
+	default "zImage"	if KERNEL_IMAGE_Z
+	default "xipImage"	if KERNEL_IMAGE_XIP
+	default "uImage"	if KERNEL_IMAGE_U
+	default "vmImage"	if KERNEL_IMAGE_VM
+	default "vmlinux"	if KERNEL_IMAGE_VMLINUX
+	default "vmlinuz"	if KERNEL_IMAGE_VMLINUZ
+	default "Image"		if KERNEL_IMAGE_RAW
 	default "simpleImage.${PTXCONF_KERNEL_IMAGE_SIMPLE_TARGET}.elf" if KERNEL_IMAGE_SIMPLE
+
+menuconfig KERNEL_DTB
+	bool
+	prompt "Build device trees            "
+
+if KERNEL_DTB
+
+config KERNEL_DTS_PATH
+	string "path to source dts file"
+	default "${PTXDIST_PLATFORMCONFIG_SUBDIR}/dts:${KERNEL_DIR}/arch/${GENERIC_KERNEL_ARCH}/boot/dts"
+	help
+	  Define path to the dts source file. Multiple directories can be
+	  specified separated by ':'. A relative path will be expanded relative
+	  to the workspace and all other layers. Only one of the specified paths
+	  can be a relative path.
+
+config KERNEL_DTS
+	string "source dts file"
+	default "<yourboard>.dts"
+	help
+	  Select the dts file to use for the device tree binary
+	  blob generation. For relative file names KERNEL_DTS_PATH
+	  is used as a search path for the device tree files specified
+	  here. Multiple dts files can be specified, separated by spaces.
+
+config KERNEL_DTS_SUPPORT_OVERLAYS
+	bool
+
+endif
+
+menuconfig KERNEL_DTBO
+	bool
+	select KERNEL_DTS_SUPPORT_OVERLAYS
+	prompt "Build device tree overlays    "
+
+if KERNEL_DTBO
+
+config KERNEL_DTSO_PATH
+	string "path to overlay file(s)"
+	default "${PTXDIST_PLATFORMCONFIG_SUBDIR}/dts/overlays:${KERNEL_DIR}/arch/${GENERIC_KERNEL_ARCH}/boot/dts"
+	help
+	  Define path to the dts(o) source file(s). Multiple directories can be
+	  specified separated by ':'. A relative path will be expanded relative
+	  to the workspace and all other layers. Only one of the specified paths
+	  can be a relative path.
+
+config KERNEL_DTSO
+	string "overlay file(s)"
+	default "<youroverlay>.dtso"
+	help
+	  Select the dts(o) file(s) to be compiled. For relative file
+	  names KERNEL_DTSO_PATH is used as a search path for the device
+	  tree files specified here.
+	  Multiple dts(o) files can be specified, separated by spaces.
+
+endif
+
+config KERNEL_CODE_SIGNING
+	prompt "use code signing infrastructure"
+	select KERNEL_OPENSSL
+	bool
+	help
+	  Enable this option if you want the kernel to make use of the code
+	  signing infrastructure, e.g. to supply trust roots from the
+	  'kernel-trusted' code signing role.
+
+	  See the section "Using the Code Signing Infrastructure with the Kernel
+	  Recipe" in the "Daily Use" chapter in the PTXdist manual for use
+	  cases and more information.
+
+config KERNEL_ZSTD
+	prompt "build zstd hosttool"
+	bool
+	help
+	  Select this if you're going to build your kernel compressed
+	  with zstd and your host system is lacking the proper tools
+	  (the "zstd" package).
+
+	  Select this if you're unsure, as it won't hurt. It just
+	  increases the build time.
 
 config KERNEL_XZ
 	prompt "build xz-utils hosttool"
@@ -246,9 +350,10 @@ config KERNEL_SERIES
 config KERNEL_CONFIG
 	prompt "kernel config file"
 	string
-	default "kernelconfig-${PTXCONF_KERNEL_VERSION}"
+	default "kernelconfig"
 	help
 	  This entry specifies the .config file used to compile your kernel.
+	  Specify the path relative to the platformconfig directory.
 
 endmenu
 

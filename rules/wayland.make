@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_WAYLAND) += wayland
 #
 # Paths and names
 #
-WAYLAND_VERSION	:= 1.18.0
-WAYLAND_MD5	:= 23317697b6e3ff2e1ac8c5ba3ed57b65
+WAYLAND_VERSION	:= 1.23.1
+WAYLAND_MD5	:= 5d27c7d3658fa90f40111b47cdb4a8fb
 WAYLAND		:= wayland-$(WAYLAND_VERSION)
 WAYLAND_SUFFIX	:= tar.xz
-WAYLAND_URL	:= http://wayland.freedesktop.org/releases/$(WAYLAND).$(WAYLAND_SUFFIX)
+WAYLAND_URL	:= https://gitlab.freedesktop.org/wayland/wayland/-/releases/$(WAYLAND_VERSION)/downloads/$(WAYLAND).$(WAYLAND_SUFFIX)
 WAYLAND_SOURCE	:= $(SRCDIR)/$(WAYLAND).$(WAYLAND_SUFFIX)
 WAYLAND_DIR	:= $(BUILDDIR)/$(WAYLAND)
 WAYLAND_LICENSE	:= MIT
@@ -27,18 +27,22 @@ WAYLAND_LICENSE	:= MIT
 # Prepare
 # ----------------------------------------------------------------------------
 
+WAYLAND_CONF_ENV	:= \
+	$(HOST_ENV) \
+	PKG_CONFIG_FOR_BUILD=$(PTXDIST_SYSROOT_HOST)/usr/bin/pkg-config
+
 #
-# autoconf
+# meson
 #
-WAYLAND_CONF_TOOL	:= autoconf
+WAYLAND_CONF_TOOL	:= meson
 WAYLAND_CONF_OPT	:= \
-	$(CROSS_AUTOCONF_USR) \
-	--disable-static \
-	--disable-fatal-warnings \
-	--enable-libraries \
-	--disable-documentation \
-	--disable-dtd-validation \
-	--with-host-scanner
+	$(CROSS_MESON_USR) \
+	-Ddocumentation=false \
+	-Ddtd_validation=false \
+	-Dicon_directory= \
+	-Dlibraries=true \
+	-Dscanner=true \
+	-Dtests=false
 
 # ----------------------------------------------------------------------------
 # Install
@@ -49,8 +53,8 @@ $(STATEDIR)/wayland.install.post:
 #	# target wayland-scanner is not needed. Make sure nobody tries to use it
 	@rm -f $(WAYLAND_PKGDIR)/usr/bin/wayland-scanner
 	@$(call world/install.post, WAYLAND)
-	@sed 's;^prefix=.*;prefix=$(PTXDIST_SYSROOT_HOST);' \
-		$(PTXDIST_SYSROOT_HOST)/lib/pkgconfig/wayland-scanner.pc \
+	@sed 's;^prefix=.*;prefix=$(PTXDIST_SYSROOT_HOST)/usr;' \
+		$(PTXDIST_SYSROOT_HOST)/usr/lib/pkgconfig/wayland-scanner.pc \
 		> $(PTXDIST_SYSROOT_TARGET)/usr/lib/pkgconfig/wayland-scanner.pc
 	@$(call touch)
 # ----------------------------------------------------------------------------

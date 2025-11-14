@@ -14,13 +14,13 @@ PACKAGES-$(PTXCONF_QT5) += qt5
 #
 # Paths and names
 #
-QT5_VERSION	:= 5.15.0
-QT5_MD5		:= 610a228dba6ef469d14d145b71ab3b88
-QT5		:= qt-everywhere-src-$(QT5_VERSION)
+QT5_VERSION	:= 5.15.15
+QT5_MD5		:= b3fce0ea39adf68cf2cf0300801874ba
+QT5		:= qt-everywhere-opensource-src-$(QT5_VERSION)
 QT5_SUFFIX	:= tar.xz
 QT5_URL		:= \
 	http://download.qt-project.org/archive/qt/$(basename $(QT5_VERSION))/$(QT5_VERSION)/single/$(QT5).$(QT5_SUFFIX) \
-	http://download.qt-project.org/development_releases/qt/$(basename $(QT5_VERSION))/$(call ptx/sh, echo $(QT5_VERSION) | tr 'A-Z' 'a-z')/single/$(QT5).$(QT5_SUFFIX)
+	http://download.qt-project.org/development_releases/qt/$(basename $(QT5_VERSION))/$(QT5_VERSION)/single/$(QT5).$(QT5_SUFFIX)
 QT5_SOURCE	:= $(SRCDIR)/$(QT5).$(QT5_SUFFIX)
 QT5_DIR		:= $(BUILDDIR)/$(QT5)
 QT5_BUILD_OOT	:= YES
@@ -35,7 +35,7 @@ QT5_MKSPECS	 = $(call ptx/get-alternative, config/qt5, linux-ptx-g++)
 
 ifdef PTXCONF_QT5
 ifeq ($(strip $(QT5_MKSPECS)),)
-$(error Qt5 mkspecs are missing)
+$(call ptx/error, Qt5 mkspecs are missing)
 endif
 endif
 
@@ -78,7 +78,7 @@ QT5_PKG_CONFIG_ENV := \
 # target options are provided via mkspecs
 QT5_CONF_ENV := \
 	$(QT5_PKG_CONFIG_ENV) \
-	MAKEFLAGS="$(PARALLELMFLAGS)" \
+	MAKEFLAGS="$(PARALLELMFLAGS) --output-sync=none" \
 	COMPILER_PREFIX=$(COMPILER_PREFIX)
 
 ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
@@ -113,6 +113,7 @@ QT5_CONF_OPT	:= \
 	-opensource \
 	-confirm-license \
 	-release \
+	-no-feature-relocatable \
 	--disable-optimized-tools \
 	--disable-separate-debug-info \
 	--disable-gdb-index \
@@ -235,11 +236,19 @@ QT5_CONF_OPT	:= \
 	--$(call ptx/endis, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sql-sqlite \
 	$(call ptx/qt5-system, PTXCONF_QT5_MODULE_QTBASE_SQL_SQLITE)-sqlite
 
+ifdef PTXCONF_ARCH_X86
+ifndef PTXCONF_ARCH_X86_64
+QT5_CONF_OPT += \
+	--disable-sse2
+endif
+endif
+
 # Note: these options are not listed in '--help' but they exist
 QT5_CONF_OPT += \
 	--disable-sm \
 	--disable-feature-gssapi \
-	--$(call ptx/endis, PTXCONF_QT5_VULKAN)-vulkan
+	--$(call ptx/endis, PTXCONF_QT5_VULKAN)-vulkan \
+	--disable-zstd
 
 ifdef PTXCONF_QT5_MODULE_QTBASE_SQL_MYSQL
 QT5_CONF_OPT += \
@@ -313,7 +322,7 @@ endif
 
 ifdef PTXCONF_QT5_GUI
 ifndef PTXCONF_QT5_PLATFORM_DEFAULT
-$(error Qt5: select at least one GUI platform!)
+$(call ptx/error, Qt5: select at least one GUI platform!)
 endif
 endif
 
@@ -333,7 +342,7 @@ ifdef PTXCONF_QT5_MODULE_QTWEBENGINE
 ifndef PTXCONF_ARCH_LP64
 	@echo "Checking for 32bit g++ host compiler ..."
 	@$(call world/execute, QT5, \
-		echo -e '#include <list>\n int main() { std::list<int> a; return 0; }' | \
+		echo -e '#include <list>\n#include <errno.h>\n int main() { std::list<int> a; return 0; }' | \
 		g++ -x c++  - -o /dev/null -m32 &> /dev/null || \
 		ptxd_bailout "32bit g++ host compiler is missing (needed for QtWebengine)." \
 			"Please install g++-multilib (debian)")
@@ -369,19 +378,19 @@ $(STATEDIR)/qt5.install.post:
 	@find $(QT5_PKGDIR) -name '*.pri' -o -name '*.cmake' | \
 		xargs sed -i 's;@WORKSPACE@;$(PTXDIST_WORKSPACE);g'
 	@$(call world/install.post, QT5)
-	@echo "[Paths]"						>  $(QT5_QT_CONF)
-	@echo "HostPrefix=$(SYSROOT)/usr"			>> $(QT5_QT_CONF)
-	@echo "HostData=$(SYSROOT)/usr/lib/qt5"			>> $(QT5_QT_CONF)
-	@echo "HostBinaries=$(PTXDIST_SYSROOT_CROSS)/bin/qt5"	>> $(QT5_QT_CONF)
-	@echo "Prefix=/usr"					>> $(QT5_QT_CONF)
-	@echo "Headers=$(SYSROOT)/usr/include/qt5"		>> $(QT5_QT_CONF)
-	@echo "Libraries=$(SYSROOT)/usr/lib"			>> $(QT5_QT_CONF)
-	@echo "Imports=/usr/lib/qt5/imports"			>> $(QT5_QT_CONF)
-	@echo "Qml2Imports=/usr/lib/qt5/qml"			>> $(QT5_QT_CONF)
-	@echo ""						>> $(QT5_QT_CONF)
+	@echo "[Paths]"							>  $(QT5_QT_CONF)
+	@echo "HostPrefix=$(SYSROOT)/usr"				>> $(QT5_QT_CONF)
+	@echo "HostData=$(SYSROOT)/usr/lib/qt5"				>> $(QT5_QT_CONF)
+	@echo "HostBinaries=$(PTXDIST_SYSROOT_CROSS)/usr/bin/qt5"	>> $(QT5_QT_CONF)
+	@echo "Prefix=/usr"						>> $(QT5_QT_CONF)
+	@echo "Headers=$(SYSROOT)/usr/include/qt5"			>> $(QT5_QT_CONF)
+	@echo "Libraries=$(SYSROOT)/usr/lib"				>> $(QT5_QT_CONF)
+	@echo "Imports=/usr/lib/qt5/imports"				>> $(QT5_QT_CONF)
+	@echo "Qml2Imports=/usr/lib/qt5/qml"				>> $(QT5_QT_CONF)
+	@echo ""							>> $(QT5_QT_CONF)
 #	# qmake is found in sysroot-cross (via PATH) and sysroot target (via cmake)
-	@rm -rf $(PTXDIST_SYSROOT_CROSS)/bin/qt5
-	@cp -a $(SYSROOT)/usr/bin/qt5 $(PTXDIST_SYSROOT_CROSS)/bin/qt5
+	@rm -rf $(PTXDIST_SYSROOT_CROSS)/usr/bin/qt5
+	@cp -a $(SYSROOT)/usr/bin/qt5 $(PTXDIST_SYSROOT_CROSS)/usr/bin/qt5
 	@$(call touch)
 
 
@@ -398,7 +407,6 @@ QT5_LIBS-$(PTXCONF_QT5_MODULE_QT3D_QUICK)			+= Qt53DQuick Qt53DQuickAnimation Qt
 QT5_QML-$(PTXCONF_QT5_MODULE_QT3D_QUICK)			+= Qt3D
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D)				+= geometryloaders/libdefaultgeometryloader
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D)				+= geometryloaders/libgltfgeometryloader
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D)				+= sceneparsers/libassimpsceneimport
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D)				+= sceneparsers/libgltfsceneexport
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D)				+= sceneparsers/libgltfsceneimport
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QT3D_QUICK)			+= renderplugins/libscene2d
@@ -577,7 +585,6 @@ QT5_QML-$(PTXCONF_QT5_MODULE_QTSCXML_QUICK)			+= QtScxml
 
 ### QtSensors ###
 QT5_LIBS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= Qt5Sensors
-QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_counterplugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_plugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensorgestures/libqtsensorgestures_shakeplugin
 QT5_PLUGINS-$(PTXCONF_QT5_MODULE_QTSENSORS)			+= sensors/libqtsensors_generic

@@ -3,11 +3,13 @@
 menuconfig GST_PLUGINS_GOOD1
 	tristate
 	select HOST_MESON
+	select CROSS_NASM		if GST_PLUGINS_GOOD1_DEINTERLACE
 
 	select GLIB
 	select GSTREAMER1
 	select GST_PLUGINS_BASE1
-	select ORC
+	select GST_PLUGINS_BASE1_GL	if GST_PLUGINS_GOOD1_QT5 || GST_PLUGINS_GOOD1_QT6
+	select ORC			if GST_PLUGINS_GOOD1_ORC
 	select BZIP2			if GST_PLUGINS_GOOD1_BZ2
 	select BZIP2_LIBBZ2		if GST_PLUGINS_GOOD1_BZ2
 	select CAIRO			if GST_PLUGINS_GOOD1_CAIRO
@@ -24,8 +26,19 @@ menuconfig GST_PLUGINS_GOOD1
 	select QT5			if GST_PLUGINS_GOOD1_QT5
 	select QT5_GUI			if GST_PLUGINS_GOOD1_QT5
 	select QT5_MODULE_QTDECLARATIVE	if GST_PLUGINS_GOOD1_QT5
+	select QT6			if GST_PLUGINS_GOOD1_QT6
+	select QT6_GUI			if GST_PLUGINS_GOOD1_QT6
+	select QT6_MODULE_QTDECLARATIVE	if GST_PLUGINS_GOOD1_QT6
 	select LIBSHOUT			if GST_PLUGINS_GOOD1_SHOUT2
 	select LIBSOUP			if GST_PLUGINS_GOOD1_SOUP
+	select LIBSOUP			if GST_PLUGINS_GOOD1_ADAPTIVEDEMUX2 && RUNTIME
+	select LIBTAG			if GST_PLUGINS_GOOD1_TAGLIB
+	select LIBXML2			if GST_PLUGINS_GOOD1_ADAPTIVEDEMUX2
+	select LIBGCRYPT		if GST_PLUGINS_GOOD1_HLS_CRYPTO_GCRYPT
+	select NETTLE			if GST_PLUGINS_GOOD1_HLS_CRYPTO_NETTLE
+	select OPENSSL			if GST_PLUGINS_GOOD1_HLS_CRYPTO_OPENSSL
+	select SYSTEMD			if GST_PLUGINS_GOOD1_V4L2 && GST_PLUGINS_GOOD1_SYSTEMD && RUNTIME
+	select SYSTEMD_UDEV_PERSISTENT_V4L	if GST_PLUGINS_GOOD1_V4L2 && GST_PLUGINS_GOOD1_SYSTEMD && RUNTIME
 	select SPEEX			if GST_PLUGINS_GOOD1_SPEEX
 	select TWOLAME			if GST_PLUGINS_GOOD1_TWOLAME
 	select LIBGUDEV			if GST_PLUGINS_GOOD1_V4L2
@@ -59,6 +72,7 @@ config GST_PLUGINS_GOOD1_APETAG
 
 config GST_PLUGINS_GOOD1_AUDIOFX
 	bool
+	select GST_PLUGINS_GOOD1_ORC
 	prompt "audiofx"
 
 config GST_PLUGINS_GOOD1_AUDIOPARSERS
@@ -87,6 +101,7 @@ config GST_PLUGINS_GOOD1_DEBUGUTILS
 
 config GST_PLUGINS_GOOD1_DEINTERLACE
 	bool
+	select GST_PLUGINS_GOOD1_ORC
 	prompt "deinterlace"
 
 config GST_PLUGINS_GOOD1_DTMF
@@ -195,6 +210,7 @@ config GST_PLUGINS_GOOD1_UDP
 
 config GST_PLUGINS_GOOD1_VIDEOBOX
 	bool
+	select GST_PLUGINS_GOOD1_ORC
 	prompt "videobox"
 
 config GST_PLUGINS_GOOD1_VIDEOCROP
@@ -207,6 +223,7 @@ config GST_PLUGINS_GOOD1_VIDEOFILTER
 
 config GST_PLUGINS_GOOD1_VIDEOMIXER
 	bool
+	select GST_PLUGINS_GOOD1_ORC
 	prompt "videomixer"
 
 config GST_PLUGINS_GOOD1_WAVENC
@@ -217,11 +234,45 @@ config GST_PLUGINS_GOOD1_WAVPARSE
 	bool
 	prompt "wavparse"
 
+config GST_PLUGINS_GOOD1_XINGMUX
+	bool
+	prompt "xingmux"
+
 config GST_PLUGINS_GOOD1_Y4M
 	bool
 	prompt "y4m"
 
 comment "plugins with dependencies"
+
+config GST_PLUGINS_GOOD1_ADAPTIVEDEMUX2
+	bool
+	prompt "adaptivedemux2"
+	help
+	  2nd generation adaptive demuxer plugin
+
+if GST_PLUGINS_GOOD1_ADAPTIVEDEMUX2
+
+choice
+	prompt "Crypto library to use for HLS plugin"
+
+	config GST_PLUGINS_GOOD1_HLS_CRYPTO_NETTLE
+	bool "nettle"
+
+	config GST_PLUGINS_GOOD1_HLS_CRYPTO_GCRYPT
+	bool "gcrypt"
+
+	config GST_PLUGINS_GOOD1_HLS_CRYPTO_OPENSSL
+	bool "openssl"
+endchoice
+
+endif
+
+config GST_PLUGINS_GOOD1_HLS_CRYPTO
+	string
+	default "nettle"	if GST_PLUGINS_GOOD1_HLS_CRYPTO_NETTLE
+	default "gcrypt"	if GST_PLUGINS_GOOD1_HLS_CRYPTO_GCRYPT
+	default "openssl"	if GST_PLUGINS_GOOD1_HLS_CRYPTO_OPENSSL
+	default "auto"
 
 config GST_PLUGINS_GOOD1_AALIB
 	bool
@@ -230,6 +281,22 @@ config GST_PLUGINS_GOOD1_AALIB
 	prompt "aalib"
 	help
 	  aalib text console video sink plugin
+
+config GST_PLUGINS_GOOD1_AMRNB
+	bool
+	# needs opencore-amrnb
+	depends on BROKEN
+	prompt "amrnb"
+	help
+	  Adaptive Multi-Rate Narrow-Band audio codec plugin
+
+config GST_PLUGINS_GOOD1_AMRWBDEC
+	bool
+	# needs opencore-amrwb
+	depends on BROKEN
+	prompt "amrwbdec"
+	help
+	  Adaptive Multi-Rate Wide-Band audio decoder plugin
 
 config GST_PLUGINS_GOOD1_CAIRO
 	bool
@@ -333,6 +400,19 @@ config GST_PLUGINS_GOOD1_QT5
 	help
 	  Qt5 QML video sink plugin
 
+config GST_PLUGINS_GOOD1_QT6
+	bool
+	prompt "qt6"
+	help
+	  Qt6 QML video sink plugin
+
+config GST_PLUGINS_GOOD1_RPICAMSRC
+	bool
+	depends on BROKEN
+	prompt "rpicamsrc"
+	help
+	  Raspberry Pi camera module plugin
+
 config GST_PLUGINS_GOOD1_SHOUT2
 	bool
 	prompt "shout2"
@@ -351,10 +431,12 @@ config GST_PLUGINS_GOOD1_SPEEX
 	help
 	  Speex audio codec plugin
 
+config GST_PLUGINS_GOOD1_SYSTEMD
+	bool
+	default INITMETHOD_SYSTEMD
+
 config GST_PLUGINS_GOOD1_TAGLIB
 	bool
-	# needs libtag
-	depends on BROKEN
 	prompt "taglib"
 	help
 	  Tag-writing plugin based on taglib
@@ -405,6 +487,9 @@ config GST_PLUGINS_GOOD1_BZ2
 	prompt "bz2"
 	help
 	  libbz2 support in the matroska plugin
+
+config GST_PLUGINS_GOOD1_ORC
+	bool
 
 config GST_PLUGINS_GOOD1_ZLIB
 	bool

@@ -16,14 +16,17 @@ PACKAGES-$(PTXCONF_PANGO) += pango
 #
 # Paths and names
 #
-PANGO_VERSION	:= 1.43.0
-PANGO_MD5	:= 2df040d3f6a4ed9bc316a70b35adcd8b
+PANGO_VERSION	:= 1.50.12
+PANGO_MD5	:= fd4b0b23915d6a0255317f811bea4215
 PANGO		:= pango-$(PANGO_VERSION)
 PANGO_SUFFIX	:= tar.xz
-PANGO_URL	:= http://ftp.gnome.org/pub/GNOME/sources/pango/$(basename $(PANGO_VERSION))/$(PANGO).$(PANGO_SUFFIX)
+PANGO_URL	:= $(call ptx/mirror, GNOME, pango/$(basename $(PANGO_VERSION))/$(PANGO).$(PANGO_SUFFIX))
 PANGO_SOURCE	:= $(SRCDIR)/$(PANGO).$(PANGO_SUFFIX)
 PANGO_DIR	:= $(BUILDDIR)/$(PANGO)
 PANGO_LICENSE	:= LGPL-2.0-or-later
+PANGO_LICENSE_FILES := \
+	file://pango/pango.h;startline=4;endline=19;md5=c77448008291979d480c86aa699c1f13 \
+	file://COPYING;md5=3bf50002aefd002f49e7bb854063f7e7
 
 # ----------------------------------------------------------------------------
 # Prepare
@@ -32,8 +35,15 @@ PANGO_LICENSE	:= LGPL-2.0-or-later
 PANGO_CONF_TOOL	:= meson
 PANGO_CONF_OPT	:= \
 	$(CROSS_MESON_USR) \
-	-Denable_docs=false \
-	-Dgir=$(call ptx/truefalse,PTXCONF_PANGO_INTROSPECTION)
+	-Dcairo=enabled \
+	-Dfontconfig=enabled \
+	-Dfreetype=enabled \
+	-Dgtk_doc=false \
+	-Dinstall-tests=false \
+	-Dintrospection=$(call ptx/endis,PTXCONF_PANGO_INTROSPECTION)d \
+	-Dlibthai=disabled \
+	-Dsysprof=disabled \
+	-Dxft=disabled
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -52,7 +62,7 @@ $(STATEDIR)/pango.targetinstall:
 	@$(call install_lib, pango, 0, 0, 0644, libpangoft2-1.0)
 	@$(call install_lib, pango, 0, 0, 0644, libpangocairo-1.0)
 ifdef PTXCONF_PANGO_INTROSPECTION
-	@$(call install_copy, pango, 0, 0, 644, -, \
+	@$(call install_copy, pango, 0, 0, 0644, -, \
 		/usr/lib/girepository-1.0/Pango-1.0.typelib)
 endif
 

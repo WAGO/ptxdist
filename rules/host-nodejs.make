@@ -13,7 +13,7 @@
 HOST_PACKAGES-$(PTXCONF_HOST_NODEJS) += host-nodejs
 
 # Always run the preprocessor locally.
-HOST_NODEJS_COMPILE_ENV	:= \
+HOST_NODEJS_MAKE_ENV	:= \
 	ICECC_REMOTE_CPP=0
 
 # ----------------------------------------------------------------------------
@@ -22,19 +22,25 @@ HOST_NODEJS_COMPILE_ENV	:= \
 
 HOST_NODEJS_CONF_TOOL	:= autoconf
 HOST_NODEJS_CONF_OPT	:= \
-	$(HOST_AUTOCONF) \
-	--prefix=/ \
+	--prefix=/usr \
+	--libdir=lib \
 	--no-cross-compiling \
 	--dest-os=linux \
-	--without-dtrace \
-	--without-etw \
-	--without-npm \
 	--shared \
 	--shared-openssl \
 	--shared-zlib \
-	--shared-cares \
-	--with-intl=none \
-	--without-snapshot
+	--shared-cares
+
+$(STATEDIR)/host-nodejs.prepare:
+	@$(call targetinfo)
+
+	@$(call world/execute, HOST_NODEJS, python3 $(HOST_NODEJS_DIR)/configure $(HOST_NODEJS_CONF_OPT))
+	@mkdir -p $(HOST_NODEJS_DIR)/out/Release/
+	@echo -e '#!/bin/sh\nexec "$${@}"' > \
+		$(HOST_NODEJS_DIR)/out/Release/tool-wrapper
+	@chmod +x $(HOST_NODEJS_DIR)/out/Release/tool-wrapper
+
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Install
@@ -42,13 +48,13 @@ HOST_NODEJS_CONF_OPT	:= \
 
 $(STATEDIR)/host-nodejs.install:
 	@$(call targetinfo)
-	@$(call install, HOST_NODEJS)
+	@$(call world/install, HOST_NODEJS)
 
 #	# Needed to cross-compile for target.
-	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/bytecode_builtins_list_generator $(HOST_NODEJS_PKGDIR)/bin/
-	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/mkcodecache $(HOST_NODEJS_PKGDIR)/bin/
-	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/node_mksnapshot $(HOST_NODEJS_PKGDIR)/bin/
-	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/torque $(HOST_NODEJS_PKGDIR)/bin/
+	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/bytecode_builtins_list_generator $(HOST_NODEJS_PKGDIR)/usr/bin/
+	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/node_mksnapshot $(HOST_NODEJS_PKGDIR)/usr/bin/
+	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/mksnapshot $(HOST_NODEJS_PKGDIR)/usr/bin/
+	@install -pm 0755 $(HOST_NODEJS_DIR)/out/Release/torque $(HOST_NODEJS_PKGDIR)/usr/bin/
 
 	@$(call touch)
 

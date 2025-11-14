@@ -2,11 +2,10 @@
 
 config CANFESTIVAL
 	tristate
-	select HOST_SYSTEM_PYTHON
+	select HOST_SYSTEM_PYTHON3
 	prompt "canfestival"
 	help
 	  CanFestival is an OpenSource CANOpen framework, licensed with GPLv2 and
 	  LGPLv2. For details, see the project web page:
 
 	  http://www.canfestival.org/
-

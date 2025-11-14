@@ -3,10 +3,11 @@
 menuconfig MTD_UTILS
 	tristate
 	prompt "mtd-utils                     "
-	select LIBC_M if MTD_UTILS_MKFS_UBIFS
+	select GCCLIBS_GCC_S	if MTD_UTILS_UBIFORMAT
+	select LIBC_M		if MTD_UTILS_MKFS_UBIFS
 	select ZLIB
-	select LIBUUID if MTD_UTILS_UBIFS
-	select LIBLZO if MTD_UTILS_USE_LIBLZO
+	select LIBUUID		if MTD_UTILS_UBIFS
+	select LIBLZO		if MTD_UTILS_USE_LIBLZO
 	help
 	  Memory Technology Device Utilities
 
@@ -43,7 +44,7 @@ config MTD_UTILS_FLASH_ERASE
 	bool
 	prompt "flash_erase"
 	help
-	  Erase parts of a MTD device
+	  Erase parts of an MTD device
 
 config MTD_UTILS_FLASH_ERASEALL
 	bool
@@ -134,29 +135,24 @@ config MTD_UTILS_JFFS2_DUMP
 	help
 	  This utility dumps the contents of a binary JFFS2 image.
 
-#config MTD_UTILS_JFFS2READER
-#	bool
-#	prompt "jffs2reader"
-#	select MTD_UTILS_JFFS
-#	help
-#	  A jffs2 image reader
-
-config MTD_UTILS_JITTERTEST
+config MTD_UTILS_JFFS2READER
 	bool
-	prompt "jittertest"
+	prompt "jffs2reader"
+	select MTD_UTILS_JFFS
 	help
-	  This program is used to measure what the jitter of a
-	  real time task would be under "standard" Linux.
-
-	  More particularly, what is the effect of running
-	  a real time task under Linux with background
-	  JFFS file system activity.
+	  A jffs2 image reader
 
 config MTD_UTILS_MTDDEBUG
 	bool
 	prompt "mtd_debug"
 	help
 	  Does info, read, write and erase on mtd devices
+
+config MTD_UTILS_MTDPART
+	bool
+	prompt "mtdpart"
+	help
+	  Add or remove a partition from an MTD device
 
 config MTD_UTILS_NANDDUMP
 	bool
@@ -288,10 +284,39 @@ comment "busybox' ubidetach is selected!"
 
 config MTD_UTILS_UBIFORMAT
 	bool
-	select GCCLIBS_GCC_S
 	prompt "ubiformat"
 	help
 	  Format an MTD device
+
+config MTD_UTILS_UBIFS_MOUNTHELPER
+	bool
+	prompt "mount.ubifs"
+	select MTD_UTILS_UBIFS
+	help
+	  Simplifies attaching an ubi and mounting an ubifs via /etc/fstab.
+
+menuconfig MTD_UTILS_UBIHEALTHD
+	bool
+	prompt "ubihealthd"
+	help
+	  Daemon that randomly scans each PEB of a UBI device to ensure that
+	  filesystems with little reading do enough wear leveling.
+	  Requires kernel >= 5.1 and glibc >= 2.25.
+
+if MTD_UTILS_UBIHEALTHD
+
+config MTD_UTILS_UBIHEALTHD_STARTSCRIPT
+	bool
+	prompt "install /etc/init.d/ubihealthd"
+	depends on INITMETHOD_BBINIT
+
+config MTD_UTILS_UBIHEALTHD_SYSTEMD_UNIT
+	bool
+	prompt "install systemd unit files"
+	default y
+	depends on SYSTEMD
+
+endif
 
 config MTD_UTILS_UBIMKVOL
 	bool
@@ -345,6 +370,14 @@ config MTD_UTILS_UBIRMVOL
 comment "busybox' ubirmvol is selected!"
 	depends on BUSYBOX_UBIRMVOL
 
+config MTD_UTILS_UBISCAN
+	bool
+	prompt "ubiscan"
+	help
+	  ubiscan will scan the PEBs in a specific MTD device and print
+	  a summary of the PEB erase counters and (optionally) details
+	  about each PEB's status.
+
 config MTD_UTILS_UBIUPDATEVOL
 	bool
 	prompt "ubiupdatevol"
@@ -362,12 +395,20 @@ config MTD_UTILS_MKFS_UBIFS
 	help
 	  Create ubifs filesystems
 
+endif
+
 config MTD_UTILS_MTDINFO
 	bool
 	prompt "mtdinfo"
 	help
-	  Print UBI specific information about MTD devices
+	  Print information about MTD devices
 
-endif
+config MTD_UTILS_TESTS
+	bool
+	prompt "MTD test programs"
+	help
+	  MTD test-suite with the following, potentially dangerous, test
+	  programs: nandbiterrs, flash_speed, flash_stress, flash_readtest,
+	  nandpagetest, nandsubpagetest, and flash_torture.
 
 endif

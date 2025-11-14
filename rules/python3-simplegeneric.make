@@ -18,7 +18,7 @@ PYTHON3_SIMPLEGENERIC_VERSION	:= 0.8.1
 PYTHON3_SIMPLEGENERIC_MD5	:= f9c1fab00fd981be588fc32759f474e3
 PYTHON3_SIMPLEGENERIC		:= simplegeneric-$(PYTHON3_SIMPLEGENERIC_VERSION)
 PYTHON3_SIMPLEGENERIC_SUFFIX	:= zip
-PYTHON3_SIMPLEGENERIC_URL	:= https://pypi.python.org/packages/source/s/simplegeneric/$(PYTHON3_SIMPLEGENERIC).$(PYTHON3_SIMPLEGENERIC_SUFFIX)\#md5=$(PYTHON3_SIMPLEGENERIC_MD5)
+PYTHON3_SIMPLEGENERIC_URL	:= $(call ptx/mirror-pypi, simplegeneric, $(PYTHON3_SIMPLEGENERIC).$(PYTHON3_SIMPLEGENERIC_SUFFIX))
 PYTHON3_SIMPLEGENERIC_SOURCE	:= $(SRCDIR)/$(PYTHON3_SIMPLEGENERIC).$(PYTHON3_SIMPLEGENERIC_SUFFIX)
 PYTHON3_SIMPLEGENERIC_DIR	:= $(BUILDDIR)/$(PYTHON3_SIMPLEGENERIC)
 PYTHON3_SIMPLEGENERIC_LICENSE	:= ZPL-2.1
@@ -43,7 +43,7 @@ $(STATEDIR)/python3-simplegeneric.targetinstall:
 	@$(call install_fixup, python3-simplegeneric, DESCRIPTION, missing)
 
 	@$(call install_copy, python3-simplegeneric, 0, 0, 0644, -, \
-		/usr/lib/python$(PYTHON3_MAJORMINOR)/site-packages/simplegeneric.pyc)
+		$(PYTHON3_SITEPACKAGES)/simplegeneric.pyc)
 
 	@$(call install_finish, python3-simplegeneric)
 

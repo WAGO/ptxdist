@@ -27,13 +27,11 @@ XORG_APP_XEYES_LICENSE	:= MIT
 # Prepare
 # ----------------------------------------------------------------------------
 
-XORG_APP_XEYES_PATH	:= PATH=$(CROSS_PATH)
-XORG_APP_XEYES_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-XORG_APP_XEYES_AUTOCONF := \
+XORG_APP_XEYES_CONF_TOOL := autoconf
+XORG_APP_XEYES_CONF_OPT := \
 	$(CROSS_AUTOCONF_USR) \
 	--datadir=$(XORG_DATADIR)
 

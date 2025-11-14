@@ -10,6 +10,10 @@ This is also essential when a verified boot chain is established, e.g. via
 *High Assurance Boot* (HAB), signed FIT images, and a verified root file
 system.
 
+.. image:: dev_code_signing_flowchart.svg
+
+On the one side, **code signing consumers** are PTXdist recipes that want to
+make use of key material, e.g. for signing kernel modules or disk images.
 PTXdist uses `PKCS#11 <pkcs11-doc_>`_ internally to provide access to keys and
 certificates, therefore code signing consumers should implement a PKCS#11
 interface to make use of PTXdist's code signing infrastructure.
@@ -18,6 +22,11 @@ As PKCS#11 URIs usually differ between different usecases (release vs.
 development) the URIs are usually not hardcoded in the package configuration.
 Instead, PTXdist has the idea of **roles** which are string identifiers used to
 access a single private/public key pair and a certificate.
+
+Roles can be grouped into **role groups**.
+Role groups should be used where more than one role is needed, but the exact
+names and/or number of roles depend on the concrete code signing provider.
+For example, an i.MX HABv4 fuse table can contain up to four keys.
 
 Finally, one or several **code signing providers** supply the mapping from
 roles to the respective key material or even provide it themselves for
@@ -49,6 +58,7 @@ material in case SoftHSM is used.
 
 When ``PTXCONF_CODE_SIGNING`` is enabled exactly one code signing provider is
 active during each invocation of PTXdist.
+The active provider can be selected in the ``platformconfig`` menu.
 
 PTXdist comes equipped with a development code signing provider "devel"
 implemented via the package ``host-ptx-code-signing-dev``.
@@ -92,7 +102,7 @@ like this:
 
     ifdef PTXCONF_CODE_SIGNING_PROVIDER_<NAME>
     CODE_SIGNING_ENV += \
-    	PKCS11_MODULE_PATH="${PTXDIST_SYSROOT_HOST}/lib/pkcs11/opensc-pkcs11.so"
+    	PKCS11_MODULE_PATH="${PTXDIST_SYSROOT_HOST}/usr/lib/pkcs11/opensc-pkcs11.so"
     endif
 
 Note that the module is built in the BSP in this case.

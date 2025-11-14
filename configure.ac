@@ -2,11 +2,11 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl Most parts of this configure script have been borrowed from quilt.
 dnl
-AC_PREREQ(2.59)
+AC_PREREQ([2.69])
 
 AC_INIT([ptxdist],
-	m4_esyscmd([scripts/kernel/setlocalversion .tarball-version]),
-	[ptxdist@pengutronix.de])
+       [m4_esyscmd([scripts/kernel/setlocalversion .tarball-version])],
+       [ptxdist@pengutronix.de])
 AC_CONFIG_AUX_DIR(scripts/autoconf)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -44,52 +44,21 @@ AC_CHECK_HEADERS([fcntl.h inttypes.h libintl.h limits.h locale.h malloc.h stddef
 
 AC_CHECK_HEADER([regex.h], [], AC_MSG_ERROR([Cannot find regex.h.]))
 
-AC_SEARCH_LIBS(regcomp, [regex gnuregex],,
-	AC_MSG_ERROR([POSIX regex required.]))
-CONF_LIBS=${LIBS}
-AC_SUBST(CONF_LIBS)
-
-PKG_CHECK_MODULES([NCURSES], [ncurses],, [
-	AC_MSG_ERROR([Cannot find ncurses library.])])
-MCONF_LIBS="${LIBS} ${NCURSES_LIBS}"
-AC_SUBST(MCONF_LIBS)
-
-PKG_CHECK_MODULES([NCURSES_PANEL], [panel],,
-	AC_MSG_ERROR([Cannot find ncurses panel library.])])
-PKG_CHECK_MODULES([NCURSES_MENU], [menu],,
-	AC_MSG_ERROR([Cannot find ncurses menu library.])])
-NCONF_LIBS="${LIBS} ${NCURSES_LIBS} ${NCURSES_PANEL_LIBS} ${NCURSES_MENU_LIBS}"
-AC_SUBST(NCONF_LIBS)
-
-AC_CHECK_HEADERS(
-	[curses.h ncurses.h ncurses/curses.h ncurses/ncurses.h],
-	[CURSES_LOC="<$ac_header>";found_curses_headers=yes; break;])
-AS_IF([test "x$CURSES_LOC" = "x"],
-	[AC_MSG_ERROR([ncurses headers not found])])
-AC_SUBST(CURSES_LOC)
-
-CPPFLAGS="${NCURSES_CFLAGS}"
-AC_ARG_WITH(ncurses, AS_HELP_STRING([--with-ncurses],[Include path to the ncurses headers]),
-	[
-		if test "x$withval" != "xyes"; then
-			CPPFLAGS="-I$withval ${CPPFLAGS}"
-		fi
-		with_ncurses=yes
-	],[
-		with_ncurses=auto
+PKG_CHECK_MODULES([MCONF], [ncursesw],, [
+	PKG_CHECK_MODULES([MCONF], [ncurses],, [
+		AC_MSG_ERROR([Cannot find ncurses library.])
+	])
 ])
-AC_SUBST(CPPFLAGS)
+CFLAGS="${CFLAGS} ${MCONF_CFLAGS}"
 
-AC_CHECK_HEADER(
-	[menu.h],
-	[NCURSES_FOUND=yes],[
-	if test "$with_ncurses" = "yes"; then
-		AC_MSG_ERROR([Cannot find menu.h (ncurses).])
-	else
-		AC_MSG_WARN([Cannot find menu.h (ncurses). Not building nconf.])
-	fi
+NCONF_FOUND=yes
+PKG_CHECK_MODULES([NCONF], [ncursesw menuw panelw],, [
+	PKG_CHECK_MODULES([NCONF], [ncurses menu panel],, [
+		AC_MSG_WARN([Cannot find ncurses/menu/panel library.. Not building nconf.])
+		NCONF_FOUND=no
+	])
 ])
-AM_CONDITIONAL(BUILD_NCONF, test "x$NCURSES_FOUND" = "xyes")
+AM_CONDITIONAL(BUILD_NCONF, test "x$NCONF_FOUND" = "xyes")
 
 dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
@@ -192,6 +161,7 @@ GNU_TOOL(mknod, coreutils)
 GNU_TOOL(mktemp, coreutils)
 GNU_TOOL(mv, coreutils)
 GNU_TOOL(readlink, coreutils)
+GNU_TOOL(realpath, coreutils)
 GNU_TOOL(rm, coreutils)
 GNU_TOOL(rmdir, coreutils)
 GNU_TOOL(sort, coreutils)
@@ -201,9 +171,6 @@ GNU_TOOL(tty, coreutils)
 GNU_TOOL(tar, tar)
 GNU_TOOL(find, findutils)
 GNU_TOOL(xargs, findutils)
-
-dnl Check for egrep
-AC_PROG_EGREP
 
 dnl Check for awk
 AC_PROG_AWK
@@ -271,9 +238,15 @@ if test -z "$GUNZIP"; then
 fi
 
 dnl Check for unzip
-AC_PATH_PROGS(UNZIP, gunzip,, $PATH)
+AC_PATH_PROGS(UNZIP, unzip,, $PATH)
 if test -z "$UNZIP"; then
 	AC_MSG_ERROR([unzip could not be found, please install])
+fi
+
+dnl Check for xz
+AC_PATH_PROGS(XZ, xz,, $PATH)
+if test -z "$XZ"; then
+	AC_MSG_ERROR([xz could not be found, please install])
 fi
 
 dnl Check for wget
@@ -312,12 +285,6 @@ if test -z "$FILE"; then
 	AC_MSG_ERROR([file could not be found, please install])
 fi
 AC_SUBST([PTXDIST_FILE], [$FILE])
-
-dnl Check for msgfmt
-AC_PATH_PROGS(MSGFMT, msgfmt,, $PATH)
-if test -z "$MSGFMT"; then
-	AC_MSG_ERROR([gettext could not be found, please install])
-fi
 
 AC_PATH_PROG(SPHINX, sphinx-build,, $PATH)
 if test -z "$SPHINX"; then
@@ -390,6 +357,7 @@ AC_SUBST(PACKAGE_VERSION)
 
 AC_MSG_RESULT([])
 AC_CONFIG_FILES( \
+	scripts/kconfig/Makefile \
 	Makefile \
 )
 AC_OUTPUT

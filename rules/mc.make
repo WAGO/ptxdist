@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_MC) += mc
 #
 # Paths and names
 #
-MC_VERSION	:= 4.8.23
-MC_MD5		:= 466c3135f727f8ac2102d060a080ace3
+MC_VERSION	:= 4.8.25
+MC_MD5		:= 19f14d368001aac454c28a2ddd2e851b
 MC		:= mc-$(MC_VERSION)
 MC_SUFFIX	:= tar.xz
 MC_URL		:= http://ftp.midnight-commander.org/$(MC).$(MC_SUFFIX)
@@ -71,6 +71,10 @@ $(STATEDIR)/mc.targetinstall:
 	@$(call install_fixup, mc,DESCRIPTION,missing)
 
 	@$(call install_copy, mc, 0, 0, 0755, -, /usr/bin/mc)
+	@$(call install_link, mc, mc, /usr/bin/mcdiff)
+	@$(call install_link, mc, mc, /usr/bin/mcedit)
+	@$(call install_link, mc, mc, /usr/bin/mcview)
+
 	@$(call install_alternative_tree, mc, 0, 0, /etc/mc)
 	@$(call install_tree, mc, 0, 0, -, /usr/share/mc/skins)
 

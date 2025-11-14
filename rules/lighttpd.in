@@ -2,22 +2,21 @@
 menuconfig LIGHTTPD
 	tristate
 	prompt "lighttpd                      "
+	select HOST_MESON
 	select LIBC_M
 	select LIBC_DL
 	select LIBC_CRYPT
 	select ZLIB			if LIGHTTPD_ZLIB
+	select ZSTD			if LIGHTTPD_ZSTD
 	select BZIP2			if LIGHTTPD_BZ2LIB
 	select BZIP2_LIBBZ2		if LIGHTTPD_BZ2LIB
-	select ATTR			if LIGHTTPD_ATTR
-	select LIBPCRE			if LIGHTTPD_PCRE
+	select ATTR				if LIGHTTPD_ATTR
+	select PCRE2			if LIGHTTPD_PCRE2
 	select LIBXML2			if LIGHTTPD_WEBDAV_PROPS
 	select SQLITE			if LIGHTTPD_WEBDAV_PROPS
-	select LIBUUID			if LIGHTTPD_WEBDAV_LOCKS
 	select OPENSSL			if LIGHTTPD_OPENSSL
-	select LIBMEMCACHED		if LIGHTTPD_MEMCACHED
 	select LUA			if LIGHTTPD_LUA
 	select LUA_INSTALL_LIBLUA	if LIGHTTPD_LUA
-	select PHP5			if LIGHTTPD_MOD_FASTCGI_PHP && RUNTIME
 	select BUSYBOX_START_STOP_DAEMON			if LIGHTTPD_STARTSCRIPT
 	select BUSYBOX_FEATURE_START_STOP_DAEMON_FANCY		if LIGHTTPD_STARTSCRIPT
 	select BUSYBOX_FEATURE_START_STOP_DAEMON_LONG_OPTIONS	if LIGHTTPD_STARTSCRIPT
@@ -44,7 +43,7 @@ config LIGHTTPD_ATTR
 	bool
 	prompt "extended attribute support"
 	help
-	  Enable extended attribute support.
+	  with xattr-support for the stat-cache
 
 config LIGHTTPD_LUA
 	bool
@@ -52,37 +51,21 @@ config LIGHTTPD_LUA
 	help
 	  lua engine for mod_cml and mod_magnet
 
-config LIGHTTPD_MEMCACHED
-	bool
-	prompt "memcached storage"
-	# fails to build with current libmemcached version
-	depends on BROKEN
-	help
-	  memcached storage for mod_trigger_b4_dl and mod_cml
-
 config LIGHTTPD_OPENSSL
 	bool
 	prompt "openssl support"
 	help
 	  Include openssl support.
 
-config LIGHTTPD_PCRE
+config LIGHTTPD_PCRE2
 	bool
-	select LIBPCRE
-	prompt "pcre support"
+	prompt "pcre2 support"
 	help
-	  Enable pcre support.
+	  Enable pcre2 support.
 
 endmenu
 
 menu "modules                     "
-
-config LIGHTTPD_MOD_ACCESS
-	bool
-	prompt "mod_access"
-	default y
-	help
-	  Deny access to some files.
 
 config LIGHTTPD_MOD_ACCESSLOG
 	bool
@@ -91,12 +74,6 @@ config LIGHTTPD_MOD_ACCESSLOG
 	help
 	  flexible logging of requests served
 
-config LIGHTTPD_MOD_ALIAS
-	bool
-	prompt "mod_alias"
-	help
-	  Specify a special document-root for a given url-subset.
-
 config LIGHTTPD_MOD_AUTH
 	bool
 	prompt "mod_auth"
@@ -104,52 +81,59 @@ config LIGHTTPD_MOD_AUTH
 	help
 	  User authentication
 
-config LIGHTTPD_MOD_CML
+config LIGHTTPD_MOD_DEFLATE
 	bool
-	select LIGHTTPD_LUA
-	prompt "mod_cml"
-	help
-	  Cache Meta Language
-
-config LIGHTTPD_MOD_COMPRESS
-	bool
-	prompt "mod_compress"
+	prompt "mod_deflate"
 	help
 	  Output compression support.
 
-if LIGHTTPD_MOD_COMPRESS
+if LIGHTTPD_MOD_DEFLATE
 
 config LIGHTTPD_ZLIB
 	bool
 	prompt "zlib support"
 	help
-	  Enable zlib support for mod_compress.
+	  Enable zlib support for mod_deflate.
+
+config LIGHTTPD_ZSTD
+	bool
+	prompt "zstd support"
+	help
+	  Enable zstd support for mod_deflate.
 
 config LIGHTTPD_BZ2LIB
 	bool
 	prompt "bz2lib support"
 	help
-	  Enable bzip2 support for mod_compress.
+	  Enable bzip2 support for mod_deflate.
 endif
 
-config LIGHTTPD_MOD_FASTCGI
+config LIGHTTPD_MOD_DIRLISTING
 	bool
-	prompt "mod_fastcgi"
-
-if LIGHTTPD_MOD_FASTCGI
+	prompt "mod_dirlisting"
+	default y
+	help
+	  Creates an HTML page listing the contents of the target directory.
 
 config LIGHTTPD_MOD_FASTCGI_PHP
 	bool
-	depends on STAGING
+	depends on PHP8_SAPI_CGI
 	prompt "setup php handling with fastcgi"
 	help
 	  Enables the necessary packages and configuration files
 	  to enable PHP support in lighttpd
 
 comment "PHP CGI SAPI must be enabled"
-	depends on LIGHTTPD_MOD_FASTCGI_PHP && !PHP5_SAPI_CGI
+	depends on !PHP8_SAPI_CGI
 
-endif
+config LIGHTTPD_MOD_H2
+	bool
+	prompt "mod_h2"
+	default y
+	help
+	  HTTP/2 support
+	  To use lighttpd without HTTP/2 you need to disable it in the configuration file:
+	     server.feature-flags += ( "server.h2proto" => "disable" )
 
 config LIGHTTPD_MOD_MAGNET
 	bool
@@ -157,22 +141,6 @@ config LIGHTTPD_MOD_MAGNET
 	prompt "mod_magnet"
 	help
 	  A module to control the request handling
-
-config LIGHTTPD_MOD_REWRITE
-	bool
-	prompt "mod_rewrite"
-	help
-	  Module for URL rewriting
-
-config LIGHTTPD_MOD_TRIGGER_B4_DL
-	bool
-	select LIGHTTPD_MEMCACHED
-	select LIGHTTPD_PCRE
-	# needs (currently broken) LIGHTTPD_MEMCACHED
-	depends on BROKEN
-	prompt "mod_trigger_b4_dl"
-	help
-	  Module for Anti Hotlinking
 
 config LIGHTTPD_MOD_WEBDAV
 	bool
@@ -189,12 +157,6 @@ config LIGHTTPD_WEBDAV_PROPS
 	help
 	  properties in mod_webdav
 
-config LIGHTTPD_WEBDAV_LOCKS
-	bool
-	select LIGHTTPD_WEBDAV_PROPS
-	prompt "locks in mod_webdav"
-	help
-	  locks in mod_webdav
 endif
 
 config LIGHTTPD_MOD_EXTRA
@@ -217,6 +179,7 @@ menu "startup                     "
 config LIGHTTPD_STARTSCRIPT
 	bool
 	default y
+	depends on INITMETHOD_BBINIT
 	prompt "install /etc/init.d/lighttpd"
 
 config LIGHTTPD_SYSTEMD_UNIT

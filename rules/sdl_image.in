@@ -6,7 +6,8 @@ menuconfig SDL_IMAGE
 	prompt "SDL image                     "
 	select LIBPNG	if SDL_IMAGE__PNG
 	select LIBJPEG	if SDL_IMAGE__JPG
-	help 
+	select LIBTIFF	if SDL_IMAGE__TIF
+	help
 	  This is a simple library to load images of various
 	  formats as SDL surfaces. This library currently supports
 	  BMP, PPM, PCX, GIF, JPEG, PNG, TIFF, and XPM formats.

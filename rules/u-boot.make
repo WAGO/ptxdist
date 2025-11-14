@@ -16,16 +16,16 @@ PACKAGES-$(PTXCONF_U_BOOT) += u-boot
 #
 # Paths and names
 #
-U_BOOT_VERSION		:= $(call remove_quotes,$(PTXCONF_U_BOOT_VERSION))
-U_BOOT_MD5		:= $(call remove_quotes,$(PTXCONF_U_BOOT_MD5))
+U_BOOT_VERSION		:= $(call ptx/config-version, PTXCONF_U_BOOT)
+U_BOOT_MD5		:= $(call ptx/config-md5, PTXCONF_U_BOOT)
 U_BOOT			:= u-boot-$(U_BOOT_VERSION)
 U_BOOT_SUFFIX		:= tar.bz2
 U_BOOT_URL		:= https://ftp.denx.de/pub/u-boot/$(U_BOOT).$(U_BOOT_SUFFIX)
 U_BOOT_SOURCE		:= $(SRCDIR)/$(U_BOOT).$(U_BOOT_SUFFIX)
 U_BOOT_DIR		:= $(BUILDDIR)/$(U_BOOT)
-U_BOOT_BUILD_DIR	:= $(U_BOOT_DIR)-build
+U_BOOT_BUILD_DIR	:= $(U_BOOT_DIR)$(call ptx/ifdef, PTXCONF_U_BOOT_BUILD_OOT,-build)
 U_BOOT_DEVPKG		:= NO
-U_BOOT_BUILD_OOT	:= KEEP
+U_BOOT_BUILD_OOT	:= $(call ptx/ifdef, PTXCONF_U_BOOT_BUILD_OOT,KEEP,NO)
 
 ifdef PTXCONF_U_BOOT_CONFIGSYSTEM_KCONFIG
 U_BOOT_CONFIG	:= $(call ptx/in-platformconfigdir, \
@@ -35,6 +35,9 @@ endif
 # ----------------------------------------------------------------------------
 # Prepare
 # ----------------------------------------------------------------------------
+
+U_BOOT_INJECT_PATH	:= ${PTXDIST_SYSROOT_TARGET}/usr/lib/firmware
+U_BOOT_INJECT_OOT	:= $(call ptx/ifdef, PTXCONF_U_BOOT_BUILD_OOT,YES,NO)
 
 ifdef PTXCONF_U_BOOT_BOOT_SCRIPT
 U_BOOT_BOOT_SCRIPT_TXT := $(call ptx/in-platformconfigdir, uboot.scr)
@@ -49,18 +52,23 @@ U_BOOT_ENV_IMAGE_CUSTOM_SRC := $(call ptx/in-platformconfigdir, \
 $(call ptx/cfghash-file, U_BOOT, $(U_BOOT_ENV_IMAGE_CUSTOM_SRC))
 endif
 
+# use host pkg-config for host tools
+U_BOOT_PATH		:= PATH=$(HOST_PATH)
+
 U_BOOT_WRAPPER_BLACKLIST := \
 	$(PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST)
 
 U_BOOT_CONF_OPT		:= \
 	-C $(U_BOOT_DIR) \
-	O=$(U_BOOT_BUILD_DIR) \
+	$(call ptx/ifdef, PTXCONF_U_BOOT_BUILD_OOT,O=$(U_BOOT_BUILD_DIR)) \
 	V=$(PTXDIST_VERBOSE) \
 	$(call remove_quotes,$(PTXCONF_U_BOOT_CUSTOM_MAKE_OPTS))
 
 U_BOOT_MAKE_ENV		:= \
 	CROSS_COMPILE=$(BOOTLOADER_CROSS_COMPILE) \
-	HOSTCC=$(HOSTCC)
+	HOSTCC=$(HOSTCC) \
+	$(call remove_quotes,$(PTXCONF_U_BOOT_CUSTOM_MAKE_ENV))
+
 U_BOOT_MAKE_OPT		:= $(U_BOOT_CONF_OPT)
 
 U_BOOT_TAGS_OPT		:= ctags cscope etags
@@ -88,13 +96,22 @@ $(U_BOOT_CONFIG):
 	@exit 1
 endif
 
-
-ifdef PTXCONF_U_BOOT_CONFIGSYSTEM_LEGACY
 $(STATEDIR)/u-boot.prepare:
 	@$(call targetinfo)
-	$(U_BOOT_CONF_ENV) $(MAKE) $(U_BOOT_CONF_OPT)
-	@$(call touch)
+
+ifdef PTXCONF_U_BOOT_CONFIGSYSTEM_KCONFIG
+	@$(call world/prepare, U_BOOT)
 endif
+
+ifdef PTXCONF_U_BOOT_CONFIGSYSTEM_LEGACY
+	$(U_BOOT_CONF_ENV) $(MAKE) $(U_BOOT_CONF_OPT)
+endif
+
+ifdef PTXCONF_U_BOOT_FIRMWARE
+	@$(call world/inject, U_BOOT)
+endif
+
+	@$(call touch)
 
 # ----------------------------------------------------------------------------
 # Compile
@@ -138,42 +155,51 @@ $(STATEDIR)/u-boot.install:
 
 $(STATEDIR)/u-boot.targetinstall:
 	@$(call targetinfo)
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot.bin $(IMAGEDIR)/u-boot.bin
+	@$(call world/image-clean, U_BOOT)
+ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_BIN
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot.bin)
+endif
 ifdef PTXCONF_U_BOOT_INSTALL_SREC
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot.srec $(IMAGEDIR)/u-boot.srec
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot.srec)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_ELF
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot $(IMAGEDIR)/u-boot.elf
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot, u-boot.elf)
+endif
+ifdef PTXCONF_U_BOOT_INSTALL_EFI_APPLICATION
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-app.efi)
+endif
+ifdef PTXCONF_U_BOOT_INSTALL_EFI_PAYLOAD
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-payload.efi)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_SPL
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/SPL $(IMAGEDIR)/SPL
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/SPL)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_MLO
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/MLO $(IMAGEDIR)/MLO
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/MLO)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_IMG
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot.img $(IMAGEDIR)/u-boot.img
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot.img)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_IMX
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot.imx $(IMAGEDIR)/u-boot.imx
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot.imx)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_DTB_IMX
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot-dtb.imx $(IMAGEDIR)/u-boot-dtb.imx
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-dtb.imx)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_DTB
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot-dtb.bin \
-		$(IMAGEDIR)/u-boot-dtb.bin
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-dtb.bin)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_WITH_SPL_PBL
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot-with-spl-pbl.bin \
-		$(IMAGEDIR)/u-boot-with-spl-pbl.bin
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-with-spl-pbl.bin)
 endif
 ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_STM32
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot.stm32 $(IMAGEDIR)/u-boot.stm32
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot.stm32)
+endif
+ifdef PTXCONF_U_BOOT_INSTALL_U_BOOT_FLASH_BIN
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/flash.bin)
 endif
 ifndef PTXCONF_U_BOOT_ENV_IMAGE_NONE
-	@install -v -D -m644 $(U_BOOT_BUILD_DIR)/u-boot-env.img \
-		$(IMAGEDIR)/u-boot-env.img
+	@$(call ptx/image-install, U_BOOT, $(U_BOOT_BUILD_DIR)/u-boot-env.img)
 endif
 
 ifdef PTXCONF_U_BOOT_BOOT_SCRIPT
@@ -197,18 +223,14 @@ endif
 $(STATEDIR)/u-boot.clean:
 	@$(call targetinfo)
 	@$(call clean_pkg, U_BOOT)
-	@rm -vf $(IMAGEDIR)/u-boot.bin $(IMAGEDIR)/u-boot.srec $(IMAGEDIR)/u-boot.elf
-	@rm -vf $(IMAGEDIR)/u-boot.img $(IMAGEDIR)/SPL $(IMAGEDIR)/MLO
-	@rm -vf $(IMAGEDIR)/u-boot.imx $(IMAGEDIR)/u-boot-dtb.imx
-	@rm -vf $(IMAGEDIR)/u-boot-env.img
-	@rm -vf	$(IMAGEDIR)/u-boot-dtb.bin $(IMAGEDIR)/u-boot-with-spl-pbl.bin
-	@rm -vf $(IMAGEDIR)/u-boot.stm32
 
 # ----------------------------------------------------------------------------
 # oldconfig / menuconfig
 # ----------------------------------------------------------------------------
 
+ifdef PTXCONF_U_BOOT_CONFIGSYSTEM_KCONFIG
 u-boot_oldconfig u-boot_menuconfig u-boot_nconfig: $(STATEDIR)/u-boot.extract
 	@$(call world/kconfig, U_BOOT, $(subst u-boot_,,$@))
+endif
 
 # vim: syntax=make

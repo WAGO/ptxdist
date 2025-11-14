@@ -20,13 +20,11 @@ HOST_LIBGD_DIR	= $(HOST_BUILDDIR)/$(LIBGD)
 # Prepare
 # ----------------------------------------------------------------------------
 
-HOST_LIBGD_PATH	:= PATH=$(HOST_PATH)
-HOST_LIBGD_ENV 	:= $(HOST_ENV)
-
 #
 # autoconf
 #
-HOST_LIBGD_AUTOCONF	:= \
+HOST_LIBGD_CONF_TOOL	:= autoconf
+HOST_LIBGD_CONF_OPT	:= \
 	$(HOST_AUTOCONF) \
 	--without-x \
 	--without-jpeg \

@@ -16,8 +16,8 @@ endif
 #
 # Paths and names
 #
-OPTEE_VERSION	:= 3.5.0
-OPTEE_MD5	:= 18dac7e462abe072956a4a9e9139d1d5
+OPTEE_VERSION	:= 4.0.0
+OPTEE_MD5	:= f7e9e874481dfb6b6b0998e1acb4e215
 OPTEE		:= optee-$(OPTEE_VERSION)
 OPTEE_SUFFIX	:= tar.gz
 OPTEE_URL	:= https://github.com/OP-TEE/optee_os/archive/$(OPTEE_VERSION).$(OPTEE_SUFFIX)
@@ -33,12 +33,16 @@ OPTEE_DEVPKG	:= NO
 OPTEE_WRAPPER_BLACKLIST := \
 	$(PTXDIST_LOWLEVEL_WRAPPER_BLACKLIST)
 
+OPTEE_PLATFORM		:= $(call remove_quotes,$(PTXCONF_OPTEE_PLATFORM))
+OPTEE_PLATFORM_FLAVOUR	:= $(call remove_quotes,$(PTXCONF_OPTEE_PLATFORM_FLAVOUR))
+OPTEE_PLATFORM_FLAVOUR	:= $(if $(OPTEE_PLATFORM_FLAVOUR),-$(OPTEE_PLATFORM_FLAVOUR))
+
 OPTEE_CONF_TOOL := NO
 OPTEE_MAKE_ENV += \
 	PATH=$(CROSS_PATH) \
 	CROSS_COMPILE=$(COMPILER_PREFIX) \
 	$(call ptx/ifdef,PTXCONF_ARCH_ARM64,CFG_ARM64_core=y) \
-	PLATFORM=$(call remove_quotes,$(PTXCONF_OPTEE_PLATFORM))-$(call remove_quotes,$(PTXCONF_OPTEE_PLATFORM_FLAVOUR)) \
+	PLATFORM=$(OPTEE_PLATFORM)$(OPTEE_PLATFORM_FLAVOUR) \
 	$(call remove_quotes,$(PTXCONF_OPTEE_CFG))
 
 # ----------------------------------------------------------------------------

@@ -1,33 +1,38 @@
 #!/bin/sh
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/dropbear
 NAME=dropbear
 
 DROPBEAR_PORT=22
 DROPBEAR_EXTRA_ARGS=
 
-. /lib/init/initmethod-bbinit-functions.sh
+. /usr/lib/init/dropbear.sh
 
 # test ! -h /var/service/dropbear || exit 0
 
-DROPBEAR_RSAKEY_DEFAULT="@KEYDIR@/dropbear_rsa_host_key"
-DROPBEAR_DSSKEY_DEFAULT="@KEYDIR@/dropbear_dss_host_key"
-
 test -z "$DROPBEAR_BANNER" || \
   DROPBEAR_EXTRA_ARGS="$DROPBEAR_EXTRA_ARGS -b $DROPBEAR_BANNER"
-test -n "$DROPBEAR_RSAKEY" || \
-  DROPBEAR_RSAKEY=$DROPBEAR_RSAKEY_DEFAULT
-test -n "$DROPBEAR_DSSKEY" || \
-  DROPBEAR_DSSKEY=$DROPBEAR_DSSKEY_DEFAULT
-test -n "$DROPBEAR_KEYTYPES" || \
-  DROPBEAR_KEYTYPES="rsa dss"
 
 dropbear_start() {
-
     KEY_ARGS=""
-    test -f $DROPBEAR_DSSKEY && KEY_ARGS="$KEY_ARGS -d $DROPBEAR_DSSKEY"
-    test -f $DROPBEAR_RSAKEY && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_RSAKEY"
+    for keytype in $DROPBEAR_KEYTYPES
+    do
+        case "$keytype" in
+            rsa)
+                test -f "$DROPBEAR_RSAKEY" && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_RSAKEY"
+                ;;
+            ecdsa)
+                test -f "$DROPBEAR_ECDSAKEY" && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_ECDSAKEY"
+                ;;
+            ed25519)
+                test -f "$DROPBEAR_ED25519KEY" && KEY_ARGS="$KEY_ARGS -r $DROPBEAR_ED25519KEY"
+                ;;
+            *)
+                echo "Key type '$keytype' not supported"
+                ;;
+        esac
+    done
 
     echo -n "starting dropbear..."
 

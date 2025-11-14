@@ -14,11 +14,11 @@ PACKAGES-$(PTXCONF_LIBCONFUSE) += libconfuse
 #
 # Paths and names
 #
-LIBCONFUSE_VERSION	:= 3.0
-LIBCONFUSE_MD5		:= bf03099ef213647451c70e54ad4b6e81
+LIBCONFUSE_VERSION	:= 3.3
+LIBCONFUSE_MD5		:= a183cef2cecdd3783436ff8de500d274
 LIBCONFUSE		:= confuse-$(LIBCONFUSE_VERSION)
-LIBCONFUSE_SUFFIX	:= tar.gz
-LIBCONFUSE_URL		:= https://github.com/martinh/libconfuse/releases/download/v$(LIBCONFUSE_VERSION)/$(LIBCONFUSE).$(LIBCONFUSE_SUFFIX)
+LIBCONFUSE_SUFFIX	:= tar.xz
+LIBCONFUSE_URL		:= https://github.com/libconfuse/libconfuse/releases/download/v$(LIBCONFUSE_VERSION)/$(LIBCONFUSE).$(LIBCONFUSE_SUFFIX)
 LIBCONFUSE_SOURCE	:= $(SRCDIR)/$(LIBCONFUSE).$(LIBCONFUSE_SUFFIX)
 LIBCONFUSE_DIR		:= $(BUILDDIR)/$(LIBCONFUSE)
 LIBCONFUSE_LICENSE	:= ISC
@@ -27,21 +27,19 @@ LIBCONFUSE_LICENSE	:= ISC
 # Prepare
 # ----------------------------------------------------------------------------
 
-LIBCONFUSE_PATH	:= PATH=$(CROSS_PATH)
-LIBCONFUSE_ENV 	:= $(CROSS_ENV)
-
 #
 # autoconf
 #
-LIBCONFUSE_AUTOCONF := \
+LIBCONFUSE_CONF_TOOL	:= autoconf
+LIBCONFUSE_CONF_OPT	:= \
 	$(CROSS_AUTOCONF_USR) \
 	--disable-examples \
 	--disable-nls
 
 ifdef PTXCONF_LIBCONFUSE_STATIC
-LIBCONFUSE_AUTOCONF += --enable-shared=no
+LIBCONFUSE_CONF_OPT += --enable-shared=no
 else
-LIBCONFUSE_AUTOCONF += --enable-shared
+LIBCONFUSE_CONF_OPT += --enable-shared
 endif
 
 # ----------------------------------------------------------------------------

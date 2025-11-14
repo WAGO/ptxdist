@@ -29,6 +29,8 @@ WIRELESS_LICENSE	:= GPL-2.0-only
 # Prepare
 # ----------------------------------------------------------------------------
 
+WIRELESS_CONF_TOOL	:= NO
+
 $(STATEDIR)/wireless.prepare:
 	@$(call targetinfo)
 ifdef PTXCONF_WIRELESS_SHARED
@@ -42,10 +44,7 @@ endif
 # Compile
 # ----------------------------------------------------------------------------
 
-WIRELESS_PATH	:= PATH=$(CROSS_PATH)
-WIRELESS_ENV 	:= $(CROSS_ENV)
-
-WIRELESS_MAKEVARS := \
+WIRELESS_MAKE_OPT	:= \
 	$(CROSS_ENV_CC) \
 	PREFIX=/usr
 
@@ -53,10 +52,9 @@ WIRELESS_MAKEVARS := \
 # Install
 # ----------------------------------------------------------------------------
 
-$(STATEDIR)/wireless.install:
-	@$(call targetinfo)
-	@$(call install, WIRELESS,,install-hdr)
-	@$(call touch)
+WIRELESS_INSTALL_OPT := \
+	PREFIX=/usr \
+	install
 
 # ----------------------------------------------------------------------------
 # Target-Install

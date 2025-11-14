@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_USBUTILS) += usbutils
 #
 # Paths and names
 #
-USBUTILS_VERSION	:= 007
-USBUTILS_MD5		:= c9df5107ae9d26b10a1736a261250139
+USBUTILS_VERSION	:= 018
+USBUTILS_MD5		:= 0a351e2241c50a1f026a455dccf24d73
 USBUTILS		:= usbutils-$(USBUTILS_VERSION)
 USBUTILS_SUFFIX		:= tar.xz
 USBUTILS_URL		:= $(call ptx/mirror, KERNEL, utils/usb/usbutils/$(USBUTILS).$(USBUTILS_SUFFIX))
@@ -28,17 +28,12 @@ USBUTILS_LICENSE	:= GPL-2.0-only
 # Prepare
 # ----------------------------------------------------------------------------
 
-USBUTILS_PATH	:= PATH=$(CROSS_PATH)
-USBUTILS_ENV 	:= $(CROSS_ENV)
-
 #
-# autoconf
+# meson
 #
-USBUTILS_AUTOCONF := \
-	$(CROSS_AUTOCONF_USR) \
-	$(GLOBAL_LARGE_FILE_OPTION) \
-	--disable-zlib \
-	--enable-usbids
+USBUTILS_CONF_TOOL	:= meson
+USBUTILS_CONF_OPT	:= \
+	$(CROSS_MESON_USR)
 
 # ----------------------------------------------------------------------------
 # Target-Install
@@ -62,7 +57,6 @@ endif
 ifdef PTXCONF_USBUTILS_USBDEVICES
 	@$(call install_copy, usbutils, 0, 0, 0755, -, /usr/bin/usb-devices)
 endif
-	@$(call install_copy, usbutils, 0, 0, 0644, -, /usr/share/usb.ids,n)
 
 	@$(call install_finish, usbutils)
 

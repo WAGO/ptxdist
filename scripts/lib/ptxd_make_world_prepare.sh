@@ -61,14 +61,13 @@ EOF
     elif [ \( "${pkg_conf_tool}" = "qmake" -o "${pkg_conf_tool}" = "perl" \) -a "${pkg_type}" != "target" ]; then
 	cat >&2 <<EOF
 
-error: only ${pkg_conf_tool} taget packages are supported
+error: only ${pkg_conf_tool} target packages are supported
 
 EOF
 	exit 1
     fi
 }
 export -f ptxd_make_world_prepare_sanity_check
-
 
 #
 # prepare for cmake based pkgs
@@ -81,7 +80,8 @@ ptxd_make_world_prepare_cmake() {
 	"${pkg_conf_env}" \
 	cmake \
 	"${pkg_conf_opt}" \
-	"${pkg_conf_dir}"
+	"${pkg_conf_dir}" &&
+    ptxd_make_world_compile_commands_filter
 }
 export -f ptxd_make_world_prepare_cmake
 
@@ -149,11 +149,37 @@ ptxd_make_world_prepare_meson() {
 	"${pkg_path}" \
 	"${pkg_env}" \
 	"${pkg_conf_env}" \
-	meson \
+	meson setup \
 	"${pkg_conf_opt}" \
-	"${pkg_conf_dir}"
+	"${pkg_conf_dir}" &&
+    ptxd_make_world_compile_commands_filter
 }
 export -f ptxd_make_world_prepare_meson
+
+#
+# prepare for cargo based pkgs
+#
+ptxd_make_world_prepare_cargo_check() {
+    local arg cargo_lock_md5
+    local -a tmp
+    local pkg_makefile_cargo="${pkg_makefile%.make}.cargo.make"
+
+    if [ -z "${pkg_cargo_lock}" ]; then
+	return
+    fi
+
+    if [ -z "${pkg_cargo_lock_md5}" ]; then
+	ptxd_bailout "Cargo dependency config is missing!" \
+	    "Run 'ptxdist cargosync ${pkg_label}' to generate '$(ptxd_print_path ${pkg_makefile_cargo})'."
+    fi
+    tmp=( $(cd "${pkg_dir}" && md5sum "${pkg_cargo_lock}" 2> /dev/null) )
+    if [ "${tmp[0]}" != "${pkg_cargo_lock_md5}" ]; then
+	echo "|${tmp[0]}|${pkg_cargo_lock_md5}|"
+	ptxd_bailout "${pkg_cargo_lock} has changed!" \
+	    "Run 'ptxdist cargosync ${pkg_label}' to regenerate '$(ptxd_print_path ${pkg_makefile_cargo})'."
+    fi
+}
+export -f ptxd_make_world_prepare_cargo_check
 
 ptxd_make_world_prepare_init() {
     # delete existing build_dir
@@ -181,7 +207,8 @@ ptxd_make_world_prepare() {
 	return
     fi
 
-    ptxd_make_world_prepare_init || return
+    ptxd_make_world_prepare_init &&
+    ptxd_make_world_prepare_cargo_check|| return
 
     case "${pkg_conf_tool}" in
 	cmake|meson)
@@ -190,8 +217,8 @@ ptxd_make_world_prepare() {
 	    fi
 	    ;;
 	qmake)
-	    if ! [[ " ${pkg_build_deps} " =~ ' 'qt[45]' ' ]]; then
-		ptxd_bailout "'${pkg_label}' uses 'qmake' but does not select 'qt4' or 'qt5'"
+	    if ! [[ " ${pkg_build_deps} " =~ ' 'qt[56]' ' ]]; then
+		ptxd_bailout "'${pkg_label}' uses 'qmake' but does not select 'qt5' or 'qt6'"
 	    fi
 	    ;;
 	perl)
@@ -215,7 +242,7 @@ ptxd_make_world_prepare() {
 	autoconf|cmake|qmake|kconfig|perl|meson)
 	    cd -- "${pkg_build_dir}" &&
 	    ptxd_make_world_prepare_"${pkg_conf_tool}" ;;
-	python|python3|scons)
+	python|python3|scons|cargo)
 	    : ;; # nothing to do
 	"NO") echo "prepare stage disabled." ;;
 	"")   echo "No prepare tool found. Do nothing." ;;

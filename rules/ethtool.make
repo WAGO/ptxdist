@@ -15,8 +15,8 @@ PACKAGES-$(PTXCONF_ETHTOOL) += ethtool
 #
 # Paths and names
 #
-ETHTOOL_VERSION	:= 5.7
-ETHTOOL_MD5	:= 3293642e58a205a834cbe5754df9c832
+ETHTOOL_VERSION	:= 6.11
+ETHTOOL_MD5	:= 0b901e0e7522082ccec13126c5ba3651
 ETHTOOL_SUFFIX	:= tar.xz
 ETHTOOL		:= ethtool-$(ETHTOOL_VERSION)
 ETHTOOL_URL	:= $(call ptx/mirror, KERNEL, ../software/network/ethtool/$(ETHTOOL).$(ETHTOOL_SUFFIX))
@@ -33,7 +33,13 @@ ETHTOOL_LICENSE_FILES	:= \
 ETHTOOL_CONF_TOOL := autoconf
 ETHTOOL_CONF_OPT  := \
 	$(CROSS_AUTOCONF_USR) \
-	--enable-pretty-dump
+	--enable-pretty-dump \
+	--enable-netlink
+
+ifdef PTXCONF_KERNEL_HEADER
+ETHTOOL_CPPFLAGS  := \
+	-isystem $(KERNEL_HEADERS_INCLUDE_DIR)
+endif
 
 # ----------------------------------------------------------------------------
 # Target-Install
